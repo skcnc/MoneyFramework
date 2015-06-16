@@ -188,7 +188,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="PreTradeModule\PreTradeModule.cs" />
+    <Compile Include="Queues\queue_prd_trade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Test\TestClass.cs" />
+    <Compile Include="TradeModule\StockTradeThread.cs" />
+    <Compile Include="Variables Type\CONFIG.cs" />
+    <Compile Include="Variables Type\ListType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />

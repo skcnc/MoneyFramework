@@ -23,6 +23,9 @@ namespace Stork_Future_TaoLi
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AuthConfig.RegisterAuth();
+
+            //模块初始化工作
+
         }
     }
 }
