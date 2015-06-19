@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TraderBassClass", "TraderBassClass\TraderBassClass.vcxproj", "{46DB467F-A40C-43BD-B925-6B6BDEE3F26D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46DB467F-A40C-43BD-B925-6B6BDEE3F26D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{46DB467F-A40C-43BD-B925-6B6BDEE3F26D}.Debug|Win32.Build.0 = Debug|Win32
+		{46DB467F-A40C-43BD-B925-6B6BDEE3F26D}.Release|Win32.ActiveCfg = Release|Win32
+		{46DB467F-A40C-43BD-B925-6B6BDEE3F26D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

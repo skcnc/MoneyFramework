@@ -1,0 +1,6 @@
+E:\Project\NET\MoneyFramework\CSharp_Use_CPP\bin\Release\CSharp_Use_CPP.exe.config
+E:\Project\NET\MoneyFramework\CSharp_Use_CPP\bin\Release\CSharp_Use_CPP.exe
+E:\Project\NET\MoneyFramework\CSharp_Use_CPP\bin\Release\CSharp_Use_CPP.pdb
+E:\Project\NET\MoneyFramework\CSharp_Use_CPP\obj\Release\CSharp_Use_CPP.csprojResolveAssemblyReference.cache
+E:\Project\NET\MoneyFramework\CSharp_Use_CPP\obj\Release\CSharp_Use_CPP.exe
+E:\Project\NET\MoneyFramework\CSharp_Use_CPP\obj\Release\CSharp_Use_CPP.pdb
