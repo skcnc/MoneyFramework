@@ -12,7 +12,7 @@ public:
 
 
 public:
-	bool init(Logininfor mylogininfor,char * Errormsg);  //加载参数,登陆
+	bool init(Logininfor mylogininfor,char* Errormsg);  //加载参数,登陆
 	bool trader(Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust,char * Errormsg);      //单个证券交易,myEntrust引用返回委托编号
 	bool Batchstocktrader(Traderorderstruct * mytraderoder,int nSize,QueryEntrustorderstruct * myEntrust,int &num,char * Errormsg); //多个证券交易,myEntrust引用返回委托编号
 	bool canceltrader( QueryEntrustorderstruct myEntrust,char * Errormsg);      //撤单 

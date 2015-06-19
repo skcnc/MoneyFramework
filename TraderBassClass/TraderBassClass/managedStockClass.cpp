@@ -2,6 +2,7 @@
 
 #include "managedTradeClass.h"
 
+
 using namespace MCStockLib;
 
 managedStockClass::managedStockClass(void)
@@ -15,17 +16,19 @@ managedStockClass::~managedStockClass(void)
 }
 
 //初始化连接
-bool managedStockClass::Init(Logininfor mylogininfor,char * Errormsg)
+bool managedStockClass::Init(managedLogin^ mylogininfor,System::String^ Errormsg)
 {
 	Logininfor info ;
 	
+	info = mylogininfor->createInstance();
 
 	bool rt_value = false;
 
-	rt_value = m_cstockTrader->init(info,Errormsg);
+	//rt_value = m_cstockTrader->init(info,Errormsg);
 
 	return rt_value;
 }
+
 
 //单笔交易
 bool managedStockClass::SingleTrade(Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust,char * Errormsg)

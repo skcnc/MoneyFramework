@@ -77,17 +77,21 @@ namespace CSharp_Use_CPP
 
             MCStockLib.managedStockClass stockLib = new MCStockLib.managedStockClass();
 
-            Logininfor login;
-            
-            
-            //stockLib.Init(
+            MCStockLib.managedLogin info = new MCStockLib.managedLogin("172.0.0.1", 80, "abc", "abc", "abc", "abc");
+
+            string err = "false";
+            stockLib.Init(info, err);
+
+            Console.WriteLine();
+
+            Console.ReadLine();
+          
 
 
 
 
         }
-        
 
-
+       
     }
 }

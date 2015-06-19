@@ -1,5 +1,7 @@
 #include "Stdafx.h"
-#include "TraderBassClass.h"
+
+#include "managedDataStruct.h"
+
 #pragma once
 
 #using <mscorlib.dll>
@@ -14,11 +16,12 @@ namespace MCStockLib
 		managedStockClass(void);
 		virtual ~managedStockClass(void);
 
-		bool Init(Logininfor mylogininfor,char * Errormsg);
+		bool Init(managedLogin^ mylogininfor,String^ Errormsg);
 		bool SingleTrade(Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust,char * Errormsg);
 		bool BatchTrade(Traderorderstruct * mytraderoder,int nSize,QueryEntrustorderstruct * myEntrust,int &num,char * Errormsg); 
 		bool getConnectStatus();
 		bool getWorkStatus();
+
 
 	private:
 		CStockTrader* m_cstockTrader;
