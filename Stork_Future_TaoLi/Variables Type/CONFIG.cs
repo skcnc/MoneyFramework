@@ -50,7 +50,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// </summary>
         /// <param name="STOCK_TRADE_THREAD_NUM">股票交易最大线程数</param>
         /// <param name="FUTURE_TRADE_THREAD_NUM">期货交易最大线程数</param>
-        public void InitConfig(CONFIG_PARA para)
+        public static void InitConfig(CONFIG_PARA para)
         {
             stock_trade_thread_num = para.STOCK_TRADE_THREAD_NUM;
             future_trade_thread_num = para.FUTURE_TRADE_THREAD_NUM;

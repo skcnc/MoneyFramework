@@ -86,7 +86,7 @@ namespace Stork_Future_TaoLi.Variables_Type
     /// </summary>
     public static class ExhcnageID
     {
-        public static string SH { get{return "0"}}
-        public static string SZ { get{return "1"}}
+        public static string SH { get { return "0"; } }
+        public static string SZ { get { return "1"; } }
     }
 }
