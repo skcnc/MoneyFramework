@@ -68,3 +68,8 @@ bool managedStockClass::getWorkStatus()
 {
 	return m_cstockTrader->getworkstate();
 }
+
+int managedStockClass::cal(int i, int j)
+{
+	return m_cstockTrader->cal(i, j);
+}

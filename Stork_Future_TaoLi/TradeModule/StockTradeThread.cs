@@ -40,7 +40,7 @@ namespace Stork_Future_TaoLi.TradeModule
                 TradeParaPackage tpp = new TradeParaPackage();
                 tpp._threadNo = (i + 1);
                 object para = (object)tpp;
-                TradeThreads[i] = Task.Factory.StartNew(() => StockTradeSubThreadProc(para));
+                TradeThreads.Add(Task.Factory.StartNew(() => StockTradeSubThreadProc(para)));
             }
 
             //此时按照配置，共初始化CONFIG.STOCK_TRADE_THREAD_NUM 数量交易线程

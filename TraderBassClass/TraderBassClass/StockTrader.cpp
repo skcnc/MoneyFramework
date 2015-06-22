@@ -750,3 +750,13 @@ int CStockTrader::getExchangeNumByStockCode(int stkCode){
 	}
 	return EXCHANGE_SH;
 }
+
+int CStockTrader::cal(int i, int j)
+{
+	for (int i = 0; i < 1000000000; i++)
+	{
+
+	}
+
+	return i + j;
+}

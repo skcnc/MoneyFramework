@@ -21,6 +21,7 @@ namespace MCStockLib
 		bool BatchTrade(Traderorderstruct * mytraderoder,int nSize,QueryEntrustorderstruct * myEntrust,int &num,char * Errormsg); 
 		bool getConnectStatus();
 		bool getWorkStatus();
+		int cal(int i, int j);
 
 
 	private:

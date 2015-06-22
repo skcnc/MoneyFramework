@@ -91,3 +91,4 @@ E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.pd
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.csprojResolveAssemblyReference.cache
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\StockTradeApi.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\StockTradeApi.pdb
+D:\projects\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.csprojResolveAssemblyReference.cache

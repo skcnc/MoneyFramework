@@ -75,20 +75,58 @@ namespace CSharp_Use_CPP
             #endregion
 
 
-            MCStockLib.managedStockClass stockLib = new MCStockLib.managedStockClass();
+            int threadNum = 2;
+            List<Task> TradeThreads = new List<Task>();
 
-            MCStockLib.managedLogin info = new MCStockLib.managedLogin("172.0.0.1", 80, "abc", "abc", "abc", "abc");
+            Console.WriteLine("测试开始");
 
-            string err = "false";
-            stockLib.Init(info, err);
+            for (int i = 0; i < threadNum; i++)
+            {
+                TradeThreads.Add(Task.Factory.StartNew(() => ThreadProc((object)i)));
+                Thread.Sleep(3000);
+            }
 
-            Console.WriteLine();
+
+            //MCStockLib.managedStockClass stockLib = new MCStockLib.managedStockClass();
+
+            //MCStockLib.managedLogin info = new MCStockLib.managedLogin("172.0.0.1", 80, "abc", "abc", "abc", "abc");
+
+            //string err = "false";
+            //stockLib.Init(info, err);
+
+            //Console.WriteLine();
 
             Console.ReadLine();
           
 
 
 
+
+        }
+
+
+        static void ThreadProc(object iNo)
+        {
+            int _threadNo = (int)iNo;
+            Console.WriteLine("线程" + iNo + ":  " + "启动完成！");
+            Thread.Sleep(3000);
+
+            MCStockLib.managedStockClass stockLib = new MCStockLib.managedStockClass();
+
+            MCStockLib.managedLogin info = new MCStockLib.managedLogin("172.0.0.1", 80, "abc", "abc", "abc", "abc");
+
+            while(true)
+            {
+                Random ra = new Random();
+                int i = ra.Next(15, 100) - _threadNo;
+                int j = ra.Next(15, 100) - _threadNo;
+                Console.WriteLine("线程" + iNo + ":  " + i + "+" + j + "=");
+
+                int k = stockLib.cal(i, j);
+
+                Console.WriteLine("线程" + iNo + ":  " + i + "+" + j + "=" + k);
+
+            }
 
         }
 
