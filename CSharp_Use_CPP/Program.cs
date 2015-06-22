@@ -87,6 +87,8 @@ namespace CSharp_Use_CPP
             }
 
 
+
+
             //MCStockLib.managedStockClass stockLib = new MCStockLib.managedStockClass();
 
             //MCStockLib.managedLogin info = new MCStockLib.managedLogin("172.0.0.1", 80, "abc", "abc", "abc", "abc");
@@ -115,6 +117,7 @@ namespace CSharp_Use_CPP
 
             MCStockLib.managedLogin info = new MCStockLib.managedLogin("172.0.0.1", 80, "abc", "abc", "abc", "abc");
 
+                       
             while(true)
             {
                 Random ra = new Random();
@@ -122,7 +125,7 @@ namespace CSharp_Use_CPP
                 int j = ra.Next(15, 100) - _threadNo;
                 Console.WriteLine("线程" + iNo + ":  " + i + "+" + j + "=");
 
-                int k = stockLib.cal(i, j);
+                
 
                 Console.WriteLine("线程" + iNo + ":  " + i + "+" + j + "=" + k);
 

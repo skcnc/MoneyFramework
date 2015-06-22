@@ -9,6 +9,22 @@ Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e0
 	hash=None, flags=None
 Assembly System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
 	hash=None, flags=None
+Class MCStockLib.managedTraderorderstruct: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(System.String, System.String, System.String, Int32, Double, SByte, SByte, SByte, SByte, SByte, SByte): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    SByte* cExchangeID : Public
+    SByte* cSecurity_code : Public
+    SByte* security_name : Public
+    Int32 nSecurity_amount IsLong : Public
+    Double dOrderprice : Public
+    SByte cTraderdirection IsSignUnspecifiedByte : Public
+    SByte cOffsetFlag IsSignUnspecifiedByte : Public
+    SByte cOrderPriceType IsSignUnspecifiedByte : Public
+    SByte cSecuritytype IsSignUnspecifiedByte : Public
+    SByte cOrderlevel IsSignUnspecifiedByte : Public
+    SByte cOrderexecutedetail IsSignUnspecifiedByte : Public
+  Methods:
+    createInstance(Traderorderstruct*): PrivateScope, Public, HideBySig
 Class MCStockLib.managedLogin: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
     Void .ctor(System.String, Int32, System.String, System.String, System.String, System.String): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Fields:
@@ -26,9 +42,9 @@ Class MCStockLib.managedStockClass: AutoLayout, AnsiClass, Class, Public, Before
     System.IDisposable
   Methods:
     Init(managedLogin, String): PrivateScope, Public, HideBySig
-    SingleTrade(Traderorderstruct, QueryEntrustorderstruct* IsImplicitlyDereferenced, SByte*): PrivateScope, Public, HideBySig
-    BatchTrade(Traderorderstruct*, Int32, QueryEntrustorderstruct*, Int32* IsImplicitlyDereferenced, SByte*): PrivateScope, Public, HideBySig
+    SingleTrade(managedTraderorderstruct IsByValue, QueryEntrustorderstruct* IsImplicitlyDereferenced, SByte*): PrivateScope, Public, HideBySig
+    BatchTrade(managedTraderorderstruct[], Int32, QueryEntrustorderstruct*, Int32* IsImplicitlyDereferenced, SByte*): PrivateScope, Public, HideBySig
     getConnectStatus(): PrivateScope, Public, HideBySig
     getWorkStatus(): PrivateScope, Public, HideBySig
-    cal(Int32, Int32): PrivateScope, Public, HideBySig
+    cal(Int32, Int32, Traderorderstruct* IsConst IsConst): PrivateScope, Public, HideBySig
     Dispose(): PrivateScope, Public, Final, Virtual, HideBySig

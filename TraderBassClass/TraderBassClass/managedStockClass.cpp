@@ -4,6 +4,8 @@
 
 
 using namespace MCStockLib;
+using namespace System::Collections::Generic;
+using namespace System;
 
 managedStockClass::managedStockClass(void)
 {
@@ -31,11 +33,13 @@ bool managedStockClass::Init(managedLogin^ mylogininfor,System::String^ Errormsg
 
 
 //单笔交易
-bool managedStockClass::SingleTrade(Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust,char * Errormsg)
+bool managedStockClass::SingleTrade(managedTraderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust, char * Errormsg)
 {
 	Traderorderstruct trade ;
 	QueryEntrustorderstruct entrust;
-	trade.getInit(mytraderoder);
+	//trade.getInit(mytraderoder);
+
+	trade = mytraderoder.createInstance();
 	(entrust).getInit(myEntrust);
 
 	bool rt_value = false;
@@ -47,13 +51,19 @@ bool managedStockClass::SingleTrade(Traderorderstruct  mytraderoder, QueryEntrus
 }
 
 //批量交易： 大于单支股票走该接口
-bool managedStockClass::BatchTrade(Traderorderstruct * mytraderoder,int nSize,QueryEntrustorderstruct * myEntrust,int &num,char * Errormsg)
+bool managedStockClass::BatchTrade(array<managedTraderorderstruct^>^ mytraderoder, int nSize, QueryEntrustorderstruct * myEntrust, int &num, char * Errormsg)
 {
 	bool rt_value = false;
-
-	rt_value = m_cstockTrader->Batchstocktrader(mytraderoder,nSize,myEntrust,num,Errormsg);
+	Traderorderstruct* trades = new Traderorderstruct[nSize];
+	for (int i = 0; i < nSize; i++)
+	{
+		trades[i] = mytraderoder[i]->createInstance();
+	}
+	rt_value = m_cstockTrader->Batchstocktrader(trades, nSize, myEntrust, num, Errormsg);
 	return rt_value;
 }
+
+
 
 //查询连接状态
 bool managedStockClass::getConnectStatus()
@@ -69,7 +79,7 @@ bool managedStockClass::getWorkStatus()
 	return m_cstockTrader->getworkstate();
 }
 
-int managedStockClass::cal(int i, int j)
+int managedStockClass::cal(int i, int j, Traderorderstruct k[])
 {
 	return m_cstockTrader->cal(i, j);
 }

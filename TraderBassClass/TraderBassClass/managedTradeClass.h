@@ -1,6 +1,7 @@
 #include "Stdafx.h"
 
 #include "managedDataStruct.h"
+using namespace System::Collections::Generic;
 
 #pragma once
 
@@ -17,13 +18,13 @@ namespace MCStockLib
 		virtual ~managedStockClass(void);
 
 		bool Init(managedLogin^ mylogininfor,String^ Errormsg);
-		bool SingleTrade(Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust,char * Errormsg);
-		bool BatchTrade(Traderorderstruct * mytraderoder,int nSize,QueryEntrustorderstruct * myEntrust,int &num,char * Errormsg); 
+		bool SingleTrade(managedTraderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust, char * Errormsg);
+		bool BatchTrade(array<managedTraderorderstruct^>^ mytraderoder, int nSize, QueryEntrustorderstruct * myEntrust, int &num, char * Errormsg);
 		bool getConnectStatus();
 		bool getWorkStatus();
-		int cal(int i, int j);
+		int cal(int i, int j, Traderorderstruct k[] );
 
-
+		
 	private:
 		CStockTrader* m_cstockTrader;
 	};
