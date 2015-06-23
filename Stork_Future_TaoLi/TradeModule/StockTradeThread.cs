@@ -7,11 +7,16 @@ using System.Threading.Tasks;
 using Stork_Future_TaoLi.Variables_Type;
 using Stork_Future_TaoLi.Queues;
 using Stork_Future_TaoLi.Modulars;
+using MCStockLib;
+using Stork_Future_TaoLi.Test;
 
 namespace Stork_Future_TaoLi.TradeModule
 {
     public class StockTradeThread
     {
+        private static LogWirter log = new LogWirter();
+        private static LogWirter sublog = new LogWirter();
+
         public static void Main()
         {
             //股票交易主控线程名设定
@@ -26,6 +31,15 @@ namespace Stork_Future_TaoLi.TradeModule
             //启动主线程
             StockTradeControl.Start();
 
+            //日志初始化
+            log.EventSourceName = "交易线程控制模块";
+            log.EventLogType = System.Diagnostics.EventLogEntryType.Information;
+            log.EventLogID = 62302;
+
+            sublog.EventSourceName = "交易线程模块";
+            sublog.EventLogType = System.Diagnostics.EventLogEntryType.Information;
+            sublog.EventLogID = 62303;
+
         }
 
         private static void ThreadProc()
@@ -33,12 +47,14 @@ namespace Stork_Future_TaoLi.TradeModule
             //初始化子线程
             int stockNum = CONFIG.STOCK_TRADE_THREAD_NUM;
 
+
             List<Task> TradeThreads = new List<Task>();
 
+            log.LogEvent("交易控制子线程启动： 初始化交易线程数 :" + stockNum.ToString());
             for (int i = 0; i < stockNum; i++)
             {
                 TradeParaPackage tpp = new TradeParaPackage();
-                tpp._threadNo = (i + 1);
+                tpp._threadNo = (i);
                 object para = (object)tpp;
                 TradeThreads.Add(Task.Factory.StartNew(() => StockTradeSubThreadProc(para)));
             }
@@ -56,18 +72,31 @@ namespace Stork_Future_TaoLi.TradeModule
             //  4. 记录每个交易线程目前处理的交易内容，并写入数据库
             while (true)
             {
-                
-                Thread.Sleep(1000);
 
                 //获取下一笔交易
                 List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
-                if (queue_prdTrade_SH_tradeMonitor.GetQueue().Count > 0)
+                if (QUEUE_SH_TRADE.GetQueueNumber() > 0)
                 {
-                    next_trade = (List<TradeOrderStruct>)queue_prdTrade_SH_tradeMonitor.GetQueue().Dequeue();
+                    lock (QUEUE_SH_TRADE.GetQueue().SyncRoot)
+                    {
+                        if (QUEUE_SH_TRADE.GetQueue().Count > 0)
+                        {
+                            next_trade = (List<TradeOrderStruct>)QUEUE_SH_TRADE.GetQueue().Dequeue();
+                        }
+                        log.LogEvent("上海交易所出队交易数量：" + next_trade.Count.ToString());
+                    }
                 }
-                else if (queue_prdTrade_SZ_tradeMonitor.GetQueue().Count > 0)
+                else if (QUEUE_SZ_TRADE.GetQueueNumber() > 0)
                 {
-                    next_trade = (List<TradeOrderStruct>)queue_prdTrade_SZ_tradeMonitor.GetQueue().Dequeue();
+                    lock (QUEUE_SZ_TRADE.GetQueue().SyncRoot)
+                    {
+                        if (QUEUE_SZ_TRADE.GetQueue().Count > 0)
+                        {
+                            next_trade = (List<TradeOrderStruct>)QUEUE_SZ_TRADE.GetQueue().Dequeue();
+                        }
+
+                        log.LogEvent("深圳交易所出队交易数量：" + next_trade.Count.ToString());
+                    }
                 }
 
                 if (next_trade.Count == 0)
@@ -90,7 +119,7 @@ namespace Stork_Future_TaoLi.TradeModule
                         _bSearch = false;
                     }
                 }
-
+                log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + next_trade.Count);
                 //选择第 _tNo 个线程执行交易
                 queue_stock_excuteThread.GetQueue(_tNo).Enqueue((object)next_trade);
 
@@ -116,27 +145,37 @@ namespace Stork_Future_TaoLi.TradeModule
         /// </summary>
         private static void StockTradeSubThreadProc(object para)
         {
-            Stork_Future_TaoLi.Test.StockTradeTest _stockTradeAPI = new Test.StockTradeTest();
+
+            /*********************************************
+             * 测试数据
+             * ******************************************/
+            MCStockLib.managedStockClass _classTradeStock = new managedStockClass();
+            MCStockLib.managedLogin login = new managedLogin(CommConfig.Stock_ServerAddr, CommConfig.Stock_Port, CommConfig.Stock_Account, CommConfig.Stock_BrokerID, CommConfig.Stock_Password, CommConfig.Stock_InvestorID);
+            string ErrorMsg = string.Empty;
+
+
             TradeParaPackage _tpp = (TradeParaPackage)para;
 
             //当前线程编号
             int _threadNo = _tpp._threadNo;
 
+            sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 开始执行");
             //用作发送心跳包的时间标记
             DateTime _markedTime = DateTime.Now;
-            
+
             //初始化通信
             //功能1
-            _stockTradeAPI.init();
+            _classTradeStock.Init(login, ErrorMsg);
 
             while (true)
             {
-                
+
                 if (_markedTime.Minute != DateTime.Now.Minute)
                 {
                     //发送心跳包
                     //功能2
-                    _stockTradeAPI.heartBeat();
+                    //_stockTradeAPI.heartBeat();
+                    _classTradeStock.HeartBeat();
                 }
 
                 if (queue_stock_excuteThread.GetQueue(_threadNo).Count > 0)
@@ -151,13 +190,16 @@ namespace Stork_Future_TaoLi.TradeModule
 
                 if (queue_stock_excuteThread.GetQueue(_threadNo).Count > 0)
                 {
-                    
+
 
                     List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_stock_excuteThread.StockExcuteQueues[_threadNo].Dequeue();
 
-                    if (!_stockTradeAPI.getconnectstate())
+                    sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 执行交易数量 ： " + trades.Count);
+
+
+                    if (!_classTradeStock.getConnectStatus())
                     {
-                        _stockTradeAPI.init();
+                        _classTradeStock.Init(login, ErrorMsg);
                     }
 
                     //根据消息队列中发来的消息数量判断调用的接口
@@ -165,15 +207,31 @@ namespace Stork_Future_TaoLi.TradeModule
                     //当内容等于1， 调用单笔接口
                     queue_stock_excuteThread.SetUpdateTime(_threadNo);
 
+
                     if (trades.Count > 1)
                     {
                         //trades
-                        _stockTradeAPI.Batchstocktrader();
+                        Random seed = new Random();
+                        if (CONFIG.IsDebugging())
+                        {
+                            sublog.LogEvent("线程 ：" + _threadNo.ToString() + "进入执行环节 ， 忙碌状态： " + queue_stock_excuteThread.GetThreadIsAvailiable(_threadNo));
+                            Thread.Sleep(seed.Next(2000, 5000));
+                        }
+                        else
+                        {
+                            //_classTradeStock.BatchTrade(null, 0, null, 0, null);
+                        }
                     }
                     else if (trades.Count == 1)
                     {
                         //trades
-                        _stockTradeAPI.trader();
+                        Random seed = new Random();
+                        if (CONFIG.IsDebugging())
+                            Thread.Sleep(seed.Next(2000, 5000));
+                        else
+                        {
+                            //_classTradeStock.SingleTrade();
+                        }
                     }
 
                     //*********************************
@@ -186,7 +244,6 @@ namespace Stork_Future_TaoLi.TradeModule
         }
 
 
-        
 
     }
 

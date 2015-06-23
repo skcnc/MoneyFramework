@@ -51,7 +51,7 @@ namespace Stork_Future_TaoLi.Modulars
     /// <summary>
     /// 交易预处理模块与上海交易所股票交易线程控制模块的消息队列
     /// </summary>
-    public class queue_prdTrade_SH_tradeMonitor
+    public class QUEUE_SH_TRADE
     {
         private static Queue instance;
 
@@ -87,12 +87,13 @@ namespace Stork_Future_TaoLi.Modulars
                 return -1;
             }
         }
+
     }
 
     /// <summary>
     /// 交易预处理模块与上海交易所股票交易线程控制模块的消息队列
     /// </summary>
-    public class queue_prdTrade_SZ_tradeMonitor
+    public class QUEUE_SZ_TRADE
     {
         private static Queue instance;
 

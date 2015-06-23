@@ -8,7 +8,7 @@ namespace Stork_Future_TaoLi.Variables_Type
     /// <summary>
     /// 登陆信息
     /// </summary>
-    public class LoginInfo
+    public struct LoginInfo
     {
         //地址
         public string serverAddr { get; set; }
@@ -22,22 +22,12 @@ namespace Stork_Future_TaoLi.Variables_Type
         public string INVESTOR_ID { get; set; }
         //密码
         public string PASSWORD { get; set; }
-
-        LoginInfo()
-        {
-            serverAddr = string.Empty;
-            PORT = 0;
-            ZjAccount = string.Empty;
-            BROKER_ID = string.Empty;
-            PASSWORD = string.Empty;
-            INVESTOR_ID = string.Empty;
-        }
     }
 
     /// <summary>
     /// 交易报单，（买卖，申购）
     /// </summary>
-    public class TradeOrderStruct
+    public struct TradeOrderStruct
     {
         //交易部分 
 

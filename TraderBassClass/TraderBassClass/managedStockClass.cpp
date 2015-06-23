@@ -31,6 +31,10 @@ bool managedStockClass::Init(managedLogin^ mylogininfor,System::String^ Errormsg
 	return rt_value;
 }
 
+void managedStockClass::HeartBeat()
+{
+	
+}
 
 //µ¥±Ê½»Ò×
 bool managedStockClass::SingleTrade(managedTraderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust, char * Errormsg)

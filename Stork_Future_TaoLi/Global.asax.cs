@@ -6,6 +6,9 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Stork_Future_TaoLi.Test;
+using Stork_Future_TaoLi.PreTradeModule;
+using Stork_Future_TaoLi.TradeModule;
 
 namespace Stork_Future_TaoLi
 {
@@ -25,7 +28,9 @@ namespace Stork_Future_TaoLi
             AuthConfig.RegisterAuth();
 
             //模块初始化工作
-
+            ListCreate.Main();
+            PreTradeModule.PreTradeModule.getInstance().Run();
+            StockTradeThread.Main();
         }
     }
 }

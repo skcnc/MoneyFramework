@@ -22,6 +22,7 @@ namespace MCStockLib
 		bool BatchTrade(array<managedTraderorderstruct^>^ mytraderoder, int nSize, QueryEntrustorderstruct * myEntrust, int &num, char * Errormsg);
 		bool getConnectStatus();
 		bool getWorkStatus();
+		void HeartBeat();
 		int cal(int i, int j, Traderorderstruct k[] );
 
 		

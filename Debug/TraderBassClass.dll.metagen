@@ -46,5 +46,6 @@ Class MCStockLib.managedStockClass: AutoLayout, AnsiClass, Class, Public, Before
     BatchTrade(managedTraderorderstruct[], Int32, QueryEntrustorderstruct*, Int32* IsImplicitlyDereferenced, SByte*): PrivateScope, Public, HideBySig
     getConnectStatus(): PrivateScope, Public, HideBySig
     getWorkStatus(): PrivateScope, Public, HideBySig
+    HeartBeat(): PrivateScope, Public, HideBySig
     cal(Int32, Int32, Traderorderstruct* IsConst IsConst): PrivateScope, Public, HideBySig
     Dispose(): PrivateScope, Public, Final, Virtual, HideBySig

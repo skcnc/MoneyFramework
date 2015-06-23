@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Diagnostics;
 
 namespace CSharp_Use_CPP
 {
@@ -72,19 +73,19 @@ namespace CSharp_Use_CPP
             //    }
 
             //    Console.ReadLine();
-            #endregion
+           
 
 
-            int threadNum = 2;
-            List<Task> TradeThreads = new List<Task>();
+            //int threadNum = 2;
+            //List<Task> TradeThreads = new List<Task>();
 
-            Console.WriteLine("测试开始");
+            //Console.WriteLine("测试开始");
 
-            for (int i = 0; i < threadNum; i++)
-            {
-                TradeThreads.Add(Task.Factory.StartNew(() => ThreadProc((object)i)));
-                Thread.Sleep(3000);
-            }
+            //for (int i = 0; i < threadNum; i++)
+            //{
+            //    TradeThreads.Add(Task.Factory.StartNew(() => ThreadProc((object)i)));
+            //    Thread.Sleep(3000);
+            //}
 
 
 
@@ -98,40 +99,54 @@ namespace CSharp_Use_CPP
 
             //Console.WriteLine();
 
-            Console.ReadLine();
-          
+            LogWirter lw = new LogWirter();
+            lw.EventSourceName = "Cheng App ";
+            lw.EventLogType = EventLogEntryType.Information;
+
+            while (true)
+            {
+                lw.LogEvent("我的日志" + DateTime.Now.ToString());
 
 
+
+                string s = Console.ReadLine();
+                if (s == "q")
+                    break;
+            }
+
+           
+
+            #endregion
 
 
         }
 
 
-        static void ThreadProc(object iNo)
-        {
-            int _threadNo = (int)iNo;
-            Console.WriteLine("线程" + iNo + ":  " + "启动完成！");
-            Thread.Sleep(3000);
+        //static void ThreadProc(object iNo)
+        //{
+        //    int _threadNo = (int)iNo;
+        //    Console.WriteLine("线程" + iNo + ":  " + "启动完成！");
+        //    Thread.Sleep(3000);
 
-            MCStockLib.managedStockClass stockLib = new MCStockLib.managedStockClass();
+        //    MCStockLib.managedStockClass stockLib = new MCStockLib.managedStockClass();
 
-            MCStockLib.managedLogin info = new MCStockLib.managedLogin("172.0.0.1", 80, "abc", "abc", "abc", "abc");
+        //    MCStockLib.managedLogin info = new MCStockLib.managedLogin("172.0.0.1", 80, "abc", "abc", "abc", "abc");
 
                        
-            while(true)
-            {
-                Random ra = new Random();
-                int i = ra.Next(15, 100) - _threadNo;
-                int j = ra.Next(15, 100) - _threadNo;
-                Console.WriteLine("线程" + iNo + ":  " + i + "+" + j + "=");
+        //    while(true)
+        //    {
+        //        Random ra = new Random();
+        //        int i = ra.Next(15, 100) - _threadNo;
+        //        int j = ra.Next(15, 100) - _threadNo;
+        //        Console.WriteLine("线程" + iNo + ":  " + i + "+" + j + "=");
 
                 
 
-                Console.WriteLine("线程" + iNo + ":  " + i + "+" + j + "=" + k);
+        //        Console.WriteLine("线程" + iNo + ":  " + i + "+" + j + "=" + k);
 
-            }
+        //    }
 
-        }
+        //}
 
        
     }

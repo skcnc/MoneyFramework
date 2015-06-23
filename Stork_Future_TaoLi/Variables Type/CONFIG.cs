@@ -17,7 +17,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// 股票交易最大线程数
         /// </summary>
         public static int STOCK_TRADE_THREAD_NUM { get { return stock_trade_thread_num; } }
-        private static int stock_trade_thread_num = 0;
+        private static int stock_trade_thread_num = 1;
 
         /// <summary>
         /// 期货交易最大线程数
@@ -57,6 +57,54 @@ namespace Stork_Future_TaoLi.Variables_Type
             stock_trade_overtime = para.STOCK_TRADE_OVERTIME;
             future_trade_overtime = para.FUTURE_TRADE_OVERTIME;
         }
+
+        /// <summary>
+        /// 控制参数，标记当前是否为测试
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsDebugging()
+        {
+            return true;
+        }
+    }
+
+    public class CommConfig
+    {
+        /// <summary>
+        /// 股票通讯地址
+        /// </summary>
+        private static string stock_serverAddr = "127.0.0.1";
+        public static string Stock_ServerAddr { get { return stock_serverAddr; } }
+
+        /// <summary>
+        /// 股票通信端口
+        /// </summary>
+        private static int stock_port = 80;
+        public static int Stock_Port { get { return stock_port; } }
+
+        /// <summary>
+        /// 资金帐户
+        /// </summary>
+        private static string stock_account = "admin";
+        public static string Stock_Account { get { return stock_account; } }
+
+        /// <summary>
+        /// 部门编号
+        /// </summary>
+        private static string stock_broker_id = "001";
+        public static string Stock_BrokerID { get { return stock_broker_id; } }
+
+        /// <summary>
+        /// 帐户密码
+        /// </summary>
+        private static string stock_password = "000000";
+        public static string Stock_Password { get { return stock_password; } }
+
+        /// <summary>
+        /// 股票帐户
+        /// </summary>
+        private static string stock_investor_id = "test user";
+        public static string Stock_InvestorID { get { return stock_investor_id; } }
     }
 
     /// <summary>

@@ -26,9 +26,9 @@ namespace Stork_Future_TaoLi.Queues
         {
             for (int i = 0; i < CONFIG.STOCK_TRADE_THREAD_NUM; i++)
             {
-                StockExcuteQueues[i] = new Queue();
-                StockThreadIsAvailiable[i] = true;
-                StockThreadUpdateTime[i] = DateTime.Now;
+                StockExcuteQueues.Add(new Queue());
+                StockThreadIsAvailiable.Add(true);
+                StockThreadUpdateTime.Add(DateTime.Now);
             }
         }
 
@@ -86,7 +86,10 @@ namespace Stork_Future_TaoLi.Queues
         /// <param name="_threadNo"></param>
         public static void SetThreadBusy(int _threadNo)
         {
-            StockThreadIsAvailiable[_threadNo] = false;
+            lock (StockThreadIsAvailiable)
+            {
+                StockThreadIsAvailiable[_threadNo] = false;
+            }
         }
 
         /// <summary>
@@ -95,7 +98,10 @@ namespace Stork_Future_TaoLi.Queues
         /// <param name="_threadNo"></param>
         public static void SetThreadFree(int _threadNo)
         {
-            StockThreadIsAvailiable[_threadNo] = true;
+            lock (StockThreadIsAvailiable)
+            {
+                StockThreadIsAvailiable[_threadNo] = true;
+            }
         }
 
         /// <summary>

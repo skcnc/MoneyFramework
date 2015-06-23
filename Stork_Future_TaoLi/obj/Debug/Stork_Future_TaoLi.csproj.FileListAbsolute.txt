@@ -89,6 +89,6 @@ E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\zh-Hant\System.Spatial.reso
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.pdb
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.csprojResolveAssemblyReference.cache
-E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\StockTradeApi.dll
-E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\StockTradeApi.pdb
 D:\projects\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.csprojResolveAssemblyReference.cache
+E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TraderBassClass.dll
+E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TraderBassClass.pdb
