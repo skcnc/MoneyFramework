@@ -122,9 +122,33 @@ namespace Stork_Future_TaoLi.PreTradeModule
         private static void ThreadProc()
         {
             log.LogEvent("交易预处理线程开始执行");
+
+            DateTime lastHeartBeat = DateTime.Now;
+
             while (true)
             {
                 Thread.Sleep(10);
+
+                /*****************************
+                 * 生成交易List之前的例行工作
+                 * **************************/
+
+                    if (!TestClass.isRun)
+                    {
+                        log.LogEvent("线程准备停止！");
+                        break;
+                    }
+                
+
+                //发送心跳
+                if (DateTime.Now.Second % 5 == 0 && DateTime.Now.Second != lastHeartBeat.Second)
+                {
+
+                    List<TradeOrderStruct> o = new List<TradeOrderStruct>();
+                    QUEUE_SH_TRADE.GetQueue().Enqueue((object)o);
+                    lastHeartBeat = DateTime.Now;
+                }
+
                 List<TradeOrderStruct> tos = PreTradeModule.instance.DeQueue();
                 if (tos == null)
                 {
@@ -265,6 +289,8 @@ namespace Stork_Future_TaoLi.PreTradeModule
                 }
 
             }
+
+            Thread.CurrentThread.Abort();
         }
         
     }

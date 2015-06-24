@@ -14,6 +14,8 @@ namespace Stork_Future_TaoLi.Test
         {
             eventlog.WriteEntry(msg);
         }
+
+        public static bool isRun = true;
     }
 
     //public class StockTradeTest

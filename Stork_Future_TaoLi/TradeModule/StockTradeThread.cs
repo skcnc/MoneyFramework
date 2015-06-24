@@ -14,8 +14,9 @@ namespace Stork_Future_TaoLi.TradeModule
 {
     public class StockTradeThread
     {
-        private static LogWirter log = new LogWirter();
-        private static LogWirter sublog = new LogWirter();
+        private static LogWirter log = new LogWirter();  //主线程记录日志
+        private static LogWirter sublog = new LogWirter(); //子线程记录日志
+
 
         public static void Main()
         {
@@ -47,8 +48,12 @@ namespace Stork_Future_TaoLi.TradeModule
             //初始化子线程
             int stockNum = CONFIG.STOCK_TRADE_THREAD_NUM;
 
+            DateTime lastSubHeartBeat = DateTime.Now; //子线程最后发送心跳时间
+            DateTime lastHeartBeat = DateTime.Now; //本线程最后发送心跳时间
+
 
             List<Task> TradeThreads = new List<Task>();
+            bool isFree = false; //如果没有任务，则安排线程休眠
 
             log.LogEvent("交易控制子线程启动： 初始化交易线程数 :" + stockNum.ToString());
             for (int i = 0; i < stockNum; i++)
@@ -72,9 +77,28 @@ namespace Stork_Future_TaoLi.TradeModule
             //  4. 记录每个交易线程目前处理的交易内容，并写入数据库
             while (true)
             {
+                Thread.Sleep(10);
+                if ((DateTime.Now - lastHeartBeat).TotalSeconds > 10)
+                {
+                    log.LogEvent("本模块供血不足，线程即将死亡");
+                    break;
+                }
+
+                //向子线程发送存活心跳，一旦心跳停止，则子线程死亡
+                if (DateTime.Now.Second % 5 == 0 && DateTime.Now.Second != lastSubHeartBeat.Second) 
+                {
+                    for (int i = 0; i < stockNum; i++)
+                    {
+                        List<TradeOrderStruct> o = new List<TradeOrderStruct>();
+                        queue_stock_excuteThread.GetQueue(i).Enqueue((object)o);
+
+                    }
+                    lastSubHeartBeat = DateTime.Now;
+                }
 
                 //获取下一笔交易
                 List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
+                bool b_get = false;
                 if (QUEUE_SH_TRADE.GetQueueNumber() > 0)
                 {
                     lock (QUEUE_SH_TRADE.GetQueue().SyncRoot)
@@ -82,6 +106,7 @@ namespace Stork_Future_TaoLi.TradeModule
                         if (QUEUE_SH_TRADE.GetQueue().Count > 0)
                         {
                             next_trade = (List<TradeOrderStruct>)QUEUE_SH_TRADE.GetQueue().Dequeue();
+                            b_get = true;
                         }
                         log.LogEvent("上海交易所出队交易数量：" + next_trade.Count.ToString());
                     }
@@ -93,10 +118,18 @@ namespace Stork_Future_TaoLi.TradeModule
                         if (QUEUE_SZ_TRADE.GetQueue().Count > 0)
                         {
                             next_trade = (List<TradeOrderStruct>)QUEUE_SZ_TRADE.GetQueue().Dequeue();
+                            b_get = true;
                         }
 
                         log.LogEvent("深圳交易所出队交易数量：" + next_trade.Count.ToString());
                     }
+                }
+
+                if (b_get == true)
+                {
+                    //说明是心跳包
+                    lastHeartBeat = DateTime.Now;
+                    continue;
                 }
 
                 if (next_trade.Count == 0)
@@ -122,15 +155,24 @@ namespace Stork_Future_TaoLi.TradeModule
                 log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + next_trade.Count);
                 //选择第 _tNo 个线程执行交易
                 queue_stock_excuteThread.GetQueue(_tNo).Enqueue((object)next_trade);
+                queue_stock_excuteThread.SetThreadBusy(_tNo);
+
 
                 //************************************
                 //将交易发送到相应执行线程后需要做的事情
-                //
-                //
-                //
                 //************************************
+                if (DateTime.Now.Second % 3 == 0)
+                {
+                    //每3秒更新一次线程使用状况
+                    Console.WriteLine(DateTime.Now.ToString());
+                    Console.WriteLine("Thread Busy Rate : " + queue_stock_excuteThread.GetBusyNum().ToString() + "/" + stockNum.ToString());
+                }
+
+              
 
             }
+
+            Thread.CurrentThread.Abort();
 
 
 
@@ -153,6 +195,11 @@ namespace Stork_Future_TaoLi.TradeModule
             MCStockLib.managedLogin login = new managedLogin(CommConfig.Stock_ServerAddr, CommConfig.Stock_Port, CommConfig.Stock_Account, CommConfig.Stock_BrokerID, CommConfig.Stock_Password, CommConfig.Stock_InvestorID);
             string ErrorMsg = string.Empty;
 
+            DateTime lastHeartBeat = DateTime.Now;//最近心跳时间
+
+            //令该线程为前台线程
+            Thread.CurrentThread.IsBackground = true;
+
 
             TradeParaPackage _tpp = (TradeParaPackage)para;
 
@@ -169,7 +216,14 @@ namespace Stork_Future_TaoLi.TradeModule
 
             while (true)
             {
+                Thread.Sleep(10);
+                if ((DateTime.Now - lastHeartBeat).TotalSeconds > 30)
+                {
+                    sublog.LogEvent("线程 ：" + _threadNo.ToString() + "心跳停止 ， 最后心跳 ： " + lastHeartBeat.ToString());
+                    break;
+                }
 
+                //Thread.CurrentThread.stat
                 if (_markedTime.Minute != DateTime.Now.Minute)
                 {
                     //发送心跳包
@@ -178,23 +232,28 @@ namespace Stork_Future_TaoLi.TradeModule
                     _classTradeStock.HeartBeat();
                 }
 
-                if (queue_stock_excuteThread.GetQueue(_threadNo).Count > 0)
-                {
-                    //标记线程当前状态为“忙碌”
-                    queue_stock_excuteThread.SetThreadBusy(_threadNo);
-                }
-                else
+
+                if (queue_stock_excuteThread.GetQueue(_threadNo).Count < 2)
                 {
                     queue_stock_excuteThread.SetThreadFree(_threadNo);
                 }
 
                 if (queue_stock_excuteThread.GetQueue(_threadNo).Count > 0)
                 {
-
+                   
 
                     List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_stock_excuteThread.StockExcuteQueues[_threadNo].Dequeue();
 
                     sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 执行交易数量 ： " + trades.Count);
+
+                    if (trades.Count == 0)
+                    {
+                        lastHeartBeat = DateTime.Now;
+
+                        continue;
+                    }
+
+                    lastHeartBeat = DateTime.Now;
 
 
                     if (!_classTradeStock.getConnectStatus())
@@ -240,6 +299,9 @@ namespace Stork_Future_TaoLi.TradeModule
 
                 }
             }
+
+            //线程结束
+            Thread.CurrentThread.Abort();
 
         }
 

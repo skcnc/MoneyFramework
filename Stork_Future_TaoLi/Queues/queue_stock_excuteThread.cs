@@ -81,6 +81,27 @@ namespace Stork_Future_TaoLi.Queues
         }
 
         /// <summary>
+        /// 放回当前忙碌线程数量
+        /// </summary>
+        /// <returns>忙碌线程数量</returns>
+        public static int GetBusyNum()
+        {
+            int i = 0;
+            lock (StockThreadIsAvailiable)
+            {
+                foreach (bool b in StockThreadIsAvailiable)
+                {
+                    if (b == false)
+                    {
+                        i++;
+                    }
+                }
+            }
+
+            return i;
+        }
+
+        /// <summary>
         /// 设定指定线程的工作状态为“忙碌”
         /// </summary>
         /// <param name="_threadNo"></param>
@@ -121,5 +142,5 @@ namespace Stork_Future_TaoLi.Queues
             }
         }
     }
-    
+
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Stork_Future_TaoLi.Test;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -18,7 +19,8 @@ namespace Stork_Future_TaoLi.Controllers
         public ActionResult About()
         {
             ViewBag.Message = "Your app description page.";
-
+            TestClass.isRun = false;
+            
             return View();
         }
 
