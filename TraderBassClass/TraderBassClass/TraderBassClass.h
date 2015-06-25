@@ -23,7 +23,7 @@ public:
 	bool getconnectstate();//  返回交易情况 未连接 
 	bool getworkstate(); //返回是否被占用
 
-	int cal(int i, int j);
+	int cal(char* msg);
 
 private:
 	void loadArgs(char * SERVER_IP,int N_PORT,char *ZJ_ACCOUNT,char *PASSWORD);//加载参数(账号，密码，服务器地址）

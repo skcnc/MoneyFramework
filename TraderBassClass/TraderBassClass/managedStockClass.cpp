@@ -26,7 +26,9 @@ bool managedStockClass::Init(managedLogin^ mylogininfor,System::String^ Errormsg
 
 	bool rt_value = false;
 
-	//rt_value = m_cstockTrader->init(info,Errormsg);
+	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
+
+	rt_value = m_cstockTrader->init(info,errmsg);
 
 	return rt_value;
 }
@@ -37,33 +39,43 @@ void managedStockClass::HeartBeat()
 }
 
 //单笔交易
-bool managedStockClass::SingleTrade(managedTraderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust, char * Errormsg)
+bool managedStockClass::SingleTrade(managedTraderorderstruct^  mytraderoder, managedQueryEntrustorderstruct^ myEntrust, String^ Errormsg)
 {
 	Traderorderstruct trade ;
 	QueryEntrustorderstruct entrust;
 	//trade.getInit(mytraderoder);
+	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
+	char err[255];
+	trade = mytraderoder->createInstance();
+	//(entrust).getInit(myEntrust);
 
-	trade = mytraderoder.createInstance();
-	(entrust).getInit(myEntrust);
+	entrust = myEntrust->createInstance();
 
 	bool rt_value = false;
 
-	rt_value = m_cstockTrader->trader(trade,entrust,Errormsg);
+	rt_value = m_cstockTrader->trader(trade,entrust,err);
 
 	return rt_value;
 
 }
 
 //批量交易： 大于单支股票走该接口
-bool managedStockClass::BatchTrade(array<managedTraderorderstruct^>^ mytraderoder, int nSize, QueryEntrustorderstruct * myEntrust, int &num, char * Errormsg)
+bool managedStockClass::BatchTrade(array<managedTraderorderstruct^>^ mytraderoder, int nSize, array<managedQueryEntrustorderstruct^>^ myEntrust, String^ Errormsg)
 {
 	bool rt_value = false;
 	Traderorderstruct* trades = new Traderorderstruct[nSize];
+	QueryEntrustorderstruct* query = new QueryEntrustorderstruct[nSize];
+	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
+	int num = 0;
+	char err[255];
 	for (int i = 0; i < nSize; i++)
 	{
 		trades[i] = mytraderoder[i]->createInstance();
+		query[i] = myEntrust[i]->createInstance();
 	}
-	rt_value = m_cstockTrader->Batchstocktrader(trades, nSize, myEntrust, num, Errormsg);
+	rt_value = m_cstockTrader->Batchstocktrader(trades, nSize, query, num, err);
+
+
 	return rt_value;
 }
 
@@ -83,7 +95,12 @@ bool managedStockClass::getWorkStatus()
 	return m_cstockTrader->getworkstate();
 }
 
-int managedStockClass::cal(int i, int j, Traderorderstruct k[])
+int managedStockClass::cal(String^ msg)
 {
-	return m_cstockTrader->cal(i, j);
+	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(msg);
+	int length = m_cstockTrader->cal(errmsg);
+
+	char* msgg = errmsg;
+	return length;
+
 }

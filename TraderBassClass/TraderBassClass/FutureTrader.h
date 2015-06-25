@@ -1,13 +1,18 @@
 #pragma once
+#include <windows.h>
 #include "ThostFtdcTraderApi.h"
 #include "CDataStruct.h"
-#pragma pack(4)
+#include <map>
+using namespace std;
+//#pragma pack(4)
 class CFutureTrader : public CThostFtdcTraderSpi
 {
 public:
-	bool init(Logininfor mylogininfor,char * Errormsg);  //加载参数,登陆 异步通信  调用需等待回报
+	bool init(const Logininfor mylogininfor);  //加载参数,登陆 异步通信  调用需等待回报
 
 	bool sendtrader(Traderorderstruct  mytraderoder,char * OrderRef);    //交易请求
+	
+
 	bool sendcanceltrader(QueryEntrustorderstruct myEntrust);      //撤单请求 
 
 	bool sendqueryorder(QueryEntrustorderstruct  myEntrust);      //发送查询委托请求
@@ -25,25 +30,29 @@ public:
 
 	bool heartBeat();  //心跳函数
 	bool getconnectstate();//  返回交易情况 未连接 
-	bool getworkstate(); //返回是否被占用
+	bool getworkstate();  //  返回是否被占用
 
+	CFutureTrader(void);
+	~CFutureTrader();
 private:
+	map<char *,FuTuremapinfor> orderDb;
+	HANDLE hFutureDataMutex;//期货行情更新的锁
 	/************变量******************/
 	TThostFtdcFrontIDType	FRONT_ID;	//前置编号
     TThostFtdcSessionIDType	SESSION_ID;	//会话编号
     TThostFtdcOrderRefType	ORDER_REF;	//报单引用
 	// 配置参数
-	char   FRONT_ADDR[255] ;
-	char   BROKER_ID[25]  ;
-	char   INVESTOR_ID[55] ;
+	char    FRONT_ADDR[255] ;
+	char   BROKER_ID[255]  ;
+	char   INVESTOR_ID[255];
 	char   PASSWORD[55] ;
 	char   addr[255];
-	char   pwd[49];
-	char userAccount[49];
+	char   pwd[55];
+	char   userAccount[55];
 	int iRequestID;
 
-
-	bool bRunning;//登陆成功后为true
+	bool bConnected;//登陆成功后为true
+	bool bRunning;  //
 	int m_nNextOrderRef;
 	
 	TThostFtdcMoneyType dBalance;
@@ -53,11 +62,9 @@ private:
 
 	CThostFtdcTraderApi* pTraderApi;
 	/************方法******************/
-	CFutureTrader(void);
-	~CFutureTrader();
 
-	void loadArgs();
-	void init();
+
+
 	bool buyOpen(char * code,double price,int Qty);
 	bool buyClose(char * code,double price,int Qty);
 	bool sellOpen(char *code,double price,int Qty);
@@ -121,6 +128,9 @@ private:
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 	// 是否我的报单回报
 	bool IsMyOrder(CThostFtdcOrderField *pOrder);
+	// 是否我的成交回报
+	bool IsMytrader(CThostFtdcTradeField *pTrade);
+
 	// 是否正在交易的报单
 	bool IsTradingOrder(CThostFtdcOrderField *pOrder);
 	

@@ -167,14 +167,16 @@ bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstru
 bool CStockTrader::Batchstocktrader(Traderorderstruct * mytraderoder,int nSize,QueryEntrustorderstruct * myEntrust,int &num,char * Errormsg)
 {
 	  //◊¥Ã¨…Ë÷√
-	Errormsg="success";
+	strcpy(Errormsg,"success");
 	bRunning=true;
 	num=0;
 
 	bool bRtn = true;
 	if(nSize<=0)
+	{
 		bRunning=true;
 		return true;
+	}
 	
 	int    len,in_len;
 	char   buf[2048],buf2[100];	
@@ -191,7 +193,7 @@ bool CStockTrader::Batchstocktrader(Traderorderstruct * mytraderoder,int nSize,Q
 	pReqMsg->detail_block_size = nSize * sizeof(SWI_BatchDetail);
 	pReqMsg->implement_mode ='1';	
 	pReqMsg->trade_interval = 2;
-	if(!strcmp(mytraderoder[0].cExchangeID,"SZ"))
+	if(!strcmp(mytraderoder[0].cExchangeID,"SH"))
 	{//…œ÷§
 		strcpy(pReqMsg->account,ShAccount);
 		pReqMsg->exchange_no = 1;
@@ -219,6 +221,7 @@ bool CStockTrader::Batchstocktrader(Traderorderstruct * mytraderoder,int nSize,Q
 	if(send(sock,buf,len,0)==SOCKET_ERROR)
 	{
 		Errormsg="send to agc error!";
+		
 	    bRunning=false;
 		return false;
 	}
@@ -751,12 +754,18 @@ int CStockTrader::getExchangeNumByStockCode(int stkCode){
 	return EXCHANGE_SH;
 }
 
-int CStockTrader::cal(int i, int j)
+int CStockTrader::cal(char* msg)
 {
-	for (int i = 0; i < 1000000000; i++)
+	const size_t length = strlen(msg);
+	char* temp = new char[length];
+	strcpy(temp,msg);
+	for(size_t i = 0; i<length/2;i++)
 	{
-
+		char c = temp[i];
+		temp[i] = temp[length - i -1];
+		temp[length - i -1] = c;
 	}
 
-	return i + j;
+	msg = temp;
+	return length;
 }

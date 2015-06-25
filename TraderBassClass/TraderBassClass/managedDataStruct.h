@@ -83,7 +83,7 @@ namespace MCStockLib
 		{
 			Logininfor unmanagedInfo;
 			unmanagedInfo.serverAddr = serverAddr;
-			nPort = nPort;
+			unmanagedInfo.nPort = nPort;
 			unmanagedInfo.ZjAccount = ZjAccount;
 			unmanagedInfo.BROKER_ID = BROKER_ID;
 			unmanagedInfo.PASSWORD = PASSWORD;
@@ -100,6 +100,39 @@ namespace MCStockLib
 			PASSWORD = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(password);
 			INVESTOR_ID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(investor_id);
 			nPort = nport;
+		}
+	};
+
+	public ref struct managedQueryEntrustorderstruct
+	{
+		char cSecurityType;
+		char* cExchangeID;
+		char* cOrderSysID;
+
+		managedQueryEntrustorderstruct(char mcSecurityType, String^ mcExchangeID ,String^ mcOrderSysID)
+		{
+			cExchangeID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcExchangeID);
+			cOrderSysID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcOrderSysID);
+			cSecurityType = mcSecurityType;
+		}
+
+		managedQueryEntrustorderstruct()
+		{
+			cExchangeID = new char[255];
+			cOrderSysID = new char[255];
+			cSecurityType = 's';
+		}
+
+		QueryEntrustorderstruct createInstance()
+		{
+			QueryEntrustorderstruct queryEntrust;
+
+			memset(queryEntrust.cExchangeID,0,21);
+			memset(queryEntrust.cOrderSysID,0,21);
+			
+			queryEntrust.cSecuritytype = 0;
+
+			return queryEntrust;
 		}
 	};
 }
