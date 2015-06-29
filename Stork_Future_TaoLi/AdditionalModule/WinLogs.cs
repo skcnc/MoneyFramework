@@ -59,4 +59,30 @@ namespace Stork_Future_TaoLi
             EventLog.WriteEntry(eventSourceName, message, eventLogType, eventLogId);
         }
     }
+
+    class GlobalErrorLog
+    {
+        //private static LogWirter errLog = new LogWirter();
+
+        GlobalErrorLog()
+        {
+            errLog.EventSourceName = "全局报警";
+            errLog.EventLogType = System.Diagnostics.EventLogEntryType.Error;
+            errLog.EventLogID = 60001;
+        }
+
+        private static LogWirter errLog = new LogWirter();
+
+        public static LogWirter LogInstance
+        {
+            get
+            {
+                if (errLog == null)
+                    errLog = new LogWirter();
+
+                return errLog;
+            }
+        }
+
+    }
 }

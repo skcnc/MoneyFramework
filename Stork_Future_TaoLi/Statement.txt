@@ -1,4 +1,7 @@
 ﻿日志系统说明：
+Name	: 全局报警
+LogId	: 60001
+About	: 全局范围内的报警信息
 
 Name	: 测试List发送模块
 LogId	: 62300

@@ -194,6 +194,7 @@
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="PreTradeModule\PreTradeModule.cs" />
+    <Compile Include="Queues\queue_hangqing_info.cs" />
     <Compile Include="Queues\queue_prd_trade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queues\queue_stock_excuteThread.cs" />

@@ -4,11 +4,15 @@ using System.Linq;
 using System.Web;
 using TDFAPI;
 using Stork_Future_TaoLi.Variables_Type;
+using System.Threading;
+using System.Text;
 
 namespace Stork_Future_TaoLi.TDFDataSource
 {
     public class TDFMain
     {
+
+        delegate String ToString(String[] args);
         /// <summary>
         /// 行情订阅主线程
         /// </summary>
@@ -41,6 +45,101 @@ namespace Stork_Future_TaoLi.TDFDataSource
                 Time =0,
                 TypeFlags = 0
             };
+
+            using (var dataSource = new TDFSourceImp(openSetting_ext))
+            {
+                dataSource.SetEnv(EnvironSetting.TDF_ENVIRON_HEART_BEAT_INTERVAL, 0);//环境设置
+                dataSource.SetEnv(EnvironSetting.TDF_ENVIRON_MISSED_BEART_COUNT, 0);//环境设置
+                dataSource.SetEnv(EnvironSetting.TDF_ENVIRON_OPEN_TIME_OUT, 0);//环境设置
+
+                TDFERRNO nOpenRet = dataSource.Open();
+
+                if (nOpenRet == TDFERRNO.TDF_ERR_SUCCESS)
+                {
+                    //连接成功
+                }
+                else
+                {
+                    //连接失败，告警顶级日志
+                    GlobalErrorLog.LogInstance.LogEvent(String.Format("open returned:{0}, program quit", nOpenRet));
+                }
+
+                while (true)
+                {
+                    #region 以下代码是演示订阅功能，真实使用时需要修改
+                    //主线程阻塞在这里，等待回调消息通知（其他消息）
+                    String strHelp = @"键入q退出
+    以下命令，请用逗号分隔
+    a 添加订阅
+    d 删除订阅
+    f 清除订阅
+    s 设置订阅
+    hs 显示完全数据
+    hh 显示万得股票名称";
+                    Console.WriteLine(strHelp);
+                    var input = Console.ReadLine();
+
+                    while (input != "q")
+                    {
+                        var inArgs = input.Split(',');
+                        if (inArgs.Length > 1)
+                        {
+                            ToString convert = (String[] ary) =>
+                            {
+                                System.Text.StringBuilder sb = new StringBuilder();
+                                for (int i = 1; i < ary.Length; ++i)
+                                {
+                                    sb.AppendFormat("{0};", ary[i]);
+                                }
+
+                                return sb.ToString();
+                            };
+
+                            switch (inArgs[0])
+                            {
+                                case "a":
+                                    dataSource.SetSubscription(convert(inArgs), SubscriptionType.SUBSCRIPTION_ADD);
+                                    break;
+                                case "d":
+                                    dataSource.SetSubscription(convert(inArgs), SubscriptionType.SUBSCRIPTION_DEL);
+                                    break;
+                                case "s":
+                                    dataSource.SetSubscription(convert(inArgs), SubscriptionType.SUBSCRIPTION_SET);
+                                    break;
+                                case "f":
+                                    dataSource.SetSubscription("", SubscriptionType.SUBSCRIPTION_FULL);
+                                    break;
+                                case "hs":
+                                    dataSource.ShowAllData = true;
+                                    break;
+                                case "hh":
+                                    dataSource.ShowAllData = false;
+                                    break;
+                            }
+                        }
+                        else if (inArgs.Length == 1)
+                        {
+                            switch (inArgs[0])
+                            {
+                                case "f":
+                                    dataSource.SetSubscription("", SubscriptionType.SUBSCRIPTION_FULL);
+                                    break;
+                                case "hs":
+                                    dataSource.ShowAllData = true;
+                                    break;
+                                case "hh":
+                                    dataSource.ShowAllData = false;
+                                    break;
+                            }
+                        }
+
+                        Console.WriteLine(strHelp);
+                        input = Console.ReadLine();
+                    }
+                    #endregion      //演示订阅功能
+                    Thread.Sleep(100);
+                }
+            }
 
         }
     }
