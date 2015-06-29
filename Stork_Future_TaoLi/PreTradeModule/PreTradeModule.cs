@@ -158,11 +158,11 @@ namespace Stork_Future_TaoLi.PreTradeModule
                 log.LogEvent("入队交易数量：" + tos.Count.ToString());
 
                 //获取到新的list
-                List<TradeOrderStruct> stocks_sh = (from item in tos where item.cTradeDirection == TradeDirection.STORK && item.cExhcnageID == ExhcnageID.SH select item).OrderBy(i => i.cOrderLevel).ToList();
+                List<TradeOrderStruct> stocks_sh = (from item in tos where item.cTradeDirection == TradeDirection.Buy && item.cExhcnageID == ExhcnageID.SH select item).OrderBy(i => i.cOrderLevel).ToList();
 
-                List<TradeOrderStruct> stocks_sz = (from item in tos where item.cTradeDirection == TradeDirection.STORK && item.cExhcnageID == ExhcnageID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
+                List<TradeOrderStruct> stocks_sz = (from item in tos where item.cTradeDirection == TradeDirection.Buy && item.cExhcnageID == ExhcnageID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
 
-                List<TradeOrderStruct> future = (from item in tos where item.cTradeDirection == TradeDirection.FUTURE select item).OrderBy(i => i.cOrderLevel).ToList();
+                List<TradeOrderStruct> future = (from item in tos where item.cTradeDirection == TradeDirection.Buy select item).OrderBy(i => i.cOrderLevel).ToList();
 
                 //将新的list推送到对应的线程控制器
                 #region 交易送入队列

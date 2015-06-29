@@ -1,0 +1,25 @@
+﻿日志系统说明：
+
+Name	: 测试List发送模块
+LogId	: 62300
+About	: 模拟生成交易日志
+
+Name	: 交易预处理模块
+LogId	: 62301
+About	: 预处理模块日志
+
+Name	: 交易线程控制模块
+LogId	: 62302
+About	: 交易主控模块日志
+
+Name	: 交易线程模块
+LogId	: 62303
+About	: 具体执行股票交易的线程日志
+
+Name	: 行情获取日志A
+LogId	: 63001
+About	: 行情返回日志，记录返回的系统消息情况。
+
+Name	: 行情获取日志B
+LogId	: 63002
+About	: 行情返回日志，记录返回的交易消息情况。

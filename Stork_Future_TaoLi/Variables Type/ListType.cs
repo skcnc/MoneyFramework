@@ -63,12 +63,12 @@ namespace Stork_Future_TaoLi.Variables_Type
     }
 
     /// <summary>
-    /// 交易类别： stock 股票 ， Future 期货
+    /// 交易类别：  b 购买 ， s 期货
     /// </summary>
     public static class TradeDirection
     {
-        public static string STORK { get { return "0"; } }
-        public static string FUTURE { get { return "1"; } }
+        public static string Buy { get { return "1"; } }
+        public static string Sell { get { return "2"; } }
     }
 
     /// <summary>
@@ -76,7 +76,18 @@ namespace Stork_Future_TaoLi.Variables_Type
     /// </summary>
     public static class ExhcnageID
     {
-        public static string SH { get { return "0"; } }
-        public static string SZ { get { return "1"; } }
+        //上证
+        public static string SH { get { return "SH"; } }
+        //深证
+        public static string SZ { get { return "SZ"; } }
+    }
+
+    /// <summary>
+    /// 类型： STOCK 股票， FUTURE 期货
+    /// </summary>
+    public static class SecurityType
+    {
+        public static string STOCK { get { return "1"; } }
+        public static string FUTURE { get { return "0"; } }
     }
 }

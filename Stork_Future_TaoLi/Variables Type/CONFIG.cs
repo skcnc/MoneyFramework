@@ -17,7 +17,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// 股票交易最大线程数
         /// </summary>
         public static int STOCK_TRADE_THREAD_NUM { get { return stock_trade_thread_num; } }
-        private static int stock_trade_thread_num = 100;
+        private static int stock_trade_thread_num = 1;
 
         /// <summary>
         /// 期货交易最大线程数
@@ -64,7 +64,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// <returns></returns>
         public static bool IsDebugging()
         {
-            return true;
+            return false;
         }
     }
 
@@ -73,19 +73,19 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// <summary>
         /// 股票通讯地址
         /// </summary>
-        private static string stock_serverAddr = "127.0.0.1";
+        private static string stock_serverAddr = "10.65.8.14";
         public static string Stock_ServerAddr { get { return stock_serverAddr; } }
 
         /// <summary>
         /// 股票通信端口
         /// </summary>
-        private static int stock_port = 80;
+        private static int stock_port = 18887;
         public static int Stock_Port { get { return stock_port; } }
 
         /// <summary>
         /// 资金帐户
         /// </summary>
-        private static string stock_account = "admin";
+        private static string stock_account = "1653043461";
         public static string Stock_Account { get { return stock_account; } }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// <summary>
         /// 帐户密码
         /// </summary>
-        private static string stock_password = "000000";
+        private static string stock_password = "607178";
         public static string Stock_Password { get { return stock_password; } }
 
         /// <summary>
@@ -118,4 +118,38 @@ namespace Stork_Future_TaoLi.Variables_Type
         public int FUTURE_TRADE_THREAD_NUM = 10;
         public int FUTURE_TRADE_OVERTIME = 15;
     }
+
+    /// <summary>
+    /// 行情系统全局参数
+    /// </summary>
+    public class CHangQingPARA
+    {
+        /// <summary>
+        /// 行情服务器IP地址
+        /// </summary>
+        public static string IP
+        {
+            get { return _ip; }
+        }
+        private static string _ip = "127.0.0.1";
+
+        /// <summary>
+        /// 行情服务器端口号
+        /// </summary>
+        public static string PORT { get { return _port; } }
+        private static string _port = "80";
+
+        /// <summary>
+        /// 行情用户名
+        /// </summary>
+        public static string USERNAME { get { return _username; } }
+        private static string _username = "admin";
+
+        /// <summary>
+        /// 行情密码
+        /// </summary>
+        public static string PASSWORD { get { return _password; } }
+        private static string _password = "admin";
+    }
+
 }

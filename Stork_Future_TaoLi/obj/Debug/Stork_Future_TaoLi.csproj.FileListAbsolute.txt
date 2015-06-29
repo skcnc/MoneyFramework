@@ -92,3 +92,6 @@ E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.cs
 D:\projects\MoneyFramework\Stork_Future_TaoLi\obj\Debug\Stork_Future_TaoLi.csprojResolveAssemblyReference.cache
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TraderBassClass.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TraderBassClass.pdb
+E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TDFApi_CSharp_v3.0.dll
+E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TDFApi_CSharp_v3.0.pdb
+E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TDFApi_CSharp_v3.0.xml

@@ -1,0 +1,1444 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TDFApi_CSharp_v3.0</name>
+    </assembly>
+    <members>
+        <member name="T:TDFAPI.EnvironSetting">
+            <summary>
+            环境变量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.EnvironSetting.TDF_ENVIRON_HEART_BEAT_INTERVAL">
+            <summary>
+            Heart Beat间隔（秒数）, 若值为0则表示默认值10秒钟
+            </summary>
+        </member>
+        <member name="F:TDFAPI.EnvironSetting.TDF_ENVIRON_MISSED_BEART_COUNT">
+            <summary>
+            如果没有收到心跳次数超过这个值，且没收到其他任何数据，则判断为掉线，若值0为默认次数2次
+            </summary>
+        </member>
+        <member name="F:TDFAPI.EnvironSetting.TDF_ENVIRON_OPEN_TIME_OUT">
+            <summary>
+            在调TDF_Open期间，接收每一个数据包的超时时间（秒数，不是TDF_Open调用总的最大等待时间），若值为0则默认30秒
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFERRNO">
+            <summary>
+            函数返回值
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_UNKOWN">
+            <summary>
+            未知错误
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_INITIALIZE_FAILURE">
+            <summary>
+            初始化socket环境失败
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_NETWORK_ERROR">
+            <summary>
+            网络连接出现问题
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_INVALID_PARAMS">
+            <summary>
+            输入参数无效
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_VERIFY_FAILURE">
+            <summary>
+            登陆验证失败：原因为用户名或者密码错误；超出登陆数量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_NO_AUTHORIZED_MARKET">
+            <summary>
+            所有请求的市场都没有授权
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_NO_CODE_TABLE">
+            <summary>
+            所有请求的市场该天都没有代码表
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_ALREADY_CONNECTED">
+            <summary>
+            已经连接
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_NOT_CONNECTED">
+            <summary>
+            未连接
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFERRNO.TDF_ERR_SUCCESS">
+            <summary>
+            成功
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFMSGID">
+            <summary>
+            回调函数内消息ID
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_INVALID">
+            <summary>
+            消息 无效数据
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_SYS_DISCONNECT_NETWORK">
+            <summary>
+            网络断开事件
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_SYS_CONNECT_RESULT">
+            <summary>
+            主动发起连接的结果
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_SYS_LOGIN_RESULT">
+            <summary>
+            登陆应答
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_SYS_CODETABLE_RESULT">
+            <summary>
+            获取代码表结果
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_SYS_QUOTATIONDATE_CHANGE">
+            <summary>
+            行情日期变更通知
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_SYS_MARKET_CLOSE">
+            <summary>
+            闭市
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_SYS_HEART_BEAT">
+            <summary>
+            服务器心跳消息
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_DATA_INDEX">
+            <summary>
+            指数数据
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_DATA_MARKET">
+            <summary>
+            行情数据
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_DATA_FUTURE">
+            <summary>
+            期货行情
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_DATA_TRANSACTION">
+            <summary>
+            逐笔成交
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_DATA_ORDERQUEUE">
+            <summary>
+            委托队列
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_DATA_ORDER">
+            <summary>
+            逐笔委托 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_DATA_BBQTRANSACTION">
+            <summary>
+            BBQ现券成交数据 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSGID.MSG_DATA_BBQBID">
+            <summary>
+            BBQ现券报价数据 
+            </summary>
+        </member>
+        <member name="T:TDFAPI.DataTypeFlag">
+            <summary>
+            指定返回数据内容。
+                行情数据属强制返回数据，不可指定
+            </summary>
+        </member>
+        <member name="F:TDFAPI.DataTypeFlag.DATA_TYPE_TRANSACTION">
+            <summary>
+            逐笔成交
+            </summary>
+        </member>
+        <member name="F:TDFAPI.DataTypeFlag.DATA_TYPE_ORDER">
+            <summary>
+            逐笔委托
+            </summary>
+        </member>
+        <member name="F:TDFAPI.DataTypeFlag.DATA_TYPE_ORDERQUEUE">
+            <summary>
+            委托队列
+            </summary>
+        </member>
+        <member name="F:TDFAPI.DataTypeFlag.DATA_TYPE_FUTURE_CX">
+            <summary>
+             只要行情，其他都不订阅；
+             订阅多个类型DATA_TYPE_TRANSACTION | DATA_TYPE_ORDER | DATA_TYPE_ORDERQUEUE
+            </summary>
+        </member>
+        <member name="T:TDFAPI.SubscriptionType">
+            <summary>
+            订阅操作类型
+            </summary>
+        </member>
+        <member name="F:TDFAPI.SubscriptionType.SUBSCRIPTION_SET">
+            <summary>
+            设置为订阅列表中股票
+            </summary>
+        </member>
+        <member name="F:TDFAPI.SubscriptionType.SUBSCRIPTION_ADD">
+            <summary>
+            增加订阅列表中股票
+            </summary>
+        </member>
+        <member name="F:TDFAPI.SubscriptionType.SUBSCRIPTION_DEL">
+            <summary>
+            删除列表中的订阅
+            </summary>
+        </member>
+        <member name="F:TDFAPI.SubscriptionType.SUBSCRIPTION_FULL">
+            <summary>
+            全市场订阅
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFServerInfo">
+            <summary>
+            服务器信息
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFServerInfo.Ip">
+            <summary>
+            服务器IP
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFServerInfo.Port">
+            <summary>
+            服务器端口
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFServerInfo.Username">
+            <summary>
+            用户名
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFServerInfo.Password">
+            <summary>
+            密码
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFOpenSetting_EXT">
+            <summary>
+            多服务器连接参数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOpenSetting_EXT.Servers">
+            <summary>
+            多服务器信息
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOpenSetting_EXT.ServerNum">
+            <summary>
+            服务器数，最大为4
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOpenSetting_EXT.ConnectionID">
+            <summary>
+            连接ID，连接回调消息的附加结构 TDF_CONNECT_RESULT中 会包含这个ID
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOpenSetting_EXT.Markets">
+            <summary>
+            例如"SZ;SH;CF;SHF;DCE;SHF"，需要订阅的市场列表，以“;”分割,为空则订阅所有支持的市场
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOpenSetting_EXT.Subscriptions">
+            <summary>
+            例如"600000.sh;ag.shf;000001.sz"，需要订阅的股票，以“;”分割，为空则订阅全市场
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOpenSetting_EXT.Time">
+            <summary>
+            请求的时间，格式HHMMSS，为0则请求实时行情，为(uint)-1从头请求
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOpenSetting_EXT.TypeFlags">
+            <summary>
+            为0请求所有品种，或者取值为DataTypeFlag中多种类别，比如DataTypeFlag.DATA_TYPE_INDEX | DataTypeFlag.DATA_TYPE_TRANSACTION
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFProxyType">
+            <summary>
+            使用代理连接类型
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxyType.TDF_PROXY_SOCK4">
+            <summary>
+            sock4代理
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxyType.TDF_PROXY_SOCK4A">
+            <summary>
+            sock4a代理
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxyType.TDF_PROXY_SOCK5">
+            <summary>
+            sock5代理
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxyType.TDF_PROXY_HTTP11">
+            <summary>
+            http1.1代理
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFProxySetting">
+            <summary>
+            使用代理连接参数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxySetting.ProxyType">
+            <summary>
+            代理类型
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxySetting.ProxyHostIp">
+            <summary>
+            代理主机IP
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxySetting.ProxyPort">
+            <summary>
+            代理主机端口
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxySetting.ProxyUser">
+            <summary>
+            代理用户名
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFProxySetting.ProxyPwd">
+            <summary>
+            代理用户密码
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFCode">
+            <summary>
+            代码
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCode.WindCode">
+            <summary>
+            万得代码，Code.市场。如：AG1302.SHF, 000001.SZ
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCode.Market">
+            <summary>
+            代码所属市场：SHF，SZ
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCode.Code">
+            <summary>
+            原始代码：000001
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCode.ENName">
+            <summary>
+            英文名称
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCode.CNName">
+            <summary>
+            中文名称
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCode.Type">
+            <summary>
+            代码类型
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFOptionCode">
+            <summary>
+            期权代码
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.BasicCode">
+            <summary>
+            基本代码数据
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.ContractID">
+            <summary>
+            期权合约代码
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.UnderlyingSecurityID">
+            <summary>
+            标的证券代码
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.CallOrPut">
+            <summary>
+            认购认沽C1        认购，则本字段为“C”；若为认沽，则本字段为“P”
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.ExerciseDate">
+            <summary>
+            期权行权日，YYYYMMDD
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.UnderlyingType">
+            <summary>
+            标的证券类型C3    0-A股 1-ETF (EBS – ETF， ASH – A 股)
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.OptionType">
+            <summary>
+            欧式美式C1        若为欧式期权，则本字段为“E”；若为美式期权，则本字段为“A”
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.PriceLimitType">
+            <summary>
+            涨跌幅限制类型C1 ‘N’表示有涨跌幅限制类型, ‘R’表示无涨跌幅限制类型
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.ContractMultiplierUnit">
+            <summary>
+            合约单位,         经过除权除息调整后的合约单位, 一定是整数
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.ExercisePrice">
+            <summary>
+            期权行权价,       经过除权除息调整后的期权行权价，右对齐，精确到厘
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.StartDate">
+            <summary>
+            期权首个交易日,YYYYMMDD
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.EndDate">
+            <summary>
+            期权最后交易日/行权日，YYYYMMDD
+            </summary>
+        </member>
+        <member name="P:TDFAPI.TDFOptionCode.ExpireDate">
+            <summary>
+            期权到期日，YYYYMMDD
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFConnectResult">
+            <summary>
+            系统消息：MSG_SYS_CONNECT_RESULT 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFConnectResult.Ip">
+            <summary>
+            IP
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFConnectResult.Port">
+            <summary>
+            Port
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFConnectResult.Username">
+            <summary>
+            用户名
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFConnectResult.Password">
+            <summary>
+            密码
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFConnectResult.ConnectID">
+            <summary>
+            连接ID
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFConnectResult.ConnResult">
+            <summary>
+            是否连接成功,为0则表示连接失败，非0则表示连接成功
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFLoginResult">
+            <summary>
+            系统消息：MSG_SYS_LOGIN_RESULT 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFLoginResult.LoginResult">
+            <summary>
+            是否登陆接成功
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFLoginResult.Info">
+            <summary>
+            登陆结果文本
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFLoginResult.Markets">
+            <summary>
+            市场代码 SZ, SH, CF, SHF, CZC, DCE
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFLoginResult.DynDate">
+            <summary>
+            动态数据日期
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFCodeResult">
+            <summary>
+            系统消息：MSG_SYS_CODETABLE_RESULT 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCodeResult.Info">
+            <summary>
+            获取代码表结果文本
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCodeResult.Markets">
+            <summary>
+            市场代码
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCodeResult.CodeCount">
+            <summary>
+            代码表项数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFCodeResult.CodeDate">
+            <summary>
+            代码表日期
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFQuotationDateChange">
+            <summary>
+            //系统消息：MSG_SYS_QUOTATIONDATE_CHANGE 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFQuotationDateChange.Market">
+            <summary>
+            市场代码
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFQuotationDateChange.OldDate">
+            <summary>
+            原行情日期
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFQuotationDateChange.NewDate">
+            <summary>
+            新行情日期
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFMarketClose">
+            <summary>
+            市场关闭消息结构体
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketClose.Market">
+            <summary>
+            交易所名称
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketClose.Time">
+            <summary>
+            时间(HHMMSSmmm)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketClose.Info">
+            <summary>
+            闭市信息
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFAPPHead">
+            <summary>
+            回调函数消息头
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFAPPHead.HeadSize">
+            <summary>
+            本记录结构大小
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFAPPHead.ItemCount">
+            <summary>
+            记录条数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFAPPHead.ItemSize">
+            <summary>
+            记录大小
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFMSG">
+            <summary>
+            回调函数消息结构体
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSG.Flag">
+            <summary>
+            16位 标识符,升级到 TDF_VERSION_NX_START_6001 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSG.MsgID">
+            <summary>
+            消息ID，标识对应的消息
+            </summary>.
+        </member>
+        <member name="F:TDFAPI.TDFMSG.DataLen">
+            <summary>
+            32位 数据长度（不包括TDFAPPHead的长度）
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSG.ServerTime">
+            <summary>
+            32位服务器时间戳（精确到毫秒HHMMSSmmm），对于系统消息为0
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSG.Order">
+            <summary>
+            32位 流水号
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSG.ConnectionID">
+            <summary>
+            连接ID，在TDF_Open设置
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSG.AppHead">
+            <summary>
+            应用头
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMSG.Data">
+            <summary>
+            数据指针
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFMarketData">
+            <summary>
+            数据消息：MSG_DATA_MARKET 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.WindCode">
+            <summary>
+            万得代码,600001.SH 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Code">
+            <summary>
+            原始Code
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.ActionDay">
+            <summary>
+            业务发生日(自然日)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.TradingDay">
+            <summary>
+            交易日
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Time">
+            <summary>
+            时间(HHMMSSmmm)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Status">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.PreClose">
+            <summary>
+            前收盘价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Open">
+            <summary>
+            开盘价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.High">
+            <summary>
+            最高价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Low">
+            <summary>
+            最低价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Match">
+            <summary>
+            最新价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.AskPrice">
+            <summary>
+            申卖价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.AskVol">
+            <summary>
+            申卖量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.BidPrice">
+            <summary>
+            申买价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.BidVol">
+            <summary>
+            申买量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.NumTrades">
+            <summary>
+            成交笔数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Volume">
+            <summary>
+            成交总量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Turnover">
+            <summary>
+            成交总金额
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.TotalBidVol">
+            <summary>
+            委托买入总量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.TotalAskVol">
+            <summary>
+            委托卖出总量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.WeightedAvgBidPrice">
+            <summary>
+            加权平均委买价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.WeightedAvgAskPrice">
+            <summary>
+            加权平均委卖价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.IOPV">
+            <summary>
+            IOPV净值估值
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.YieldToMaturity">
+            <summary>
+            到期收益率
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.HighLimited">
+            <summary>
+            涨停价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.LowLimited">
+            <summary>
+            跌停价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Prefix">
+            <summary>
+            证券信息前缀
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Syl1">
+            <summary>
+            市盈率1
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.Syl2">
+            <summary>
+            市盈率2
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFMarketData.SD2">
+            <summary>
+            升跌2（对比上一笔）
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFIndexData">
+            <summary>
+            数据消息：MSG_DATA_INDEX 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.WindCode">
+            <summary>
+            600001.SH 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.Code">
+            <summary>
+            原始Code
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.ActionDay">
+            <summary>
+            业务发生日(自然日)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.TradingDay">
+            <summary>
+            交易日
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.Time">
+            <summary>
+            时间(HHMMSSmmm)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.OpenIndex">
+            <summary>
+            今开盘指数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.HighIndex">
+            <summary>
+            最高指数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.LowIndex">
+            <summary>
+            最低指数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.LastIndex">
+            <summary>
+            最新指数
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.TotalVolume">
+            <summary>
+            参与计算相应指数的交易数量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.Turnover">
+            <summary>
+            参与计算相应指数的成交金额
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFIndexData.PreCloseIndex">
+            <summary>
+            前盘指数
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFFutureData">
+            <summary>
+            数据消息：MSG_DATA_FUTURE 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.WindCode">
+            <summary>
+            600001.SH 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Code">
+            <summary>
+            原始Code
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.ActionDay">
+            <summary>
+            业务发生日(自然日)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.TradingDay">
+            <summary>
+            交易日
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Time">
+            <summary>
+            时间(HHMMSSmmm)	
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Status">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.PreOpenInterest">
+            <summary>
+            昨持仓
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.PreClose">
+            <summary>
+            昨收盘价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.PreSettlePrice">
+            <summary>
+            昨结算
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Open">
+            <summary>
+            开盘价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.High">
+            <summary>
+            最高价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Low">
+            <summary>
+            最低价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Match">
+            <summary>
+            最新价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Volume">
+            <summary>
+            成交总量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Turnover">
+            <summary>
+            成交总金额
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.OpenInterest">
+            <summary>
+            持仓总量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.Close">
+            <summary>
+            今收盘
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.SettlePrice">
+            <summary>
+            今结算
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.HighLimited">
+            <summary>
+            涨停价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.LowLimited">
+            <summary>
+            跌停价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.PreDelta">
+            <summary>
+            昨虚实度
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.CurrDelta">
+            <summary>
+            今虚实度
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.AskPrice">
+            <summary>
+            申卖价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.AskVol">
+            <summary>
+            申卖量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.BidPrice">
+            <summary>
+            申买价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.BidVol">
+            <summary>
+            申买量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.AuctionPrice">
+            <summary>
+            波动性中断参考价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.AuctionQty">
+            <summary>
+            波动性中断集合竞价虚拟匹配量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFFutureData.AvgPrice">
+            <summary>
+            郑商所期货均价
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFOrderQueue">
+            <summary>
+            数据消息：MSG_DATA_ORDERQUEUE 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.WindCode">
+            <summary>
+            600001.SH 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.Code">
+            <summary>
+            原始Code
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.ActionDay">
+            <summary>
+            自然日
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.Time">
+            <summary>
+            时间(HHMMSSmmm)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.Side">
+            <summary>
+            买卖方向('B':Bid 'A':Ask)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.Price">
+            <summary>
+            委托价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.Orders">
+            <summary>
+            订单数量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.ABItems">
+            <summary>
+            明细个数，目前最大50档
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrderQueue.ABVolume">
+            <summary>
+            订单明细
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFTransaction">
+            <summary>
+            数据消息：MSG_DATA_TRANSACTION 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.WindCode">
+            <summary>
+            600001.SH 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.Code">
+            <summary>
+            原始Code
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.ActionDay">
+            <summary>
+            自然日
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.Time">
+            <summary>
+            成交时间(HHMMSSmmm)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.Index">
+            <summary>
+            成交编号
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.Price">
+            <summary>
+            成交价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.Volume">
+            <summary>
+            成交数量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.Turnover">
+            <summary>
+            成交金额
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.BSFlag">
+            <summary>
+            买卖方向(买：'B', 卖：'S', 不明：' ')
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.OrderKind">
+            <summary>
+            成交类别
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.FunctionCode">
+            <summary>
+            成交代码
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.AskOrder">
+            <summary>
+            叫卖方委托序号
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFTransaction.BidOrder">
+            <summary>
+            叫买方委托序号
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFOrder">
+            <summary>
+            数据消息：MSG_DATA_ORDER 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.WindCode">
+            <summary>
+            600001.SH 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.Code">
+            <summary>
+            原始Code
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.ActionDay">
+            <summary>
+            委托日期(YYMMDD)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.Time">
+            <summary>
+            委托时间(HHMMSSmmm)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.Order">
+            <summary>
+            委托号
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.Price">
+            <summary>
+            委托价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.Volume">
+            <summary>
+            委托数量
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.OrderKind">
+            <summary>
+            委托类别
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFOrder.FunctionCode">
+            <summary>
+            委托代码('B','S','C')
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFBbqtransactionData">
+            <summary>
+            数据消息：MSG_DATA_BBQTRANSACTION 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.WindCode">
+            <summary>
+            600001.SH 
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.ActionDay">
+            <summary>
+            业务发生日(YYMMDD)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.Time">
+            <summary>
+            时间(HHMMSSmmm)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.DoneID">
+            <summary>
+            成交报价编号
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.Price">
+            <summary>
+            成交收益率(%)或价格 *10000
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.PriceStatus">
+            <summary>
+            收益率或价格标识	1：收益率 	2：价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.Status">
+            <summary>
+            收益率或价格标识	1：收益率 	2：价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.Direction">
+            <summary>
+            成交方向	1：done	2：gvn		3：tkn		4：其他
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.Source">
+            <summary>
+            报价机构	1：国际 2：平安利顺 3：中诚 4：天津信唐	5：国利
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqtransactionData.SpecialFlag">
+            <summary>
+            标识报价是否是行权或到期	0无标记	1备注中包含到期		2备注中包含行权
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFBbqbidData">
+            <summary>
+            数据消息：MSG_DATA_BBQBID 对应的结构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.WindCode">
+            <summary>
+            600001.SH
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.ActionDay">
+            <summary>
+            业务发生日(自然日)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.Time">
+            <summary>
+            时间(HHMMSSmmm)
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.Source">
+            <summary>
+            报价机构
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.BidPrice">
+            <summary>
+            买入收益率或价格 x10000
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.BidVolume">
+            <summary>
+            买入量 x10000
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.BidPriceStatus">
+            <summary>
+            收益率或价格标识	1：收益率 	2：价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.IsBid">
+            <summary>
+            是否bid	0：不是bid（普通报价）	1：是bid（意向报价）
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.BidSpecialFlag">
+            <summary>
+            标识报价是否是行权或到期	0无标记	1备注中包含到期		2备注中包含行权
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.BidStatus">
+            <summary>
+            买入最优报价状态	0：正常报价	1：撤销报价
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.OfrPrice">
+            <summary>
+            卖出收益率或价格 x10000
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.OfrVolume">
+            <summary>
+            卖出量	所有量的加总，如2000+1000，就合并为3000；如字符串中含- - 则视为0. x10000
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.OfrPriceStatus">
+            <summary>
+            收益率或价格标识	1：收益率 	2：价格
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.IsOfr">
+            <summary>
+            是否ofr	0：不是ofr（普通报价）	  1：是ofr（意向报价）
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.OfrSpecialFlag">
+            <summary>
+            标识报价是否是行权或到期	0无标记	1备注中包含到期		2备注中包含行权
+            </summary>
+        </member>
+        <member name="F:TDFAPI.TDFBbqbidData.OfrStatus">
+            <summary>
+            卖出最优报价状态	0：正常报价	1：撤销报价
+            </summary>
+        </member>
+        <member name="T:TDFAPI.TDFDataSource">
+            <summary>
+            TDFDataSource: 请从该类派生,重载回调函数,在回调函数内接收数据
+            </summary>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.#ctor(TDFAPI.TDFOpenSetting_EXT)">
+            <summary>
+            连接、登陆服务器
+            </summary>
+            <param name="connSettingsExt"></param>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.#ctor(TDFAPI.TDFOpenSetting_EXT,TDFAPI.TDFProxySetting)">
+            <summary>
+            使用代理连接、登陆服务器
+            </summary>
+            <param name="connSettingsExt"></param>
+            <param name="proxySetting"></param>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.Dispose">
+            <summary>
+            析构
+            </summary>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.SetEnv(TDFAPI.EnvironSetting,System.UInt32)">
+            <summary>
+            SetEnv: 设置环境变量
+            </summary>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.Open">
+            <summary>
+            Open: 链接和登录服务器
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.GetCodeTable(System.String,TDFAPI.TDFCode[]@)">
+            <summary>
+            GetCodeTable: 获得代码表
+            </summary>
+            <param name="markets">
+                指定市场，多个市场，用;分割。如：SH;SZ;
+                如果为空，获取所有授权市场代码表
+            </param>
+            <param name="codeArr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.GetOptionCodeInfo(System.String,TDFAPI.TDFOptionCode@)">
+            <summary>
+            GetOptionCodeInfo: 获得代码信息
+                1. 对于期权Code，除了basicCode之外，还会有期权专门数据
+                2. 非期权Code，只有basicCode数据，其他数据均为空
+            </summary>
+            <param name="windCode">万得代码，如：000001.SZ</param>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.SetSubscription(System.String,TDFAPI.SubscriptionType)">
+            <summary>
+            SetSubscription: 设置订阅
+            </summary>
+            <param name="subscription">
+                WindCode. 可同时订阅多个,使用;分割
+                如：000001.SZ;600000.SH;
+            </param>
+            <param name="subType">操作类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.Close">
+            <summary>
+            关闭连接. 
+            Dispose可自动关闭和释放资源
+            </summary>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.OnRecvSysMsg(TDFAPI.TDFMSG)">
+            <summary>
+            Sys消息回调函数
+            </summary>
+            <param name="msg"></param>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.OnRecvDataMsg(TDFAPI.TDFMSG)">
+            <summary>
+            Data消息回调函数
+            </summary>
+            <param name="msg"></param>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.ToBbqtransactionData(LibTDFWrap.TDF_BBQTRANSACTION_DATA@)">
+            <summary>
+            MSG_DATA_BBQTRANSACTION
+            </summary>
+            <param name="apiBbqtransactionData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.ToBbqbidData(LibTDFWrap.TDF_BBQBID_DATA@)">
+            <summary>
+            MSG_DATA_BBQBID
+            </summary>
+            <param name="apiBbqbidData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TDFAPI.TDFDataSource.Dispose(System.Boolean)">
+            <summary>
+            析构实现函数
+            </summary>
+            <param name="disposing">是否释放资源</param>
+        </member>
+        <member name="T:LibTDFWrap.TDF_BBQTRANSACTION_DATA">
+             <summary>
+            数据类型MSG_DATA_BBQTRANSACTION
+             </summary>
+        </member>
+        <member name="T:LibTDFWrap.TDF_BBQBID_DATA">
+            <summary>
+            数据类MSG_DATA_BBQBID
+            </summary>
+        </member>
+        <member name="T:LibTDFWrap.TDF_MARKET_DATA">
+            <summary>
+            数据消息：MSG_DATA_MARKET 对应的结构
+            </summary>
+        </member>
+        <member name="T:LibTDFWrap.TDF_INDEX_DATA">
+            <summary>
+            数据消息：MSG_DATA_INDEX 对应的结构
+            </summary>
+        </member>
+        <member name="T:LibTDFWrap.TDF_FUTURE_DATA">
+            <summary>
+            数据消息：MSG_DATA_FUTURE 对应的结构
+            </summary>
+        </member>
+    </members>
+</doc>
