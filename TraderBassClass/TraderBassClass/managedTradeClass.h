@@ -7,8 +7,6 @@ using namespace System::Collections::Generic;
 
 #using <mscorlib.dll>
 
-#include "CDataStruct.h"
-
 namespace MCStockLib
 {
 	public ref class managedStockClass

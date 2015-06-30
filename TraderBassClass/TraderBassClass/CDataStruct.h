@@ -154,4 +154,22 @@ struct QueryBalanceSheetReturn
 
 };
 
+/*******************期货映射数据****************/
+struct  FuTuremapinfor
+{
+	char  OrderRef[31];  //自定义
+	bool issendfail; //发送是否失败（CTP拒绝发送）
+	bool isreject;   //交易所是否拒绝
+	char  errormsg[255];
+	QueryEntrustorderstruct  myEntrust;
+	Entrustreturnstruct      myoderreturn;
+	Bargainreturnstruct      mytraderreturn;
+	FuTuremapinfor()
+	{
+		issendfail=false;
+		isreject=false;
+	}
+
+};
+
 #endif

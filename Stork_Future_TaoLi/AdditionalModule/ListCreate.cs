@@ -6,7 +6,7 @@ using Stork_Future_TaoLi.Variables_Type;
 using System.Threading;
 using Stork_Future_TaoLi.Modulars;
 using System.Threading.Tasks;
-using MCStockLib;
+//using MCStockLib;
 
 namespace Stork_Future_TaoLi.Test
 {

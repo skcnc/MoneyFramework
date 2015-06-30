@@ -1,0 +1,5 @@
+E:\Project\NET\MoneyFramework\HangQingInfoSys\bin\HangQingInfoSys.dll
+E:\Project\NET\MoneyFramework\HangQingInfoSys\bin\HangQingInfoSys.pdb
+E:\Project\NET\MoneyFramework\HangQingInfoSys\obj\Release\HangQingInfoSys.csprojResolveAssemblyReference.cache
+E:\Project\NET\MoneyFramework\HangQingInfoSys\obj\Release\HangQingInfoSys.dll
+E:\Project\NET\MoneyFramework\HangQingInfoSys\obj\Release\HangQingInfoSys.pdb

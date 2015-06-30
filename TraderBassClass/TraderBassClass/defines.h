@@ -1,0 +1,22 @@
+
+#define SAMPLE_NUMBER 1000
+#define TAO_LONG_MANAGER_NUMBER 11
+#define TAO_SHORT_MANAGER_NUMBER 11
+#define TEST_TIMER_EVENT   10000
+#define TEST_GTA_INFOR_EVENT 10001
+#define REFRESH_TIMER_EVENT 10002
+#define STOCK_INFOR_TIMER_EVENT 10003
+#define REFRESH_FREQUENCY   100
+#define TAO_STOCK_TABLE_SIZE 1000
+#define THREAD_CAPACITY      15
+#define BATCH_TRADE_CAPACITY 15
+#define STOCK_TRADER_NUMBER 35 //最多交易500个股票
+#define SAMPLE_TYPE_NORMAL  1
+#define SAMPLE_TYPE_HOLDING_POSITION  2
+#define INDEX_HS300 0
+#define INDEX_SZ50  1
+#define INDEX_ZZ500 2
+#define FUTURE_INFOR_INI_FILE_PATH ".\\init\\futureInforManager.ini"
+#define FUTURE_TRADE_INI_FILE_PATH ".\\init\\futureTrader.ini"
+#define STOCK_INFOR_INI_FILE_PATH ".\\init\\stockInfroManager.ini"
+#define STOCK_TRADE_INI_FILE_PATH ".\\init\\stockTrader.ini"

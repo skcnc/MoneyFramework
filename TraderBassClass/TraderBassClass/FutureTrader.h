@@ -1,7 +1,7 @@
 #pragma once
 #include <windows.h>
 #include "ThostFtdcTraderApi.h"
-#include "CDataStruct.h"
+#include "TraderBassClass.h"
 #include <map>
 using namespace std;
 //#pragma pack(4)

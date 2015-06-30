@@ -9,6 +9,7 @@ using System.Web.Routing;
 using Stork_Future_TaoLi.Test;
 using Stork_Future_TaoLi.PreTradeModule;
 using Stork_Future_TaoLi.TradeModule;
+using Stork_Future_TaoLi.TDFDataSource;
 
 namespace Stork_Future_TaoLi
 {
@@ -31,6 +32,8 @@ namespace Stork_Future_TaoLi
             ListCreate.Main();
             PreTradeModule.PreTradeModule.getInstance().Run();
             StockTradeThread.Main();
+            TDFMain.Run();
+
         }
     }
 }

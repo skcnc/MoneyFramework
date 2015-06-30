@@ -10,8 +10,8 @@ namespace Stork_Future_TaoLi.TDFDataSource
 {
     public class TDFSourceImp : TDFAPI.TDFDataSource
     {
-        public static LogWirter logA = new LogWirter();
-        public static LogWirter logB = new LogWirter();
+        private static LogWirter logA = new LogWirter();
+        private static LogWirter logB = new LogWirter();
 
         public TDFSourceImp(TDFOpenSetting_EXT openSetting_ext)
             : base(openSetting_ext)

@@ -12,6 +12,17 @@ namespace Stork_Future_TaoLi.TDFDataSource
     public class TDFMain
     {
 
+        
+
+        public static void Run()
+        {
+            //启动行情线程
+            Thread excuteThread = new Thread(new ThreadStart(MainThread));
+            excuteThread.Start();
+            Thread.Sleep(1000);
+
+        }
+
         delegate String ToString(String[] args);
         /// <summary>
         /// 行情订阅主线程
@@ -23,10 +34,16 @@ namespace Stork_Future_TaoLi.TDFDataSource
 
             theServers[0] = new TDFServerInfo()
             {
-                Ip = CHangQingPARA.IP,
-                Port = CHangQingPARA.PORT,
-                Username = CHangQingPARA.USERNAME,
-                Password = CHangQingPARA.PASSWORD
+                //Ip = CHangQingPARA.IP,
+                //Port = CHangQingPARA.PORT,
+                //Username = CHangQingPARA.USERNAME,
+                //Password = CHangQingPARA.PASSWORD
+
+                Ip = "114.80.154.34",
+                Port = "6231",                              //服务器端口
+                Username = "TD1033422002",                        //服务器用户名
+                Password = "27692616"
+
             };
 
             /******即使不用，也要初始化******/
@@ -40,7 +57,7 @@ namespace Stork_Future_TaoLi.TDFDataSource
             {
                 Servers = theServers,
                 ServerNum = iServerNum,
-                Subscriptions = "sh;sz;cf;shf;czc;dce",
+                Subscriptions = "sh;sz",
                 ConnectionID = 1,
                 Time =0,
                 TypeFlags = 0
@@ -66,6 +83,8 @@ namespace Stork_Future_TaoLi.TDFDataSource
 
                 while (true)
                 {
+                    Thread.Sleep(20);
+                    continue;
                     #region 以下代码是演示订阅功能，真实使用时需要修改
                     //主线程阻塞在这里，等待回调消息通知（其他消息）
                     String strHelp = @"键入q退出
