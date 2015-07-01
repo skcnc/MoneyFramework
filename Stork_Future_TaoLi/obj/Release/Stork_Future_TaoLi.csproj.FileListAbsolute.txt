@@ -23,9 +23,11 @@ E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\System.Web.Razor.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\System.Web.WebPages.Deployment.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\System.Web.WebPages.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\System.Web.WebPages.Razor.dll
+E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TraderBassClass.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\WebGrease.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\WebMatrix.Data.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\WebMatrix.WebData.dll
+E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TraderBassClass.pdb
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\EntityFramework.xml
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\Newtonsoft.Json.xml
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\System.Web.Helpers.xml
@@ -89,8 +91,3 @@ E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\zh-Hant\System.Spatial.reso
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Release\Stork_Future_TaoLi.csprojResolveAssemblyReference.cache
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Release\Stork_Future_TaoLi.dll
 E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\obj\Release\Stork_Future_TaoLi.pdb
-E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TDFApi_CSharp_v3.0.dll
-E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TraderBassClass.dll
-E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TraderBassClass.pdb
-E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TDFApi_CSharp_v3.0.pdb
-E:\Project\NET\MoneyFramework\Stork_Future_TaoLi\bin\TDFApi_CSharp_v3.0.xml
