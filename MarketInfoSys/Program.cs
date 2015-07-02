@@ -19,12 +19,12 @@ namespace MarketInfoSys
             ServiceHost host = new ServiceHost(typeof(StockInfo));
             host.Open();
 
-            ServiceHost crossDomainserivceHOST = new ServiceHost(typeof(DomainService));
-            crossDomainserivceHOST.Open();
+            //ServiceHost crossDomainserivceHOST = new ServiceHost(typeof(DomainService));
+            //crossDomainserivceHOST.Open();
 
             Console.ReadLine();
             host.Close();
-            crossDomainserivceHOST.Close();
+            //crossDomainserivceHOST.Close();
         }
     }
 }

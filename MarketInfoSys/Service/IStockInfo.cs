@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 
-namespace MarketInfoSys.Service
+namespace MarketInfoSys
 {
     // 注意: 使用“重构”菜单上的“重命名”命令，可以同时更改代码和配置文件中的接口名“IService1”。
     [ServiceContract(Namespace = "http://MarketInfoSys")]
@@ -18,18 +18,17 @@ namespace MarketInfoSys.Service
         int DoWork2(int a, int b);
 
         [OperationContract]
-        object DeQueueInfo();
+        MarketData DeQueueInfo();
     }
 
 
-    [DataContract]
+    [ServiceContract(Namespace = "http://MarketInfoSys")]
     public class TestData
     {
-        string t;
-        public string tt { get { return t; } set { t = value; } }
+        public Int32 t = 0;
     }
 
-    [DataContract(Namespace = "http://MarketInfoSys")]
+    [ServiceContract(Namespace = "http://MarketInfoSys")]
     public class MarketData
     {
         

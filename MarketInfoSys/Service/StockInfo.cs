@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 
-namespace MarketInfoSys.Service
+namespace MarketInfoSys
 {
     // 注意: 使用“重构”菜单上的“重命名”命令，可以同时更改代码和配置文件中的类名“Service1”。
     public class StockInfo : IStockInfo
@@ -17,16 +17,16 @@ namespace MarketInfoSys.Service
 
         public int DoWork2(int a, int b)
         {
-            return a - b;
+            return b;
         }
 
-        public object DeQueueInfo()
+        public MarketData DeQueueInfo()
         {
             lock (Queue_Market_Data.GetQueue().SyncRoot)
             {
                 if (Queue_Market_Data.GetQueue().Count > 0)
                 {
-                    return (Queue_Market_Data.GetQueue().Dequeue());
+                    return (MarketData)(Queue_Market_Data.GetQueue().Dequeue());
                 }
                 else
                 {

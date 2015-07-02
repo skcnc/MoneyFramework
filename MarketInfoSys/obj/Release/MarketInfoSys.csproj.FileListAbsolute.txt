@@ -6,4 +6,3 @@ E:\Project\NET\MoneyFramework\MarketInfoSys\bin\Release\TDFApi_CSharp_v3.0.pdb
 E:\Project\NET\MoneyFramework\MarketInfoSys\bin\Release\TDFApi_CSharp_v3.0.xml
 E:\Project\NET\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.exe
 E:\Project\NET\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.pdb
-E:\Project\NET\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.csprojResolveAssemblyReference.cache
