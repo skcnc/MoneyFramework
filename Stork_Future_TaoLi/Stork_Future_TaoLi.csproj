@@ -192,6 +192,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="MarketInfo\MarketInfo.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="PreTradeModule\PreTradeModule.cs" />
     <Compile Include="Queues\queue_hangqing_info.cs" />
@@ -267,6 +268,7 @@
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Properties\DataSources\System.ServiceModel.Channels.Message.datasource" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
     <Content Include="Scripts\jquery-1.8.2.min.js" />
@@ -282,14 +284,17 @@
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
-    <None Include="Service References\StockInfoService\StockInfo.wsdl" />
-    <None Include="Service References\StockInfoService\StockService.disco" />
     <None Include="Service References\StockInfoService\configuration91.svcinfo" />
     <None Include="Service References\StockInfoService\configuration.svcinfo" />
+    <Content Include="Service References\StockInfoService\DomainService.wsdl" />
+    <None Include="Service References\StockInfoService\item.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\StockInfoService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Content Include="Service References\StockInfoService\item.disco" />
     <Content Include="Statement.txt" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -330,12 +335,6 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
-    <None Include="Service References\StockInfoService\StockService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\StockInfoService\StockService1.xsd">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

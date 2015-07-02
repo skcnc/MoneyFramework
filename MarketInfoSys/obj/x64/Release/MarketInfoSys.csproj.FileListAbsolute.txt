@@ -1,0 +1,8 @@
+E:\Project\NET\MoneyFramework\MarketInfoSys\bin\x64\Release\MarketInfoSys.exe.config
+E:\Project\NET\MoneyFramework\MarketInfoSys\bin\x64\Release\MarketInfoSys.exe
+E:\Project\NET\MoneyFramework\MarketInfoSys\bin\x64\Release\MarketInfoSys.pdb
+E:\Project\NET\MoneyFramework\MarketInfoSys\bin\x64\Release\TDFApi_CSharp_v3.0.dll
+E:\Project\NET\MoneyFramework\MarketInfoSys\bin\x64\Release\TDFApi_CSharp_v3.0.pdb
+E:\Project\NET\MoneyFramework\MarketInfoSys\bin\x64\Release\TDFApi_CSharp_v3.0.xml
+E:\Project\NET\MoneyFramework\MarketInfoSys\obj\x64\Release\MarketInfoSys.exe
+E:\Project\NET\MoneyFramework\MarketInfoSys\obj\x64\Release\MarketInfoSys.pdb
