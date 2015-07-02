@@ -106,6 +106,7 @@ namespace Stork_Future_TaoLi.MarketInfo
 
         /// <summary>
         /// 输入策略及策略包含代码
+        /// 包括添加新的代码和删除老的代码
         /// </summary>
         /// <param name="Strategy">策略名</param>
         /// <param name="Codes">策略包含代码</param>
@@ -123,24 +124,10 @@ namespace Stork_Future_TaoLi.MarketInfo
                 {
                     MapSS[code].Add(Strategy);
                 }
-            }
-        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Strategy"></param>
-        /// <param name="Codes"></param>
-        public static void RemoveRegeditStrategy(String Strategy, List<String> Codes)
-        {
-            //获取已经注册过的代码
-            List<String> existRegedit = GetRegeditCode(Strategy);
-
-            lock (syncRoot)
-            {
                 List<String> RemoveRegeditCodes = (from item in existRegedit where Codes.Contains(item) == false select item).ToList();
 
-                foreach (String code in RemoveRegeditCodes)
+                foreach(String code in RemoveRegeditCodes)
                 {
                     MapSS[code].Remove(Strategy);
                 }

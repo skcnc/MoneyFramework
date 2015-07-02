@@ -70,6 +70,7 @@ namespace MCStockLib
 	};
 
 
+
 	public ref struct managedLogin
 	{
 		char* serverAddr;// µØÖ·
