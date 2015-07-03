@@ -13,13 +13,35 @@ namespace Stork_Future_TaoLi.MarketInfo
 {
     public class MarketInfo
     {
+        private static LogWirter log = new LogWirter();
+        
+
+        private MarketInfo()
+        {
+            log.EventSourceName = "行情获取模块";
+            log.EventLogType = System.Diagnostics.EventLogEntryType.Information;
+            log.EventLogID = 63003;
+        }
+
+        /// <summary>
+        /// 启动行情获取新示例
+        /// </summary>
+        public static void Run()
+        {
+            Thread excuteThread = new Thread(new ThreadStart(ThreadProc));
+            excuteThread.Start();
+            Thread.Sleep(1000);
+        }
+
         private static void ThreadProc()
         {
+            //本地股市信息存入stockTable 中
             Hashtable StockTable = new Hashtable();
             StockInfoClient client = new StockInfoClient();
             while (true)
             {
                 //从行情应用获取新行情
+                Thread.Sleep(1); //线程的喘息时间
                 MarketData info = client.DeQueueInfo();
                 if (info == null)
                     continue;
@@ -33,8 +55,15 @@ namespace Stork_Future_TaoLi.MarketInfo
                     }
                     StockTable.Add(info.Code, info);
 
-                    
+                    List<String> _relatedStrategy = MapMarketStratgy.GetRegeditStrategy(info.Code);
 
+                    foreach (String strategy in _relatedStrategy)
+                    {
+                        if (!StrategyInterface.EnStrategyQueue(strategy, (object)info))
+                        {
+                            log.LogEvent("向 策略：" + strategy + "写入队列信息出错。");
+                        }
+                    }
                 }
             }
         }

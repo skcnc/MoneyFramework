@@ -203,6 +203,7 @@
     <Compile Include="AdditionalModule\ListCreate.cs" />
     <Compile Include="AdditionalModule\TestClass.cs" />
     <Compile Include="AdditionalModule\WinLogs.cs" />
+    <Compile Include="StrategyModule\StrategyInterface.cs" />
     <Compile Include="TradeModule\StockTradeThread.cs" />
     <Compile Include="Variables Type\CONFIG.cs" />
     <Compile Include="Variables Type\ListType.cs" />
@@ -283,7 +284,9 @@
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Statement.txt" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
