@@ -9,12 +9,47 @@ using System.Collections;
 
 
 
-namespace Stork_Future_TaoLi.MarketInfo
+namespace Stork_Future_TaoLi
 {
-    public class MarketInfo
+    public class MarketInfo 
+
     {
         private static LogWirter log = new LogWirter();
-        
+
+        private static Dictionary<Guid, Queue> refStrategyQueue = new Dictionary<Guid, Queue>();
+        private static object lockSync = new object();
+
+        private Dictionary<String, List<Guid>> subscribeList = new Dictionary<string, List<Guid>>();
+
+
+        /// <summary>
+        /// 启动行情获取新示例
+        /// </summary>
+        public void Run()
+        {
+            Thread excuteThread = new Thread(new ThreadStart(ThreadProc));
+            excuteThread.Start();
+            Thread.Sleep(1000);
+        }
+
+        /// <summary>
+        /// 设置策略实例行情消息队列的关系
+        /// </summary>
+        /// <param name="para"></param>
+        public static void SetStrategyQueue(KeyValuePair<Guid, Queue> para)
+        {
+            lock (lockSync)
+            {
+                if (refStrategyQueue.ContainsKey(para.Key))
+                {
+                    refStrategyQueue.Remove(para.Key);
+                }
+                else
+                {
+                    refStrategyQueue.Add(para.Key, para.Value);
+                }
+            }
+        }
 
         private MarketInfo()
         {
@@ -24,24 +59,36 @@ namespace Stork_Future_TaoLi.MarketInfo
         }
 
         /// <summary>
-        /// 启动行情获取新示例
+        /// 更新本地行情订阅列表
         /// </summary>
-        public static void Run()
+        private void updateNewSubscribeList()
         {
-            Thread excuteThread = new Thread(new ThreadStart(ThreadProc));
-            excuteThread.Start();
-            Thread.Sleep(1000);
+            if (MapMarketStratgy.bSubscribeListChangeLabel)
+            {
+                subscribeList = MapMarketStratgy.GetMapSS();
+                MapMarketStratgy.bSubscribeListChangeLabel = false;
+            }
         }
 
-        private static void ThreadProc()
+        private void ThreadProc()
         {
             //本地股市信息存入stockTable 中
             Hashtable StockTable = new Hashtable();
             StockInfoClient client = new StockInfoClient();
             while (true)
             {
+                //更新本地行情列表
+                updateNewSubscribeList();
+
                 //从行情应用获取新行情
                 Thread.Sleep(1); //线程的喘息时间
+
+                if((DateTime.Now-GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 15)
+                {
+                    log.LogEvent("行情获取线程即将停止！");
+                    break;
+                }
+
                 MarketData info = client.DeQueueInfo();
                 if (info == null)
                     continue;
@@ -55,17 +102,16 @@ namespace Stork_Future_TaoLi.MarketInfo
                     }
                     StockTable.Add(info.Code, info);
 
-                    List<String> _relatedStrategy = MapMarketStratgy.GetRegeditStrategy(info.Code);
+                    List<Guid> _relatedStrategy = subscribeList[info.Code];
 
-                    foreach (String strategy in _relatedStrategy)
+                    foreach (Guid strategy in _relatedStrategy)
                     {
-                        if (!StrategyInterface.EnStrategyQueue(strategy, (object)info))
-                        {
-                            log.LogEvent("向 策略：" + strategy + "写入队列信息出错。");
-                        }
+                        refStrategyQueue[strategy].Enqueue((object)info);
                     }
                 }
             }
+
+            Thread.CurrentThread.Abort();
         }
     }
 
@@ -87,7 +133,8 @@ namespace Stork_Future_TaoLi.MarketInfo
         //股票代码与注册该代码的行情映射表
         //public static List<KeyValuePair<String, List<String>>> MapSS = new List<KeyValuePair<string, List<string>>>();
 
-        public static Dictionary<String, List<String>> MapSS = new Dictionary<string, List<string>>();
+        public static Dictionary<String, List<Guid>> MapSS = new Dictionary<String, List<Guid>>();
+        public static bool bSubscribeListChangeLabel = false;
 
         /// <summary>
         /// 获取代码注册的策略
@@ -116,7 +163,7 @@ namespace Stork_Future_TaoLi.MarketInfo
         /// </summary>
         /// <param name="Strategy">策略号</param>
         /// <returns>注册代码编号列表</returns>
-        public static List<String> GetRegeditCode(String Strategy)
+        public static List<String> GetRegeditCode(Guid Strategy)
         {
             lock (syncRoot)
             {
@@ -139,7 +186,7 @@ namespace Stork_Future_TaoLi.MarketInfo
         /// </summary>
         /// <param name="Strategy">策略名</param>
         /// <param name="Codes">策略包含代码</param>
-        public static void SetRegeditStrategy(String Strategy, List<String> Codes)
+        public static void SetRegeditStrategy(Guid Strategy, List<String> Codes)
         {
             //获取已经注册过的代码
             List<String> existRegedit = GetRegeditCode(Strategy);
@@ -161,6 +208,29 @@ namespace Stork_Future_TaoLi.MarketInfo
                     MapSS[code].Remove(Strategy);
                 }
             }
+        }
+
+        /// <summary>
+        /// 更新订阅列表
+        /// </summary>
+        /// <param name="para"></param>
+        public static void SetMapSS(Dictionary<String,List<Guid>> para)
+        {
+            lock(syncRoot)
+            {
+                MapSS = para;
+                bSubscribeListChangeLabel = true;
+            }
+        }
+
+        /// <summary>
+        /// 获取订阅列表
+        /// 该函数由行情模块调用
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<String,List<Guid>> GetMapSS()
+        {
+            return MapSS;
         }
     }
 }

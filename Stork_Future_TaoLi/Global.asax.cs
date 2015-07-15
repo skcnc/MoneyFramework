@@ -9,6 +9,7 @@ using System.Web.Routing;
 using Stork_Future_TaoLi.Test;
 using Stork_Future_TaoLi.PreTradeModule;
 using Stork_Future_TaoLi.TradeModule;
+using System.Threading;
 
 
 namespace Stork_Future_TaoLi
@@ -33,6 +34,32 @@ namespace Stork_Future_TaoLi
             PreTradeModule.PreTradeModule.getInstance().Run();
             StockTradeThread.Main();
 
+        }
+    }
+
+    /// <summary>
+    /// Global 心跳发射线程
+    /// </summary>
+    public class ThreadHeartBeatControl
+    {
+        private static Thread HeartThread = new Thread(new ThreadStart(threadProc));
+
+        public static void Run()
+        {
+            HeartThread.Start();
+            Thread.Sleep(1000);
+        }
+
+        private static void threadProc()
+        {
+            while(true)
+            {
+                Thread.Sleep(1000);
+                if (DateTime.Now.Minute % 2 == 0)
+                {
+                    GlobalHeartBeat.SetGlobalTime();
+                }
+            }
         }
     }
 }

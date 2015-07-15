@@ -30,5 +30,20 @@ namespace Stork_Future_TaoLi.Controllers
 
             return View();
         }
+
+        public ActionResult Index2()
+        {
+            return View();
+        }
+
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        public ActionResult MonitorConsole()
+        {
+            return View();
+        }
     }
 }

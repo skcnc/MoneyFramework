@@ -56,7 +56,8 @@ namespace MarketInfoSys
             {
                 Servers = theServers,
                 ServerNum = iServerNum,
-                Subscriptions = "sh;sz",
+                Markets = "",
+                Subscriptions = "IF1508.cf",
                 ConnectionID = 1,
                 Time =0,
                 TypeFlags = 0
@@ -160,5 +161,21 @@ namespace MarketInfoSys
             }
 
         }
+    }
+
+    public class MarketInfo
+    {
+        //
+        // 摘要: 
+        //     原始Code
+        public string Code;
+        //
+        // 摘要: 
+        //     时间(HHMMSSmmm)
+        public int Time;
+        //
+        // 摘要: 
+        //     状态
+        public int Status;
     }
 }

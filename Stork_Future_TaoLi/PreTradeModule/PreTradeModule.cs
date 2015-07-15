@@ -10,7 +10,7 @@ using Stork_Future_TaoLi.Test;
 namespace Stork_Future_TaoLi.PreTradeModule
 {
     /// <summary>
-    /// 模块名称：   交易预处理模块
+    /// 模块名称：   交易预处理模块 
     /// 模块函数：
     ///             getInstance()          返回模块实例，并保持在整个应用程序执行期间，不会同事运行两个交易预处理模块
     ///             DeQueue()               从消息队列中获取数据

@@ -1,0 +1,9 @@
+D:\projects\MoneyFramework\MarketInfoSys\bin\Debug\MarketInfoSys.exe.config
+D:\projects\MoneyFramework\MarketInfoSys\bin\Debug\MarketInfoSys.exe
+D:\projects\MoneyFramework\MarketInfoSys\bin\Debug\MarketInfoSys.pdb
+D:\projects\MoneyFramework\MarketInfoSys\bin\Debug\TDFApi_CSharp_v3.0.dll
+D:\projects\MoneyFramework\MarketInfoSys\bin\Debug\TDFApi_CSharp_v3.0.pdb
+D:\projects\MoneyFramework\MarketInfoSys\bin\Debug\TDFApi_CSharp_v3.0.xml
+D:\projects\MoneyFramework\MarketInfoSys\obj\Debug\MarketInfoSys.csprojResolveAssemblyReference.cache
+D:\projects\MoneyFramework\MarketInfoSys\obj\Debug\MarketInfoSys.exe
+D:\projects\MoneyFramework\MarketInfoSys\obj\Debug\MarketInfoSys.pdb

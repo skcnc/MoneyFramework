@@ -22,7 +22,7 @@ namespace Stork_Future_TaoLi.TradeModule
         public static void Main()
         {
             //股票交易主控线程名设定
-            Thread.CurrentThread.Name = "StockTradeControl";
+            //Thread.CurrentThread.Name = "StockTradeControl";
 
             //初始化消息队列
             queue_stock_excuteThread.Init();

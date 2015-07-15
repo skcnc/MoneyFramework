@@ -85,4 +85,35 @@ namespace Stork_Future_TaoLi
         }
 
     }
+
+    class GlobalHeartBeat
+    {
+        static DateTime lastHeartBeat = DateTime.Now;
+        static object rootsync = new object();
+
+        /// <summary>
+        /// 修改全局心跳时间
+        /// </summary>
+        public static void SetGlobalTime()
+        {
+            lock (rootsync)
+            {
+                lastHeartBeat = DateTime.Now;
+            }
+        }
+
+        /// <summary>
+        /// 获取最近心跳
+        /// </summary>
+        /// <returns></returns>
+        public static DateTime GetGlobalTime()
+        {
+            return lastHeartBeat;
+        }
+
+
+
+    }
+
+   
 }

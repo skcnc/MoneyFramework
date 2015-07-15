@@ -1,4 +1,30 @@
-﻿html {
+﻿
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/*html {
     background-color: #e2e2e2;
     margin: 0;
     padding: 0;
@@ -88,11 +114,11 @@ h5, h6 {
     h5 a:link, h5 a:visited, h5 a:active {
         padding: 0;
         text-decoration: none;
-    }
+    }*/
 
 
 /* main layout
-----------------------------------------------------------*/
+----------------------------------------------------------
 .content-wrapper {
     margin: 0 auto;
     max-width: 960px;
@@ -126,8 +152,8 @@ footer {
 }
 
 
-/* site title
-----------------------------------------------------------*/
+ site title
+----------------------------------------------------------
 .site-title {
     color: #c8c8c8;
     font-family: Rockwell, Consolas, "Courier New", Courier, monospace;
@@ -143,8 +169,8 @@ footer {
 }
 
 
-/* login
-----------------------------------------------------------*/
+ login
+----------------------------------------------------------
 #login {
     display: block;
     font-size: .85em;
@@ -177,8 +203,8 @@ footer {
     }
 
 
-/* menu
-----------------------------------------------------------*/
+ menu
+----------------------------------------------------------
 ul#menu {
     font-size: 1.3em;
     font-weight: 600;
@@ -205,9 +231,9 @@ ul#menu {
         }
 
 
-/* page elements
-----------------------------------------------------------*/
-/* featured */
+ page elements
+----------------------------------------------------------
+ featured 
 .featured {
     background-color: #fff;
 }
@@ -231,7 +257,7 @@ ul#menu {
             font-size: 1.1em;
         }
 
-/* page titles */
+ page titles 
 hgroup.title {
     margin-bottom: 10px;
 }
@@ -245,14 +271,14 @@ hgroup.title h2 {
     margin-left: 3px;
 }
 
-/* features */
+ features 
 section.feature {
     width: 300px;
     float: left;
     padding: 10px;
 }
 
-/* ordered list */
+ ordered list 
 ol.round {
     list-style-type: none;
     padding-left: 0;
@@ -303,7 +329,7 @@ ol.round {
             background: url("../Images/orderedList9.png") no-repeat;
         }
 
-/* content */
+ content 
 article {
     float: left;
     width: 70%;
@@ -328,7 +354,7 @@ aside {
     font-weight: 700;
 }
 
-/* login page */
+ login page 
 #loginForm {
     border-right: solid 2px #c8c8c8;
     float: left;
@@ -380,7 +406,7 @@ aside {
     display: inline;
 }
 
-/* contact */
+ contact 
 .contact h3 {
     font-size: 1.2em;
 }
@@ -394,7 +420,7 @@ aside {
     margin: 5px 0 0 10px;
 }
 
-/* forms */
+ forms 
 fieldset {
     border: none;
     margin: 0;
@@ -470,7 +496,7 @@ textarea {
         margin-right: 4px;
     }
 
-/* info and errors */
+ info and errors 
 .message-info {
     border: 1px solid;
     clear: both;
@@ -496,7 +522,7 @@ textarea {
     color: #e80c4d;
 }
 
-/* styles for validation helpers */
+ styles for validation helpers 
 .field-validation-error {
     color: #e80c4d;
     font-weight: bold;
@@ -525,8 +551,8 @@ input[type="checkbox"].input-validation-error {
 }
 
 
-/* tables
-----------------------------------------------------------*/
+ tables
+----------------------------------------------------------
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -587,25 +613,25 @@ tr.pager td {
 }
 
 
-/********************
+*******************
 *   Mobile Styles   *
-********************/
+*******************
 @media only screen and (max-width: 850px) {
 
-    /* header
-    ----------------------------------------------------------*/
+     header
+    ----------------------------------------------------------
     header .float-left,
     header .float-right {
         float: none;
     }
 
-    /* logo */
+     logo 
     header .site-title {
         margin: 10px;
         text-align: center;
     }
 
-    /* login */
+     login 
     #login {
         font-size: .85em;
         margin: 0 0 12px;
@@ -636,7 +662,7 @@ tr.pager td {
             color: #333;
         }
 
-    /* menu */
+     menu 
     nav {
         margin-bottom: 5px;
     }
@@ -653,8 +679,8 @@ tr.pager td {
         }
 
 
-    /* main layout
-    ----------------------------------------------------------*/
+     main layout
+    ----------------------------------------------------------
     .main-content,
     .featured + .main-content {
         background-position: 10px 0;
@@ -669,13 +695,13 @@ tr.pager td {
         padding: 10px;
     }
 
-    /* page content */
+     page content 
     article, aside {
         float: none;
         width: 100%;
     }
 
-    /* ordered list */
+     ordered list 
     ol.round {
         list-style-type: none;
         padding-left: 0;
@@ -699,7 +725,7 @@ tr.pager td {
                 background: none;
             }
 
-     /* features */
+      features 
      section.feature {
         float: none;
         padding: 10px;
@@ -713,12 +739,12 @@ tr.pager td {
             font-weight: 600;
         }
 
-    /* forms */
+     forms 
     input {
         width: 90%;
     }
 
-    /* login page */
+     login page 
     #loginForm {
         border-right: none;
         float: none;
@@ -737,8 +763,8 @@ tr.pager td {
     }
 
 
-    /* footer
-    ----------------------------------------------------------*/
+     footer
+    ----------------------------------------------------------
     footer .float-left,
     footer .float-right {
         float: none;
@@ -753,4 +779,4 @@ tr.pager td {
         footer p {
             margin: 0;
         }
-}
+}*/

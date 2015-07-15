@@ -64,6 +64,7 @@ namespace MarketInfoSys
                 logA.LogEvent(String.Format("获取到代码表, info:{0}，市场个数:{1}", codeResult.Info, codeResult.Markets.Length));
 
                 //代码表是什么鸟玩意？？
+                
                 TDFCode[] codeArrSZ;
                 GetCodeTable("SZ", out codeArrSZ);
 

@@ -84,8 +84,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TDFApi_CSharp_v3.0">
-      <HintPath>bin\hangqing_bin\x64Release\TDFApi_CSharp_v3.0.dll</HintPath>
+    <Reference Include="TDFApi_CSharp_v3.0, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Release\TDFApi_CSharp_v3.0.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
