@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Threading;
-using MarketInfoSys;
 using System.Threading.Tasks;
 using System.Collections;
+using marketinfosys;
 
 
 
@@ -51,7 +51,7 @@ namespace Stork_Future_TaoLi
             }
         }
 
-        private MarketInfo()
+        public MarketInfo()
         {
             log.EventSourceName = "行情获取模块";
             log.EventLogType = System.Diagnostics.EventLogEntryType.Information;
@@ -88,8 +88,16 @@ namespace Stork_Future_TaoLi
                     log.LogEvent("行情获取线程即将停止！");
                     break;
                 }
-
-                MarketData info = client.DeQueueInfo();
+                MarketData info = new MarketData();
+                try
+                {
+                    info = client.DeQueueInfo();
+                }
+                catch(Exception ex)
+                {
+                    log.LogEvent("未能成功返回； "+ ex.ToString());
+                    continue;
+                }
                 if (info == null)
                     continue;
                 else
@@ -101,6 +109,11 @@ namespace Stork_Future_TaoLi
                         StockTable.Remove(info.Code);
                     }
                     StockTable.Add(info.Code, info);
+
+                    if(!subscribeList.Keys.Contains(info.Code))
+                    {
+                        subscribeList.Add(info.Code, new List<Guid>());
+                    }
 
                     List<Guid> _relatedStrategy = subscribeList[info.Code];
 
@@ -115,11 +128,6 @@ namespace Stork_Future_TaoLi
         }
     }
 
-    public class MarketPool
-    {
-        MarketData currentData = new MarketData();
-
-    }
 
     /// <summary>
     /// 股票代码与策略映射关系表

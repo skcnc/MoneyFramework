@@ -86,6 +86,11 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public float OP = 1;
 
+        /// <summary>
+        /// 指数
+        /// </summary>
+        public String Index = String.Empty;
+
          /// <summary>
         /// 发起操作用户名
         /// </summary>
@@ -150,17 +155,17 @@ namespace Stork_Future_TaoLi
     {
         public Guid id = new Guid();
 
-        public bool bAllow = false;
+        public bool bRun = false;
 
            /// <summary>
         /// 发起操作用户名
         /// </summary>
         public String UserName = String.Empty;
 
-        public ASI(Guid _id, bool _bAllow , String _userName)
+        public RSI(Guid _id, bool _bRun, String _userName)
         {
             this.id = _id;
-            this.bAllow = _bAllow;
+            this.bRun = _bRun;
             this.UserName = _userName;
         }
     }

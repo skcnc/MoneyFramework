@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using TDFAPI;
 
 namespace MarketInfoSys
 {
@@ -28,10 +29,10 @@ namespace MarketInfoSys
         public Int32 t = 0;
     }
 
-    [ServiceContract(Namespace = "http://MarketInfoSys")]
+    [DataContract(Namespace = "http://MarketInfoSys")]
     public class MarketData
     {
-        
+       
         // 摘要:
         //     业务发生日(自然日)
         [DataMember]
@@ -181,5 +182,27 @@ namespace MarketInfoSys
         //     到期收益率
         [DataMember]
         public int YieldToMaturity { get; set; }
+
+        public MarketData(TDFMarketData _mData)
+        {
+            ActionDay = _mData.ActionDay;
+            AskPrice = _mData.AskPrice;
+            AskVol = _mData.AskVol;
+            BidPrice = _mData.BidPrice;
+            BidVol = _mData.BidVol;
+            Code = _mData.Code;
+            High = _mData.High;
+            HighLimited = _mData.HighLimited;
+            IOPV = _mData.IOPV;
+            Low = _mData.Low;
+            LowLimited = _mData.LowLimited;
+            Match = _mData.Match;
+            NumTrades = _mData.NumTrades;
+            Open = _mData.Open;
+            PreClose = _mData.PreClose;
+            Prefix = _mData.Prefix;
+            SD2 = _mData.SD2;
+        }
+        
     }
 }

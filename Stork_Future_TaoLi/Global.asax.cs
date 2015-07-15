@@ -31,8 +31,17 @@ namespace Stork_Future_TaoLi
 
             //模块初始化工作
             ListCreate.Main();
+
+
             PreTradeModule.PreTradeModule.getInstance().Run();
+
             StockTradeThread.Main();
+
+            StrategyMonitorClass strategyMonitor = new StrategyMonitorClass();
+            strategyMonitor.Run();
+
+            MarketInfo marketInfo = new MarketInfo();
+            marketInfo.Run();
 
         }
     }

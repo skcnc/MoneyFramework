@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Diagnostics;
 
-namespace Stork_Future_TaoLi.Test
+namespace Stork_Future_TaoLi
 {
     public class TestClass
     {
@@ -16,5 +16,10 @@ namespace Stork_Future_TaoLi.Test
         }
 
         public static bool isRun = true;
+    }
+
+    public class DebugMode
+    {
+        public static bool debug = true;
     }
 }

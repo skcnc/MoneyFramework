@@ -57,7 +57,7 @@ namespace MarketInfoSys
                 Servers = theServers,
                 ServerNum = iServerNum,
                 Markets = "",
-                Subscriptions = "IF1508.cf",
+                Subscriptions = "600005.sh;600651.sh;600104.sh",
                 ConnectionID = 1,
                 Time =0,
                 TypeFlags = 0

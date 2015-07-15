@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using TDFAPI;
 
 namespace MarketInfoSys
 {
@@ -26,7 +27,8 @@ namespace MarketInfoSys
             {
                 if (Queue_Market_Data.GetQueue().Count > 0)
                 {
-                    return (MarketData)(Queue_Market_Data.GetQueue().Dequeue());
+                    MarketData OBJ = new MarketData((TDFMarketData)(Queue_Market_Data.GetQueue().Dequeue()));
+                    return OBJ;
                 }
                 else
                 {

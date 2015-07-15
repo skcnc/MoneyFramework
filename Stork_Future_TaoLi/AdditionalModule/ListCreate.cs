@@ -111,7 +111,7 @@ namespace Stork_Future_TaoLi.Test
             log.EventLogID = 62300;
 
             Task SendListTask = new Task(ThreadProc);
-            SendListTask.Start();
+            //SendListTask.Start();
         }
 
         static void ThreadProc()

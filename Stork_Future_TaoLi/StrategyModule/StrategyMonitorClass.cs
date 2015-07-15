@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Stork_Future_TaoLi.StrategyModule;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web;
 
-namespace Stork_Future_TaoLi.StrategyModule
+namespace Stork_Future_TaoLi
 {
     public class StrategyMonitorClass
     {
@@ -27,12 +28,25 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         private Dictionary<string, List<Guid>> MarketSubscribeList = new Dictionary<string, List<Guid>>();
 
+        /// <summary>
+        /// 策略管理线程启动
+        /// </summary>
         public void Run()
         {
-            Thread excuteThread;
+            Thread excutedThread = new Thread(new ThreadStart(ThreadProc));
+            excutedThread.Start();
+
+
+
+            //测试参数开始
+
+            //测试参数结束
+
+
+            Thread.Sleep(1000);
         }
 
-        /// <summary>
+        /// <summary>a
         /// 创建新的策略实例
         /// </summary>
         /// <param name="para"></param>
@@ -139,6 +153,12 @@ namespace Stork_Future_TaoLi.StrategyModule
             }
         }
 
+        /// <summary>
+        /// 策略管理线程工作函数
+        /// 任务： 
+        /// 1. 获取用户请求队列中的指令
+        /// 2. 巡检工作组中订阅列表修改
+        /// </summary>
         private void ThreadProc()
         {
             while(true)
@@ -173,19 +193,36 @@ namespace Stork_Future_TaoLi.StrategyModule
                     }
                     else if(command is USI)
                     {
+                        USI _c = (USI)command;
 
+                        InitParameters para = new InitParameters()
+                        {
+                            CT = _c.CT,
+                            BP = 0,
+                            Index = _c.Index,
+                            OP = _c.OP,
+                            HD = _c.HD
+                        };
+
+                        UpdateWorker(para, _c.order, _c.id);
                     }
                     else if(command is DSI)
                     {
+                        DSI _c = (DSI)command;
 
+                        DeleteWorker(_c.id);
                     }
                     else if(command is ASI)
                     {
+                        ASI _c = (ASI)command;
 
+                        Workers[_c.id].bAllow = _c.brun;
                     }
                     else if(command is RSI)
                     {
+                        RSI _c = (RSI)command;
 
+                        Workers[_c.id].bRun = _c.bRun;
                     }
                     else
                     {
@@ -195,6 +232,11 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     #endregion
                 }
+
+                //巡检工作组订阅内容修改
+                CheckSubscribeUpdate();
+
+                Thread.Sleep(10);
             }
         }
 

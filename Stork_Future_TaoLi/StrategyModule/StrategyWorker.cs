@@ -58,6 +58,20 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// 允许实例交易
         /// </summary>
         public bool bAllow = false;
+
+        /// <summary>
+        /// 获取交易列表
+        /// </summary>
+        public List<string> SubscribeList
+        {
+            get { return _subscribe; }
+        }
+
+        /// <summary>
+        /// 行情订阅内容修改标志
+        /// </summary>
+        public bool bSubscribeChange = true;
+
         #endregion
 
         #region private variables
@@ -78,11 +92,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         private List<string> _subscribe = new List<string>();
 
-        /// <summary>
-        /// 行情订阅内容修改标志
-        /// </summary>
-        public bool bSubscribeChange = true;
-        
+
         /// <summary>
         /// 同步锁 
         /// </summary>
@@ -115,6 +125,17 @@ namespace Stork_Future_TaoLi.StrategyModule
             RunningTime = DateTime.Now;
 
             Thread.Sleep(100);
+
+            //Test Code Begin
+            if(DebugMode.debug)
+            {
+              
+                _subscribe.Add("600005.sh");
+                _subscribe.Add("600651.sh");
+                bSubscribeChange = true;
+            }
+            //Test Code End
+
         }
 
         /// <summary>
