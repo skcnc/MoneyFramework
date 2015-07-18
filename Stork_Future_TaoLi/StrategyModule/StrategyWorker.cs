@@ -132,6 +132,7 @@ namespace Stork_Future_TaoLi.StrategyModule
               
                 _subscribe.Add("600005.sh");
                 _subscribe.Add("600651.sh");
+                _subscribe.Add("600104.sh");
                 bSubscribeChange = true;
             }
             //Test Code End
@@ -168,10 +169,17 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// <returns></returns>
         public List<string> GetSubscribeList()
         {
-            lock (lockSync)
+            bSubscribeChange = false;
+            return _subscribe;
+        }
+
+        public void SetSubscribeList(List<String> markets)
+        {
+            foreach(String s in markets)
             {
-                return _subscribe;
+                _subscribe.Add(s);
             }
+            bSubscribeChange = true;
         }
 
         /// <summary>
@@ -212,6 +220,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                     breaklabel = true;
                 }
 
+                Thread.Sleep(1);
             }
         }
         #endregion

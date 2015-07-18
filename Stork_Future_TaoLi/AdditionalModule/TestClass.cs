@@ -20,6 +20,6 @@ namespace Stork_Future_TaoLi
 
     public class DebugMode
     {
-        public static bool debug = true;
+        public static bool debug = false;
     }
 }

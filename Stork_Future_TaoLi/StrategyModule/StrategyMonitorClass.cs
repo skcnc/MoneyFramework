@@ -39,7 +39,45 @@ namespace Stork_Future_TaoLi
 
 
             //测试参数开始
+            // Add Three Workers
+            //int j = 0;
 
+            //while (j < 3)
+            //{
+            //    InitParameters para = new InitParameters();
+            //    Dictionary<string, int> order = new Dictionary<string, int>();
+
+            //    RecruitNewWorker(para, order);
+            //    j++;
+            //}
+           
+            
+            //int i = 0;
+            //foreach(StrategyWorker _worker in Workers.Values)
+            //{
+            //    switch(i)
+            //    {
+            //        case 0:
+            //            _worker.SetSubscribeList(new List<string>{
+            //                "600005"
+            //            });
+            //            break;
+            //        case 1:
+            //            _worker.SetSubscribeList(new List<string>{
+            //               "600005",
+            //               "600651"
+            //            });
+            //            break;
+            //        case 2:
+            //            _worker.SetSubscribeList(new List<string>{
+            //                "600104",
+            //                "600005",
+            //                "600651"
+            //            });
+            //            break;
+            //    }
+            //    i++;
+            //}
             //测试参数结束
 
 
@@ -125,7 +163,16 @@ namespace Stork_Future_TaoLi
 
                 for(int i = 0;i < _ToAdd.Count ;i++)
                 {
-                    MarketSubscribeList[_ToAdd[i]].Add(g);
+                    if (MarketSubscribeList.Keys.Contains(_ToAdd[i]))
+                    {
+                        MarketSubscribeList[_ToAdd[i]].Add(g);
+                    }
+                    else
+                    {
+                        MarketSubscribeList.Add(_ToAdd[i], new List<Guid>(){
+                            g
+                        });
+                    }
                 }
 
                  for(int i = 0;i < _ToDelete.Count ;i++)

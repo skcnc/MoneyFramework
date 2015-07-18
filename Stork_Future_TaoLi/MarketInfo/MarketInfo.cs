@@ -115,11 +115,24 @@ namespace Stork_Future_TaoLi
                         subscribeList.Add(info.Code, new List<Guid>());
                     }
 
-                    List<Guid> _relatedStrategy = subscribeList[info.Code];
 
-                    foreach (Guid strategy in _relatedStrategy)
+                    if (subscribeList.Keys.Contains(info.Code))
                     {
-                        refStrategyQueue[strategy].Enqueue((object)info);
+                        //如果没有实例订阅过该股票，就不用管了
+                        List<Guid> _relatedStrategy = subscribeList[info.Code];
+
+                        foreach (Guid strategy in _relatedStrategy)
+                        {
+                            if (refStrategyQueue.Keys.Contains(strategy))
+                            {
+                                refStrategyQueue[strategy].Enqueue((object)info);
+                            }
+                            else
+                            {
+                                //如果发现策略实例包含工作列表，却不包含消息队列，则应该报错。
+                                continue;
+                            }
+                        }
                     }
                 }
             }
@@ -151,19 +164,18 @@ namespace Stork_Future_TaoLi
         /// <returns>策略编号列表</returns>
         public static List<String> GetRegeditStrategy(String code)
         {
-            lock (syncRoot)
-            {
-                var t = (from item in MapSS where item.Key == code select item.Value);
 
-                if (t.Count() != 0)
-                {
-                    return (List<String>)t;
-                }
-                else
-                {
-                    return null;
-                }
+            var t = (from item in MapSS where item.Key == code select item.Value);
+
+            if (t.Count() != 0)
+            {
+                return (List<String>)t;
             }
+            else
+            {
+                return null;
+            }
+
         }
 
         /// <summary>

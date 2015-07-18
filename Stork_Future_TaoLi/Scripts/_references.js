@@ -10,4 +10,5 @@
 /// <reference path="respond.min.js" />
 /// <reference path="npm.js" />
 /// <reference path="login.js" />
+/// <reference path="sitescript.js" />
 

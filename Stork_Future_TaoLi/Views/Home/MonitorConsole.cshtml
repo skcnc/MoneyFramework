@@ -2,26 +2,225 @@
     ViewBag.Title = "MonitorConsole";
 }
 
-<h2>MonitorConsole</h2>
+<h2>套利策略控制台</h2>
 <div class="container-fluid">
-    <div class="col-lg-6">
-        <p>开仓档位</p>
-        <div class="col-lg-3">
-            <div class="input-lg">
-                <span>CT</span>
-                <input class="form-control" type="text" placeholder="CT" />
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3 style="left:50%"><strong>开仓</strong></h3>
+                </div>
+                <div class="col-md-4 col-md-push-2">
+                    <h3>
+                        <button class="btn btn-sm btn-primary" type="submit" onclick="AddPanelOper()">
+                            <span id="_bAddStrategy" class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                        </button>
+                    </h3>
+                </div>
             </div>
-
+            <div id="StrategyAddPanel" class="row hidden" style="background-color:rgb(233,233,233);">
+                <div class="row" style="margin:10px">
+                    <div class="form-horizontal form-group">
+                        <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="CT_input" type="text" class="form-control" placeholder="合约" /></div>
+                        <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="OP_input" type="text" class="form-control" placeholder="开仓点位" /></div>
+                        <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="HD_input" type="text" class="form-control" placeholder="手数" /></div>
+                        <div class="col-xs-2" style="padding-left:2px;padding-right:2px" >
+                            <select id="Index_input" class="input-sm" style="height:34px">
+                                <option value="300">沪深300</option>
+                                <option value="50">上证50</option>
+                                <option value="500">中证500</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-1 col-xs-offset-2">
+                            <button id="addStrategy" type="button" class="btn btn-success">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="category_panel" class="col-md-11" style="margin-top:20px">
+                <div class="strategycategory" name="CT201507&上证300">
+                    <div style="background-color:#CCFEBF;display:inline-block;width:100%">
+                        <div class="col-md-5">
+                            <h4><strong>期货: </strong>CT201507</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h4><strong>指数：</strong>上证300</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-info displaystrategy">
+                                <span class="badge">10</span>
+                            </button>
+                        </div>
+                        <span class="sr-only">CT201507|上证300</span>
+                    </div>
+                    <ul class="list-group" style="display:inline-block">
+                        <li class="list-group-item" OP="30" HD="20">
+                            <div class="row" style="padding-bottom:5px">
+                                <div>
+                                    <div class="col-md-3">
+                                        <h4>OP&nbsp;=&nbsp;<a>30</a></h4>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h4>HD&nbsp;=&nbsp;<a>20</a></h4>
+                                    </div>
+                                    <div class="col-md-6 col-md-push-2">
+                                        <button class="btn-sm btn-default runopenstrategy">
+                                            <span class="glyphicon glyphicon-play"></span>
+                                        </button>
+                                        <button class="btn-sm btn-default allow_strategy">
+                                            <span class="glyphicon glyphicon-check"></span>
+                                        </button>
+                                        <button class="btn-sm btn-danger">
+                                            <span class="glyphicon glyphicon-remove-sign"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <i>
+                                        参数1：***
+                                        参数2：***
+                                        参数3：***
+                                        参数4：***
+                                        参数5：***
+                                        参数6：***
+                                        参数4：***
+                                        参数5：***
+                                        参数6：***
+                                        参数1：***
+                                        参数2：***
+                                        参数3：***
+                                        参数4：***
+                                        参数5：***
+                                        参数6：***
+                                        参数4：***
+                                        参数5：***
+                                        参数6：***
+                                    </i>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item" OP="30" HD="10">
+                            <div class="row" style="padding-bottom:5px">
+                                <div>
+                                    <div class="col-md-3">
+                                        <h4>OP&nbsp;=&nbsp;<a>30</a></h4>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h4>HD&nbsp;=&nbsp;<a>10</a></h4>
+                                    </div>
+                                    <div class="col-md-6 col-md-push-2 ">
+                                        <button class="btn-sm btn-default runopenstrategy">
+                                            <span class="glyphicon glyphicon-play "></span>
+                                        </button>
+                                        <button class="btn-sm btn-default allow_strategy">
+                                            <span class="glyphicon glyphicon-check "></span>
+                                        </button>
+                                        <button class="btn-sm btn-danger">
+                                            <span class="glyphicon glyphicon-remove-sign"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <i>
+                                        参数1：***
+                                        参数2：***
+                                        参数3：***
+                                        参数4：***
+                                        参数5：***
+                                        参数6：***
+                                        参数4：***
+                                        参数5：***
+                                        参数6：***
+                                        参数1：***
+                                        参数2：***
+                                        参数3：***
+                                        参数4：***
+                                        参数5：***
+                                        参数6：***
+                                        参数4：***
+                                        参数5：***
+                                        参数6：***
+                                    </i>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-3">
-            <div class="input-lg">
-                <span>HD</span>
-                <input class="form-control" type="text" placeholder="HD" />
-            </div>
-
+        <div class="col-lg-6">
+            <h3><strong>平仓</strong></h3>
         </div>
     </div>
-    <div class="col-lg-6">
-        <p>平仓档位</p>
+</div>
+
+
+
+<div class="strategycategory sr-only category_template">
+    <div style="background-color:#CCFEBF;display:inline-block;width:100%">
+        <div class="col-md-5">
+            <h4><strong>期货: </strong><i name="CTValue">CT201507</i></h4>
+        </div>
+        <div class="col-md-4">
+            <h4><strong>指数：</strong><i name="IndexValue">上证300</i></h4>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-info displaystrategy">
+                <span class="badge">10</span>
+            </button>
+        </div>
+        <span class="sr-only">CT201507|上证300</span>
     </div>
+    <ul class="list-group" style="display:inline-block">
+    </ul>
+</div>
+
+<div class="sr-only">
+    <li class="list-group-item sr-only strategy_template">
+        <div class="row" style="padding-bottom:5px">
+            <div>
+                <div class="col-md-3">
+                    <h4>OP&nbsp;=&nbsp;<i class="OPValue">30</i></h4>
+                </div>
+                <div class="col-md-3">
+                    <h4>HD&nbsp;=&nbsp;<i class="HDValue">10</i></h4>
+                </div>
+                <div class="col-md-6 col-md-push-2">
+                    <button class="btn-sm btn-default runopenstrategy">
+                        <span class="glyphicon glyphicon-play"></span>
+                    </button>
+                    <button class="btn-sm btn-default allow_strategy">
+                        <span class="glyphicon glyphicon-check"></span>
+                    </button>
+                    <button class="btn-sm btn-danger">
+                        <span class="glyphicon glyphicon-remove-sign"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-10">
+                <i>
+                    参数1：***
+                    参数2：***
+                    参数3：***
+                    参数4：***
+                    参数5：***
+                    参数6：***
+                    参数4：***
+                    参数5：***
+                    参数6：***
+                    参数1：***
+                    参数2：***
+                    参数3：***
+                    参数4：***
+                    参数5：***
+                    参数6：***
+                    参数4：***
+                    参数5：***
+                    参数6：***
+                </i>
+            </div>
+        </div>
+    </li>
 </div>

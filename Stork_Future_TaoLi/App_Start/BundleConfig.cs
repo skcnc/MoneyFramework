@@ -27,7 +27,8 @@ namespace Stork_Future_TaoLi
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.min.js",
-                      "~/Scripts/respond.min.js"));
+                      "~/Scripts/respond.min.js",
+                      "~/Scripts/siteScript.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
