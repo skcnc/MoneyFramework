@@ -40,23 +40,23 @@
                 </div>
             </div>
             <div id="category_panel" class="col-md-11" style="margin-top:20px">
-                <div class="strategycategory" name="CT201507&上证300">
+                <div class="strategycategory" name="CT201507-300">
                     <div style="background-color:#CCFEBF;display:inline-block;width:100%">
                         <div class="col-md-5">
-                            <h4><strong>期货: </strong>CT201507</h4>
+                            <h4><strong>期货: </strong><i name="CTValue">CT201507</i></h4>
                         </div>
                         <div class="col-md-4">
-                            <h4><strong>指数：</strong>上证300</h4>
+                            <h4><strong>指数：</strong><i name="IndexValue">沪深300</i></h4>
                         </div>
                         <div class="col-md-3">
                             <button class="btn btn-info displaystrategy">
-                                <span class="badge">10</span>
+                                <span class="badge badge_count">2</span>
                             </button>
                         </div>
-                        <span class="sr-only">CT201507|上证300</span>
+                        <span class="sr-only">CT201507|沪深300</span>
                     </div>
                     <ul class="list-group" style="display:inline-block">
-                        <li class="list-group-item" OP="30" HD="20">
+                        <li class="list-group-item" op_value="30" hd_value="20">
                             <div class="row" style="padding-bottom:5px">
                                 <div>
                                     <div class="col-md-3">
@@ -72,7 +72,7 @@
                                         <button class="btn-sm btn-default allow_strategy">
                                             <span class="glyphicon glyphicon-check"></span>
                                         </button>
-                                        <button class="btn-sm btn-danger">
+                                        <button class="btn-sm btn-danger delete_strategy" data-toggle="modal" data-target="#myModal">
                                             <span class="glyphicon glyphicon-remove-sign"></span>
                                         </button>
                                     </div>
@@ -117,7 +117,7 @@
                                         <button class="btn-sm btn-default allow_strategy">
                                             <span class="glyphicon glyphicon-check "></span>
                                         </button>
-                                        <button class="btn-sm btn-danger">
+                                        <button class="btn-sm btn-danger delete_strategy" data-toggle="modal" data-target="#myModal">
                                             <span class="glyphicon glyphicon-remove-sign"></span>
                                         </button>
                                     </div>
@@ -156,7 +156,7 @@
     </div>
 </div>
 
-
+<button id="ajaxTest" call="btn btn-primary" type="button" onclick="AjaxTest">Ajax</button>
 
 <div class="strategycategory sr-only category_template">
     <div style="background-color:#CCFEBF;display:inline-block;width:100%">
@@ -168,7 +168,7 @@
         </div>
         <div class="col-md-3">
             <button class="btn btn-info displaystrategy">
-                <span class="badge">10</span>
+                <span class="badge badge_count">10</span>
             </button>
         </div>
         <span class="sr-only">CT201507|上证300</span>
@@ -178,14 +178,14 @@
 </div>
 
 <div class="sr-only">
-    <li class="list-group-item sr-only strategy_template">
+    <li class="list-group-item sr-only strategy_template" op_value="10" hd_value="10">
         <div class="row" style="padding-bottom:5px">
             <div>
                 <div class="col-md-3">
-                    <h4>OP&nbsp;=&nbsp;<i class="OPValue">30</i></h4>
+                    <h4>OP&nbsp;=&nbsp;<a class="OPValue">30</a></h4>
                 </div>
                 <div class="col-md-3">
-                    <h4>HD&nbsp;=&nbsp;<i class="HDValue">10</i></h4>
+                    <h4>HD&nbsp;=&nbsp;<a class="HDValue">10</a></h4>
                 </div>
                 <div class="col-md-6 col-md-push-2">
                     <button class="btn-sm btn-default runopenstrategy">
@@ -194,7 +194,7 @@
                     <button class="btn-sm btn-default allow_strategy">
                         <span class="glyphicon glyphicon-check"></span>
                     </button>
-                    <button class="btn-sm btn-danger">
+                    <button class="btn-sm btn-danger delete_strategy">
                         <span class="glyphicon glyphicon-remove-sign"></span>
                     </button>
                 </div>
@@ -224,3 +224,4 @@
         </div>
     </li>
 </div>
+
