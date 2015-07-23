@@ -220,62 +220,27 @@ namespace Stork_Future_TaoLi
 
                 while(QCommands.Count > 0)
                 {
-                    object command = QCommands.Dequeue();
+                    object obj = QCommands.Dequeue();
 
                     #region 指令类型判断
-                    if (command is CSI)
-                    {
-                        CSI _c = (CSI)command;
+                    if (obj is OPENCREATE){
+                        OPENCREATE value = (OPENCREATE)obj;
 
-                        InitParameters para = new InitParameters()
-                        {
-                            CT = _c.CT,
-                            BP = 0,
-                            Index = _c.Index,
-                            OP = _c.OP,
-                            HD = _c.HD
-                        };
-
-                        RecruitNewWorker(para, _c.order);
                     }
-                    else if(command is USI)
+                    else if (obj is OPENMODIFY)
                     {
-                        USI _c = (USI)command;
 
-                        InitParameters para = new InitParameters()
-                        {
-                            CT = _c.CT,
-                            BP = 0,
-                            Index = _c.Index,
-                            OP = _c.OP,
-                            HD = _c.HD
-                        };
-
-                        UpdateWorker(para, _c.order, _c.id);
                     }
-                    else if(command is DSI)
-                    {
-                        DSI _c = (DSI)command;
-
-                        DeleteWorker(_c.id);
-                    }
-                    else if(command is ASI)
-                    {
-                        ASI _c = (ASI)command;
-
-                        Workers[_c.id].bAllow = _c.brun;
-                    }
-                    else if(command is RSI)
-                    {
-                        RSI _c = (RSI)command;
-
-                        Workers[_c.id].bRun = _c.bRun;
-                    }
+                    else if (obj is OPENALLOW) { }
+                    else if (obj is OPENRUN) { }
+                    else if (obj is OPENDELETE) { }
+                    else if (obj is CLOSECREATE) { }
+                    else if (obj is CLOSEMODIFY) { }
+                    else if (obj is CLOSERUN) { }
+                    else if (obj is CLOSEALLOW) { }
+                    else if (obj is CLOSEDELETE) { }
                     else
-                    {
-                        //未知指令类型
-                    }
-
+                    { }
 
                     #endregion
                 }

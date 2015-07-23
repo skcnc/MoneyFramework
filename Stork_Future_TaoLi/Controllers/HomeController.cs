@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Stork_Future_TaoLi.Test;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -47,11 +48,25 @@ namespace Stork_Future_TaoLi.Controllers
             return View();
         }
 
-        public String PostAjax(String InputJson)
+        public string ImportHarbor(String InputJson)
         {
-            object obj = JsonConvert.DeserializeObject(InputJson);
-            
+            try
+            {
+                object obj = JsonConvert.DeserializeObject(InputJson);
+                StrategyMonitorClass.QCommands.Enqueue(obj);
+                return "SUCCESS";
+            }
+            catch(Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
 
+        public string AjaxTest(FileStream file)
+        {
+            string s = file.Name;
+
+            return "SUCCESS";
         }
     }
 }

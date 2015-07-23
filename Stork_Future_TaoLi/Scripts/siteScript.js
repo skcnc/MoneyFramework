@@ -19,18 +19,6 @@ function AddPanelOper()
     }
 }
 
-//展开实例详情
-//$('button.displaystrategy').click(function (e) {
-//    var _list = $(this).parents("div.strategycategory").children('ul.list-group:eq(0)');
-//    var _value = _list.css('display');
-
-//    if (_value == 'none') {
-//        _list.css('display', 'block');
-//    }
-//    else {
-//        _list.css('display', 'none');
-//    }
-//})
 $('#category_panel').delegate('button.displaystrategy', 'click', function (e) {
     var _list = $(this).parents("div.strategycategory").children('ul.list-group:eq(0)');
     var _value = _list.css('display');
@@ -130,7 +118,7 @@ $('#addStrategy').click(function (e) {
 
         new_category.attr('name', _name);
 
-
+      
         $('#category_panel').append(new_category);
     }
 
@@ -153,17 +141,69 @@ $('#addStrategy').click(function (e) {
     var length = _ul.find('li.list-group-item').length
     _ul.find('span.badge_count').text(length + 1);
 
+
+    var _basic = {
+        USER: "TESTER",
+        ACTIVITY: "OPENCREATE",
+        ORIENTATION: "0"
+    }
+
+    var _weight = new Array("600005;s;127.73143839138", "600651;s;91.227173361486", "600104;s;50.757279744186");
+
+    var strategy = {
+        WEIGHTING: _weight,
+        basic: _basic,
+        OP: op,
+        HD: hd,
+        CT: ct,
+        INDEX: Index
+    }
+
+    var JSONSTRING = JSON.stringify(strategy);
+
+    $.post("/Home/ImportHarbor", {
+        InputJson: JSONSTRING
+        }, function (data, status) {
+        alert("数据：" + data + "\n状态：" + status);
+    })
+
+    _getFile();
+
     var t = $('div.strategycategory[name=' + _name + '] ul.list-group');
     $('div.strategycategory[name=' + _name + '] ul.list-group').append(_li);
 
 })
 
 $('#ajaxTest').click(function (e) {
-    $.post("/Home/PostAjax", {
-        ko: "Hello World!"
-    },
-    function (data, status) {
-        alert("数据：" + data + "\n状态：" + status);
-    })
+    //$.post("/Home/ImportHarbor", {
+    //    file:attachment
+    //},
+    //function (data, status) {
+    //    alert("数据：" + data + "\n状态：" + status);
+    //})
 
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", "file:///D:/foucusstock50.samp", true);
+    rawFile.onreadystatechange = function()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status === 0)
+            {
+                var allText = rawFile.responseText;
+                alert(allText);
+            }
+        }
+    }
+    rawFile.
 })
+
+
+function _getFile() {
+    _weightFile = $("#WeightInput");
+    
+    var file = $("#WeightInput").get(0).files[0];
+
+    
+
+}

@@ -19,25 +19,33 @@
                 </div>
             </div>
             <div id="StrategyAddPanel" class="row hidden" style="background-color:rgb(233,233,233);">
-                <div class="row" style="margin:10px">
-                    <div class="form-horizontal form-group">
-                        <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="CT_input" type="text" class="form-control" placeholder="合约" /></div>
-                        <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="OP_input" type="text" class="form-control" placeholder="开仓点位" /></div>
-                        <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="HD_input" type="text" class="form-control" placeholder="手数" /></div>
-                        <div class="col-xs-2" style="padding-left:2px;padding-right:2px" >
-                            <select id="Index_input" class="input-sm" style="height:34px">
-                                <option value="300">沪深300</option>
-                                <option value="50">上证50</option>
-                                <option value="500">中证500</option>
-                            </select>
-                        </div>
-                        <div class="col-xs-1 col-xs-offset-2">
-                            <button id="addStrategy" type="button" class="btn btn-success">
-                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                            </button>
+                <form>
+                    <div class="row" style="margin:10px">
+                        <div class="form-horizontal form-group">
+                            <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="CT_input" type="text" class="form-control" placeholder="合约" /></div>
+                            <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="OP_input" type="text" class="form-control" placeholder="开仓点位" /></div>
+                            <div class="col-xs-2" style="padding-left:2px;padding-right:2px"><input id="HD_input" type="text" class="form-control" placeholder="手数" /></div>
+                            <div class="col-xs-2" style="padding-left:2px;padding-right:2px">
+                                <select id="Index_input" class="input-sm" style="height:34px">
+                                    <option value="300">沪深300</option>
+                                    <option value="50">上证50</option>
+                                    <option value="500">中证500</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-1 col-xs-offset-2">
+                                <button id="addStrategy" type="button" class="btn btn-success">
+                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <div class="row" style="margin:10px">
+                        <div class="form-horizontal form-group">
+                            <label for="WeightInput">上传权重文件</label>
+                            <input type="file" id="WeightInput" accept=".samp">
+                        </div>
+                    </div>
+                </form>
             </div>
             <div id="category_panel" class="col-md-11" style="margin-top:20px">
                 <div class="strategycategory" name="CT201507-300">
@@ -156,8 +164,13 @@
     </div>
 </div>
 
-<button id="ajaxTest" call="btn btn-primary" type="button" onclick="AjaxTest">Ajax</button>
-
+<form enctype="multipart/form-data" method="post">
+    <div class="form-horizontal form-group">
+        <label for="WeightInput">上传权重文件</label>
+        <input type="file" id="WeightInput" accept=".samp" name="attachment">
+        <input type="submit" value="上传文件" id="ajaxTest" />
+    </div>
+</form>
 <div class="strategycategory sr-only category_template">
     <div style="background-color:#CCFEBF;display:inline-block;width:100%">
         <div class="col-md-5">
