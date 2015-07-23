@@ -75,7 +75,6 @@ namespace Stork_Future_TaoLi.Controllers
             try
             {
                 ViewBag.HD = Int16.Parse(Request.QueryString["HD"]);
-                throw new Exception();
             }
             catch (Exception e)
             {

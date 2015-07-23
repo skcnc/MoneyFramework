@@ -197,7 +197,7 @@ function _getFile() {
 //预览交易列表
 $('#btnViewList').click(function (e) {
 
-    var hd = $.trim($('#hd_value').val());
+    var hd = $.trim($('#hd_value')[0].innerText);
     var weight = $.trim($('#weightList').val());
     var id = $.trim($('#strategyID').val());
 
@@ -242,7 +242,7 @@ $('#btnViewList').click(function (e) {
 
 //权重交易生成页面加载判断
 $('#danger-alert_1').ready(function () {
-    var err = $.trim($('#danger-alert_2').val());
+    var err = $.trim($('#danger-alert_2')[0].innerText);
     if (err == "")
     {
         $('#danger-alert_1').addClass('sr-only');
