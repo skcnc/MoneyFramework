@@ -12,3 +12,9 @@ D:\projects\MoneyFramework\MarketInfoSys\bin\Release\MarketInfoSys.pdb
 D:\projects\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.exe
 D:\projects\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.pdb
 D:\projects\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.csprojResolveAssemblyReference.cache
+F:\项目文档\金融套利系统\MoneyFramework\MarketInfoSys\bin\Release\MarketInfoSys.exe.config
+F:\项目文档\金融套利系统\MoneyFramework\MarketInfoSys\bin\Release\MarketInfoSys.exe
+F:\项目文档\金融套利系统\MoneyFramework\MarketInfoSys\bin\Release\MarketInfoSys.pdb
+F:\项目文档\金融套利系统\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.csprojResolveAssemblyReference.cache
+F:\项目文档\金融套利系统\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.exe
+F:\项目文档\金融套利系统\MoneyFramework\MarketInfoSys\obj\Release\MarketInfoSys.pdb

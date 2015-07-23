@@ -175,27 +175,16 @@ $('#addStrategy').click(function (e) {
 })
 
 $('#ajaxTest').click(function (e) {
-    //$.post("/Home/ImportHarbor", {
-    //    file:attachment
-    //},
-    //function (data, status) {
-    //    alert("数据：" + data + "\n状态：" + status);
-    //})
+    var hd = $.trim($('#HD_input').val());
 
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", "file:///D:/foucusstock50.samp", true);
-    rawFile.onreadystatechange = function()
+    if (hd == "")
     {
-        if(rawFile.readyState === 4)
-        {
-            if(rawFile.status === 200 || rawFile.status === 0)
-            {
-                var allText = rawFile.responseText;
-                alert(allText);
-            }
-        }
+        alert("手数不能为空！");
+        return;
     }
-    rawFile.
+
+    var _strategyID = $('#strategyid').text();
+    window.open(encodeURI("/home/EditWeightAndTradeList?" + "StrategyID=" + _strategyID + "&HD=" + hd));
 })
 
 
@@ -203,7 +192,66 @@ function _getFile() {
     _weightFile = $("#WeightInput");
     
     var file = $("#WeightInput").get(0).files[0];
-
-    
-
 }
+
+//预览交易列表
+$('#btnViewList').click(function (e) {
+
+    var hd = $.trim($('#hd_value').val());
+    var weight = $.trim($('#weightList').val());
+    var id = $.trim($('#strategyID').val());
+
+    if (hd == "") {
+        alert("手数值未设置，请重新打开本页面");
+        return;
+    }
+
+    if(weight == "")
+    {
+        alert("权重列表不能为空！")
+        return;
+    }
+
+    var weight_items = weight.split('\n');
+
+    var buylist = "";
+
+    weight_items.forEach(function (value, index) {
+        var item = value.split(';');
+        var code = item[0];
+        var type = item[1];
+        var weightValue = item[2];
+
+        var buy = (weightValue * hd) - (weightValue * hd) % 100;
+
+        buylist += (code + ";" + type + ";" + buy + "\n");
+    });
+
+    $('#tradeOrder').text(buylist);
+
+    if (window.localStorage) {
+        if (id == "") id = "newer";
+
+        localStorage[id + ";weight"] = weight;
+        localstorage[id + ";buylist"] = buylist;
+    }
+    else {
+        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+    }
+})
+
+//权重交易生成页面加载判断
+$('#danger-alert_1').ready(function () {
+    var err = $.trim($('#danger-alert_2').val());
+    if (err == "")
+    {
+        $('#danger-alert_1').addClass('sr-only');
+        $('#danger-alert_2').addClass('sr-only');
+    }
+    else
+    {
+        $('#content').addClass('sr-only');
+    }
+})
+
+

@@ -41,8 +41,9 @@
                     </div>
                     <div class="row" style="margin:10px">
                         <div class="form-horizontal form-group">
-                            <label for="WeightInput">上传权重文件</label>
+                            <label for="WeightInput">编辑权重文件</label>
                             <input type="file" id="WeightInput" accept=".samp">
+                            <span class="sr-only" id="strategyid"></span>
                         </div>
                     </div>
                 </form>
@@ -66,6 +67,7 @@
                     <ul class="list-group" style="display:inline-block">
                         <li class="list-group-item" op_value="30" hd_value="20">
                             <div class="row" style="padding-bottom:5px">
+                                <span class="sr-only strategy_id">abcdefghid</span>
                                 <div>
                                     <div class="col-md-3">
                                         <h4>OP&nbsp;=&nbsp;<a>30</a></h4>
@@ -111,6 +113,7 @@
                         </li>
                         <li class="list-group-item" OP="30" HD="10">
                             <div class="row" style="padding-bottom:5px">
+                                <span class="sr-only strategy_id">abcde</span>
                                 <div>
                                     <div class="col-md-3">
                                         <h4>OP&nbsp;=&nbsp;<a>30</a></h4>
@@ -193,6 +196,7 @@
 <div class="sr-only">
     <li class="list-group-item sr-only strategy_template" op_value="10" hd_value="10">
         <div class="row" style="padding-bottom:5px">
+            <span class="sr-only strategy_id"></span>
             <div>
                 <div class="col-md-3">
                     <h4>OP&nbsp;=&nbsp;<a class="OPValue">30</a></h4>

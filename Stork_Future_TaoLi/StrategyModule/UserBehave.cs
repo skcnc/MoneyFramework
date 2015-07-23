@@ -33,6 +33,17 @@ namespace Stork_Future_TaoLi
         /// 1： 开仓类交易
         /// </summary>
         public String ORIENTATION { get; set; }
+
+        /// <summary>
+        /// 调试标志位
+        /// 如果为true，生成的List不会用于真实的交易
+        /// </summary>
+        public bool DEBUGMODE {
+            get
+            {
+                return true;
+            }
+        }
     }
 
     /// <summary>
