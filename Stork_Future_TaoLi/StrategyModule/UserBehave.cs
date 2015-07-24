@@ -114,7 +114,7 @@ namespace Stork_Future_TaoLi
     /// </summary>
     class OPENRUN {
         public Basic basic { set; get; }
-
+        public bool RUN { get; set; }
     }
 
     /// <summary>
@@ -122,6 +122,7 @@ namespace Stork_Future_TaoLi
     /// </summary>
     class OPENALLOW {
         public Basic basic { set; get; }
+        public bool ALLOW { get; set; }
     }
 
     /// <summary>

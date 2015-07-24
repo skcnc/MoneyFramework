@@ -1,26 +1,7 @@
-﻿//展开添加面板
-//function AddPanelOper()
-//{
-//    if($('#StrategyAddPanel').hasClass('show'))
-//    {
-//        $('#_bAddStrategy').removeClass('glyphicon-menu-up');
-//        $('#_bAddStrategy').addClass('glyphicon-menu-down');
+﻿
 
-//        $('#StrategyAddPanel').removeClass('show');
-//        $('#StrategyAddPanel').addClass('hidden');
-//    }
-//    else
-//    {
-//        $('#_bAddStrategy').removeClass('glyphicon-menu-down');
-//        $('#_bAddStrategy').addClass('glyphicon-menu-up');
-
-//        $('#StrategyAddPanel').removeClass('hidden');
-//        $('#StrategyAddPanel').addClass('show');
-//    }
-//}
-
-$('#category_panel').delegate('button.displaystrategy', 'click', function (e) {
-    var _list = $(this).parents("div.strategycategory").children('ul.list-group:eq(0)');
+$('#category_panel_open').delegate('button.displaystrategy', 'click', function (e) {
+    var _list = $(this).parents("div.strategycategory_open").children('ul.list-group:eq(0)');
     var _value = _list.css('display');
 
     if (_value == 'none') {
@@ -32,26 +13,120 @@ $('#category_panel').delegate('button.displaystrategy', 'click', function (e) {
 })
 
 //允许运行
-$('#category_panel').delegate('button.runopenstrategy', 'click', function (e) {
-    if ($(this).hasClass('btn-default')) {
+$('#category_panel_open').delegate('button.runopenstrategy', 'click', function (e) {
+
+
+    var _li = $(this).parents('li.list-group-item');
+    var _userName = $('#userName').text();
+    var _id = _li.find('span.liid').text();
+    var _bRUN = localStorage[_id + ":RUN"];
+    var _bALLOW = localStorage[_id + ":ALLOW"];
+
+    if (_bRUN == 0) {
+        //当前为不可以运行，将转换成可以运行
         $(this).removeClass('btn-default');
         $(this).addClass('btn-success');
+
+        _bRUN = 1; 
     }
+    else if (_bRUN == 1 && _bALLOW == 0) {
+        //当前状态为运行，下一步转成禁止运行
+        $(this).removeClass('btn-success');
+        $(this).addClass('btn-default');
+
+        _bRUN = 0;
+    }
+    else if (_bRUN == 1 && _bALLOW == 1) {
+        alert("交易允许时无法停止策略！");
+        return;
+    }
+
+    localStorage.setItem(_id + ":RUN", _bRUN);
+
+    //发送至服务器
+    var _basic = {
+        USER: _userName,
+        ACTIVITY: "OPENRUN",
+        ORIENTATION: "0",
+        ID: _id
+    }
+
+    var strategy = {
+        basic: _basic,
+        RUN: _bRUN
+    }
+
+    var JSONSTRING = JSON.stringify(strategy);
+
+    $.post("/Home/ImportHarbor", {
+        InputJson: JSONSTRING
+    }, function (data, status) {
+        alert("数据：" + data + "\n状态：" + status);
+    })
+
 })
 
 //允许交易
-$('#category_panel').delegate('button.allow_strategy', 'click', function (e) {
-    if ($(this).hasClass('btn-default')) {
+$('#category_panel_open').delegate('button.allow_strategy', 'click', function (e) {
+
+
+    var _li = $(this).parents('li.list-group-item');
+    var _userName = $('#userName').text();
+    var _id = _li.find('span.liid').text();
+    var _bRUN = localStorage[_id + ":RUN"];
+    var _bALLOW = localStorage[_id + ":ALLOW"];
+
+    if (_bALLOW == 0 && _bRUN == 1) {
+        //下一步允许交易
         $(this).removeClass('btn-default');
         $(this).addClass('btn-success');
+
+        _bALLOW = 1;
     }
+    else if(_bALLOW == 1 && _bRUN == 1){
+        $(this).removeClass('btn-success');
+        $(this).addClass('btn-default');
+
+        _bALLOW = 0;
+    }
+    else{
+        alert("只有运行中的策略才能允许交易！");
+        return ;
+    }
+
+
+    localStorage.setItem(_id + ":ALLOW", _bALLOW);
+
+    //发送至服务器
+    var _basic = {
+        USER: _userName,
+        ACTIVITY: "OPENALLOW",
+        ORIENTATION: "0",
+        ID: _id
+    }
+
+    var strategy = {
+        basic: _basic,
+        ALLOW: _bALLOW
+    }
+
+    var JSONSTRING = JSON.stringify(strategy);
+
+    $.post("/Home/ImportHarbor", {
+        InputJson: JSONSTRING
+    }, function (data, status) {
+        alert("数据：" + data + "\n状态：" + status);
+    })
 })
 
-//删除交易
-$('#category_panel').delegate('button.delete_strategy', 'click', function (e) {
+//删除开仓策略
+$('#category_panel_open').delegate('button.delete_strategy', 'click', function (e) {
     var _li = $(this).parents('li.list-group-item');
     var _ul = $(this).parents('ul.list-group');
-    var _div = $(this).parents('div.strategycategory');
+    var _div = $(this).parents('div.strategycategory_open');
+
+    var _userName = $('#userName').text();
+    var _id = _li.find('span.liid').text();
 
     var ct = _div.find('[name=CTValue]').text();
     var index_fullname = _div.find('[name=IndexValue]').text();
@@ -60,6 +135,16 @@ $('#category_panel').delegate('button.delete_strategy', 'click', function (e) {
     var hd = _li.find('a.HDValue').text();
 
     var _length = _ul.find('li.list-group-item').length;
+
+
+    var _allow =  localStorage[_id + ":ALLOW"];
+    var _run = localStorage[_id + ":RUN"];
+
+    if(_allow + _run > 0)
+    {
+        alert("交易运行时无法删除！");
+        return;
+    }
     
     if (_length == 1)
     {
@@ -70,20 +155,94 @@ $('#category_panel').delegate('button.delete_strategy', 'click', function (e) {
         _div.find('span.badge_count').text(_length - 1);
         $(_li).remove();
     }
+
+    //发送至服务器
+    var _basic = {
+        USER: _userName,
+        ACTIVITY: "OPENDELETE",
+        ORIENTATION: "0",
+        ID: _id
+    }
+
+    var strategy = {
+        basic: _basic
+    }
+
+
+    var JSONSTRING = JSON.stringify(strategy);
+
+    $.post("/Home/ImportHarbor", {
+        InputJson: JSONSTRING
+    }, function (data, status) {
+        alert("数据：" + data + "\n状态：" + status);
+    })
+
+    //删除对应的键值
+    localStorage.removeItem(_id + ":TYPE");
+    localStorage.removeItem(_id + ":DT");
+    localStorage.removeItem(_id + ":BUYLIST");
+    localStorage.removeItem(_id + ":CT");
+    localStorage.removeItem(_id + ":HD");
+    localStorage.removeItem(_id + ":CHANGE");
+    localStorage.removeItem(_id + ":WEIGHT");
+    localStorage.removeItem(_id + ":OP");
+    localStorage.removeItem(_id + ":INDEX");
+    localStorage.removeItem(_id + ":RUN");
+    localStorage.removeItem(_id + ":ALLOW");
+
 })
 
-//控制面板刷新时的处理
+//修改开仓策略
+$('#category_panel_open').delegate('button.modify-strategy', 'click', function (e) {
+    var _li = $(this).parents('li.list-group-item');
+    var _userName = $('#userName').text();
+    var _id = _li.find('span.liid').text();
+
+    var _href = "/home/EditWeightAndTradeList?StrategyID=" + _id + "&USER=" + _userName;
+    window.open(encodeURI(_href), "_blank");
+})
+
+//页面重新进入
 window.onload = function (e) {
     if (e.currentTarget.location.pathname == "/") {
         if (Modernizr.localstorage) {
             localStorage.setItem("IDCollection", "");
-
             UpdateStrategies(false);
         }
         else {
             alert("您当前使用的浏览器版本过低，网站功能将被限制！");
             return
         }
+    }
+    else if (e.currentTarget.location.pathname == "/home/EditWeightAndTradeList") {
+        if (Modernizr.localstorage) {
+            var _queryString = e.currentTarget.location.href.split('?')[1];
+            var _id = _queryString.split('&')[0].split('=')[1];
+            
+            if (_id != "") {
+                var ct = localStorage[_id + ":CT"];
+                var op = localStorage[_id + ":OP"];
+                var hd = localStorage[_id + ":HD"];
+                var Index = localStorage[_id + ":INDEX"];
+                var weight = localStorage[_id + ":WEIGHT"];
+                var order = localStorage[_id + ":BUYLIST"];
+
+                var fullName = GetIndexFullName(Index);
+                
+                $('#ct_value').val(ct);
+                $('#op_value').val(op);
+                $('#hd_value').val(hd);
+                $('#index_input').val(fullName);
+                $('#weightList').text(weight);
+                $('#tradeOrder').text(order);
+            }
+        }
+        else {
+            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+            return
+        }
+
+        
     }
 }
 
@@ -142,6 +301,9 @@ function UpdateStrategies(changeFlag)
         var buylist = localStorage[id + ":BUYLIST"];
         var ct = localStorage[id + ":CT"];
         var hd = localStorage[id + ":HD"];
+
+        var run = localStorage[id + ":RUN"];
+        var allow = localStorage[id + ":ALLOW"];
         
         var isExist = changeArray[i].split(':')[2];
 
@@ -158,7 +320,7 @@ function UpdateStrategies(changeFlag)
             if (weight == "" || Index == "" || op == "") continue;
 
             var _name = ct + '-' + Index;
-            var search = 'div.strategycategory[name=' + _name + ']';
+            var search = 'div.strategycategory_open[name=' + _name + ']';
             var cates = $.find(search);
 
             if (cates.length == 0) {
@@ -170,21 +332,7 @@ function UpdateStrategies(changeFlag)
 
                 new_category.find("[name='CTValue']").text(ct);
 
-                var IndexFullName;
-                if (Index == 300) {
-                    IndexFullName = "沪深300";
-                }
-                else if (Index == 500) {
-                    IndexFullName = "中证500";
-                }
-                else if (Index == 50) {
-                    IndexFullName = "上证50";
-                }
-                else
-                {
-                    IndexFullName = "未知";
-                }
-
+                var IndexFullName = GetIndexFullName(Index);
 
                 new_category.find("[name='IndexValue']").text(IndexFullName);
                 new_category.find("[name='OPValue']").text(op);
@@ -193,11 +341,20 @@ function UpdateStrategies(changeFlag)
                 new_category.attr('name', _name);
 
 
-                $('#category_panel').append(new_category);
+                $('#category_panel_open').append(new_category);
             }
 
             //需要添加小类
             var _li = $('.strategy_template').clone();
+
+            $('#category_panel_open').find('span.liid').each(function (index, element) {
+                if(element.innerText == id)
+                {
+                    _li = $(this).parents("li.list-group-item");
+                }
+            })
+            
+
             _li.removeClass('sr-only');
             _li.removeClass('strategy_template');
             _li.attr('op_value', op);
@@ -206,10 +363,32 @@ function UpdateStrategies(changeFlag)
             _li.find('a.OPValue').text(op);
             _li.find('a.HDValue').text(hd);
 
-            var _ul = $('div.strategycategory[name=' + _name + ']');
+            _li.find('span.liid').text(id);
+
+            if (run == 1)
+            {
+                _li.find('button.runopenstrategy').removeClass('btn-default');
+                _li.find('button.runopenstrategy').addClass('btn-success');
+            }
+            else {
+                _li.find('button.runopenstrategy').removeClass('btn-success');
+                _li.find('button.runopenstrategy').addClass('btn-default');
+            }
+
+            if (allow == 1)
+            {
+                _li.find('button.allow_strategy').addClass('btn-success');
+                _li.find('button.allow_strategy').removeClass('btn-default');
+            }
+            else {
+                _li.find('button.allow_strategy').addClass('btn-default');
+                _li.find('button.allow_strategy').removeClass('btn-success');
+            }
+
+            var _ul = $('div.strategycategory_open[name=' + _name + ']');
             var tt = _ul.find('li.list-group-item[op_value=' + op + '][hd_value=' + hd + ']');
             if (tt.length != 0) {
-                return;
+                continue;
             }
             var length = _ul.find('li.list-group-item').length
             _ul.find('span.badge_count').text(length + 1);
@@ -218,7 +397,7 @@ function UpdateStrategies(changeFlag)
 
             var activity = undefined;
 
-            $('div.strategycategory[name=' + _name + '] ul.list-group').append(_li);
+            $('div.strategycategory_open[name=' + _name + '] ul.list-group').append(_li);
 
             //向服务器发送数据
 
@@ -284,7 +463,7 @@ function UpdateStrategies(changeFlag)
     }
 }
 
-
+//刷新界面
 $('#refresh').click(function (e) {
     UpdateStrategies(true);
 })
@@ -381,6 +560,14 @@ $('#btnSubmit').click(function (e) {
         localStorage.setItem(id + ":INDEX", index);
 
         localStorage.setItem(id + ":CHANGE", 1);
+
+        if(localStorage[id+":RUN"] == undefined)
+        {
+            localStorage.setItem(id + ":RUN", 0);
+        }
+
+        if (localStorage[id + ":ALLOW"] == undefined) localStorage.setItem(id + ":ALLOW", 0);
+
         
     } else {
     // no native support for HTML5 storage :(
@@ -390,6 +577,16 @@ $('#btnSubmit').click(function (e) {
     }
     alert('参数已写入，请刷新控制页面')
 })
+
+//辅助函数
+function GetIndexFullName(briefName)
+{
+    if(briefName == 500)
+    { return "中证500" }
+    else if(briefName == 300){ return "沪深300";}
+    else if (briefName == 50) { return "上证50" }
+    else { return "未知";}
+}
 
 
 
