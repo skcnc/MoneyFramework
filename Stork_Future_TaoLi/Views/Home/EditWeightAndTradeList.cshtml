@@ -1,19 +1,27 @@
 ﻿@{
     ViewBag.Title = "EditWeightAndTradeList";
 }
-<!--本页涉及开仓权重内容的修改，以及交易文件的修改-->>
+<!--本页涉及开仓权重内容的修改，以及交易文件的修改-->
 <h2>开仓参数设定</h2>
 
 
 <div class="container-fluid">
-    <div id="danger-alert_1" class="alert alert-danger" role="alert" >由于交易手数设置错误，导致本页面显示错误，加载失败！</div>
-    <div id="danger-alert_2" class="alert alert-danger" role="alert">@ViewBag.ERROR</div>
     <div id="content">
         <div class="col-md-12" style="margin-bottom:30px">
-            <span id="hd_value" class="sr-only">@ViewBag.HD</span>
+            <div class="col-md-8">
+                <input id="ct_value" type="text" placeholder="期货合约" />
+                <input id="op_value" type="text" placeholder="开仓点位" />
+                <input id="hd_value" type="text" placeholder="交易手数" />
+                <select id="index_input" style="font-size:20px">
+                    <option value="300">沪深300</option>
+                    <option value="300">上证50</option>
+                    <option value="300">中证500</option>
+                </select>
+            </div>
             <button id="btnViewList" class="btn btn-success">预览交易列表</button>
             <button id="btnSubmit" class="btn btn-info">确认交易列表</button>
             <span class="sr-only" id="strategyID">@ViewBag.ID</span>
+            <span class="sr-only" id="userName">@ViewBag.USER</span>
         </div>
         <div class="row" style="margin-top:40px">
             <div class="col-lg-6">

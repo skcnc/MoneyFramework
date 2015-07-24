@@ -72,14 +72,7 @@ namespace Stork_Future_TaoLi.Controllers
         public ActionResult EditWeightAndTradeList()
         {
             ViewBag.ID = Request.QueryString["StrategyID"];
-            try
-            {
-                ViewBag.HD = Int16.Parse(Request.QueryString["HD"]);
-            }
-            catch (Exception e)
-            {
-                ViewBag.ERROR = e.ToString();
-            }
+            ViewBag.USER = Request.QueryString["USER"];
             return View();
         }
     }

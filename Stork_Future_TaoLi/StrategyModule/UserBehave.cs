@@ -44,6 +44,8 @@ namespace Stork_Future_TaoLi
                 return true;
             }
         }
+
+        public String ID { get; set; }
     }
 
     /// <summary>
@@ -75,7 +77,7 @@ namespace Stork_Future_TaoLi
         /// 权重参数
         /// 股票代码;类型;权重值
         /// </summary>
-        public IList<String> WEIGHTING { get; set; }
+        public String orderli { get; set; }
     }
 
     /// <summary>
@@ -113,7 +115,6 @@ namespace Stork_Future_TaoLi
     class OPENRUN {
         public Basic basic { set; get; }
 
-        public String ID { get; set; }
     }
 
     /// <summary>
@@ -121,8 +122,6 @@ namespace Stork_Future_TaoLi
     /// </summary>
     class OPENALLOW {
         public Basic basic { set; get; }
-
-        public String ID { get; set; }
     }
 
     /// <summary>
@@ -130,8 +129,6 @@ namespace Stork_Future_TaoLi
     /// </summary>
     class OPENDELETE {
         public Basic basic { set; get; }
-
-        public String ID { get; set; }
     }
 
     /// <summary>
@@ -250,8 +247,6 @@ namespace Stork_Future_TaoLi
     /// </summary>
     class CLOSERUN {
         public Basic basic { get; set; }
-
-        public String ID { get; set; }
     }
 
     /// <summary>
@@ -260,8 +255,6 @@ namespace Stork_Future_TaoLi
     class CLOSEALLOW
     {
         public Basic basic { get; set; }
-
-        public String ID { get; set; }
     }
 
     /// <summary>
@@ -270,7 +263,5 @@ namespace Stork_Future_TaoLi
     class CLOSEDELETE
     {
         public Basic basic { get; set; }
-
-        public String ID { get; set; }
     }
 }
