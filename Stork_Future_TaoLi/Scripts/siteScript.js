@@ -71,6 +71,7 @@ $('#category_panel').delegate('button.delete_strategy', 'click', function (e) {
     }
 })
 
+//创建新的策略实例
 $('#addStrategy').click(function (e) {
 
     var ct =$.trim($('#CT_input').val());
@@ -141,6 +142,25 @@ $('#addStrategy').click(function (e) {
     var length = _ul.find('li.list-group-item').length
     _ul.find('span.badge_count').text(length + 1);
 
+    var user = $('#userName')[0].innerText;
+    var currentDate = new Date();
+    var id = user + ":" + currentDate.getVarDate();
+   
+    if(Modernizr.localstorage)
+    {
+        //子页面中已经添加 类型 交易列表 权重信息
+
+        //实例ID （用户名：）+（年年年年月月日日）
+        localStorage.setItem()
+        //期货合约
+        localStorage.setItem()
+
+    } else {
+        // no native support for HTML5 storage :(
+        // maybe try dojox.storage or a third-party solution
+        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+    }
+
 
     var _basic = {
         USER: "TESTER",
@@ -148,7 +168,8 @@ $('#addStrategy').click(function (e) {
         ORIENTATION: "0"
     }
 
-    var _weight = new Array("600005;s;127.73143839138", "600651;s;91.227173361486", "600104;s;50.757279744186");
+
+    var _weight = 
 
     var strategy = {
         WEIGHTING: _weight,
@@ -167,7 +188,6 @@ $('#addStrategy').click(function (e) {
         alert("数据：" + data + "\n状态：" + status);
     })
 
-    _getFile();
 
     var t = $('div.strategycategory[name=' + _name + '] ul.list-group');
     $('div.strategycategory[name=' + _name + '] ul.list-group').append(_li);
@@ -188,11 +208,6 @@ $('#ajaxTest').click(function (e) {
 })
 
 
-function _getFile() {
-    _weightFile = $("#WeightInput");
-    
-    var file = $("#WeightInput").get(0).files[0];
-}
 
 //预览交易列表
 $('#btnViewList').click(function (e) {
@@ -229,15 +244,39 @@ $('#btnViewList').click(function (e) {
 
     $('#tradeOrder').text(buylist);
 
-    if (window.localStorage) {
-        if (id == "") id = "newer";
+})
 
-        localStorage[id + ";weight"] = weight;
-        localstorage[id + ";buylist"] = buylist;
+//确认交易列表
+//用户确认后，会回到主页面，进行下一步添加操作
+//权重信息和交易列表会保存在本地
+$('#btnSubmit').click(function (e) {
+
+    var buylist = $('#tradeOrder')[0].value;
+
+    var weight = $('#weightList').text();
+
+    var id = $('#strategyID').text();
+
+    if (id == "") {
+        id = "newer";
     }
-    else {
+
+
+    if (Modernizr.localstorage) {
+        //window.localStorage is available!
+        //0 : 开仓  1： 平仓 
+        localStorage.setItem(id + ":TYPE", 0);
+        //权重文件
+        localStorage.setItem(id + ":weight", weight);
+        //交易列表
+        localStorage.setItem(id + ":buylist", buylist);
+
+        
+    } else {
+    // no native support for HTML5 storage :(
+    // maybe try dojox.storage or a third-party solution
         alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-    }
+}
 })
 
 //权重交易生成页面加载判断
@@ -253,5 +292,6 @@ $('#danger-alert_1').ready(function () {
         $('#content').addClass('sr-only');
     }
 })
+
 
 
