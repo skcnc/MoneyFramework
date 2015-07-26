@@ -36,7 +36,7 @@ namespace Stork_Future_TaoLi
         /// 设置策略实例行情消息队列的关系
         /// </summary>
         /// <param name="para"></param>
-        public static void SetStrategyQueue(KeyValuePair<Guid, Queue> para)
+        public static void SetStrategyQueue(KeyValuePair<String, Queue> para)
         {
             lock (lockSync)
             {

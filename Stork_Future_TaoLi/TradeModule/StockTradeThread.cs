@@ -41,7 +41,6 @@ namespace Stork_Future_TaoLi.TradeModule
             sublog.EventSourceName = "交易线程模块";
             sublog.EventLogType = System.Diagnostics.EventLogEntryType.Information;
             sublog.EventLogID = 62303;
-
         }
 
         private static void ThreadProc()

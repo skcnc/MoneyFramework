@@ -20,7 +20,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 策略实例监管线程
         /// </summary>
-        public Dictionary<Guid, StrategyWorker> Workers = new Dictionary<Guid, StrategyWorker>();
+        public Dictionary<String, StrategyWorker> Workers = new Dictionary<String, StrategyWorker>();
 
         /// <summary>
         /// 行情订阅关系表
@@ -89,22 +89,96 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="para"></param>
         /// <param name="orderList"></param>
-        private void RecruitNewWorker(InitParameters para,Dictionary<string,int> orderList)
+        private void RecruitNewWorker(object v)
         {
             //创建新的策略实例
             StrategyWorker newWorker = new StrategyWorker();
-            newWorker.BaseNumber = para;
-            newWorker.LiStockOrder = orderList;
 
+            if (v is OPENCREATE)
+            {
+                //开仓策略
+                OPENCREATE value = (OPENCREATE)v;
+                newWorker.open_para = new OPENPARA();
+                newWorker.open_para.INDEX = value.INDEX;
+                newWorker.open_para.OP = value.OP;
+                Dictionary<string, int> oli = new Dictionary<string, int>();
 
-            newWorker.StrategyInstanceID = Guid.NewGuid();
-            newWorker.StrategyInstanceName = DateTime.Now.ToString("yyyyMMddHHmmss") + para.CT + para.Index;
+                foreach (var item in value.orderli.Split('\n'))
+                {
+                    if (item.Trim() == string.Empty) { continue; }
+                    else
+                    {
+                        oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[1]));
+                    }
+                }
+
+                newWorker.LiStockOrder = oli;
+
+                newWorker.bAllow = false;
+                newWorker.bRun = false;
+                newWorker.CT = value.CT;
+
+                newWorker.HD = value.HD;
+                newWorker.StrategyInstanceID = value.basic.ID;
+                newWorker.User = value.basic.USER;
+
+                newWorker.Type = "OPEN";
+
+                Dictionary<string, float> wli = new Dictionary<string, float>();
+
+                foreach (var item in value.weightli.Split('\n'))
+                {
+                    if (item.Trim() == String.Empty) { continue; }
+                    else
+                    {
+                        wli.Add(item.Split('\n')[0], Convert.ToSingle(item.Split('\n')[2]));
+                    }
+                }
+
+                newWorker.open_para.WeightList = wli;
+            }
+            else
+            {
+                //平仓策略
+                CLOSECREATE value = (CLOSECREATE)v;
+                newWorker.close_para = new CLOSEPARA();
+                newWorker.User = value.basic.USER;
+                newWorker.StrategyInstanceID = value.basic.ID;
+                newWorker.CT = value.CT;
+                newWorker.close_para.SP = value.SP;
+                newWorker.HD = value.HD;
+                Dictionary<string, int> oli = new Dictionary<string, int>();
+
+                foreach (var item in value.POSITION.Split('\n'))
+                {
+                    if (item.Trim() == string.Empty) { continue; }
+                    else
+                    {
+                        oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[1]));
+                    }
+                }
+
+                newWorker.LiStockOrder = oli;
+                newWorker.Type = "CLOSE";
+
+                newWorker.bAllow = false;
+                newWorker.bRun = false;
+
+                newWorker.close_para.SP = value.SP;
+                newWorker.close_para.COE = value.COSTOFEQUITY;
+                newWorker.close_para.SD = value.STOCKDIVIDENDS;
+                newWorker.close_para.SA = value.STOCKALLOTMENT;
+                newWorker.close_para.PE = value.PROSPECTIVEARNINGS;
+                newWorker.close_para.BASIS = value.OB;
+                
+            }
 
             Workers.Add(newWorker.StrategyInstanceID, newWorker);
+
             newWorker.RUN();
 
             //向行情模块添加消息列表映射
-            MarketInfo.SetStrategyQueue(new KeyValuePair<Guid, Queue>(newWorker.StrategyInstanceID, newWorker.GetRefQueue()));
+            MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(newWorker.StrategyInstanceID, newWorker.GetRefQueue()));
 
         }
 
@@ -114,10 +188,22 @@ namespace Stork_Future_TaoLi
         /// <param name="para">开仓基本参数</param>
         /// <param name="orderList">交易列表</param>
         /// <param name="id">需要修改的策略实例ID</param>
-        public void UpdateWorker(InitParameters para,Dictionary<string,int> orderList,Guid id)
+        public void UpdateWorker(object v)
         {
+            string id = string.Empty;
+            if (v is OPENMODIFY)
+            {
+                OPENMODIFY value = (OPENMODIFY)v;
+                id = value.ID;
+            }
+            else
+            {
+                CLOSEMODIFY value = (CLOSEMODIFY)v;
+                id = value.ID;
+            }
+
             StrategyWorker worker = Workers[id];
-            worker.UpdateBaseParas(para, orderList);
+            worker.UpdateBaseParas(v);
         }
 
         public void DeleteWorker(Guid id)
@@ -226,21 +312,36 @@ namespace Stork_Future_TaoLi
                     if (obj is OPENCREATE){
                         OPENCREATE value = (OPENCREATE)obj;
 
+
                     }
                     else if (obj is OPENMODIFY)
                     {
-
+                        OPENMODIFY value = (OPENMODIFY)obj;
                     }
-                    else if (obj is OPENALLOW) { }
-                    else if (obj is OPENRUN) { }
-                    else if (obj is OPENDELETE) { }
-                    else if (obj is CLOSECREATE) { }
-                    else if (obj is CLOSEMODIFY) { }
-                    else if (obj is CLOSERUN) { }
-                    else if (obj is CLOSEALLOW) { }
-                    else if (obj is CLOSEDELETE) { }
+                    else if (obj is OPENALLOW)
+                    {
+                        OPENALLOW value = (OPENALLOW)obj;
+                    }
+                    else if (obj is OPENRUN)
+                    {
+                        OPENRUN value = (OPENRUN)obj;
+                    }
+                    else if (obj is OPENDELETE)
+                    {
+                        OPENDELETE value = (OPENDELETE)obj;
+                    }
+                    else if (obj is CLOSECREATE) 
+                    {
+                        CLOSECREATE value = (CLOSECREATE)obj;
+                    }
+                    else if (obj is CLOSEMODIFY) {
+                        CLOSEMODIFY value = (CLOSEMODIFY)obj;
+                    }
+                    else if (obj is CLOSERUN) { CLOSERUN value = (CLOSERUN)obj; }
+                    else if (obj is CLOSEALLOW) { CLOSEALLOW value = (CLOSEALLOW)obj; }
+                    else if (obj is CLOSEDELETE) { CLOSEDELETE value = (CLOSEDELETE)obj; }
                     else
-                    { }
+                    { continue; }
 
                     #endregion
                 }

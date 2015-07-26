@@ -658,7 +658,8 @@ function UpdateOPENStrategies(changeFlag)
 
 
             var strategy = {
-                orderli:buylist,
+                orderli: buylist,
+                weightli:weight,
                 basic: _basic,
                 OP: op,
                 HD: hd,
