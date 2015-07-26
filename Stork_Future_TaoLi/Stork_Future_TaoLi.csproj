@@ -299,7 +299,8 @@
     <Content Include="Views\Home\Index2.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
     <Content Include="Views\Home\MonitorConsole.cshtml" />
-    <Content Include="Views\Home\EditWeightAndTradeList.cshtml" />
+    <Content Include="Views\Home\OPEN_EDIT.cshtml" />
+    <Content Include="Views\Home\CLOSE_EDIT.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -308,6 +309,10 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\STYClass\STYClass\STYClass.vcxproj">
+      <Project>{c3c736a6-43fd-44f7-8aab-94c4d78063da}</Project>
+      <Name>STYClass</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TraderBassClass\TraderBassClass\TraderBassClass.vcxproj">
       <Project>{46db467f-a40c-43bd-b925-6b6bdee3f26d}</Project>
       <Name>TraderBassClass</Name>

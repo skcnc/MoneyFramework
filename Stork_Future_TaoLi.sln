@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stork_Future_TaoLi", "Stork_Future_TaoLi\Stork_Future_TaoLi.csproj", "{384B5217-F6EA-4254-B4F8-F9FC60619971}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TraderBassClass", "TraderBassClass\TraderBassClass\TraderBassClass.vcxproj", "{46DB467F-A40C-43BD-B925-6B6BDEE3F26D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketInfoSys", "MarketInfoSys\MarketInfoSys.csproj", "{18D36003-506E-48EE-AA5F-0C363628E1FC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "STYClass", "STYClass\STYClass\STYClass.vcxproj", "{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +64,18 @@ Global
 		{18D36003-506E-48EE-AA5F-0C363628E1FC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{18D36003-506E-48EE-AA5F-0C363628E1FC}.Release|Win32.ActiveCfg = Release|Any CPU
 		{18D36003-506E-48EE-AA5F-0C363628E1FC}.Release|x64.ActiveCfg = Release|Any CPU
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Debug|Mixed Platforms.ActiveCfg = Release|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Debug|Mixed Platforms.Build.0 = Release|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Debug|Win32.Build.0 = Debug|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Debug|x64.ActiveCfg = Debug|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Release|Any CPU.ActiveCfg = Release|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Release|Win32.ActiveCfg = Release|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Release|Win32.Build.0 = Release|Win32
+		{C3C736A6-43FD-44F7-8AAB-94C4D78063DA}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

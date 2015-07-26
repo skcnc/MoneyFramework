@@ -159,7 +159,7 @@ namespace Stork_Future_TaoLi
         /// 持仓列表参数
         /// 股票代码;类型;持仓数量
         /// </summary>
-        public IList<String> POSITION { get; set; }
+        public String POSITION { get; set; }
 
         /// <summary>
         /// 股票成本
@@ -178,9 +178,9 @@ namespace Stork_Future_TaoLi
 
         /// <summary>
         /// 预期收益
-        /// Prospective yield
+        /// prospective earnings
         /// </summary>
-        public decimal PY { get; set; }
+        public decimal PROSPECTIVEARNINGS { get; set; }
 
         /// <summary>
         /// 开仓基差

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using managedSTY;
 
 namespace Stork_Future_TaoLi.StrategyModule
 {
@@ -110,7 +111,6 @@ namespace Stork_Future_TaoLi.StrategyModule
         private DateTime RunningTime = new DateTime();
         #endregion
 
-
         #region public methods
 
         /// <summary>
@@ -204,6 +204,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         private void _threadProc()
         {
+            
             while (!breaklabel)
             { 
                 if(bRun)
@@ -248,7 +249,6 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// 指数
         /// </summary>
         public string Index;
-
 
     }
 }

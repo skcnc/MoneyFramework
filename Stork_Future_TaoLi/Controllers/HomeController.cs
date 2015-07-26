@@ -69,7 +69,14 @@ namespace Stork_Future_TaoLi.Controllers
             return "SUCCESS";
         }
 
-        public ActionResult EditWeightAndTradeList()
+        public ActionResult OPEN_EDIT()
+        {
+            ViewBag.ID = Request.QueryString["StrategyID"];
+            ViewBag.USER = Request.QueryString["USER"];
+            return View();
+        }
+
+        public ActionResult CLOSE_EDIT()
         {
             ViewBag.ID = Request.QueryString["StrategyID"];
             ViewBag.USER = Request.QueryString["USER"];

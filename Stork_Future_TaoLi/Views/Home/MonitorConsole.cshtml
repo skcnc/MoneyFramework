@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "MonitorConsole";
+    ViewBag.Title = "策略控制台";
 }
 
 <h2>套利策略控制台</h2>
@@ -7,10 +7,10 @@
     <button class="btn btn-success col-md-1" id="refresh" style="margin-right:20px">
         <span class="glyphicon glyphicon-refresh"></span>
     </button>
-    <a id="OpenStrategyCreate" class="col-md-1  btn btn-info" style="margin-right:20px" href="/home/EditWeightAndTradeList?StrategyID=NEW&USER=" target="_blank">
+    <a id="OpenStrategyCreate" class="col-md-1  btn btn-info" style="margin-right:20px" href="/home/OPEN_EDIT?StrategyID=NEW&USER=" target="_blank">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>   建仓
     </a>
-    <a id="CloseStrategyCreate" class="col-md-1 btn btn-info" href="/home/EditWeightAndTradeList?StrategyID=NEW&USER=" target="_blank">
+    <a id="CloseStrategyCreate" class="col-md-1 btn btn-info" href="/home/CLOSE_EDIT?StrategyID=NEW&USER=" target="_blank">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>   平仓
     </a>
 </div>
@@ -29,7 +29,7 @@
     </div>
 </div>
 
-<div class="strategycategory_open sr-only category_template">
+<div class="strategycategory_open sr-only category_open_template">
     <div style="background-color:#CCFEBF;display:inline-block;width:100%">
         <div class="col-md-5">
             <h4><strong>期货: </strong><i name="CTValue">CT201507</i></h4>
@@ -48,8 +48,23 @@
     </ul>
 </div>
 
+<div class="strategycategory_close sr-only category_close_template">
+    <div style="background-color:#CCFEBF;display:inline-block;width:100%">
+        <div class="col-md-9">
+            <h4><strong>期货: </strong><i name="CTValue">CT201507</i></h4>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-info displaystrategy">
+                <span class="badge badge_count">10</span>
+            </button>
+        </div>
+        <span class="sr-only">CT201507</span>
+    </div>
+    <ul class="list-group" style="display:inline-block"></ul>
+</div>
+
 <div class="sr-only">
-    <li class="list-group-item sr-only strategy_template" op_value="10" hd_value="10">
+    <li class="list-group-item sr-only strategy_open_template" op_value="10" hd_value="10">
         <span class="sr-only liid"></span> 
         <div class="row" style="padding-bottom:5px">
             <span class="sr-only strategy_id"></span>
@@ -76,6 +91,71 @@
                 </div>
             </div>
             <div class="col-md-10">
+                <i>
+                    参数1：***
+                    参数2：***
+                    参数3：***
+                    参数4：***
+                    参数5：***
+                    参数6：***
+                    参数4：***
+                    参数5：***
+                    参数6：***
+                    参数1：***
+                    参数2：***
+                    参数3：***
+                    参数4：***
+                    参数5：***
+                    参数6：***
+                    参数4：***
+                    参数5：***
+                    参数6：***
+                </i>
+            </div>
+        </div>
+    </li>
+    @*  *@
+    <li class="list-group-item sr-only strategy_close_template"  sp_value="" coe_value="" sd_value="" sa_value="" pe_value="">
+        <span class="sr-only liid"></span>
+        <div class="row" style="padding-bottom:5px">
+            <span class="sr-only strategy_id"></span>
+            <div>
+                <div class="col-md-9">
+                    <div class="col-md-3">
+                        <h5>空头点位 </h5>&nbsp;=&nbsp;<a class="SPValue">30</a>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>股票成本 </h5>&nbsp;=&nbsp;<a class="COEValue">10</a>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>股票分红 </h5>&nbsp;=&nbsp;<a class="SDValue">10</a>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>股票配股 </h5>&nbsp;=&nbsp;<a class="SAValue">10</a>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>预期收益 </h5>&nbsp;=&nbsp;<a class="PEValue">10</a>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>开仓基差 </h5>&nbsp;=&nbsp;<a class="BASISValue">10</a>
+                    </div>
+                </div>
+                <div class="col-md-3 " >
+                    <button class="btn-sm btn-default runopenstrategy" style="margin:2px">
+                        <span class="glyphicon glyphicon-play"></span>
+                    </button>
+                    <button class="btn-sm btn-default allow_strategy" style="margin:2px">
+                        <span class="glyphicon glyphicon-check"></span>
+                    </button>
+                    <button class="btn-sm btn-danger delete_strategy" style="margin:2px">
+                        <span class="glyphicon glyphicon-remove-sign"></span>
+                    </button>
+                    <button class="btn-sm btn-info modify-strategy" style="margin:3px">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-10" style="margin-top:20px">
                 <i>
                     参数1：***
                     参数2：***
