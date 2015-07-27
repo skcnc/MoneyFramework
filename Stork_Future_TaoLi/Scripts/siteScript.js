@@ -69,7 +69,7 @@ $('#category_panel_open').delegate('button.runopenstrategy', 'click', function (
         RUN: _bRUN
     }
 
-    var JSONSTRING = JSON.stringify(strategy);
+    var JSONSTRING = GetHeader(_basic.ACTIVITY) + JSON.stringify(strategy);
 
     $.post("/Home/ImportHarbor", {
         InputJson: JSONSTRING
@@ -121,7 +121,7 @@ $('#category_panel_close').delegate('button.runopenstrategy', 'click', function 
         RUN: _bRUN
     }
 
-    var JSONSTRING = JSON.stringify(strategy);
+    var JSONSTRING = GetHeader(_basic.ACTIVITY) + JSON.stringify(strategy);
 
     $.post("/Home/ImportHarbor", {
         InputJson: JSONSTRING
@@ -174,7 +174,7 @@ $('#category_panel_open').delegate('button.allow_strategy', 'click', function (e
         ALLOW: _bALLOW
     }
 
-    var JSONSTRING = JSON.stringify(strategy);
+    var JSONSTRING = GetHeader(_basic.ACTIVITY) + JSON.stringify(strategy);
 
     $.post("/Home/ImportHarbor", {
         InputJson: JSONSTRING
@@ -227,7 +227,7 @@ $('#category_panel_close').delegate('button.allow_strategy', 'click', function (
         ALLOW: _bALLOW
     }
 
-    var JSONSTRING = JSON.stringify(strategy);
+    var JSONSTRING = GetHeader(_basic.ACTIVITY) + JSON.stringify(strategy);
 
     $.post("/Home/ImportHarbor", {
         InputJson: JSONSTRING
@@ -286,7 +286,7 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
     }
 
 
-    var JSONSTRING = JSON.stringify(strategy);
+    var JSONSTRING = GetHeader(_basic.ACTIVITY) + JSON.stringify(strategy);
 
     $.post("/Home/ImportHarbor", {
         InputJson: JSONSTRING
@@ -350,7 +350,7 @@ $('#category_panel_close').delegate('button.delete_strategy', 'click', function 
     }
 
 
-    var JSONSTRING = JSON.stringify(strategy);
+    var JSONSTRING = GetHeader(_basic.ACTIVITY) + JSON.stringify(strategy);
 
     $.post("/Home/ImportHarbor", {
         InputJson: JSONSTRING
@@ -667,7 +667,7 @@ function UpdateOPENStrategies(changeFlag)
                 INDEX: Index
             }
 
-            var JSONSTRING = JSON.stringify(strategy);
+            var JSONSTRING = GetHeader(_basic.ACTIVITY) + JSON.stringify(strategy);
 
             $.post("/Home/ImportHarbor", {
                 InputJson: JSONSTRING
@@ -808,7 +808,7 @@ function UpdateOPENStrategies(changeFlag)
             }
             
 
-            var JSONSTRING = JSON.stringify(strategy);
+            var JSONSTRING = GetHeader(_basic.ACTIVITY) + JSON.stringify(strategy);
 
             $.post("/Home/ImportHarbor", {
                 InputJson: JSONSTRING
@@ -1016,6 +1016,20 @@ function GetIndexFullName(briefName)
     else if(briefName == 300){ return "沪深300";}
     else if (briefName == 50) { return "上证50" }
     else { return "未知";}
+}
+
+//添加报文头
+function GetHeader(headMark) {
+    if (headMark == "OPENCREATE") { return "A1"; }
+    else if (headMark == "OPENMODIFY") { return "A2"; }
+    else if (headMark == "OPENRUN") { return "A3"; }
+    else if (headMark == "OPENALLOW") { return "A4"; }
+    else if (headMark == "OPENDELETE") { return "A5"; }
+    else if (headMark == "CLOSECREATE") { return "B1"; }
+    else if (headMark == "CLOSEMODIFY") { return "B2"; }
+    else if (headMark == "CLOSERUN") { return "B3"; }
+    else if (headMark == "CLOSEALLOW") { return "B4"; }
+    else if (headMark == "CLOSEDELETE") { return "B5";}
 }
 
 

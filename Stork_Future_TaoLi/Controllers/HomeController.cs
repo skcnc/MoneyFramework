@@ -52,7 +52,21 @@ namespace Stork_Future_TaoLi.Controllers
         {
             try
             {
-                object obj = JsonConvert.DeserializeObject(InputJson);
+                string mark = InputJson.Substring(0, 2);
+                string jsonString = InputJson.Substring(2);
+                object obj = new object();
+
+                if (mark == "A1") {obj =  (object)(JsonConvert.DeserializeObject<OPENCREATE>(jsonString)); }
+                else if (mark == "A2") { obj = (object)(JsonConvert.DeserializeObject<OPENMODIFY>(jsonString)); }
+                else if (mark == "A3") { obj = (object)(JsonConvert.DeserializeObject<OPENRUN>(jsonString)); }
+                else if (mark == "A4") { obj = (object)(JsonConvert.DeserializeObject<OPENALLOW>(jsonString)); }
+                else if (mark == "A5") { obj = (object)(JsonConvert.DeserializeObject<OPENDELETE>(jsonString)); }
+                else if (mark == "B1") { obj = (object)(JsonConvert.DeserializeObject<CLOSECREATE>(jsonString)); }
+                else if (mark == "B2") { obj = (object)(JsonConvert.DeserializeObject<CLOSEMODIFY>(jsonString)); }
+                else if (mark == "B3") { obj = (object)(JsonConvert.DeserializeObject<CLOSERUN>(jsonString)); }
+                else if (mark == "B4") { obj = (object)(JsonConvert.DeserializeObject<CLOSEALLOW>(jsonString)); }
+                else if (mark == "B5") { obj = (object)(JsonConvert.DeserializeObject<CLOSEDELETE>(jsonString)); }
+
                 StrategyMonitorClass.QCommands.Enqueue(obj);
                 return "SUCCESS";
             }

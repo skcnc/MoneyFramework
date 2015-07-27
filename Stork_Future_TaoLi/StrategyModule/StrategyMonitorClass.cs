@@ -26,7 +26,7 @@ namespace Stork_Future_TaoLi
         /// 行情订阅关系表
         /// 行情对象 1 To N 策略实例 
         /// </summary>
-        private Dictionary<string, List<Guid>> MarketSubscribeList = new Dictionary<string, List<Guid>>();
+        private Dictionary<string, List<String>> MarketSubscribeList = new Dictionary<string, List<String>>();
 
         /// <summary>
         /// 策略管理线程启动
@@ -108,7 +108,7 @@ namespace Stork_Future_TaoLi
                     if (item.Trim() == string.Empty) { continue; }
                     else
                     {
-                        oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[1]));
+                        oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
                     }
                 }
 
@@ -131,7 +131,7 @@ namespace Stork_Future_TaoLi
                     if (item.Trim() == String.Empty) { continue; }
                     else
                     {
-                        wli.Add(item.Split('\n')[0], Convert.ToSingle(item.Split('\n')[2]));
+                        wli.Add(item.Split(';')[0], Convert.ToSingle(item.Split(';')[2]));
                     }
                 }
 
@@ -154,7 +154,7 @@ namespace Stork_Future_TaoLi
                     if (item.Trim() == string.Empty) { continue; }
                     else
                     {
-                        oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[1]));
+                        oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
                     }
                 }
 
@@ -206,8 +206,24 @@ namespace Stork_Future_TaoLi
             worker.UpdateBaseParas(v);
         }
 
-        public void DeleteWorker(Guid id)
+        public void DeleteWorker(object v)
         {
+            string id = string.Empty;
+            
+            if(v is OPENDELETE)
+            {
+                OPENDELETE value = v as OPENDELETE;
+
+                id = value.basic.ID;
+            }
+            else
+            {
+                CLOSEDELETE value = v as CLOSEDELETE;
+                id = value.basic.ID;
+            }
+
+            if (!Workers.Keys.Contains(id)) { return; }
+
             //结束策略实例
             Workers[id].breaklabel = true;
 
@@ -216,7 +232,7 @@ namespace Stork_Future_TaoLi
 
             //行情模块中删除该策略实例的订阅，和消息队列
             DeleteStrategySubscribe(id);
-            MarketInfo.SetStrategyQueue(new KeyValuePair<Guid, Queue>(id, new Queue()));
+            MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(id, new Queue()));
 
         }
 
@@ -235,9 +251,9 @@ namespace Stork_Future_TaoLi
         private void CheckSubscribeUpdate()
         {
             //获取发生改变的工作实例列表
-            List<Guid> ToChangeList = (from item in Workers where item.Value.bSubscribeChange == true select item.Key).ToList();
+            List<String> ToChangeList = (from item in Workers where item.Value.bSubscribeChange == true select item.Key).ToList();
 
-            foreach(Guid g in ToChangeList)
+            foreach(String g in ToChangeList)
             {
                 //遍历其中订阅的股票期货信息，剔除其中不匹配内容
                 List<String> _newSubscribeMarketList = Workers[g].GetSubscribeList();
@@ -255,7 +271,7 @@ namespace Stork_Future_TaoLi
                     }
                     else
                     {
-                        MarketSubscribeList.Add(_ToAdd[i], new List<Guid>(){
+                        MarketSubscribeList.Add(_ToAdd[i], new List<String>(){
                             g
                         });
                     }
@@ -278,7 +294,7 @@ namespace Stork_Future_TaoLi
         /// 删除策略后，清除订阅列表中对应策略订阅
         /// </summary>
         /// <param name="Sid"></param>
-        private void DeleteStrategySubscribe(Guid Sid)
+        private void DeleteStrategySubscribe(String Sid)
         {
             foreach (var item in MarketSubscribeList)
             {
@@ -310,17 +326,16 @@ namespace Stork_Future_TaoLi
 
                     #region 指令类型判断
                     if (obj is OPENCREATE){
-                        OPENCREATE value = (OPENCREATE)obj;
-
-
+                        RecruitNewWorker(obj);
                     }
                     else if (obj is OPENMODIFY)
                     {
-                        OPENMODIFY value = (OPENMODIFY)obj;
+                        UpdateWorker(obj);
                     }
                     else if (obj is OPENALLOW)
                     {
                         OPENALLOW value = (OPENALLOW)obj;
+
                     }
                     else if (obj is OPENRUN)
                     {
@@ -328,18 +343,18 @@ namespace Stork_Future_TaoLi
                     }
                     else if (obj is OPENDELETE)
                     {
-                        OPENDELETE value = (OPENDELETE)obj;
+                        DeleteWorker(obj);
                     }
                     else if (obj is CLOSECREATE) 
                     {
-                        CLOSECREATE value = (CLOSECREATE)obj;
+                        RecruitNewWorker(obj);
                     }
                     else if (obj is CLOSEMODIFY) {
-                        CLOSEMODIFY value = (CLOSEMODIFY)obj;
+                        UpdateWorker(obj);
                     }
                     else if (obj is CLOSERUN) { CLOSERUN value = (CLOSERUN)obj; }
                     else if (obj is CLOSEALLOW) { CLOSEALLOW value = (CLOSEALLOW)obj; }
-                    else if (obj is CLOSEDELETE) { CLOSEDELETE value = (CLOSEDELETE)obj; }
+                    else if (obj is CLOSEDELETE) { DeleteWorker(obj); }
                     else
                     { continue; }
 

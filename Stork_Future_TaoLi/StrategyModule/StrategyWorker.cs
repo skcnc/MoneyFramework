@@ -279,7 +279,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         if (item.Trim() == string.Empty) { continue; }
                         else
                         {
-                            oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[1]));
+                            oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
                         }
                     }
 
@@ -331,7 +331,6 @@ namespace Stork_Future_TaoLi.StrategyModule
         public void Init(OPENCREATE para)
         {
             open_args args = new open_args();
-            args.weightlist
             
         }
 

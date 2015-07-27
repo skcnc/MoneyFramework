@@ -16,10 +16,10 @@ namespace Stork_Future_TaoLi
     {
         private static LogWirter log = new LogWirter();
 
-        private static Dictionary<Guid, Queue> refStrategyQueue = new Dictionary<Guid, Queue>();
+        private static Dictionary<String, Queue> refStrategyQueue = new Dictionary<String, Queue>();
         private static object lockSync = new object();
 
-        private Dictionary<String, List<Guid>> subscribeList = new Dictionary<string, List<Guid>>();
+        private Dictionary<String, List<String>> subscribeList = new Dictionary<string, List<String>>();
 
 
         /// <summary>
@@ -112,16 +112,16 @@ namespace Stork_Future_TaoLi
 
                     if(!subscribeList.Keys.Contains(info.Code))
                     {
-                        subscribeList.Add(info.Code, new List<Guid>());
+                        subscribeList.Add(info.Code, new List<String>());
                     }
 
 
                     if (subscribeList.Keys.Contains(info.Code))
                     {
                         //如果没有实例订阅过该股票，就不用管了
-                        List<Guid> _relatedStrategy = subscribeList[info.Code];
+                        List<String> _relatedStrategy = subscribeList[info.Code];
 
-                        foreach (Guid strategy in _relatedStrategy)
+                        foreach (String strategy in _relatedStrategy)
                         {
                             if (refStrategyQueue.Keys.Contains(strategy))
                             {
@@ -154,7 +154,7 @@ namespace Stork_Future_TaoLi
         //股票代码与注册该代码的行情映射表
         //public static List<KeyValuePair<String, List<String>>> MapSS = new List<KeyValuePair<string, List<string>>>();
 
-        public static Dictionary<String, List<Guid>> MapSS = new Dictionary<String, List<Guid>>();
+        public static Dictionary<String, List<String>> MapSS = new Dictionary<String, List<String>>();
         public static bool bSubscribeListChangeLabel = false;
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="Strategy">策略号</param>
         /// <returns>注册代码编号列表</returns>
-        public static List<String> GetRegeditCode(Guid Strategy)
+        public static List<String> GetRegeditCode(String Strategy)
         {
             lock (syncRoot)
             {
@@ -206,7 +206,7 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="Strategy">策略名</param>
         /// <param name="Codes">策略包含代码</param>
-        public static void SetRegeditStrategy(Guid Strategy, List<String> Codes)
+        public static void SetRegeditStrategy(String Strategy, List<String> Codes)
         {
             //获取已经注册过的代码
             List<String> existRegedit = GetRegeditCode(Strategy);
@@ -234,7 +234,7 @@ namespace Stork_Future_TaoLi
         /// 更新订阅列表
         /// </summary>
         /// <param name="para"></param>
-        public static void SetMapSS(Dictionary<String,List<Guid>> para)
+        public static void SetMapSS(Dictionary<String,List<String>> para)
         {
             lock(syncRoot)
             {
@@ -248,7 +248,7 @@ namespace Stork_Future_TaoLi
         /// 该函数由行情模块调用
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<String,List<Guid>> GetMapSS()
+        public static Dictionary<String,List<String>> GetMapSS()
         {
             return MapSS;
         }

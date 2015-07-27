@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Stork_Future_TaoLi
 {
-    class Basic
+    public class Basic
     {
         /// <summary>
         /// 用户名
@@ -51,7 +51,7 @@ namespace Stork_Future_TaoLi
     /// <summary>
     /// 创建开仓
     /// </summary>
-    class OPENCREATE
+    public class OPENCREATE
     {
         public Basic basic { get; set; }
         /// <summary>
@@ -89,7 +89,7 @@ namespace Stork_Future_TaoLi
     /// <summary>
     /// 修改开仓实例
     /// </summary>
-    class OPENMODIFY
+    public class OPENMODIFY
     {
         public Basic basic { get; set; }
 
@@ -123,7 +123,8 @@ namespace Stork_Future_TaoLi
     /// <summary>
     /// 启动开仓运行
     /// </summary>
-    class OPENRUN {
+    public class OPENRUN
+    {
         public Basic basic { set; get; }
         public bool RUN { get; set; }
     }
@@ -146,7 +147,8 @@ namespace Stork_Future_TaoLi
     /// <summary>
     /// 创建平仓
     /// </summary>
-    class CLOSECREATE {
+    public class CLOSECREATE
+    {
         public Basic basic { get; set; }
 
 
@@ -200,7 +202,7 @@ namespace Stork_Future_TaoLi
         public float OB { get; set; }
     }
 
-    class CLOSEMODIFY
+    public class CLOSEMODIFY
     {
         public Basic basic { get; set; }
 
@@ -258,22 +260,25 @@ namespace Stork_Future_TaoLi
     /// <summary>
     /// 启动平仓运行
     /// </summary>
-    class CLOSERUN {
+    public class CLOSERUN
+    {
         public Basic basic { get; set; }
+        public bool RUN { get; set; }
     }
 
     /// <summary>
     /// 允许平仓交易
     /// </summary>
-    class CLOSEALLOW
+    public class CLOSEALLOW
     {
         public Basic basic { get; set; }
+        public bool ALLOW { get; set; }
     }
 
     /// <summary>
     /// 删除平仓
     /// </summary>
-    class CLOSEDELETE
+    public class CLOSEDELETE
     {
         public Basic basic { get; set; }
     }
