@@ -35,7 +35,6 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// <summary>
         /// 判断策略触发点
         /// 每次计算后判断
-        /// 
         /// </summary>
         /// <returns></returns>
         bool TriggerPoint();
