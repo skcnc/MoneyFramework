@@ -47,10 +47,13 @@ struct Logininfor // µÇÂ½ÐÅÏ¢
 
 	void getInit(Logininfor info)
 	{
-		strcpy(serverAddr,info.serverAddr);
+		//strcpy(serverAddr,info.serverAddr);
+		strcpy_s(serverAddr, strlen(info.serverAddr), info.serverAddr);
 		nPort = info.nPort;
-		strcpy(ZjAccount,info.ZjAccount);
-		strcpy(BROKER_ID,info.BROKER_ID);
+		//strcpy(ZjAccount,info.ZjAccount);
+		strcpy_s(ZjAccount, strlen(info.ZjAccount), info.ZjAccount);
+		//strcpy(BROKER_ID,info.BROKER_ID);
+		strcpy_s(BROKER_ID, strlen(info.BROKER_ID), info.BROKER_ID);
 		strcpy(PASSWORD,info.PASSWORD);
 		strcpy(INVESTOR_ID,info.INVESTOR_ID);
 	}

@@ -58,8 +58,6 @@ namespace Stork_Future_TaoLi.Variables_Type
         //报单执行细节
         public string cOrderexecutedetail { get; set; }
 
-
-
     }
 
     /// <summary>

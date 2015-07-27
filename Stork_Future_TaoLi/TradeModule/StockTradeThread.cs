@@ -53,7 +53,6 @@ namespace Stork_Future_TaoLi.TradeModule
 
 
             List<Task> TradeThreads = new List<Task>();
-            bool isFree = false; //如果没有任务，则安排线程休眠
             log.LogEvent("交易控制子线程启动： 初始化交易线程数 :" + stockNum.ToString());
 
             //启动心跳和交易线程
@@ -314,7 +313,6 @@ namespace Stork_Future_TaoLi.TradeModule
                         else
                         {
                             managedTraderorderstruct tradesUnit = CreateTradeUnit(trades[0]);
-                            int i = 0;
                             managedQueryEntrustorderstruct entrustUnit = new managedQueryEntrustorderstruct();
                             string s = string.Empty;
                             _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);

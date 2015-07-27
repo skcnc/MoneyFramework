@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using managedSTY;
+using marketinfosys;
+using Stork_Future_TaoLi.Variables_Type;
+using Stork_Future_TaoLi.Modulars;
 
 namespace Stork_Future_TaoLi.StrategyModule
 {
@@ -16,7 +19,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// <summary>
         /// 权重文件列表
         /// </summary>
-        public Dictionary<String, float> WeightList { get; set; }
+        public Dictionary<String, double> WeightList { get; set; }
 
         /// <summary>
         /// 开仓点位
@@ -197,12 +200,25 @@ namespace Stork_Future_TaoLi.StrategyModule
 
             ThreadProc _thread = new ThreadProc(_threadProc);
             excutedThread = new Thread(new ThreadStart(_thread));
+            if (Type == "OPEN")
+            {
+                //开仓
+                open_args args = InitArgs(open_para.WeightList, LiStockOrder, CT, open_para.OP, open_para.INDEX, HD);
+                m_strategy_open.init(args);
+
+            }
+            else if (Type == "CLOSE")
+            {
+                //平仓
+
+            }
+            
             excutedThread.Start();
             RunningTime = DateTime.Now;
 
-            Thread.Sleep(100);
+            
 
-            //Test Code Begin
+
             if(DebugMode.debug)
             {
               
@@ -211,8 +227,23 @@ namespace Stork_Future_TaoLi.StrategyModule
                 _subscribe.Add("600104.sh");
                 bSubscribeChange = true;
             }
-            //Test Code End
+            else
+            {
+                //获取订阅列表
+                List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
+                _subscribe.Clear();
 
+                bool change = false;
+                foreach (var item in subscribelist)
+                {
+                    _subscribe.Add(item.cSecurity_code);
+                    change = true;
+                }
+
+                bSubscribeChange = change;
+            }
+
+            Thread.Sleep(100);
         }
 
         /// <summary>
@@ -228,6 +259,17 @@ namespace Stork_Future_TaoLi.StrategyModule
             }
 
             return _marketQueue.Count;
+        }
+
+        /// <summary>
+        /// 获取最新的行情内容
+        /// </summary>
+        /// <returns></returns>
+        private object DeQueueInfo()
+        {
+            if (_marketQueue.Count == 0) return null;
+
+            return _marketQueue.Dequeue();
         }
 
         /// <summary>
@@ -279,7 +321,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         if (item.Trim() == string.Empty) { continue; }
                         else
                         {
-                            oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
+                            oli.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
                         }
                     }
 
@@ -287,14 +329,14 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     open_para.OP = value.OP;
 
-                    Dictionary<string, float> wli = new Dictionary<string, float>();
+                    Dictionary<string, double> wli = new Dictionary<string, double>();
 
                     foreach (var item in value.weightli.Split('\n'))
                     {
                         if (item.Trim() == String.Empty) { continue; }
                         else
                         {
-                            wli.Add(item.Split('\n')[0], Convert.ToSingle(item.Split('\n')[2]));
+                            wli.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToDouble(item.Split(';')[2]));
                         }
                     }
 
@@ -342,25 +384,182 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         private void _threadProc()
         {
-            
+            while (!bRun) { 
+
+                //尚未运行的策略，直接丢弃队列中新的行情
+                while (_marketQueue.Count > 0)
+                {
+                    DeQueueInfo();
+                }
+
+                
+                Thread.Sleep(1000); 
+            }
             while (!breaklabel)
             { 
+                /****
+                 * 循环工作：
+                 * 1. 更新行情信息
+                 * 2. 计算中间参数
+                 * 3. 判断开仓条件
+                 * 4. 生成交易列表
+                 * ****/
                 if(bRun)
                 {
                     //策略实例运算
+                    List<managedMarketInforStruct> infos = new List<managedMarketInforStruct>();
+                    while (_marketQueue.Count > 0)
+                    {
+                        MarketData data = (MarketData)DeQueueInfo();
+                        managedMarketInforStruct info = new managedMarketInforStruct();
+
+                        for (int i = 0; i < 10; i++)
+                        {
+                            info.dAskPrice[i] = Convert.ToDouble(data.AskPrice[i]);
+                            info.dAskVol[i] = Convert.ToDouble(data.AskVol[i]);
+                            info.dBidPrice[i] = Convert.ToDouble(data.BidPrice[i]);
+                            info.dBidVol[i] = Convert.ToDouble(data.BidVol[i]);
+                        }
+
+                        managedsecurityindex index = new managedsecurityindex();
+                        index.cSecurity_code = data.Code;
+                        index.cSecuritytype = Convert.ToSByte(data.Code);
+
+                        info.msecurity = index;
+                        info.security_name = data.Code;
+                        info.nTime = data.Time;
+                        info.nStatus = data.Status;
+                        info.nPreClose = data.PreClose;
+                        info.dLastPrice = data.Match;
+                        info.dHighLimited = data.HighLimited;
+                        info.dLowLimited = data.LowLimited;
+                        info.exchangeID = data.WindCode.Split('.')[1];
+
+                        infos.Add(info);
+                    }
+
+                    if(infos.Count > 0)
+                    {
+                        m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
+                    }
+                    else { continue; }
                 }
+
+                m_strategy_open.calculateSimTradeStrikeAndDelta();
 
                 if(bRun && bAllow)
                 {
                     // 生成交易列表
+                    if (m_strategy_open.isOpenPointReached())
+                    {
+                        List<managedTraderorderstruct> ol = m_strategy_open.getTradeList().ToList();
+
+                        //交易列表送往交易线程下单（下单的线程，股票和期货是分开的）
+
+                        List<TradeOrderStruct> orderli = new List<TradeOrderStruct>();
+
+                        foreach (managedTraderorderstruct item in ol)
+                        {
+                            TradeOrderStruct order = new TradeOrderStruct();
+                            order.cExhcnageID = item.cExchangeID;
+                            order.cSecurityCode = item.cSecurity_code;
+                            order.SecurityName = item.cSecurity_code;
+                            order.nSecurityAmount = item.nSecurity_amount;
+                            order.dOrderPrice = item.dOrderprice;
+                            order.cTradeDirection = item.cTraderdirection.ToString();
+                            order.cOffsetFlag = item.cOffsetFlag.ToString();
+                            order.cOrderPriceType = item.cOrderPriceType.ToString();
+
+                            order.cSecurityType = item.cSecuritytype.ToString();
+                            order.cOrderLevel = item.cOrderlevel.ToString();
+                            order.cOrderexecutedetail = item.cOrderexecutedetail.ToString();
+
+                            orderli.Add(order);
+                        }
 
 
+                        //下单到交易预处理模块
+                        queue_prd_trade.GetQueue().Enqueue((object)orderli);
+                    }
                     // 列表只会生成一次
                     breaklabel = true;
                 }
 
+                //获取中间显示参数
+                //gettaderargs   getshowstatus
                 Thread.Sleep(1);
             }
+        }
+
+
+        /// <summary>
+        /// 初始化开仓参数列表
+        /// </summary>
+        /// <param name="WeightList">权重列表</param>
+        /// <param name="LiStockOrder">持仓列表</param>
+        /// <param name="CT">期货</param>
+        /// <param name="OP">开仓点位</param>
+        /// <param name="INDEX">开仓指数</param>
+        /// <param name="HD">手数</param>
+        /// <returns>开仓参数实例</returns>
+        open_args InitArgs(Dictionary<String, double> WeightList, Dictionary<string, int> LiStockOrder,
+            String CT, double OP, string INDEX, int HD)
+        {
+            open_args args = new open_args();
+            List<managedIndexWeights> weight = new List<managedIndexWeights>();
+            List<managedstockposition> position = new List<managedstockposition>();
+
+            foreach (var item in WeightList)
+            {
+
+                managedIndexWeights w = new managedIndexWeights();
+                managedsecurityindex si = new managedsecurityindex();
+
+                string code = item.Key.Substring(1);
+                string type = item.Key.Substring(0, 1);
+                double weightvalue = item.Value;
+
+                si.cSecuritytype = Convert.ToSByte(type[0]);
+                si.cSecurity_code = code;
+                w.sSecurity = si;
+                w.dweight = weightvalue;
+
+                weight.Add(w);
+            }
+
+            foreach (var item in LiStockOrder)
+            {
+                managedstockposition s = new managedstockposition();
+                managedsecurityindex si = new managedsecurityindex();
+
+                si.cSecurity_code = item.Key.Substring(1);
+                si.cSecuritytype = Convert.ToSByte(item.Key.Substring(0, 1)[0]);
+
+                s.sSecurity = si;
+
+                s.tradevolume = item.Value;
+
+                /*****************************
+                 * TODO: 是否停盘和最新价格
+                 *          尚未赋值
+                 * **************************/
+
+                position.Add(s);
+            }
+
+            args.bTradingAllowed = false;
+
+            args.contractCode = CT;
+            args.dPositiveOpenDelta = OP;
+            args.indexCode = INDEX;
+            args.nHands = HD;
+            args.positionlist = position.ToArray();
+            args.positionlistNUM = LiStockOrder.Count;
+            args.weightlist = weight.ToArray();
+            args.weightlistnum = WeightList.Count;
+
+            return args;
+
         }
         #endregion
     }

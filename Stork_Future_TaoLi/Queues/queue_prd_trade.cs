@@ -29,6 +29,25 @@ namespace Stork_Future_TaoLi.Modulars
         }
 
         /// <summary>
+        /// 入队
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static bool EnQueue(object v)
+        {
+            if(instance == null)
+            {
+                instance = new Queue();
+            }
+            try
+            {
+                instance.Enqueue(v);
+                return true;
+            }
+            catch { return false; }
+        }
+
+        /// <summary>
         /// 获取该队列中的消息数量
         /// </summary>
         /// <returns>

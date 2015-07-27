@@ -108,7 +108,7 @@ namespace Stork_Future_TaoLi
                     if (item.Trim() == string.Empty) { continue; }
                     else
                     {
-                        oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
+                        oli.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
                     }
                 }
 
@@ -124,14 +124,14 @@ namespace Stork_Future_TaoLi
 
                 newWorker.Type = "OPEN";
 
-                Dictionary<string, float> wli = new Dictionary<string, float>();
+                Dictionary<string, double> wli = new Dictionary<string, double>();
 
                 foreach (var item in value.weightli.Split('\n'))
                 {
                     if (item.Trim() == String.Empty) { continue; }
                     else
                     {
-                        wli.Add(item.Split(';')[0], Convert.ToSingle(item.Split(';')[2]));
+                        wli.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToDouble(item.Split(';')[2]));
                     }
                 }
 
@@ -154,7 +154,7 @@ namespace Stork_Future_TaoLi
                     if (item.Trim() == string.Empty) { continue; }
                     else
                     {
-                        oli.Add(item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
+                        oli.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToInt32(item.Split(';')[2]));
                     }
                 }
 
