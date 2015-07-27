@@ -11,4 +11,5 @@
 /// <reference path="npm.js" />
 /// <reference path="login.js" />
 /// <reference path="sitescript.js" />
+/// <reference path="jquery.signalr-2.2.0.min.js" />
 
