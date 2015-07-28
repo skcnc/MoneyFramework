@@ -53,7 +53,7 @@ public:
 public:
     /************行情部分********/
 	bool    updateSecurityInfo(MarketInforStruct *,int &num);      //获得行情信息  
-    bool    getsubscribelist(securityindex *,int& num);            //获得订阅的股票 必须在初始化结束后调用
+    bool    getsubscribelist(securityindex*,int& num);            //获得订阅的股票 必须在初始化结束后调用
 
 	
 

@@ -45,20 +45,23 @@ bool Strategy_OPEN::updateSecurityInfo(array<managedMarketInforStruct^>^ marketi
 
 array<managedsecurityindex^>^ Strategy_OPEN::getsubscribelist(){
 
-	securityindex * subscribelist;
+	securityindex*  subscribelist = new securityindex[1];
 	array<managedsecurityindex^>^ securityIndexs;
-
 	int num;
 	if (m_open_strategy->getsubscribelist(subscribelist, num))
 	{
+		securityIndexs = gcnew array<managedsecurityindex^>(num);
 		for (int i = 0; i < num; i++){
 			managedsecurityindex^ index = gcnew managedsecurityindex();
+			securityIndexs[i] = gcnew managedsecurityindex();
 
 			index->cSecuritytype = subscribelist[i].cSecuritytype;
 			index->cSecurity_code = gcnew String(subscribelist[i].cSecurity_code);
-
-			securityIndexs[i] = index;
+			securityIndexs[i]->cSecurity_code = gcnew String(index->cSecurity_code);
+			securityIndexs[i]->cSecuritytype = index->cSecuritytype;
+		
 		}
+		return securityIndexs;
 	}
 
 	return securityIndexs;

@@ -14,7 +14,7 @@ class CSyntheticIndex:public CSyntheticSecurity
 	double  dSimIndex;
 	double  marketvalue;
 	list<indexweightstruct>  stockweight;  //权重文件CSecurity
-	CIndex     *  m_index;              //指数
+	CIndex      m_index;              //指数
 
  public:
     map<securityindex ,CSecurity *>  stockDb;  //行情数据

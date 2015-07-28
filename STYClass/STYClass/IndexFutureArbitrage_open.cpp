@@ -35,13 +35,17 @@ bool    CIndexFutureArbitrage_open::updateSecurityInfo(MarketInforStruct * Marke
 
 	return true;
 }
-bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex * subscribelist,int& num)            //获得订阅的股票 
+bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex* subscribelist,int& num)            //获得订阅的股票 
  {
-	 map<securityindex ,CSecurity * >::iterator itor;
+	int totalnum = this->m_SyntheticIndex.stockDb.size() + 2;
+	 //securityindex * subscribelist = new securityindex[totalnum];
+
+
+	map<securityindex ,CSecurity * >::iterator itor;
 	
 	 itor=this->m_SyntheticIndex.stockDb.begin();
-	  num=0;
-
+	 
+	 num = 0;
 	 while(itor!=m_SyntheticIndex.stockDb.end())
        {    
 		   subscribelist[num].cSecuritytype=itor->first.cSecuritytype;
@@ -57,7 +61,7 @@ bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex * subscribelis
 
 	 subscribelist[num].cSecuritytype='f';
 	 strcpy(subscribelist[num].cSecurity_code,this->m_indexfuturearbitrageopenargs.contractCode);
-	 itor++;
+	 
      num++;
 	 return true;
  }

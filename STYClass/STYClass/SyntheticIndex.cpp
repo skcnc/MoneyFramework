@@ -95,10 +95,8 @@ bool    CSyntheticIndex::isupdated()
 
 bool   CSyntheticIndex::init(indexweightstruct * indexweightlist,int weightnum, stockpotionstruct * stockpotionlist,int positionnum,char *indexCode )
 {
-	if(this->m_index!=0)
-		delete m_index;
-	 m_index=new CIndex;
-	 m_index->setcode(indexCode);   //初始指数
+
+	 m_index.setcode(indexCode);   //初始指数
 
 
 	 stockweight.clear();  //如果更新权重文件  释放内存
