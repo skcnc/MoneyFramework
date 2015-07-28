@@ -20,6 +20,16 @@ namespace Stork_Future_TaoLi
         public void Send(String name, String message)
         {
             Clients.All.broadcastMessage(name, message);
+            
+        }
+    }
+
+    public class PushStrategyInfo
+    {
+        private static dynamic GetClients(string group)
+        {
+            var context = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
+            return context.Clients[group];
         }
     }
 
