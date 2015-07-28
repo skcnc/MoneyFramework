@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "平仓设置";
+}
+
+<!--本页涉及平仓内容的修改，以及交易文件的修改-->
+<h2>平仓参数设定</h2>
+
+
+<div class="container-fluid">
+    <div id="content">
+        <div class="col-md-12" style="margin-bottom:20px;margin-top:30px">
+            <div class="col-md-10">
+                <input id="ct_value" type="text" placeholder="期货合约" style="margin:5px"/>
+                <input id="sp_value" type="text" placeholder="空头点位" style="margin:5px" />
+                <input id="hd_value" type="text" placeholder="交易手数" style="margin:5px" />
+                <input id="coe_value" type="text" placeholder="空头点位" style="margin:5px" />
+                <input id="sd_value" type="text" placeholder="股票分红" style="margin:5px" />
+                <input id="sa_value" type="text" placeholder="股票配股" style="margin:5px" />
+                <input id="pe_value" type="text" placeholder="预期收益" style="margin:5px" />
+                <input id="basis_value" type="text" placeholder="开仓基差" style="margin:5px" />
+            </div>
+            <div class="col-md-2">
+                <div class="col-md-12">
+                    <button id="btnSubmit_close" class="btn btn-info">确认交易列表</button>
+                </div>
+            </div>
+            <span class="sr-only" id="strategyID">@ViewBag.ID</span>
+            <span class="sr-only" id="userName">@ViewBag.USER</span>
+        </div>
+        <div class="col-md-12" style="margin-top:20px">
+            <div class="col-lg-12">
+                <textarea id="buylist" placeholder="请将交易文件粘贴至此后编辑" style="max-width:1000px;width:inherit;height:500px"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
