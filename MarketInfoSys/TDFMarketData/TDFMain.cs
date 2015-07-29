@@ -11,7 +11,11 @@ namespace MarketInfoSys
     public class TDFMain
     {
 
-        
+        public static String ip { get; set; }
+        public static String port { get; set; }
+        public static String userName { get; set; }
+        public static String password { get; set; }
+        public static string subscribeList { get; set; }
 
         public static void Run()
         {
@@ -38,17 +42,23 @@ namespace MarketInfoSys
                 //Username = CHangQingPARA.USERNAME,
                 //Password = CHangQingPARA.PASSWORD
 
-                Ip = "114.80.154.34",
-                Port = "6231",                              //服务器端口
-                Username = "TD1033422002",                        //服务器用户名
-                Password = "27692616"
+                //Ip = "114.80.154.34",
+                //Port = "6231",                              //服务器端口
+                //Username = "TD1033422002",                        //服务器用户名
+                //Password = "27692616"
 
+                Ip = ip,
+                Port = port,
+                Username = userName,
+                Password=password
             };
 
             /******即使不用，也要初始化******/
             theServers[1] = new TDFServerInfo();
             theServers[2] = new TDFServerInfo();
             theServers[3] = new TDFServerInfo();
+
+           
 
 
             /************订阅的类型需要再确认***********/
@@ -57,7 +67,7 @@ namespace MarketInfoSys
                 Servers = theServers,
                 ServerNum = iServerNum,
                 Markets = "",
-                Subscriptions = "600005.sh;600651.sh;600104.sh",
+                Subscriptions = subscribeList.Replace('\n', ';'),
                 ConnectionID = 1,
                 Time =0,
                 TypeFlags = 0
