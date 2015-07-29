@@ -21,8 +21,6 @@ namespace Stork_Future_TaoLi.Controllers
         public ActionResult About()
         {
             ViewBag.Message = "Your app description page.";
-            TestClass.isRun = false;
-            
             return View();
         }
 

@@ -98,7 +98,6 @@ bool   CSyntheticIndex::init(indexweightstruct * indexweightlist,int weightnum, 
 
 	 m_index.setcode(indexCode);   //初始指数
 
-
 	 stockweight.clear();  //如果更新权重文件  释放内存
 	 stockDb.clear();      //行情
 	 m_positionlist.clear();
