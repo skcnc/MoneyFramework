@@ -86,7 +86,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="TDFApi_CSharp_v3.0, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Release\TDFApi_CSharp_v3.0.dll</HintPath>
+      <HintPath>..\..\..\金融套利系统\MoneyFramework\bin\x64\Release\TDFApi_CSharp_v3.0.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

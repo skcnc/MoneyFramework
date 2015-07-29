@@ -537,6 +537,10 @@ function UpdateOPENStrategies(changeFlag)
         if (type == "" || buylist == "" || ct == "" || hd == "") {
             continue;
         }
+
+        var chat = $.connection.chatHub;
+
+        chat.server.linkIn(id);
         
         if (type == 0) {
             //开仓类
@@ -818,6 +822,8 @@ function UpdateOPENStrategies(changeFlag)
 
         }
     }
+
+
 }
 
 
