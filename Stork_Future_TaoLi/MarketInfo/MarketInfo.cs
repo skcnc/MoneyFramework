@@ -19,8 +19,11 @@ namespace Stork_Future_TaoLi
         private static Dictionary<String, Queue> refStrategyQueue = new Dictionary<String, Queue>();
         private static object lockSync = new object();
 
-        private Dictionary<String, List<String>> subscribeList = new Dictionary<string, List<String>>();
+        
 
+        private Dictionary<String, List<String>> subscribeList = new Dictionary<string, List<String>>();
+        private Hashtable StockTable = new Hashtable();
+        private static Queue MarketChangeQueue = new Queue();
 
         /// <summary>
         /// 启动行情获取新示例
@@ -73,7 +76,8 @@ namespace Stork_Future_TaoLi
         private void ThreadProc()
         {
             //本地股市信息存入stockTable 中
-            Hashtable StockTable = new Hashtable();
+            
+            
             StockInfoClient client = new StockInfoClient();
             while (true)
             {
@@ -110,11 +114,12 @@ namespace Stork_Future_TaoLi
                     }
                     StockTable.Add(info.Code, info);
 
+                    marketMonitorQueue.EnQueueNew(info.Code, info.Match.ToString());
+
                     if(!subscribeList.Keys.Contains(info.Code))
                     {
                         subscribeList.Add(info.Code, new List<String>());
                     }
-
 
                     if (subscribeList.Keys.Contains(info.Code))
                     {

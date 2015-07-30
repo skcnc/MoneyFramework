@@ -94,5 +94,10 @@ namespace Stork_Future_TaoLi.Controllers
             ViewBag.USER = Request.QueryString["USER"];
             return View();
         }
+
+        public ActionResult MarketView()
+        {
+            return View();
+        }
     }
 }
