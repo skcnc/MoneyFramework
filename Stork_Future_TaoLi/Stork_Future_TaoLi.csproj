@@ -220,8 +220,10 @@
     <Compile Include="Hubs\chathub.cs" />
     <Compile Include="MarketInfo\MarketInfo.cs" />
     <Compile Include="MarketInfo\StockInfo.cs" />
+    <Compile Include="MarketInfo\UpdateMarketPanel.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="PreTradeModule\PreTradeModule.cs" />
+    <Compile Include="Queues\marketMonitorQueue.cs" />
     <Compile Include="Queues\queue_hangqing_info.cs" />
     <Compile Include="Queues\queue_prd_trade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -330,6 +332,7 @@
     <Content Include="Views\Home\MonitorConsole.cshtml" />
     <Content Include="Views\Home\OPEN_EDIT.cshtml" />
     <Content Include="Views\Home\CLOSE_EDIT.cshtml" />
+    <Content Include="Views\Home\MarketView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
