@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Stork_Future_TaoLi
 {
-    public class MarketInfo
+    public class MarketValue
     {
         public String Code { get; set; }
         public String Value { get; set; }
@@ -18,17 +18,22 @@ namespace Stork_Future_TaoLi
 
         public static void EnQueueNew(String code, String value)
         {
-            instance.Enqueue((object)(new MarketInfo()
+            instance.Enqueue((object)(new MarketValue()
             {
                 Code = code,
                 Value = value
             }));
         }
 
-        public static MarketInfo DeQueueNew()
+        public static MarketValue DeQueueNew()
         {
             if (instance.Count == 0) return null;
-            return (MarketInfo)(instance.Dequeue());
+            return (MarketValue)(instance.Dequeue());
+        }
+
+        public static int GetQueueLength()
+        {
+            return instance.Count;
         }
     }
 }
