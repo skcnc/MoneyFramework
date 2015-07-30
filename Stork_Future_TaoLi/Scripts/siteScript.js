@@ -538,7 +538,7 @@ function UpdateOPENStrategies(changeFlag)
             continue;
         }
 
-        var chat = $.connection.chatHub;
+        var chat = $.connection.ProxyHub;
 
         chat.server.linkIn(id);
         
