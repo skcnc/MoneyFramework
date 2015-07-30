@@ -46,6 +46,8 @@ namespace Stork_Future_TaoLi
             TestClass t = new TestClass();
             t.Run();
 
+            UpdateMarketPanel MarketMonitor = new UpdateMarketPanel();
+            MarketMonitor.Run();
         }
     }
 

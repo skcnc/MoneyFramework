@@ -9,7 +9,7 @@ namespace Stork_Future_TaoLi
 {
     public class UpdateMarketPanel
     {
-        private void Run()
+        public void Run()
         {
             Thread excutedThread = new Thread(new ThreadStart(ThreadProc));
             excutedThread.Start();
@@ -24,7 +24,7 @@ namespace Stork_Future_TaoLi
                 while (marketMonitorQueue.GetQueueLength() > 0)
                 {
                     MarketValue value = marketMonitorQueue.DeQueueNew();
-                    MarketMonitor.Instance.Send(value.Code, value.Value);
+                    MarketMonitor.Instance.Send(value);
                 }
             }
         }

@@ -40,6 +40,8 @@
             this.rtbSubscribe = new System.Windows.Forms.RichTextBox();
             this.btnSubmit = new System.Windows.Forms.Button();
             this.errTip = new System.Windows.Forms.ToolTip(this.components);
+            this.QueueLength = new System.Windows.Forms.Label();
+            this.updateCount = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // label1
@@ -129,11 +131,25 @@
             this.btnSubmit.Text = "启动运行";
             this.btnSubmit.UseVisualStyleBackColor = true;
             // 
+            // QueueLength
+            // 
+            this.QueueLength.AutoSize = true;
+            this.QueueLength.Location = new System.Drawing.Point(20, 97);
+            this.QueueLength.Name = "QueueLength";
+            this.QueueLength.Size = new System.Drawing.Size(41, 12);
+            this.QueueLength.TabIndex = 6;
+            this.QueueLength.Text = "label3";
+            // 
+            // updateCount
+            // 
+            this.updateCount.Tick += new System.EventHandler(this.updateCount_Tick);
+            // 
             // ControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(397, 590);
+            this.Controls.Add(this.QueueLength);
             this.Controls.Add(this.btnSubmit);
             this.Controls.Add(this.rtbSubscribe);
             this.Controls.Add(this.tbpassword);
@@ -166,5 +182,7 @@
         private System.Windows.Forms.RichTextBox rtbSubscribe;
         private System.Windows.Forms.Button btnSubmit;
         private System.Windows.Forms.ToolTip errTip;
+        private System.Windows.Forms.Label QueueLength;
+        private System.Windows.Forms.Timer updateCount;
     }
 }
