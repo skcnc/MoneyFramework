@@ -307,6 +307,8 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
     localStorage.removeItem(_id + ":RUN");
     localStorage.removeItem(_id + ":ALLOW");
 
+    var chat = $.connection.proxyHub;
+    chat.delete();
 })
 
 //删除平仓策略
@@ -374,6 +376,8 @@ $('#category_panel_close').delegate('button.delete_strategy', 'click', function 
     localStorage.removeItem(_id + ":RUN");
     localStorage.removeItem(_id + ":ALLOW");
 
+    var chat = $.connection.proxyHub;
+    chat.delete();
 })
 
 //修改开仓策略
@@ -537,10 +541,6 @@ function UpdateOPENStrategies(changeFlag)
         if (type == "" || buylist == "" || ct == "" || hd == "") {
             continue;
         }
-
-        var chat = $.connection.ProxyHub;
-
-        chat.server.linkIn(id);
         
         if (type == 0) {
             //开仓类
@@ -639,6 +639,8 @@ function UpdateOPENStrategies(changeFlag)
                 exist += id + ";"
                 localStorage.setItem("IDCollection", exist);
                 localStorage.setItem(id + ":CHANGE", 0);
+                var chat = $.connection.proxyHub;
+                chat.join(id);
             }
             else if(isExist == "true"){
                 activity = "OPENMODIFY";
@@ -777,6 +779,9 @@ function UpdateOPENStrategies(changeFlag)
                 exist += id + ";"
                 localStorage.setItem("IDCollection", exist);
                 localStorage.setItem(id + ":CHANGE", 0);
+
+                var chat = $.connection.proxyHub;
+                chat.join(id);
             }
             else if (isExist == "true") {
                 activity = "CLOSEMODIFY";
@@ -823,7 +828,7 @@ function UpdateOPENStrategies(changeFlag)
         }
     }
 
-
+    
 }
 
 

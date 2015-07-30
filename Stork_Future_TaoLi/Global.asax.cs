@@ -43,6 +43,9 @@ namespace Stork_Future_TaoLi
             MarketInfo marketInfo = new MarketInfo();
             marketInfo.Run();
 
+            TestClass t = new TestClass();
+            t.Run();
+
         }
     }
 

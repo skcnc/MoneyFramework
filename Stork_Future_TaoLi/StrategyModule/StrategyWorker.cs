@@ -204,7 +204,7 @@ namespace Stork_Future_TaoLi.StrategyModule
             {
                 //开仓
                 open_args args = InitArgs(open_para.WeightList, LiStockOrder, CT, open_para.OP, open_para.INDEX, HD);
-                m_strategy_open.init(args);
+                //m_strategy_open.init(args);
 
             }
             else if (Type == "CLOSE")
@@ -230,15 +230,15 @@ namespace Stork_Future_TaoLi.StrategyModule
             else
             {
                 //获取订阅列表
-                List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
+                //List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
                 _subscribe.Clear();
 
                 bool change = false;
-                foreach (var item in subscribelist)
-                {
-                    _subscribe.Add(item.cSecurity_code);
-                    change = true;
-                }
+                //foreach (var item in subscribelist)
+                //{
+                //    _subscribe.Add(item.cSecurity_code);
+                //    change = true;
+                //}
 
                 bSubscribeChange = change;
             }
@@ -440,17 +440,18 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     if(infos.Count > 0)
                     {
-                        m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
+                        //m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
                     }
                     else { continue; }
                 }
 
-                m_strategy_open.calculateSimTradeStrikeAndDelta();
+                //m_strategy_open.calculateSimTradeStrikeAndDelta();
 
                 if(bRun && bAllow)
                 {
                     // 生成交易列表
-                    if (m_strategy_open.isOpenPointReached())
+                    //if (m_strategy_open.isOpenPointReached())
+                    if(false)
                     {
                         List<managedTraderorderstruct> ol = m_strategy_open.getTradeList().ToList();
 

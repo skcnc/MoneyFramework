@@ -135,11 +135,6 @@ namespace Stork_Future_TaoLi.PreTradeModule
                  * 生成交易List之前的例行工作
                  * **************************/
 
-                    if (!TestClass.isRun)
-                    {
-                        log.LogEvent("线程准备停止！");
-                        break;
-                    }
                 
 
                 //发送心跳

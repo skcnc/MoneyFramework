@@ -217,6 +217,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Hubs\chathub.cs" />
     <Compile Include="MarketInfo\MarketInfo.cs" />
     <Compile Include="MarketInfo\StockInfo.cs" />
     <Compile Include="Models\AccountModels.cs" />
@@ -228,7 +229,7 @@
     <Compile Include="AdditionalModule\ListCreate.cs" />
     <Compile Include="AdditionalModule\TestClass.cs" />
     <Compile Include="AdditionalModule\WinLogs.cs" />
-    <Compile Include="SignalR.cs" />
+    <Compile Include="Hubs\ProxyHub.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="StrategyModule\StrategyInterface.cs" />
     <Compile Include="StrategyModule\StrategyMonitorClass.cs" />
