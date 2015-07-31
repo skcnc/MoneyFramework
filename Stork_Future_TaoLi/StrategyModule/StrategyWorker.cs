@@ -440,18 +440,18 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     if(infos.Count > 0)
                     {
-                        //m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
+                        m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
                     }
                     else { continue; }
                 }
 
-                //m_strategy_open.calculateSimTradeStrikeAndDelta();
+                m_strategy_open.calculateSimTradeStrikeAndDelta();
 
                 if(bRun && bAllow)
                 {
                     // 生成交易列表
-                    //if (m_strategy_open.isOpenPointReached())
-                    if(false)
+                    if (m_strategy_open.isOpenPointReached())
+                    //if(false)
                     {
                         List<managedTraderorderstruct> ol = m_strategy_open.getTradeList().ToList();
 

@@ -8,7 +8,7 @@ public:
 	CSecurity(void);
 	~CSecurity(void);
 private:
-	HANDLE hlocalDataMutex;//股票，指数行情更新的锁
+	//HANDLE hlocalDataMutex;//股票，指数行情更新的锁
 	
 public:
 	CDepthMarketData m_DepthMarketData;

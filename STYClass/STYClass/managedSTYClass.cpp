@@ -81,7 +81,7 @@ bool Strategy_OPEN::gettaderargs(open_args^ realargs){
 bool Strategy_OPEN::getshowstatus(String^ status){
 
 	char* str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(status);
-	return m_open_strategy->getshowstatus(str);
+	return true;// m_open_strategy->getshowstatus(str);
 }
 
 array<managedTraderorderstruct^>^ Strategy_OPEN::getTradeList(){

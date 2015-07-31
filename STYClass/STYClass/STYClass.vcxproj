@@ -89,7 +89,6 @@
     <ClInclude Include="Security.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Stock.h" />
-    <ClInclude Include="StockTrader.h" />
     <ClInclude Include="StrategyBase.h" />
     <ClInclude Include="STYClass.h" />
     <ClInclude Include="SyntheticIndex.h" />

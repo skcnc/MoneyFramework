@@ -3,9 +3,13 @@
 #pragma once
 struct MarketInforStruct
 {
-	securityindex msecurity;
+	securityindex msecurity;  //key
+	int		LastUpdateTime;				//行情最新接受更新时间(HHMMSSmmm)
+	int		nInfotLag;   //行情更新间隔
+	bool    bStoped;     //状态位   停牌  正常交易  熔断
+	/********原始行情****/
 	char    security_name[18];		//名称
-    int		nTime;					//时间(HHMMSSmmm)
+	int		nTime;					//推送时间(HHMMSSmmm)
     int		nStatus;				//状态
     double  nPreClose;				//前收盘价
     double  dLastPrice;				//最新价
@@ -30,18 +34,13 @@ public:
 	~CDepthMarketData(void);
  
 public:
-	
 	int    nMarketdepth;        //市场深度
-    securityindex msecurity;
-	
+    securityindex msecurity;    //key
 public:
 	bool  bupdated;			    //根据时间判断行情更新延迟时间
-	bool  bStoped;              //状态位   停牌  正常交易  熔断
-	int LastUpdateTime;  //行情最新更新时间
-	int nInfotLag;   //行情更新间隔
-
+            
 public:
-   MarketInforStruct marketinfor;
+     MarketInforStruct marketinfor;
 
 };
 

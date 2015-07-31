@@ -20,6 +20,12 @@ typedef struct securityindex
 
           return false;
     };
+  securityindex & operator=(const securityindex & infor1)
+  {
+	  this->cSecuritytype = infor1.cSecuritytype;
+	  strcpy(this->cSecurity_code, infor1.cSecurity_code);
+	  return *this;
+  }
 
 }securitykey;
 
@@ -34,25 +40,16 @@ struct stockpotionstruct    //持仓显示文件
 	securityindex  sSecurity;     // 证券信息
 	int        ntradervolume;		   //数量
 	bool       bstoped;                //当前状态（是否停牌）
+	double     duplimitprice;             // 当前价格
+	double     ddownlimitprice;             // 当前价格
 	double     dlastprice;             // 当前价格
 };
 
 /*****************交易相关***********************************************/
+
+
 struct  Clientinfor //客户端编码信息 含策略类型
 {
-};
-
-struct  Logininfor // 登陆信息
-{
-	char * serverAddr;// 地址
-	int nPort;//端口
-	char * ZjAccount; //资金
-	char * BROKER_ID  ;   //部门编号
-	char *  PASSWORD ;    //密码
-	char * INVESTOR_ID ;  //账户
-
-
-	
 };
 
 struct Traderorderstruct   //交易报单（买卖 申购 ）
@@ -109,14 +106,14 @@ struct Entrustreturnstruct //委托回报
 
 struct Bargainreturnstruct  //成交回报
 {
-	char    cSecurity_code[31];     // 证券代码
+	char    cSecurity_code[31];			// 证券代码
 	char    security_name[18];
 	char	cOrderSysID[21]; 			///报单编号
 	char	cOrderStatus;				///报单状态
 	char	cOrderType;					///报单类型
 	long    stock_ammount;         		// 成交数量
 	double  bargain_price;        		// 成交价格
-	double  bargain_money;             		// 成交金额
+	double  bargain_money;             	// 成交金额
 	char    bargain_time[9];       		// 成交时间
 	long    bargain_no;            		// 成交编号
 	//标志信息

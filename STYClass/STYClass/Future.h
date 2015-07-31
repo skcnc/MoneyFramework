@@ -12,6 +12,7 @@ public:
 public:
 	int   getfuturetime();  //根据期货代码获得指数倍数
 	double  getrealmarketvalue(int namount);
+	bool  setcode(char * temp);
 
 };
 
