@@ -29,19 +29,20 @@ bool    CIndexFutureArbitrage_open::updateSecurityInfo(MarketInforStruct * Marke
 {
 	for(int i=0;i<num;i++)
 	{
-		if(MarketInfor[num].msecurity.cSecuritytype=='s')
+		char m = MarketInfor[i].msecurity.cSecuritytype;
+		if(MarketInfor[i].msecurity.cSecuritytype=='s')
 		{
-			this->m_SyntheticIndex.updateInfo(&MarketInfor[num]);  //复制行情
+			this->m_SyntheticIndex.updateInfo(&MarketInfor[i]);  //复制行情
 		}
 
-		if(MarketInfor[num].msecurity==this->m_future.m_DepthMarketData.msecurity) //期货
+		if(MarketInfor[i].msecurity==this->m_future.m_DepthMarketData.msecurity) //期货
 		{
-			this->m_future.updateInfo(&MarketInfor[num]);  //复制行情
+			this->m_future.updateInfo(&MarketInfor[i]);  //复制行情
 		}
 
-		if(MarketInfor[num].msecurity==this->m_index.m_DepthMarketData.msecurity) //期货
+		if(MarketInfor[i].msecurity==this->m_index.m_DepthMarketData.msecurity) //期货
 		{
-			this->m_index.updateInfo(&MarketInfor[num]);  //复制行情
+			this->m_index.updateInfo(&MarketInfor[i]);  //复制行情
 		}
 	}
 

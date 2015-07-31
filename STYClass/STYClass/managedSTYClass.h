@@ -121,6 +121,10 @@ namespace managedSTY
 		double  dHighLimited;			//涨停价
 		double  dLowLimited;			//跌停价
 
+		bool bstoped;					//状态位   停牌  正常交易  熔断
+		int nInfotLag;					//行情更新间隔
+		int LastUpdateTime;				//行情最新接受更新时间(HHMMSSmmm)
+
 		MarketInforStruct CreateInstance(){
 			MarketInforStruct m;
 			strcpy_s(m.security_name, 18, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(security_name));
@@ -139,6 +143,10 @@ namespace managedSTY
 
 			m.dHighLimited = dHighLimited;
 			m.dLowLimited = dLowLimited;
+
+			m.bStoped = bstoped;
+			m.nInfotLag = nInfotLag;
+			m.LastUpdateTime = LastUpdateTime;
 		
 
 			m.msecurity = msecurity->GetInstance();

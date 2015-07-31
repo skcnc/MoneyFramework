@@ -188,6 +188,7 @@ namespace MarketInfoSys
         public MarketData(TDFMarketData _mData)
         {
             ActionDay = _mData.ActionDay;
+            
             AskPrice = _mData.AskPrice;
             AskVol = _mData.AskVol;
             BidPrice = _mData.BidPrice;
@@ -235,6 +236,10 @@ namespace MarketInfoSys
             Code = data.Code;
             WindCode = data.WindCode;
             Time = data.Time;
+            Match = (uint)data.LastIndex;
+            PreClose = (uint)data.PreCloseIndex;
+            HighLimited = (uint)data.HighIndex;
+            LowLimited = (uint)data.LowIndex;
             IOPV = 2;
         }
         

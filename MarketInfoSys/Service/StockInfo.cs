@@ -23,11 +23,11 @@ namespace MarketInfoSys
 
         public MarketData DeQueueInfo()
         {
-            lock (Queue_Market_Data.GetQueue().SyncRoot)
+            lock (Queue_Data.GetQueue().SyncRoot)
             {
-                if (Queue_Market_Data.GetQueue().Count > 0)
+                if (Queue_Data.GetQueue().Count > 0)
                 {
-                    EnQueueType OBJ = (EnQueueType)Queue_Market_Data.GetQueue().Dequeue();
+                    EnQueueType OBJ = (EnQueueType)Queue_Data.GetQueue().Dequeue();
 
                     if (OBJ.Type == "S") { return new MarketData((TDFMarketData)(OBJ.value)); }
                     else if (OBJ.Type == "I") { return new MarketData((TDFIndexData)(OBJ.value)); }

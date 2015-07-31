@@ -49,7 +49,7 @@ namespace MarketInfoSys
 
         public static int GetLength()
         {
-            return Queue_Market_Data.GetQueue().Count;
+            return Queue_Data.GetQueue().Count;
         }
 
         public static void run()

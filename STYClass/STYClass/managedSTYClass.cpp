@@ -17,12 +17,15 @@ Strategy_OPEN::~Strategy_OPEN()
 };
 
 bool Strategy_OPEN::updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num){
-	MarketInforStruct * MarketInfo;
-
-	memset(MarketInfo->dAskPrice, 0, 10);
-	memset(MarketInfo->dAskVol, 0, 10);
-	memset(MarketInfo->dBidPrice, 0, 10);
-	memset(MarketInfo->dBidVol, 0, 10);
+	MarketInforStruct * MarketInfo = new MarketInforStruct();
+	
+	for (int i = 0; i < 10; i++)
+	{
+		MarketInfo->dAskPrice[i] = 0;
+		MarketInfo->dAskVol[i] = 0;
+		MarketInfo->dBidPrice[i] = 0;
+		MarketInfo->dBidVol[i] = 0;
+	}
 
 	MarketInfo = new MarketInforStruct();
 

@@ -206,6 +206,30 @@ namespace Stork_Future_TaoLi
             worker.UpdateBaseParas(v);
         }
 
+        public void RunOperater(object v)
+        {
+            string id = string.Empty;
+            bool oper = false;
+            if(v is OPENRUN)
+            {
+                OPENRUN value = (OPENRUN)v;
+                id = value.basic.ID;
+                oper = value.RUN;
+            }
+            else
+            {
+                CLOSERUN value = (CLOSERUN)v;
+                id = value.basic.ID;
+                oper = value.RUN;
+            }
+
+
+            if (Workers.Keys.Contains(id))
+            {
+                Workers[id].bRun = oper;
+            }
+        }
+
         public void DeleteWorker(object v)
         {
             string id = string.Empty;
@@ -340,6 +364,7 @@ namespace Stork_Future_TaoLi
                     else if (obj is OPENRUN)
                     {
                         OPENRUN value = (OPENRUN)obj;
+                        RunOperater((object)value);
                     }
                     else if (obj is OPENDELETE)
                     {
@@ -362,7 +387,11 @@ namespace Stork_Future_TaoLi
                 }
 
                 //巡检工作组订阅内容修改
-                CheckSubscribeUpdate();
+                try
+                {
+                    CheckSubscribeUpdate();
+                }
+                catch (Exception ex) { ex.ToString(); }
 
                 Thread.Sleep(10);
             }

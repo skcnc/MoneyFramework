@@ -119,7 +119,7 @@ namespace MarketInfoSys
                 foreach (TDFMarketData data in marketDataArr)
                 {
                     EnQueueType obj = new EnQueueType() { Type = "S", value = (object)data };
-                    Queue_Market_Data.GetQueue().Enqueue((object)obj);
+                    Queue_Data.GetQueue().Enqueue((object)obj);
                 }
             }
             else if (msg.MsgID == TDFMSGID.MSG_DATA_FUTURE)
@@ -130,7 +130,7 @@ namespace MarketInfoSys
                 foreach (TDFFutureData data in futureDataArr)
                 {
                     EnQueueType obj = new EnQueueType() { Type = "F", value = (object)data };
-                    Queue_Future_Data.GetQueue().Enqueue((object)obj);
+                    Queue_Data.GetQueue().Enqueue((object)obj);
                 }
 
             }
@@ -142,7 +142,7 @@ namespace MarketInfoSys
                 foreach (TDFIndexData data in indexDataArr)
                 {
                     EnQueueType obj = new EnQueueType() { Type = "I", value = (object)data };
-                    Queue_Index_Data.GetQueue().Enqueue((object)obj);
+                    Queue_Data.GetQueue().Enqueue((object)obj);
                 }
             }
         }
