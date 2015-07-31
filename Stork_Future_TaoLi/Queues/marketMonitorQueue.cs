@@ -42,6 +42,7 @@ namespace Stork_Future_TaoLi
             v.HighLimit = HighLimit;
             v.LowLimit = LowLimit;
             v.PreClose = preClose;
+            v.Code = code;
 
 
             instance.Enqueue((object)v);
