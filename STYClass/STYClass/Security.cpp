@@ -23,17 +23,17 @@ double   CSecurity::getlastprice()
 
 bool   CSecurity::isstoped()
 {
-	return this->m_DepthMarketData.bStoped ;
+	return this->m_DepthMarketData.marketinfor.bStoped ;
  }
 bool   CSecurity::isupdated()
 {
-	WaitForSingleObject( hlocalDataMutex, INFINITE ); 	
+	//WaitForSingleObject( hlocalDataMutex, INFINITE ); 	
 	int nCurrentTime =  CTimeUtil::getIntTime();
-	if(CTimeUtil::getDeltaSecond(nCurrentTime,this->m_DepthMarketData.LastUpdateTime)>5||this->m_DepthMarketData.nInfotLag>5)
+	if (CTimeUtil::getDeltaSecond(nCurrentTime, this->m_DepthMarketData.marketinfor.LastUpdateTime / 1000)>5 || this->m_DepthMarketData.marketinfor.nInfotLag>5)
 	    this->m_DepthMarketData.bupdated=false;
 	else
 		this->m_DepthMarketData.bupdated=true;
-	ReleaseMutex( hlocalDataMutex );
+	//ReleaseMutex( hlocalDataMutex );
 	return this->m_DepthMarketData.bupdated;
 }
 double  CSecurity::getrealmarketvalue(int namount)
@@ -43,7 +43,7 @@ double  CSecurity::getrealmarketvalue(int namount)
 double  CSecurity::getrealbuycost(int namount)
 {
 		
-	if(this->m_DepthMarketData.bStoped)
+	if(this->m_DepthMarketData.marketinfor.bStoped)
 		return getrealmarketvalue(namount);
 	if(!this->m_DepthMarketData.bupdated)//没有更新
 		return getrealmarketvalue(namount)*1.02;
@@ -86,7 +86,7 @@ double  CSecurity::getrealbuycost(int namount)
 double  CSecurity::getrealsellgain(int namount)
 {
 	
-	if(this->m_DepthMarketData.bStoped)
+	if(this->m_DepthMarketData.marketinfor.bStoped)
 		return getrealmarketvalue(namount);
 	if(!this->m_DepthMarketData.bupdated)//没有更新
 		return getrealmarketvalue(namount)*0.98;
@@ -125,15 +125,7 @@ double  CSecurity::getrealsellgain(int namount)
 	return dGain;
 }
 void CSecurity::updateInfo(MarketInforStruct * tempmarketinfor)
-{
-	WaitForSingleObject( hlocalDataMutex, INFINITE ); 	
+{	
 	this->m_DepthMarketData.marketinfor.update(tempmarketinfor);
-	if(this->m_DepthMarketData.marketinfor.nStatus==66||this->m_DepthMarketData.marketinfor.nStatus==68)
-		this->m_DepthMarketData.bStoped=true;
-	else
-		this->m_DepthMarketData.bStoped=false;
-	this->m_DepthMarketData.LastUpdateTime=CTimeUtil::getIntTime();
-	this->m_DepthMarketData.nInfotLag =CTimeUtil::getDeltaSecond(this->m_DepthMarketData.LastUpdateTime,m_DepthMarketData.marketinfor.nTime/1000);
-	ReleaseMutex( hlocalDataMutex );
 
 }

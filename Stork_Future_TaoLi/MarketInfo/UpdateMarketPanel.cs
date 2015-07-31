@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 
-namespace Stork_Future_TaoLi.MarketInfo
+namespace Stork_Future_TaoLi
 {
     public class UpdateMarketPanel
     {

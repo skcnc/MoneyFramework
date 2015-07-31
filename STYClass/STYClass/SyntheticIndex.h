@@ -8,11 +8,9 @@ using namespace std;
 
 
 
-class CSyntheticIndex:public CSyntheticSecurity
+class CSyntheticIndex:public CSyntheticSecurity  //如果不考虑weight文件 则可以
 {
   private:
-	double  dSimIndex;
-	double  marketvalue;
 	list<indexweightstruct>  stockweight;  //权重文件CSecurity
 	CIndex      m_index;              //指数
 
@@ -25,19 +23,20 @@ class CSyntheticIndex:public CSyntheticSecurity
    ~CSyntheticIndex(void);
 
 public:
-	double  getSimIndex();  //获得模拟指数
+	double  getSimIndex();  //获得weight文件模拟指数
 
-	double  getrealmarketvalue();  //市值
-	double  getrealbuycost();  
-	double  getrealsellgain();
+	double  getrealmarketvalue(double & stopmarketvalue);  //postion列表市值
+	double  getrealbuycost();      //买入成本
+	double  getrealsellgain();     //卖出收益
 
-	bool    isupdated();    //行情是否更新
+	bool    isupdated();    //DB行情是否更新
 
 	bool   init(indexweightstruct * indexweightlist,int weightnum, stockpotionstruct * stockpotionlist,int potionnum,char *indexCode);  //初始行情  
 
-	bool   updatepositioninfor();  //根据手数更新positon文件
+	bool   updatepositioninfor();  //更新positon文件，获取价格和状态
 
 	bool   isSecurityFocused(securityindex   SecurityCode);
-	void updateInfo(MarketInforStruct *);
+
+	void updateInfo(MarketInforStruct *); //更新stockDB中的行情
 };
 
