@@ -114,7 +114,8 @@ namespace Stork_Future_TaoLi
                     }
                     StockTable.Add(info.Code, info);
 
-                    marketMonitorQueue.EnQueueNew(info.Code, info.Match.ToString());
+                    //marketMonitorQueue.EnQueueNew(info.Code, (((decimal)info.Match)/1000).ToString());
+                    marketMonitorQueue.EnQueueNew(info.Code, info.Time, info.Match, info.Status, info.HighLimited, info.LowLimited, info.PreClose, info.IOPV);
 
                     if(!subscribeList.Keys.Contains(info.Code))
                     {

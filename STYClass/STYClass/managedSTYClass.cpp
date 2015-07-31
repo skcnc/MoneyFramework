@@ -33,16 +33,6 @@ bool Strategy_OPEN::updateSecurityInfo(array<managedMarketInforStruct^>^ marketi
 	return m_open_strategy->updateSecurityInfo(MarketInfo, num);
 };
 
-//bool Strategy_OPEN::getsubscribelist(array<managedsecurityindex^>^ securityIndex, int num)
-//{
-//	securityindex * subscribelist;
-//
-//	for (int i = 0; i < num; i++){
-//		subscribelist[i] = securityIndex[i]->GetInstance();
-//	}
-//	return m_open_strategy->getsubscribelist(subscribelist, num);
-//};
-
 array<managedsecurityindex^>^ Strategy_OPEN::getsubscribelist(){
 
 	securityindex*  subscribelist = new securityindex[1];
@@ -93,27 +83,6 @@ bool Strategy_OPEN::getshowstatus(String^ status){
 	char* str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(status);
 	return true;// m_open_strategy->getshowstatus(str);
 }
-
-//bool Strategy_OPEN::getTradeList(array<managedTraderorderstruct^>^ orderlist, int^ num)
-//{
-//	Traderorderstruct* m_list;
-//	int m_num;
-//
-//	bool b = m_open_strategy->gettaderlist(m_list, m_num);
-//
-//	if (b == false)
-//	{
-//		return b;
-//	}
-//
-//	num = m_num;
-//
-//	for (int i = 0; i < m_num; i++){
-//		orderlist[i]->SetInstance(m_list[i]);
-//	}
-//
-//	return b;
-//}
 
 array<managedTraderorderstruct^>^ Strategy_OPEN::getTradeList(){
 	array<managedTraderorderstruct^>^ orderlist;

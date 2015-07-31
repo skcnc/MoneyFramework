@@ -75,6 +75,7 @@ namespace MarketInfoSys
         //
         // 摘要:
         //     IOPV净值估值
+        //      重新利用 0:股票 1：期货 2：指数
         [DataMember]
         public int IOPV { get; set; }
         //
@@ -183,6 +184,7 @@ namespace MarketInfoSys
         [DataMember]
         public int YieldToMaturity { get; set; }
 
+
         public MarketData(TDFMarketData _mData)
         {
             ActionDay = _mData.ActionDay;
@@ -202,7 +204,220 @@ namespace MarketInfoSys
             PreClose = _mData.PreClose;
             Prefix = _mData.Prefix;
             SD2 = _mData.SD2;
+            WindCode = _mData.WindCode;
+            Time = _mData.Time;
+            IOPV = 0;
+        }
+
+        public MarketData(TDFFutureData data)
+        {
+            ActionDay = data.ActionDay;
+            AskPrice = data.AskPrice;
+            AskVol = data.AskVol;
+            BidPrice = data.BidPrice;
+            BidVol = data.BidVol;
+            Code = data.Code;
+            High = data.High;
+            HighLimited = data.HighLimited;
+            Low = data.Low;
+            LowLimited = data.LowLimited;
+            Match = data.Match;
+            PreClose = data.PreClose;
+            WindCode = data.WindCode;
+            Time = data.Time;
+            Status = data.Status;
+            IOPV = 1;
+        }
+
+        public MarketData(TDFIndexData data)
+        {
+            ActionDay = data.ActionDay;
+            Code = data.Code;
+            WindCode = data.WindCode;
+            Time = data.Time;
+            IOPV = 2;
         }
         
     }
+
+    //public class FutureData
+    //{
+    //    // 摘要:
+    //    //     业务发生日(自然日)
+    //    [DataMember]
+    //    public int ActionDay { get; set; }
+    //    // 摘要:
+    //    //     申卖价
+    //    [DataMember]
+    //    public uint[] AskPrice { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     申卖量
+    //    [DataMember]
+    //    public uint[] AskVol { get; set; }
+
+    //    //
+    //    // 摘要:
+    //    //     拍卖价格
+    //    [DataMember]
+    //    public int AuctionPrice { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     拍卖量
+    //    [DataMember]
+    //    public int AuctionQty { get; set; }
+
+    //    //
+    //    // 摘要:
+    //    //     平均价格
+    //    [DataMember]
+    //    public int AvgPrice { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     申买价
+    //    [DataMember]
+    //    public uint[] BidPrice { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     申买量
+    //    [DataMember]
+    //    public uint[] BidVol { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public uint Close { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     原始交易代码
+    //    [DataMember]
+    //    public String Code { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public int CurrDelta { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     最高价
+    //    [DataMember]
+    //    public uint High { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     涨停价
+    //    [DataMember]
+    //    public uint HighLimited { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     最低价
+    //    [DataMember]
+    //    public uint Low { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     跌停价
+    //    [DataMember]
+    //    public uint LowLimited { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     最新价
+    //    [DataMember]
+    //    public uint Match { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     开盘价
+    //    [DataMember]
+    //    public uint Open { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public long OpenInterest { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     前收盘价
+    //    [DataMember]
+    //    public uint PreClose { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public int PreDelta { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public long PreOpenInterest { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public uint PreSettlePrice { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public uint SettlePrice { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public int Status { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public int Time { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public int TradingDay { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public long Turnover { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public long Volume { get; set; }
+    //    //
+    //    // 摘要:
+    //    //     
+    //    [DataMember]
+    //    public String WindCode { get; set; }
+
+    //    public FutureData(TDFFutureData data)
+    //    {
+    //        ActionDay = data.ActionDay;
+    //        AskPrice = data.AskPrice;
+    //        AskVol = data.AskVol;
+    //        AuctionPrice = data.AuctionPrice;
+    //        AuctionQty = data.AuctionQty;
+    //        AvgPrice = data.AvgPrice;
+    //        BidPrice = data.BidPrice;
+    //        Close = data.Close;
+    //        Code = data.Code;
+    //        CurrDelta = data.CurrDelta;
+    //        High = data.High;
+    //        HighLimited = data.HighLimited;
+    //        Low = data.Low;
+    //        LowLimited = data.LowLimited;
+    //        Match = data.Match;
+    //        Open = data.Open;
+    //        OpenInterest = data.OpenInterest;
+    //        PreClose = data.PreClose;
+    //        PreDelta = data.PreDelta;
+    //        PreOpenInterest = data.PreOpenInterest;
+    //        PreSettlePrice = data.PreSettlePrice;
+    //        SettlePrice = data.SettlePrice;
+    //        Status = data.Status;
+    //        Time = data.Time;
+    //        TradingDay = data.TradingDay;
+    //        Turnover = data.Turnover;
+    //        Volume = data.Volume;
+    //        WindCode = data.WindCode;
+    //    }
+    //}
 }

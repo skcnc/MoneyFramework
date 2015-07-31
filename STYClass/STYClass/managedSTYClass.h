@@ -114,10 +114,10 @@ namespace managedSTY
 		int		nStatus;				//状态
 		double  nPreClose;				//前收盘价
 		double  dLastPrice;				//最新价
-		array<double>^  dAskPrice;			//申卖价
-		array<double>^  dAskVol;			//申卖量
-		array<double>^  dBidPrice;			//申买价
-		array<double>^  dBidVol;			//申买量
+		array<double>^  dAskPrice;		//申卖价
+		array<double>^  dAskVol;		//申卖量
+		array<double>^  dBidPrice;		//申买价
+		array<double>^  dBidVol;		//申买量
 		double  dHighLimited;			//涨停价
 		double  dLowLimited;			//跌停价
 

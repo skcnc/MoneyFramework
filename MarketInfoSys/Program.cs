@@ -7,9 +7,20 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TDFAPI;
 
 namespace MarketInfoSys
 {
+    /// <summary>
+    /// 从远端获取到信息，先转换成该类型
+    /// 应用服务获取时会根据类型转换成通用型参数
+    /// </summary>
+    class EnQueueType
+    {
+        public String Type { get; set; }
+        public object value { get; set; }
+    }
+
     class Program
     {
         [STAThread]
@@ -17,19 +28,28 @@ namespace MarketInfoSys
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ControlPanel());
+            
+            ControlPanel panel = new ControlPanel();
+
+            Application.Run(panel);
         }
     }
 
     class webservice
     {
-        private static bool stop = true;
+        private static  bool stop = true;
         public static bool STOP
         {
             set
             {
                 stop = value;
             }
+        }
+
+
+        public static int GetLength()
+        {
+            return Queue_Market_Data.GetQueue().Count;
         }
 
         public static void run()
@@ -51,7 +71,8 @@ namespace MarketInfoSys
                     if ((DateTime.Now - dt).TotalSeconds > 10)
                     {
                         dt = DateTime.Now;
-                        Console.WriteLine(DateTime.Now.ToString("hh:mm:ss") + "  股市队列长度:" + Queue_Market_Data.GetQueue().Count);
+
+                        //Console.WriteLine(DateTime.Now.ToString("hh:mm:ss") + "  股市队列长度:" + Queue_Market_Data.GetQueue().Count);
                     }
 
                     if (dt.DayOfWeek == DayOfWeek.Saturday)

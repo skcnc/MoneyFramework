@@ -217,7 +217,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Hubs\chathub.cs" />
+    <Compile Include="Hubs\Marketmonitorhub.cs" />
     <Compile Include="MarketInfo\MarketInfo.cs" />
     <Compile Include="MarketInfo\StockInfo.cs" />
     <Compile Include="MarketInfo\UpdateMarketPanel.cs" />

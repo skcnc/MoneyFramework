@@ -230,15 +230,15 @@ namespace Stork_Future_TaoLi.StrategyModule
             else
             {
                 //获取订阅列表
-                //List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
+                List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
                 _subscribe.Clear();
 
                 bool change = false;
-                //foreach (var item in subscribelist)
-                //{
-                //    _subscribe.Add(item.cSecurity_code);
-                //    change = true;
-                //}
+                foreach (var item in subscribelist)
+                {
+                    _subscribe.Add(item.cSecurity_code);
+                    change = true;
+                }
 
                 bSubscribeChange = change;
             }
