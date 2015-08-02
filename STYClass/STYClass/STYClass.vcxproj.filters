@@ -54,9 +54,6 @@
     <ClInclude Include="Stock.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="StockTrader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="StrategyBase.h">
       <Filter>头文件</Filter>
     </ClInclude>

@@ -30,7 +30,7 @@ double  CSyntheticIndex::getSimIndex()
 {
 	list<indexweightstruct>::iterator itor;
 	 itor=stockweight.begin();
-	 dSimIndex=0;
+	double  dSimIndex=0;
 	 while(itor!=stockweight.end())
        {    
 		   dSimIndex+=itor->dweight*stockDb[itor->sSecurity]->getlastprice();
@@ -39,17 +39,26 @@ double  CSyntheticIndex::getSimIndex()
 	 return dSimIndex;
 }
 
-double  CSyntheticIndex::getrealmarketvalue()
+double  CSyntheticIndex::getrealmarketvalue(double & stopmarketvalue)
 {
 	 list<stockpotionstruct>::iterator itor;
 	 itor=m_positionlist.begin();
-	 marketvalue=0;
+	 double marketvalue=0;
+	 stopmarketvalue = 0;
+	 double   stockvalue=0;
+
 	 while(itor!=m_positionlist.end())
        { 
-		   marketvalue+=stockDb[itor->sSecurity]->getrealmarketvalue(itor->ntradervolume);
+		 stockvalue=stockDb[itor->sSecurity]->getrealmarketvalue(itor->ntradervolume);
+		   if (stockDb[itor->sSecurity]->isstoped()) //停牌的
+		   {
+			   stopmarketvalue += stockvalue;
+		   }
+		   marketvalue += stockvalue;
 		   itor++;
        } 
 	
+
 	 return  marketvalue;
 }
 
@@ -98,38 +107,49 @@ bool   CSyntheticIndex::init(indexweightstruct * indexweightlist,int weightnum, 
 
 	 m_index.setcode(indexCode);   //初始指数
 
-	 stockweight.clear();  //如果更新权重文件  释放内存
-	 stockDb.clear();      //行情
-	 m_positionlist.clear();
+	 stockweight.clear();  //权重文件清0  释放内存
+	 m_positionlist.clear();  //list文件清0
 
-	for(int i=0;i<weightnum;i++)  
+	for(int i=0;i<weightnum;i++)  //获取权重列表
 	{
 		stockweight.push_back(indexweightlist[i]);//获取权重
      
-	  if(isSecurityFocused(indexweightlist[i].sSecurity))
+	 if (isSecurityFocused(indexweightlist[i].sSecurity)) //利用weight文件初始化DB数据库（如果有需要）
 			continue;
 
-	  if( indexweightlist[i].sSecurity.cSecuritytype=='s') //初始化股票数据
+	 if( indexweightlist[i].sSecurity.cSecuritytype=='s') //初始化股票数据
 		   {
-
 		      stockDb[indexweightlist[i].sSecurity]=new CStock;
 			  stockDb[indexweightlist[i].sSecurity]->setcode(indexweightlist[i].sSecurity.cSecurity_code);
 
 		   }
-	   else
+	   else  //其他类型暂时不允许
 
 		return false;
 
 	}
 
+
 	for(int i=0;i<positionnum;i++)//获取交易列表
 	 {
-		  m_positionlist.push_back(*(stockpotionlist+i));
+		  m_positionlist.push_back(stockpotionlist[i]);
+
+		  if (isSecurityFocused(stockpotionlist[i].sSecurity)) //利用postion文件初始化DB数据库（如果有需要）
+			  continue;
+
+		  if (stockpotionlist[i].sSecurity.cSecuritytype == 's') //初始化股票数据
+		  {
+			  stockDb[stockpotionlist[i].sSecurity] = new CStock;
+			  stockDb[stockpotionlist[i].sSecurity]->setcode(stockpotionlist[i].sSecurity.cSecurity_code);
+
+		  }
+		  else  //其他类型暂时不允许
+
+			  return false;
 	 }
 
 	 return true;
 }
-
 
 
 bool   CSyntheticIndex::updatepositioninfor()
@@ -140,6 +160,8 @@ bool   CSyntheticIndex::updatepositioninfor()
        { 
 		   itor->bstoped=stockDb[itor->sSecurity]->isstoped();
 		   itor->dlastprice=stockDb[itor->sSecurity]->getlastprice(); 
+		   itor->ddownlimitprice = stockDb[itor->sSecurity]->m_DepthMarketData.marketinfor.dLowLimited;
+		   itor->duplimitprice = stockDb[itor->sSecurity]->m_DepthMarketData.marketinfor.dHighLimited;
 		   itor++;
        } 
 
@@ -157,7 +179,7 @@ bool   CSyntheticIndex::isSecurityFocused(securityindex  SecurityCode)
 
 void CSyntheticIndex::updateInfo(MarketInforStruct * MarketInfor )
 {
-	//if(isSecurityFocused(MarketInfor->msecurity)) //每次行情过来都要判断股票是否在hash表里
+	if(isSecurityFocused(MarketInfor->msecurity)) //每次行情过来都要判断股票是否在hash表里
 	{
 	   this->stockDb[MarketInfor->msecurity]->updateInfo(MarketInfor);
 	}
