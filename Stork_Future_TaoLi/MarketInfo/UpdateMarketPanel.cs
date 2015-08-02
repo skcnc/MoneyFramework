@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Stork_Future_TaoLi.Hubs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,7 +9,7 @@ namespace Stork_Future_TaoLi
 {
     public class UpdateMarketPanel
     {
-        private void Run()
+        public void Run()
         {
             Thread excutedThread = new Thread(new ThreadStart(ThreadProc));
             excutedThread.Start();
@@ -16,7 +17,16 @@ namespace Stork_Future_TaoLi
 
         private void ThreadProc()
         {
+            while (true)
+            {
+                Thread.Sleep(1);
 
+                while (marketMonitorQueue.GetQueueLength() > 0)
+                {
+                    MarketValue value = marketMonitorQueue.DeQueueNew();
+                    MarketMonitor.Instance.Send(value);
+                }
+            }
         }
     }
 }

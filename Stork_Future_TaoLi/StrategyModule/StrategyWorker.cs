@@ -117,7 +117,12 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// <summary>
         /// 允许实例运行
         /// </summary>
-        public bool bRun { get; set; }
+        public bool bRun
+        {
+            get { return _brun; }
+            set { _brun = value; }
+        }
+        private bool _brun = false;
 
         /// <summary>
         /// 允许实例交易
@@ -132,7 +137,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// <summary>
         /// 策略实例结束标志
         /// </summary>
-        public bool breaklabel = false;
+        public  bool breaklabel = false;
 
         /// <summary>
         /// 获取订阅列表
@@ -147,6 +152,10 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         public bool bSubscribeChange = true;
 
+        /// <summary>
+        /// 标记当前状态
+        /// </summary>
+        public int Status { get; set; }
         #endregion
 
         #region private variables
@@ -188,6 +197,8 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// 如果线程运行超过24小时，则强制关闭。
         /// </summary>
         private DateTime RunningTime = new DateTime();
+
+        private DateTime dt = new DateTime();
         #endregion
 
         #region public methods
@@ -212,36 +223,29 @@ namespace Stork_Future_TaoLi.StrategyModule
                 //平仓
 
             }
-            
-            excutedThread.Start();
+
+
             RunningTime = DateTime.Now;
 
-            
 
 
-            if(DebugMode.debug)
+
+            //获取订阅列表
+            //List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
+            List<managedsecurityindex> subscribelist = new List<managedsecurityindex>();
+            _subscribe.Clear();
+
+            bool change = false;
+            foreach (var item in subscribelist)
             {
-              
-                _subscribe.Add("600005.sh");
-                _subscribe.Add("600651.sh");
-                _subscribe.Add("600104.sh");
-                bSubscribeChange = true;
+                _subscribe.Add(item.cSecurity_code);
+                change = true;
             }
-            else
-            {
-                //获取订阅列表
-                //List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
-                _subscribe.Clear();
 
-                bool change = false;
-                //foreach (var item in subscribelist)
-                //{
-                //    _subscribe.Add(item.cSecurity_code);
-                //    change = true;
-                //}
+            bSubscribeChange = change;
 
-                bSubscribeChange = change;
-            }
+
+            excutedThread.Start();
 
             Thread.Sleep(100);
         }
@@ -391,7 +395,8 @@ namespace Stork_Future_TaoLi.StrategyModule
                 {
                     DeQueueInfo();
                 }
-
+                //标记线程状态为正在空转
+                Status = 1;
                 
                 Thread.Sleep(1000); 
             }
@@ -406,6 +411,9 @@ namespace Stork_Future_TaoLi.StrategyModule
                  * ****/
                 if(bRun)
                 {
+                    //标记线程状态为正在运行
+                    Status = 2;
+
                     //策略实例运算
                     List<managedMarketInforStruct> infos = new List<managedMarketInforStruct>();
                     while (_marketQueue.Count > 0)
@@ -413,28 +421,66 @@ namespace Stork_Future_TaoLi.StrategyModule
                         MarketData data = (MarketData)DeQueueInfo();
                         managedMarketInforStruct info = new managedMarketInforStruct();
 
-                        for (int i = 0; i < 10; i++)
+                        info.dAskPrice = new double[10];
+                        info.dAskVol = new double[10];
+                        info.dBidPrice  = new double[10];
+                        info.dBidVol = new double[10];
+
+                        for (int i = 0; i < data.AskPrice.Count(); i++)
                         {
-                            info.dAskPrice[i] = Convert.ToDouble(data.AskPrice[i]);
-                            info.dAskVol[i] = Convert.ToDouble(data.AskVol[i]);
-                            info.dBidPrice[i] = Convert.ToDouble(data.BidPrice[i]);
-                            info.dBidVol[i] = Convert.ToDouble(data.BidVol[i]);
+                            info.dAskPrice[i] = Convert.ToDouble(data.AskPrice[i]) /10000;
+                            info.dAskVol[i] = Convert.ToDouble(data.AskVol[i]) / 10000;
+                            info.dBidPrice[i] = Convert.ToDouble(data.BidPrice[i]) /10000;
+                            info.dBidVol[i] = Convert.ToDouble(data.BidVol[i]) /10000;
                         }
 
                         managedsecurityindex index = new managedsecurityindex();
                         index.cSecurity_code = data.Code;
-                        index.cSecuritytype = Convert.ToSByte(data.Code);
+                        
 
                         info.msecurity = index;
                         info.security_name = data.Code;
-                        info.nTime = data.Time;
+                        info.nTime = data.Time / 1000;
                         info.nStatus = data.Status;
-                        info.nPreClose = data.PreClose;
-                        info.dLastPrice = data.Match;
-                        info.dHighLimited = data.HighLimited;
-                        info.dLowLimited = data.LowLimited;
+                        info.nPreClose = data.PreClose / 10000;
+                        info.dLastPrice = data.Match / 10000;
+                        info.dHighLimited = data.HighLimited / 10000;
+                        info.dLowLimited = data.LowLimited /10000;
                         info.exchangeID = data.WindCode.Split('.')[1];
 
+                        switch(data.IOPV)
+                        {
+                            case 0:
+                                {
+                                    index.cSecuritytype = 115;
+                                    break;
+                                }
+                            case 1:
+                                {
+                                    index.cSecuritytype = 102;
+                                    break;
+                                }
+                            case 2:
+                                {
+                                    index.cSecuritytype = 105;
+                                    break;
+                                }
+                            
+
+                        }
+                        info.LastUpdateTime = Int32.Parse(DateTime.Now.Hour.ToString().PadLeft(2, '0') + DateTime.Now.Minute.ToString().PadLeft(2, '0') + DateTime.Now.Second.ToString().PadLeft(2, '0'));
+
+
+                        if (data.Status == 68 || data.Status == 66)
+                        {
+                            info.bstoped = true;
+                        }
+                        else
+                        {
+                            info.bstoped = false;
+                        }
+
+                        info.nInfotLag = info.LastUpdateTime - info.nTime ;
                         infos.Add(info);
                     }
 
