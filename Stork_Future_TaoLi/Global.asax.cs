@@ -48,6 +48,10 @@ namespace Stork_Future_TaoLi
 
             UpdateMarketPanel MarketMonitor = new UpdateMarketPanel();
             MarketMonitor.Run();
+
+            ThreadHeartBeatControl.Run();
+
+            Thread.Sleep(3000);
         }
     }
 

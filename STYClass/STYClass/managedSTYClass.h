@@ -43,7 +43,7 @@ namespace managedSTY
 		bool bstoped;    //当前状态(是否停盘)
 		double dlastprice;  //当前价格
 
-		stockpotionstruct GetInstance(){
+	     stockpotionstruct  GetInstance(){
 			stockpotionstruct* m = new stockpotionstruct();
 			m->sSecurity = sSecurity->GetInstance();
 			m->ntradervolume = tradevolume;
@@ -67,43 +67,6 @@ namespace managedSTY
 		double dPositiveOpenDelta; //开仓点位
 
 		bool bTradingAllowed;  //是否允许交易
-
-		IndexFutureArbitrageopeninputargs GetInstance(){
-			IndexFutureArbitrageopeninputargs* m = new IndexFutureArbitrageopeninputargs();
-			m->weightlist = new indexweightstruct();
-			m->positionlist = new stockpotionstruct();
-
-			for (int i = 0; i < weightlistnum; i++){
-				indexweightstruct str = weightlist[i]->GetInstance();
-				
-				
-				m->weightlist[i].dweight = str.dweight;
-				strcpy_s(m->weightlist[i].sSecurity.cSecurity_code, 31, str.sSecurity.cSecurity_code);
-				m->weightlist[i].sSecurity.cSecuritytype = str.sSecurity.cSecuritytype;
-			}
-			m->weightlistnum = weightlistnum;
-			for (int i = 0; i < positionlistNUM; i++){
-				stockpotionstruct str = positionlist[i]->GetInstance();
-				m->positionlist[i].bstoped = str.bstoped;
-				m->positionlist[i].dlastprice = str.dlastprice;
-				m->positionlist[i].ntradervolume = str.ntradervolume;
-				m->positionlist[i].sSecurity.cSecuritytype = str.sSecurity.cSecuritytype;
-				strcpy_s(m->positionlist[i].sSecurity.cSecurity_code, 31, str.sSecurity.cSecurity_code);
-			}
-
-			m->positionlistnum = positionlistNUM;
-
-			m->nHands = nHands;
-			strcpy_s(m->indexCode, 32, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(indexCode));
-			strcpy_s(m->contractCode, 32, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(contractCode));
-
-			m->dPositiveOpenDelta = dPositiveOpenDelta;
-			m->bTradingAllowed = bTradingAllowed;
-
-			return *m;
-		}
-
-
 	};
 
 	public ref struct managedMarketInforStruct{
@@ -154,7 +117,6 @@ namespace managedSTY
 			return m;
 		};
 	};
-
 
 	public ref struct managedTraderorderstruct
 	{
@@ -252,7 +214,7 @@ namespace managedSTY
 		bool calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
 		bool isOpenPointReached(); //是否达到开仓点，行情，资金
 
-		bool   gettaderargs(open_args^ realargs);    //获得实际运行中的参数 包含samp文件
+		//bool   gettaderargs(open_args^ realargs);    //获得实际运行中的参数 包含samp文件
 		bool   getshowstatus(String^ status); 
 
 		//bool getTradeList(array<managedTraderorderstruct^>^ orderlist, int^ num);

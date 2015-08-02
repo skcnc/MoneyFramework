@@ -215,7 +215,7 @@ namespace Stork_Future_TaoLi.StrategyModule
             {
                 //开仓
                 open_args args = InitArgs(open_para.WeightList, LiStockOrder, CT, open_para.OP, open_para.INDEX, HD);
-                //m_strategy_open.init(args);
+                m_strategy_open.init(args);
 
             }
             else if (Type == "CLOSE")
