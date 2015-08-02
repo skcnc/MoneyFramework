@@ -5,6 +5,7 @@ using System.Threading;
 using System.Web.Mvc;
 using WebMatrix.WebData;
 using Stork_Future_TaoLi.Models;
+using System.Data.Entity;
 
 namespace Stork_Future_TaoLi.Filters
 {

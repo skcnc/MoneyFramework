@@ -146,6 +146,11 @@ namespace Stork_Future_TaoLi
                 }
 
                 newWorker.open_para.WeightList = wli;
+
+                if (DBAccessLayer.DBEnable)
+                {
+                    DBAccessLayer.InsertSGOPEN(value.basic.ID, value.CT, value.OP, value.HD, Int32.Parse(value.INDEX), value.weightli, value.orderli);
+                }
             }
             else
             {
@@ -180,6 +185,11 @@ namespace Stork_Future_TaoLi
                 newWorker.close_para.SA = value.STOCKALLOTMENT;
                 newWorker.close_para.PE = value.PROSPECTIVEARNINGS;
                 newWorker.close_para.BASIS = value.OB;
+
+                if (DBAccessLayer.DBEnable)
+                {
+                    DBAccessLayer.InsertSGCLOSE(value.basic.ID, string.Empty, value.POSITION, value.CT, (int)value.SP, (int)value.HD, (float)value.COSTOFEQUITY, (float)value.STOCKDIVIDENDS, (float)value.STOCKALLOTMENT, (float)value.PROSPECTIVEARNINGS, (float)value.OB);
+                }
                 
             }
 

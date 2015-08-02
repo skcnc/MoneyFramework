@@ -76,6 +76,7 @@
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -213,6 +214,31 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Database\DBAccessLayer.cs" />
+    <Compile Include="Database\DbSet.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DbSet.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DbSet.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DbSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\DbSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DbSet.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Database\SG_TAOLI_CLOSE_TABLE.cs">
+      <DependentUpon>DbSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\SG_TAOLI_OPEN_TABLE.cs">
+      <DependentUpon>DbSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\SG_TAOLI_STATUS_TABLE.cs">
+      <DependentUpon>DbSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -248,6 +274,16 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\login.css" />
+    <Content Include="Database\DbSet.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DbSet.edmx</DependentUpon>
+      <LastGenOutput>DbSet.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Database\DbSet.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DbSet.edmx</DependentUpon>
+      <LastGenOutput>DbSet.cs</LastGenOutput>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -263,6 +299,13 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <EntityDeploy Include="Database\DbSet.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DbSet.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Database\DbSet.edmx.diagram">
+      <DependentUpon>DbSet.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.9.1.js" />
     <Content Include="Scripts\jquery-1.9.1.min.js" />
@@ -349,6 +392,9 @@
       <Project>{46db467f-a40c-43bd-b925-6b6bdee3f26d}</Project>
       <Name>TraderBassClass</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
