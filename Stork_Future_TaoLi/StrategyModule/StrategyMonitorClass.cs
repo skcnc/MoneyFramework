@@ -29,6 +29,16 @@ namespace Stork_Future_TaoLi
         private Dictionary<string, List<String>> MarketSubscribeList = new Dictionary<string, List<String>>();
 
         /// <summary>
+        /// 标记策略状态
+        /// 0： 退出或故障
+        /// 1： 空转状态
+        /// 2 : 运行状态
+        /// </summary>
+        private Dictionary<string, int> WorkersStratus = new Dictionary<string, int>();
+
+        private DateTime _logUpdateTime = new DateTime();
+
+        /// <summary>
         /// 策略管理线程启动
         /// </summary>
         public void Run()
@@ -173,6 +183,7 @@ namespace Stork_Future_TaoLi
                 
             }
 
+            WorkersStratus.Add(newWorker.StrategyInstanceID, 0);
             Workers.Add(newWorker.StrategyInstanceID, newWorker);
 
             newWorker.RUN();
@@ -253,6 +264,7 @@ namespace Stork_Future_TaoLi
 
             //策略管理中删除该实例信息
             Workers.Remove(id);
+            WorkersStratus.Remove(id);
 
             //行情模块中删除该策略实例的订阅，和消息队列
             DeleteStrategySubscribe(id);
@@ -384,6 +396,27 @@ namespace Stork_Future_TaoLi
                     { continue; }
 
                     #endregion
+                }
+
+
+                if (DateTime.Now.Second % 5 == 0)
+                {
+                    if (_logUpdateTime.Second != DateTime.Now.Second)
+                    {
+                        _logUpdateTime = DateTime.Now;
+                        
+
+                        int count_0 = (from item in WorkersStratus where item.Value == 0 select item).Count();
+                        int count_12 = (from item in WorkersStratus where item.Value == 1 || item.Value == 2 select item).Count();
+
+                        log.LogEvent("运行策略： " + (count_0 + count_12).ToString() + "\n问题或结束策略： " + count_0.ToString());
+
+                        foreach (var item in Workers)
+                        {
+                            WorkersStratus[item.Key] = item.Value.Status;
+                            item.Value.Status = 0;
+                        }
+                    }
                 }
 
                 //巡检工作组订阅内容修改

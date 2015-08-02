@@ -152,6 +152,10 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         public bool bSubscribeChange = true;
 
+        /// <summary>
+        /// 标记当前状态
+        /// </summary>
+        public int Status { get; set; }
         #endregion
 
         #region private variables
@@ -193,6 +197,8 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// 如果线程运行超过24小时，则强制关闭。
         /// </summary>
         private DateTime RunningTime = new DateTime();
+
+        private DateTime dt = new DateTime();
         #endregion
 
         #region public methods
@@ -209,7 +215,7 @@ namespace Stork_Future_TaoLi.StrategyModule
             {
                 //开仓
                 open_args args = InitArgs(open_para.WeightList, LiStockOrder, CT, open_para.OP, open_para.INDEX, HD);
-                m_strategy_open.init(args);
+                //m_strategy_open.init(args);
 
             }
             else if (Type == "CLOSE")
@@ -225,7 +231,8 @@ namespace Stork_Future_TaoLi.StrategyModule
 
 
             //获取订阅列表
-            List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
+            //List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
+            List<managedsecurityindex> subscribelist = new List<managedsecurityindex>();
             _subscribe.Clear();
 
             bool change = false;
@@ -388,7 +395,8 @@ namespace Stork_Future_TaoLi.StrategyModule
                 {
                     DeQueueInfo();
                 }
-
+                //标记线程状态为正在空转
+                Status = 1;
                 
                 Thread.Sleep(1000); 
             }
@@ -403,6 +411,9 @@ namespace Stork_Future_TaoLi.StrategyModule
                  * ****/
                 if(bRun)
                 {
+                    //标记线程状态为正在运行
+                    Status = 2;
+
                     //策略实例运算
                     List<managedMarketInforStruct> infos = new List<managedMarketInforStruct>();
                     while (_marketQueue.Count > 0)
@@ -475,12 +486,12 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     if(infos.Count > 0)
                     {
-                        m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
+                        //m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
                     }
                     else { continue; }
                 }
 
-                m_strategy_open.calculateSimTradeStrikeAndDelta();
+                //m_strategy_open.calculateSimTradeStrikeAndDelta();
 
                 if(bRun && bAllow)
                 {
