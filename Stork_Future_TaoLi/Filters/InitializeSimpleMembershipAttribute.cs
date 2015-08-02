@@ -5,7 +5,6 @@ using System.Threading;
 using System.Web.Mvc;
 using WebMatrix.WebData;
 using Stork_Future_TaoLi.Models;
-using System.Data.Entity;
 
 namespace Stork_Future_TaoLi.Filters
 {
@@ -26,7 +25,7 @@ namespace Stork_Future_TaoLi.Filters
         {
             public SimpleMembershipInitializer()
             {
-                Database.SetInitializer<UsersContext>(null);
+                System.Data.Entity.Database.SetInitializer<UsersContext>(null);
 
                 try
                 {
