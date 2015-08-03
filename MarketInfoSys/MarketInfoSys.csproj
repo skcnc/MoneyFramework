@@ -98,7 +98,6 @@
     <Compile Include="ControlPanel.Designer.cs">
       <DependentUpon>ControlPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="GlobalToolClass\queue_hangqing_info.cs" />
     <Compile Include="GlobalToolClass\WinLogs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace MarketInfoSys.Service
+namespace MarketInfoSys
 {
     /// <summary>
     /// 行情接收数据队列
@@ -12,6 +12,12 @@ namespace MarketInfoSys.Service
     public class Queue_Data
     {
         private static Queue instance;
+
+        public static bool Connected
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// 获取队列的实例

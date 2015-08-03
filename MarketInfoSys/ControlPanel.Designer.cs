@@ -42,6 +42,7 @@
             this.errTip = new System.Windows.Forms.ToolTip(this.components);
             this.QueueLength = new System.Windows.Forms.Label();
             this.updateCount = new System.Windows.Forms.Timer(this.components);
+            this.login = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -144,11 +145,21 @@
             // 
             this.updateCount.Tick += new System.EventHandler(this.updateCount_Tick);
             // 
+            // login
+            // 
+            this.login.AutoSize = true;
+            this.login.Location = new System.Drawing.Point(326, 97);
+            this.login.Name = "login";
+            this.login.Size = new System.Drawing.Size(41, 12);
+            this.login.TabIndex = 7;
+            this.login.Text = "未登陆";
+            // 
             // ControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(397, 590);
+            this.Controls.Add(this.login);
             this.Controls.Add(this.QueueLength);
             this.Controls.Add(this.btnSubmit);
             this.Controls.Add(this.rtbSubscribe);
@@ -184,5 +195,6 @@
         private System.Windows.Forms.ToolTip errTip;
         private System.Windows.Forms.Label QueueLength;
         private System.Windows.Forms.Timer updateCount;
+        private System.Windows.Forms.Label login;
     }
 }

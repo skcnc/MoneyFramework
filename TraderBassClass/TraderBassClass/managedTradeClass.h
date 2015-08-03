@@ -22,6 +22,7 @@ namespace MCStockLib
 		bool getWorkStatus();
 		void HeartBeat();
 		int cal(String^ msg);
+		array<managedEntrustreturnstruct^>^  QueryEntrust(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg);
 
 		
 	private:

@@ -67,6 +67,15 @@ namespace MarketInfoSys
         private void updateCount_Tick(object sender, EventArgs e)
         {
             this.QueueLength.Text = "目前队列长度:" +  webservice.GetLength().ToString();
+
+            if (Queue_Data.Connected)
+            {
+                this.login.Text = "已连接";
+            }
+            else
+            {
+                this.login.Text = "未连接";
+            }
         }
     }
 }

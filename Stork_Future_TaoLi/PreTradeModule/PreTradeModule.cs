@@ -92,6 +92,7 @@ namespace Stork_Future_TaoLi.PreTradeModule
             t.dOrderPrice = tos.dOrderPrice;
             t.nSecurityAmount = tos.nSecurityAmount;
             t.SecurityName = tos.SecurityName;
+            t.belongStrategy = tos.belongStrategy;
             return t;
         }
 

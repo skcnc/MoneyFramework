@@ -84,9 +84,11 @@ namespace MarketInfoSys
                 if (nOpenRet == TDFERRNO.TDF_ERR_SUCCESS)
                 {
                     //连接成功
+                    Queue_Data.Connected = true;
                 }
                 else
                 {
+                    Queue_Data.Connected = false;
                     //连接失败，告警顶级日志
                     //GlobalErrorLog.LogInstance.LogEvent(String.Format("open returned:{0}, program quit", nOpenRet));
                 }

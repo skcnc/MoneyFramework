@@ -8,6 +8,8 @@ using managedSTY;
 using marketinfosys;
 using Stork_Future_TaoLi.Variables_Type;
 using Stork_Future_TaoLi.Modulars;
+using Newtonsoft.Json;
+using System.Web.Helpers;
 
 namespace Stork_Future_TaoLi.StrategyModule
 {
@@ -502,7 +504,6 @@ namespace Stork_Future_TaoLi.StrategyModule
                         List<managedTraderorderstruct> ol = m_strategy_open.getTradeList().ToList();
 
                         //交易列表送往交易线程下单（下单的线程，股票和期货是分开的）
-
                         List<TradeOrderStruct> orderli = new List<TradeOrderStruct>();
 
                         foreach (managedTraderorderstruct item in ol)
@@ -520,10 +521,18 @@ namespace Stork_Future_TaoLi.StrategyModule
                             order.cSecurityType = item.cSecuritytype.ToString();
                             order.cOrderLevel = item.cOrderlevel.ToString();
                             order.cOrderexecutedetail = item.cOrderexecutedetail.ToString();
-
+                            order.belongStrategy = StrategyInstanceID;
                             orderli.Add(order);
                         }
 
+                        if (DBAccessLayer.DBEnable == true)
+                        {
+                            lock (DBAccessLayer.RootSync)
+                            {
+                                string json = Json.Encode(orderli);
+                                DBAccessLayer.InsertORDERLIST(StrategyInstanceID, json);
+                            }
+                        }
 
                         //下单到交易预处理模块
                         queue_prd_trade.GetQueue().Enqueue((object)orderli);

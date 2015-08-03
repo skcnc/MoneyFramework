@@ -230,6 +230,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DBSet.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Database\ER_TAOLI_TABLE.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\OL_TAOLI_LIST_TABLE.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\SG_TAOLI_CLOSE_TABLE.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
@@ -239,6 +245,7 @@
     <Compile Include="Database\SG_TAOLI_STATUS_TABLE.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -253,6 +260,7 @@
     <Compile Include="Queues\queue_hangqing_info.cs" />
     <Compile Include="Queues\queue_prd_trade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queues\queue_query_entrust.cs" />
     <Compile Include="Queues\queue_stock_excuteThread.cs" />
     <Compile Include="AdditionalModule\ListCreate.cs" />
     <Compile Include="AdditionalModule\TestClass.cs" />

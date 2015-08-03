@@ -57,6 +57,8 @@ namespace Stork_Future_TaoLi.Variables_Type
         public string cOrderLevel { get; set; }
         //报单执行细节
         public string cOrderexecutedetail { get; set; }
+        // 列表所属策略实例ID
+        public string belongStrategy { get; set; }
 
     }
 
