@@ -26,6 +26,9 @@ namespace Stork_Future_TaoLi
         //类型 时间 价格  是否停牌 涨停价格 跌停价格  昨收价
         public static void EnQueueNew(String code, int Time, uint Match, int status , uint HighLimit, uint LowLimit,  uint preClose,int type)
         {
+            MarketValue  v = new MarketValue();
+            v.Match=Match;
+            if(status==66||status==68)
             {
                 v.isStop = true;
             }

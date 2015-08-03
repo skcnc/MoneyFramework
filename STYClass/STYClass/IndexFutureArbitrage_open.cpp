@@ -6,7 +6,7 @@ namespace STYClass
 {
 CIndexFutureArbitrage_open::CIndexFutureArbitrage_open(void)
 {
-   bTradingAllowed=false;//是否允许交易,勾"允许"时置为true	 用于返回 
+//   bTradingAllowed=false;//是否允许交易,勾"允许"时置为true	 用于返回 
    dSimIndex=0;			   //模拟指数大小
    dSimerrorPre=0;           //模拟误差，百分比 
    dSimtraderPre = 0;		 	   //交易指数大小
@@ -81,7 +81,7 @@ bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs      i
 {
 	this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
 	this->dExpectOpenDelta = indexfuturearbitrageopenargs.dPositiveOpenDelta; //开仓点位
-	this->bTradingAllowed = indexfuturearbitrageopenargs.bTradingAllowed;
+	//this->bTradingAllowed = indexfuturearbitrageopenargs.bTradingAllowed;
 	m_future.setcode(indexfuturearbitrageopenargs.contractCode); //初始期货
 	m_index.setcode(indexfuturearbitrageopenargs.indexCode);     //初始化指数
 	//初始化position文件 
@@ -140,7 +140,7 @@ bool   CIndexFutureArbitrage_open::gettaderargs(IndexFutureArbitrageopeninputarg
 {
 	realargs.nHands=this->nHands;  //手数
 	realargs.dPositiveOpenDelta=this->dExpectOpenDelta; //开仓点位
-	realargs.bTradingAllowed=this->bTradingAllowed;
+	//realargs.bTradingAllowed=this->bTradingAllowed;
 	strcpy(realargs.contractCode, m_future.m_DepthMarketData.msecurity.cSecurity_code); //初始期货
 	strcpy(realargs.indexCode, m_index.m_DepthMarketData.msecurity.cSecurity_code);    //初始化指数
 	//复制position文件  weight文件不返回 

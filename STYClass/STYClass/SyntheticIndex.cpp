@@ -179,7 +179,7 @@ bool   CSyntheticIndex::isSecurityFocused(securityindex  SecurityCode)
 
 void CSyntheticIndex::updateInfo(MarketInforStruct * MarketInfor )
 {
-	if(isSecurityFocused(MarketInfor->msecurity)) //每次行情过来都要判断股票是否在hash表里
+	//if(isSecurityFocused(MarketInfor->msecurity)) //每次行情过来都要判断股票是否在hash表里
 	{
 	   this->stockDb[MarketInfor->msecurity]->updateInfo(MarketInfor);
 	}
