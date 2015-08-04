@@ -428,12 +428,18 @@ namespace Stork_Future_TaoLi.StrategyModule
                         info.dBidPrice  = new double[10];
                         info.dBidVol = new double[10];
 
+                        if(data.AskPrice != null)
+                        {
+
+                        
+
                         for (int i = 0; i < data.AskPrice.Count(); i++)
                         {
                             info.dAskPrice[i] = Convert.ToDouble(data.AskPrice[i]) /10000;
                             info.dAskVol[i] = Convert.ToDouble(data.AskVol[i]) / 10000;
                             info.dBidPrice[i] = Convert.ToDouble(data.BidPrice[i]) /10000;
                             info.dBidVol[i] = Convert.ToDouble(data.BidVol[i]) /10000;
+                        }
                         }
 
                         managedsecurityindex index = new managedsecurityindex();
@@ -488,12 +494,14 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     if(infos.Count > 0)
                     {
-                        //m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
+                        m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
                     }
                     else { continue; }
+
+                    m_strategy_open.calculateSimTradeStrikeAndDelta();
                 }
 
-                //m_strategy_open.calculateSimTradeStrikeAndDelta();
+                
 
                 if(bRun && bAllow)
                 {
@@ -527,11 +535,8 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                         if (DBAccessLayer.DBEnable == true)
                         {
-                            lock (DBAccessLayer.RootSync)
-                            {
-                                string json = Json.Encode(orderli);
-                                DBAccessLayer.InsertORDERLIST(StrategyInstanceID, json);
-                            }
+                            string json = Json.Encode(orderli);
+                            DBAccessLayer.InsertORDERLIST(StrategyInstanceID, json);
                         }
 
                         //下单到交易预处理模块

@@ -43,6 +43,8 @@ namespace Stork_Future_TaoLi.Entrust
         private void threadproc()
         {
             while (true) {
+
+                Thread.Sleep(1);
             
                 if((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 5)
                 {
@@ -57,39 +59,38 @@ namespace Stork_Future_TaoLi.Entrust
                 while (maxCount > 0 && queue_query_entrust.GetQueueNumber() > 0)
                 {
                     maxCount--;
-                    managedQueryEntrustorderstruct item = (managedQueryEntrustorderstruct)queue_query_entrust.GetQueue().Dequeue();
-                    string err = string.Empty;
-                    List<managedEntrustreturnstruct> rets = _classTradeStock.QueryEntrust(item, err).ToList();
 
-                    //标记委托已经处理完毕
-                    bool isCompleted = true;
+                    //获取新委托
+                    managedQueryEntrustorderstruct item = (managedQueryEntrustorderstruct)queue_query_entrust.GetQueue().Dequeue();
+
+
+                    string err = string.Empty;
+
+                    //查询委托及获取实例
+                    List<managedEntrustreturnstruct> rets = _classTradeStock.QueryEntrust(item, err).ToList();
 
                     //将委托变动返回更新数据库
                     if (DBAccessLayer.DBEnable == true)
                     {
                         foreach(var rec in rets){
 
+                            //更新数据，记录入数据库
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(rec));
+
                             //此处判断，相应代码的委托是否完成
                             //此处逻辑需要待返回报文内容确认后修改
-                            if (rec.nVolumeTotal != 0 && rec.withdraw_ammount != rec.nVolumeTotal)
+                            if (rec.cOrderStatus.ToString() != "end")
                             {
-                                isCompleted = false;
+                                queue_query_entrust.GetQueue().Enqueue((object)item);
+                                continue;
                             }
 
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(rec));
+
+                            //委托已经完成，进入成交状态查询
+
+                            //更新持仓表
+                            
                         }
-                    }
-
-                    if(isCompleted == false)
-                    {
-                        //该委托尚未完成，重新入队列，等待下次再查询
-                        queue_query_entrust.GetQueue().Enqueue((object)item);
-                    }
-                    else
-                    {
-                        //该委托已经完成，进入计算成本状态
-                        //未完成的委托，是没有成本的
-
                     }
                 }
             }
