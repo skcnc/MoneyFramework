@@ -85,6 +85,12 @@ namespace Stork_Future_TaoLi.Entrust
                         //该委托尚未完成，重新入队列，等待下次再查询
                         queue_query_entrust.GetQueue().Enqueue((object)item);
                     }
+                    else
+                    {
+                        //该委托已经完成，进入计算成本状态
+                        //未完成的委托，是没有成本的
+
+                    }
                 }
             }
         }
