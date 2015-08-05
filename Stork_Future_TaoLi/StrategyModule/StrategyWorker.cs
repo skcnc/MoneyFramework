@@ -244,6 +244,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                 change = true;
             }
 
+
             bSubscribeChange = change;
 
 
@@ -450,10 +451,10 @@ namespace Stork_Future_TaoLi.StrategyModule
                         info.security_name = data.Code;
                         info.nTime = data.Time / 1000;
                         info.nStatus = data.Status;
-                        info.nPreClose = data.PreClose / 10000;
-                        info.dLastPrice = data.Match / 10000;
-                        info.dHighLimited = data.HighLimited / 10000;
-                        info.dLowLimited = data.LowLimited /10000;
+                        info.nPreClose = Convert.ToDouble(data.PreClose) / 10000;
+                        info.dLastPrice = Convert.ToDouble(data.Match) / 10000;
+                        info.dHighLimited = Convert.ToDouble(data.HighLimited) / 10000;
+                        info.dLowLimited = Convert.ToDouble(data.LowLimited) /10000;
                         info.exchangeID = data.WindCode.Split('.')[1];
 
                         switch(data.IOPV)
@@ -505,8 +506,10 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                 if(bRun && bAllow)
                 {
+                    bool _reached = false;
+                    m_strategy_open.isOpenPointReached(_reached);
                     // 生成交易列表
-                    if (m_strategy_open.isOpenPointReached())
+                    if (_reached)
                     //if(false)
                     {
                         List<managedTraderorderstruct> ol = m_strategy_open.getTradeList().ToList();

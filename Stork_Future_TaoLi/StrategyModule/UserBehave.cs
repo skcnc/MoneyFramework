@@ -151,6 +151,10 @@ namespace Stork_Future_TaoLi
     {
         public Basic basic { get; set; }
 
+        /// <summary>
+        /// 平仓关联开仓ID
+        /// </summary>
+        public string OpenStraID { get; set; }
 
         /// <summary>
         /// 合约

@@ -205,17 +205,17 @@ namespace managedSTY
 		virtual ~Strategy_OPEN();
 
 	public:
-		bool updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num); //获得行情信息
+		void updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num); //获得行情信息
 		//bool getsubscribelist(array<managedsecurityindex^>^ securityIndex, int num);//获得订阅的股票，必须在初始化后调用
 
 		array<managedsecurityindex^>^ getsubscribelist();
 
-		bool init(open_args^ m); //初始化设置，导入权重数据  更新股票列表  
-		bool calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
-		bool isOpenPointReached(); //是否达到开仓点，行情，资金
+		void init(open_args^ m); //初始化设置，导入权重数据  更新股票列表  
+		void calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
+		void isOpenPointReached(bool^ open); //是否达到开仓点，行情，资金
 
 		//bool   gettaderargs(open_args^ realargs);    //获得实际运行中的参数 包含samp文件
-		bool   getshowstatus(String^ status); 
+		void getshowstatus(String^ status); 
 
 		//bool getTradeList(array<managedTraderorderstruct^>^ orderlist, int^ num);
 		array<managedTraderorderstruct^>^ getTradeList();
