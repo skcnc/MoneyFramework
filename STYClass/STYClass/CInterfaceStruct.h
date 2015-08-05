@@ -67,21 +67,17 @@ struct IndexFutureArbitragecloseinputargs
 
 struct IndexFutureArbitragecloseshowargs  //界面显示变量
 {
-	/*公共部分*/
-	double  futureprice;       //期货价格
-	double  indexprice;        //指数大小
-	double  SimIndex;		 //模拟指数大小
-	double OrgDeltaPre;           //模拟误差，百分比 
-	double SimerrorPre;           //模拟误差，百分比 
+	double dTotalStockMarketValue;  //股票市值
+	double 	dStopedStockValue;   //停牌市值
+	double 	dDownlimitStockValue;   //跌停市值
+	double dTotalStockSellStrike;  //股票冲击
+	double drealStockIncome; //真实股票卖出收益
+	double dActualStockGain; //真实股票收益（考虑费用 冲击）
 
-	/*个体部分*/
-	double SimtraderPre;		 	   //交易误差
-	double TotalStocksMarketValue;	//要买入的股票的市值(不包含停牌)
-	double stopmarketvalue;			 //停牌市值
-	double uplimitmarketvalue;       //涨停市值
-	double dFutureSellStrike;		//卖出期货的冲击
-	double TotalStockBuyStrike;		//买入股票的冲击	
-	double dPositiveDelta;			//调整后的基差 = 期货 - 模拟指数 -冲击（换算成点）
+	double dFutureBuyStrike; //期货买入冲击
+	double dActualFutureGain;  //真实期货收益
+	double dtotalgain;		 //全部收益
+	double  dzerobpgain;	 //到0基差收益
 	char statusmsg[255];			//错误原因 或状态
 };
 #endif

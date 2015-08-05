@@ -231,8 +231,8 @@ namespace Stork_Future_TaoLi.StrategyModule
 
 
             //获取订阅列表
-            //List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
-            List<managedsecurityindex> subscribelist = new List<managedsecurityindex>();
+            List<managedsecurityindex> subscribelist = m_strategy_open.getsubscribelist().ToList();
+            //List<managedsecurityindex> subscribelist = new List<managedsecurityindex>();
             _subscribe.Clear();
 
             bool change = false;
