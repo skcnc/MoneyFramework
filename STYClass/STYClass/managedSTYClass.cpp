@@ -92,7 +92,10 @@ void Strategy_OPEN::init(open_args^ m){
 	m_args->dPositiveOpenDelta = m->dPositiveOpenDelta;
 	m_args->bTradingAllowed = m->bTradingAllowed;
 
-	bool b = m_open_strategy->init(m_args);
+
+	IndexFutureArbitrageopeninputargs mm;
+
+	bool b = m_open_strategy->init(&mm);
 
 }
 
