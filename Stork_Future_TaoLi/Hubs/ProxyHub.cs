@@ -144,7 +144,14 @@ namespace Stork_Future_TaoLi
                 return;
             }
 
-            _context.Clients.Client(RegisterRelation[name]).updatePara(name,DateTime.Now.ToString());
+            try
+            {
+                _context.Clients.Client(RegisterRelation[name]).updatePara(name, DateTime.Now.ToString());
+            }
+            catch(Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
+            }
         }
 
         public string getkey(int k)

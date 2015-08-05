@@ -8,6 +8,8 @@ using managedSTY;
 using marketinfosys;
 using Stork_Future_TaoLi.Variables_Type;
 using Stork_Future_TaoLi.Modulars;
+using Newtonsoft.Json;
+using System.Web.Helpers;
 
 namespace Stork_Future_TaoLi.StrategyModule
 {
@@ -242,6 +244,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                 change = true;
             }
 
+
             bSubscribeChange = change;
 
 
@@ -426,12 +429,18 @@ namespace Stork_Future_TaoLi.StrategyModule
                         info.dBidPrice  = new double[10];
                         info.dBidVol = new double[10];
 
+                        if(data.AskPrice != null)
+                        {
+
+                        
+
                         for (int i = 0; i < data.AskPrice.Count(); i++)
                         {
                             info.dAskPrice[i] = Convert.ToDouble(data.AskPrice[i]) /10000;
                             info.dAskVol[i] = Convert.ToDouble(data.AskVol[i]) / 10000;
                             info.dBidPrice[i] = Convert.ToDouble(data.BidPrice[i]) /10000;
                             info.dBidVol[i] = Convert.ToDouble(data.BidVol[i]) /10000;
+                        }
                         }
 
                         managedsecurityindex index = new managedsecurityindex();
@@ -442,10 +451,10 @@ namespace Stork_Future_TaoLi.StrategyModule
                         info.security_name = data.Code;
                         info.nTime = data.Time / 1000;
                         info.nStatus = data.Status;
-                        info.nPreClose = data.PreClose / 10000;
-                        info.dLastPrice = data.Match / 10000;
-                        info.dHighLimited = data.HighLimited / 10000;
-                        info.dLowLimited = data.LowLimited /10000;
+                        info.nPreClose = Convert.ToDouble(data.PreClose) / 10000;
+                        info.dLastPrice = Convert.ToDouble(data.Match) / 10000;
+                        info.dHighLimited = Convert.ToDouble(data.HighLimited) / 10000;
+                        info.dLowLimited = Convert.ToDouble(data.LowLimited) /10000;
                         info.exchangeID = data.WindCode.Split('.')[1];
 
                         switch(data.IOPV)
@@ -489,20 +498,23 @@ namespace Stork_Future_TaoLi.StrategyModule
                         m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
                     }
                     else { continue; }
+
+                    m_strategy_open.calculateSimTradeStrikeAndDelta();
                 }
 
-                m_strategy_open.calculateSimTradeStrikeAndDelta();
+                
 
                 if(bRun && bAllow)
                 {
+                    bool _reached = false;
+                    m_strategy_open.isOpenPointReached(_reached);
                     // 生成交易列表
-                    if (m_strategy_open.isOpenPointReached())
+                    if (_reached)
                     //if(false)
                     {
                         List<managedTraderorderstruct> ol = m_strategy_open.getTradeList().ToList();
 
                         //交易列表送往交易线程下单（下单的线程，股票和期货是分开的）
-
                         List<TradeOrderStruct> orderli = new List<TradeOrderStruct>();
 
                         foreach (managedTraderorderstruct item in ol)
@@ -520,10 +532,15 @@ namespace Stork_Future_TaoLi.StrategyModule
                             order.cSecurityType = item.cSecuritytype.ToString();
                             order.cOrderLevel = item.cOrderlevel.ToString();
                             order.cOrderexecutedetail = item.cOrderexecutedetail.ToString();
-
+                            order.belongStrategy = StrategyInstanceID;
                             orderli.Add(order);
                         }
 
+                        if (DBAccessLayer.DBEnable == true)
+                        {
+                            string json = Json.Encode(orderli);
+                            DBAccessLayer.InsertORDERLIST(StrategyInstanceID, json);
+                        }
 
                         //下单到交易预处理模块
                         queue_prd_trade.GetQueue().Enqueue((object)orderli);

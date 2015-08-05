@@ -46,50 +46,22 @@ namespace Stork_Future_TaoLi
             Thread excutedThread = new Thread(new ThreadStart(ThreadProc));
             excutedThread.Start();
 
+            //策略管理线程启动检测未完成策略
+            List<OPENCREATE> remainOpenStra = DBAccessLayer.GetInCompletedOPENStrategy();
 
+            foreach(var item in remainOpenStra)
+            {
+                QCommands.Enqueue((object)item);
+            }
 
-            //测试参数开始
-            // Add Three Workers
-            //int j = 0;
+            List<CLOSECREATE> remainCloseStra = DBAccessLayer.GetInCompletedCLOSEStrategy();
 
-            //while (j < 3)
-            //{
-            //    InitParameters para = new InitParameters();
-            //    Dictionary<string, int> order = new Dictionary<string, int>();
+            foreach(var item in remainCloseStra)
+            {
+                QCommands.Enqueue((object)item);
+            }
 
-            //    RecruitNewWorker(para, order);
-            //    j++;
-            //}
-           
             
-            //int i = 0;
-            //foreach(StrategyWorker _worker in Workers.Values)
-            //{
-            //    switch(i)
-            //    {
-            //        case 0:
-            //            _worker.SetSubscribeList(new List<string>{
-            //                "600005"
-            //            });
-            //            break;
-            //        case 1:
-            //            _worker.SetSubscribeList(new List<string>{
-            //               "600005",
-            //               "600651"
-            //            });
-            //            break;
-            //        case 2:
-            //            _worker.SetSubscribeList(new List<string>{
-            //                "600104",
-            //                "600005",
-            //                "600651"
-            //            });
-            //            break;
-            //    }
-            //    i++;
-            //}
-            //测试参数结束
-
 
             Thread.Sleep(1000);
         }
@@ -146,6 +118,11 @@ namespace Stork_Future_TaoLi
                 }
 
                 newWorker.open_para.WeightList = wli;
+
+                if (DBAccessLayer.DBEnable)
+                {
+                    DBAccessLayer.InsertSGOPEN((object)value);
+                }
             }
             else
             {
@@ -180,6 +157,11 @@ namespace Stork_Future_TaoLi
                 newWorker.close_para.SA = value.STOCKALLOTMENT;
                 newWorker.close_para.PE = value.PROSPECTIVEARNINGS;
                 newWorker.close_para.BASIS = value.OB;
+
+                if (DBAccessLayer.DBEnable)
+                {
+                    DBAccessLayer.InsertSGCLOSE((object)value);
+                }
                 
             }
 

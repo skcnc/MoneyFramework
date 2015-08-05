@@ -138,14 +138,14 @@ struct Entrustreturnstruct //委托回报
 
 struct Bargainreturnstruct  //成交回报
 {
-	char    cSecurity_code[31];     // 证券代码
+	char    cSecurity_code[31];         // 证券代码
 	char    security_name[18];
 	char	cOrderSysID[21]; 			///报单编号
 	char	cOrderStatus;				///报单状态
 	char	cOrderType;					///报单类型
 	long    stock_ammount;         		// 成交数量
 	double  bargain_price;        		// 成交价格
-	double  bargain_money;             		// 成交金额
+	double  bargain_money;             	// 成交金额
 	char    bargain_time[9];       		// 成交时间
 	long    bargain_no;            		// 成交编号
 	//标志信息

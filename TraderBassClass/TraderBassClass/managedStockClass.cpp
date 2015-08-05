@@ -79,7 +79,50 @@ bool managedStockClass::BatchTrade(array<managedTraderorderstruct^>^ mytraderode
 	return rt_value;
 }
 
+//查询交易回报
+array<managedEntrustreturnstruct^>^  managedStockClass::QueryEntrust(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg)
+{
+	QueryEntrustorderstruct query = queryEntrust->createInstance();
+	Entrustreturnstruct* ret = new Entrustreturnstruct[1];
+	int count = 0;
+	char* errmsg;
+	array<managedEntrustreturnstruct^>^ managedRet;
 
+	//C++ 版查询委托函数尚未实现
+	//bool  b= m_cstockTrader->queryorder(query, ret, count, errmsg);
+	bool b = true;
+
+	if (b == true)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			managedRet[i] = gcnew managedEntrustreturnstruct();
+
+			managedRet[i]->cSecurity_code = gcnew String(ret->cSecurity_code);
+			managedRet[i]->security_name = gcnew String(ret->security_name);
+			managedRet[i]->cOrderSysID = gcnew String(ret->cOrderSysID);
+			managedRet[i]->cInsertDate = gcnew String(ret->cInsertDate);
+			managedRet[i]->cInsertTime = gcnew String(ret->cInsertTime);
+			managedRet[i]->cCancelTime = gcnew String(ret->cCancelTime);
+
+			managedRet[i]->nVolumeTotalOriginal = (int)(ret->nVolumeTotalOriginal);
+			managedRet[i]->nVolumeTraded = (int)(ret->nVolumeTraded);
+			managedRet[i]->nVolumeTotal = (int)(ret->nVolumeTotal);
+			managedRet[i]->withdraw_ammount = (int)(ret->withdraw_ammount);
+			managedRet[i]->frozen_money = (float)(ret->frozen_money);
+			managedRet[i]->frozen_amount = (int)(ret->frozen_amount);
+
+			managedRet[i]->cOrderStatus = ret->cOrderStatus;
+			managedRet[i]->cOrderType = ret->cOrderType;
+		}
+
+		return managedRet;
+	}
+	else
+	{
+		return managedRet;
+	}
+}
 
 //查询连接状态
 bool managedStockClass::getConnectStatus()

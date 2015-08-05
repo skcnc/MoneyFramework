@@ -186,9 +186,6 @@ namespace Stork_Future_TaoLi.TradeModule
         private static void StockTradeSubThreadProc(object para)
         {
 
-            /*********************************************
-             * 测试数据
-             * ******************************************/
             MCStockLib.managedStockClass _classTradeStock = new managedStockClass();
             MCStockLib.managedLogin login = new managedLogin(CommConfig.Stock_ServerAddr, CommConfig.Stock_Port, CommConfig.Stock_Account, CommConfig.Stock_BrokerID, CommConfig.Stock_Password, CommConfig.Stock_InvestorID);
             string ErrorMsg = string.Empty;
@@ -266,7 +263,7 @@ namespace Stork_Future_TaoLi.TradeModule
                     //当内容大于1 ，调用批量接口
                     //当内容等于1， 调用单笔接口
                     queue_stock_excuteThread.SetUpdateTime(_threadNo);
-
+                    List<managedQueryEntrustorderstruct> entrustorli = new List<managedQueryEntrustorderstruct>();
 
                     if (trades.Count > 1)
                     {
@@ -298,6 +295,10 @@ namespace Stork_Future_TaoLi.TradeModule
                             }
 
                             _classTradeStock.BatchTrade(tradesUnit, 15, entrustUnit, s);
+
+                            if(entrustUnit != null && entrustUnit.ToList().Count() > 0){
+                                entrustorli = entrustUnit.ToList();
+                            }
                             
                         }
                     }
@@ -316,13 +317,38 @@ namespace Stork_Future_TaoLi.TradeModule
                             managedQueryEntrustorderstruct entrustUnit = new managedQueryEntrustorderstruct();
                             string s = string.Empty;
                             _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
+
+                            if(entrustUnit != null){
+                                entrustorli.Add(entrustUnit);
+                            }
                         }
+
+
                     }
 
                     //*********************************
                     //  交易成功后执行的特殊处理
+                    //  交易生成委托存入数据库，并将委托送往查询成交线程
                     //*********************************
+                    if (trades.Count != 0)
+                    {
+                        //存入数据库
+                        if(entrustorli.Count() == 0){continue;}
 
+                        if (DBAccessLayer.DBEnable == true)
+                        {
+
+                            for (int i = 0; i < trades.Count; i++)
+                            {
+                                entrustorli[i].Code = trades[i].cSecurityCode;
+                                entrustorli[i].StrategyId = trades[0].belongStrategy;
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateERRecord), (object)(entrustorli[i]));
+                                queue_query_entrust.GetQueue().Enqueue((object)entrustorli[i]);
+                            }
+
+                        }
+
+                    }
                 }
             }
 

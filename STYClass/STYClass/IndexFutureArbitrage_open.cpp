@@ -77,8 +77,9 @@ bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex* subscribelist
 	 return true;
  }
 
-bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs)
+bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs* m)
 {
+	IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs = *m;
 	this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
 	this->dExpectOpenDelta = indexfuturearbitrageopenargs.dPositiveOpenDelta; //开仓点位
 	//this->bTradingAllowed = indexfuturearbitrageopenargs.bTradingAllowed;

@@ -107,20 +107,26 @@ namespace MCStockLib
 	public ref struct managedQueryEntrustorderstruct
 	{
 		char cSecurityType;
-		char* cExchangeID;
-		char* cOrderSysID;
+		/*char* cExchangeID;
+		char* cOrderSysID;*/
+		String^ cExchangeID;
+		String^ cOrderSysID;
+		String^ Code;
+		String^ StrategyId;
 
 		managedQueryEntrustorderstruct(char mcSecurityType, String^ mcExchangeID ,String^ mcOrderSysID)
 		{
-			cExchangeID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcExchangeID);
-			cOrderSysID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcOrderSysID);
+			//cExchangeID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcExchangeID);
+			cExchangeID = mcExchangeID;
+			cOrderSysID = mcOrderSysID;
+			//cOrderSysID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcOrderSysID);
 			cSecurityType = mcSecurityType;
 		}
 
 		managedQueryEntrustorderstruct()
 		{
-			cExchangeID = new char[255];
-			cOrderSysID = new char[255];
+			//cExchangeID = new char[255];
+			//cOrderSysID = new char[255];
 			cSecurityType = 's';
 		}
 
@@ -134,6 +140,44 @@ namespace MCStockLib
 			queryEntrust.cSecuritytype = 0;
 
 			return queryEntrust;
+		}
+	};
+
+	public ref struct managedEntrustreturnstruct{
+		String^ cSecurity_code;
+		String^ security_name;
+		String^ cOrderSysID;
+		char cOrderStatus;
+		char cOrderType;
+		int nVolumeTotalOriginal;
+		int nVolumeTraded;
+		int nVolumeTotal;
+		int withdraw_ammount;
+		float frozen_money;
+		float frozen_amount;
+		String^ cInsertDate;
+		String^ cInsertTime;
+		String^ cCancelTime;
+
+		Entrustreturnstruct CreateInstance(){
+			Entrustreturnstruct instance;
+
+			strcpy_s(instance.cSecurity_code, 31, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cSecurity_code));
+			strcpy_s(instance.security_name, 18, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(security_name));
+			strcpy_s(instance.cOrderSysID, 21, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cOrderSysID));
+			instance.cOrderStatus = cOrderStatus;
+			instance.cOrderType = cOrderType;
+			instance.nVolumeTotalOriginal = nVolumeTotalOriginal;
+			instance.nVolumeTraded = nVolumeTraded;
+			instance.nVolumeTotal = nVolumeTotal;
+			instance.withdraw_ammount = withdraw_ammount;
+			instance.frozen_money = frozen_money;
+			instance.frozen_amount = frozen_amount;
+			strcpy_s(instance.cInsertDate, 9, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cInsertDate));
+			strcpy_s(instance.cInsertTime, 9, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cInsertTime));
+			strcpy_s(instance.cCancelTime, 9, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cCancelTime));
+
+			return instance;
 		}
 	};
 }

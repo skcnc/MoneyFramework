@@ -10,6 +10,7 @@ using Stork_Future_TaoLi.Test;
 using Stork_Future_TaoLi.PreTradeModule;
 using Stork_Future_TaoLi.TradeModule;
 using System.Threading;
+using Stork_Future_TaoLi.Entrust;
 
 
 namespace Stork_Future_TaoLi
@@ -30,7 +31,7 @@ namespace Stork_Future_TaoLi
             AuthConfig.RegisterAuth();
 
             //模块初始化工作
-            ListCreate.Main();
+            //ListCreate.Main();
 
 
             PreTradeModule.PreTradeModule.getInstance().Run();
@@ -48,6 +49,8 @@ namespace Stork_Future_TaoLi
 
             UpdateMarketPanel MarketMonitor = new UpdateMarketPanel();
             MarketMonitor.Run();
+
+            Entrust_Query.Instance.Run();
 
             ThreadHeartBeatControl.Run();
 

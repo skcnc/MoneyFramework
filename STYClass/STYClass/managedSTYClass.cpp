@@ -16,7 +16,7 @@ Strategy_OPEN::~Strategy_OPEN()
 	delete m_open_strategy;
 };
 
-bool Strategy_OPEN::updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num){
+void Strategy_OPEN::updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num){
 	MarketInforStruct * MarketInfo = new MarketInforStruct();
 	
 	for (int i = 0; i < 10; i++)
@@ -33,7 +33,7 @@ bool Strategy_OPEN::updateSecurityInfo(array<managedMarketInforStruct^>^ marketi
 	{
 		MarketInfo[i] = marketinfo[i]->CreateInstance();
 	}
-	return m_open_strategy->updateSecurityInfo(MarketInfo, num);
+     m_open_strategy->updateSecurityInfo(MarketInfo, num);
 };
 
 array<managedsecurityindex^>^ Strategy_OPEN::getsubscribelist(){
@@ -60,62 +60,55 @@ array<managedsecurityindex^>^ Strategy_OPEN::getsubscribelist(){
 	return securityIndexs;
 }
 
-bool Strategy_OPEN::init(open_args^ m){
-	IndexFutureArbitrageopeninputargs m_args; 
-	m_args.weightlist = new indexweightstruct();
-	m_args.positionlist = new stockpotionstruct();
+void Strategy_OPEN::init(open_args^ m){
+	IndexFutureArbitrageopeninputargs* m_args = new IndexFutureArbitrageopeninputargs[1];
+	m_args->weightlist = new indexweightstruct[1];
+	m_args->positionlist = new stockpotionstruct[1];
 
-	m_args.weightlistnum = m->weightlistnum;
 
-  
-	for (int i = 0; i < m_args.weightlistnum; i++){
-		m_args.weightlist[i].dweight = m->weightlist[i]->dweight;
-		strcpy_s(m_args.weightlist[i].sSecurity.cSecurity_code, 31, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->weightlist[i]->sSecurity->cSecurity_code));
-		m_args.weightlist[i].sSecurity.cSecuritytype = m->weightlist[i]->sSecurity->cSecuritytype;
+	m_args->weightlistnum = m->weightlistnum;
+
+
+	for (int i = 0; i < m_args->weightlistnum; i++){
+		m_args->weightlist[i].dweight = m->weightlist[i]->dweight;
+		strcpy_s(m_args->weightlist[i].sSecurity.cSecurity_code, 31, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->weightlist[i]->sSecurity->cSecurity_code));
+		m_args->weightlist[i].sSecurity.cSecuritytype = m->weightlist[i]->sSecurity->cSecuritytype;
 	}
 
-	m_args.positionlistnum = m->positionlistNUM;
+	m_args->positionlistnum = m->positionlistNUM;
 
-	for (int i = 0; i < m_args.positionlistnum; i++){
-		m_args.positionlist[i].bstoped = m->positionlist[i]->bstoped;
-		m_args.positionlist[i].dlastprice = m->positionlist[i]->dlastprice;
-		m_args.positionlist[i].ntradervolume = m->positionlist[i]->tradevolume;
-		m_args.positionlist[i].sSecurity.cSecuritytype = m->positionlist[i]->sSecurity->cSecuritytype;
-		strcpy_s(m_args.positionlist[i].sSecurity.cSecurity_code, 31, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->positionlist[i]->sSecurity->cSecurity_code));
+	for (int i = 0; i < m_args->positionlistnum; i++){
+		m_args->positionlist[i].bstoped = m->positionlist[i]->bstoped;
+		m_args->positionlist[i].dlastprice = m->positionlist[i]->dlastprice;
+		m_args->positionlist[i].ntradervolume = m->positionlist[i]->tradevolume;
+		m_args->positionlist[i].sSecurity.cSecuritytype = m->positionlist[i]->sSecurity->cSecuritytype;
+		strcpy_s(m_args->positionlist[i].sSecurity.cSecurity_code, 31, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->positionlist[i]->sSecurity->cSecurity_code));
 	}
 
-	m_args.nHands = m->nHands;
-	strcpy_s(m_args.indexCode, 32, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->indexCode));
-	strcpy_s(m_args.contractCode, 32, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->contractCode));
+	m_args->nHands = m->nHands;
+	strcpy_s(m_args->indexCode, 32, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->indexCode));
+	strcpy_s(m_args->contractCode, 32, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->contractCode));
 
-	m_args.dPositiveOpenDelta = m->dPositiveOpenDelta;
-	m_args.bTradingAllowed = m->bTradingAllowed;
+	m_args->dPositiveOpenDelta = m->dPositiveOpenDelta;
+	m_args->bTradingAllowed = m->bTradingAllowed;
 
+	bool b = m_open_strategy->init(m_args);
 
-	//IndexFutureArbitrageopeninputargs m_args = m->GetInstance();
-	return m_open_strategy->init(m_args);
 }
 
-bool Strategy_OPEN::calculateSimTradeStrikeAndDelta(){
-	return m_open_strategy->calculateSimTradeStrikeAndDelta();
+void Strategy_OPEN::calculateSimTradeStrikeAndDelta(){
+	 m_open_strategy->calculateSimTradeStrikeAndDelta();
 }
 
-bool Strategy_OPEN::isOpenPointReached(){
-	return m_open_strategy->isOpenPointReached();
+void Strategy_OPEN::isOpenPointReached(bool^ open){
+	bool b = m_open_strategy->isOpenPointReached();
+	open = b;
 }
 
-//bool Strategy_OPEN::gettaderargs(open_args^ realargs){
-//	IndexFutureArbitrageopeninputargs m = realargs->GetInstance();
-//
-//	bool b = m_open_strategy->gettaderargs(m);
-//
-//	return b;
-//}
-
-bool Strategy_OPEN::getshowstatus(String^ status){
+void Strategy_OPEN::getshowstatus(String^ status){
 
 	char* str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(status);
-	return true;// m_open_strategy->getshowstatus(str);
+	//return true;// m_open_strategy->getshowstatus(str);
 }
 
 array<managedTraderorderstruct^>^ Strategy_OPEN::getTradeList(){
