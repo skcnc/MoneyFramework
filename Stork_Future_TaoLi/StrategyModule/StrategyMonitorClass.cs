@@ -46,21 +46,23 @@ namespace Stork_Future_TaoLi
             Thread excutedThread = new Thread(new ThreadStart(ThreadProc));
             excutedThread.Start();
 
-            //策略管理线程启动检测未完成策略
-            List<OPENCREATE> remainOpenStra = DBAccessLayer.GetInCompletedOPENStrategy();
-
-            foreach(var item in remainOpenStra)
+            if (DBAccessLayer.DBEnable)
             {
-                QCommands.Enqueue((object)item);
+                //策略管理线程启动检测未完成策略
+                List<OPENCREATE> remainOpenStra = DBAccessLayer.GetInCompletedOPENStrategy();
+
+                foreach (var item in remainOpenStra)
+                {
+                    QCommands.Enqueue((object)item);
+                }
+
+                List<CLOSECREATE> remainCloseStra = DBAccessLayer.GetInCompletedCLOSEStrategy();
+
+                foreach (var item in remainCloseStra)
+                {
+                    QCommands.Enqueue((object)item);
+                }
             }
-
-            List<CLOSECREATE> remainCloseStra = DBAccessLayer.GetInCompletedCLOSEStrategy();
-
-            foreach(var item in remainCloseStra)
-            {
-                QCommands.Enqueue((object)item);
-            }
-
             
 
             Thread.Sleep(1000);
