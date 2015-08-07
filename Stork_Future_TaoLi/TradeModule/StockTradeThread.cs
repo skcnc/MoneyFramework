@@ -8,7 +8,7 @@ using Stork_Future_TaoLi.Variables_Type;
 using Stork_Future_TaoLi.Queues;
 using Stork_Future_TaoLi.Modulars;
 using MCStockLib;
-using Stork_Future_TaoLi.Test;
+using Stork_Future_TaoLi;
 
 namespace Stork_Future_TaoLi.TradeModule
 {
@@ -342,6 +342,7 @@ namespace Stork_Future_TaoLi.TradeModule
                             {
                                 entrustorli[i].Code = trades[i].cSecurityCode;
                                 entrustorli[i].StrategyId = trades[0].belongStrategy;
+                                entrustorli[i].Direction = Convert.ToInt32(trades[0].cTradeDirection);
                                 ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateERRecord), (object)(entrustorli[i]));
                                 queue_query_entrust.GetQueue().Enqueue((object)entrustorli[i]);
                             }

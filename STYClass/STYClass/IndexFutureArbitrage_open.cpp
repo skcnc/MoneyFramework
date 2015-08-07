@@ -77,19 +77,34 @@ bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex* subscribelist
 	 return true;
  }
 
-bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs* m)
+//bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs* m)
+bool   CIndexFutureArbitrage_open::init()
 {
-	IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs = *m;
-	this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
-	this->dExpectOpenDelta = indexfuturearbitrageopenargs.dPositiveOpenDelta; //开仓点位
-	this->bTradingAllowed = indexfuturearbitrageopenargs.bTradingAllowed;
-	m_future.setcode(indexfuturearbitrageopenargs.contractCode); //初始期货
-	m_index.setcode(indexfuturearbitrageopenargs.indexCode);     //初始化指数
+	//IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs = *m;
+	//this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
+	//this->dExpectOpenDelta = indexfuturearbitrageopenargs.dPositiveOpenDelta; //开仓点位
+	//this->bTradingAllowed = indexfuturearbitrageopenargs.bTradingAllowed;
+	//m_future.setcode(indexfuturearbitrageopenargs.contractCode); //初始期货
+	//m_index.setcode(indexfuturearbitrageopenargs.indexCode);     //初始化指数
+	////初始化position文件 
+	//if(indexfuturearbitrageopenargs.weightlistnum==0)  //对于期现套利，必须有权重文件
+	//	return false;   //如果权重文件为空 
+
+	//if (!m_SyntheticIndex.init(indexfuturearbitrageopenargs.weightlist, indexfuturearbitrageopenargs.weightlistnum, indexfuturearbitrageopenargs.positionlist, indexfuturearbitrageopenargs.positionlistnum, indexfuturearbitrageopenargs.indexCode))
+	//	return  false;
+	//	// 初始化模拟指数类型
+	//return   true;
+
+	this->nHands = m_args->nHands;  //手数
+	this->dExpectOpenDelta = m_args->dPositiveOpenDelta; //开仓点位
+	this->bTradingAllowed = m_args->bTradingAllowed;
+	m_future.setcode(m_args->contractCode); //初始期货
+	m_index.setcode(m_args->indexCode);     //初始化指数
 	//初始化position文件 
-	if(indexfuturearbitrageopenargs.weightlistnum==0)  //对于期现套利，必须有权重文件
+	if (m_args->weightlistnum == 0)  //对于期现套利，必须有权重文件
 		return false;   //如果权重文件为空 
 
-	if (!m_SyntheticIndex.init(indexfuturearbitrageopenargs.weightlist, indexfuturearbitrageopenargs.weightlistnum, indexfuturearbitrageopenargs.positionlist, indexfuturearbitrageopenargs.positionlistnum, indexfuturearbitrageopenargs.indexCode))
+	if (!m_SyntheticIndex.init(m_args->weightlist, m_args->weightlistnum, m_args->positionlist, m_args->positionlistnum, m_args->indexCode))
 		return  false;
 		// 初始化模拟指数类型
 	return   true;

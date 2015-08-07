@@ -6,7 +6,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using Stork_Future_TaoLi.Test;
+using Stork_Future_TaoLi;
 using Stork_Future_TaoLi.PreTradeModule;
 using Stork_Future_TaoLi.TradeModule;
 using System.Threading;

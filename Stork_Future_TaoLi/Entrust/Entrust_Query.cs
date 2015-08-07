@@ -1,4 +1,5 @@
 ﻿using MCStockLib;
+using Stork_Future_TaoLi.Database;
 using Stork_Future_TaoLi.Queues;
 using System;
 using System.Collections.Generic;
@@ -18,8 +19,10 @@ namespace Stork_Future_TaoLi.Entrust
 
         #region 单例模式
         private static readonly Entrust_Query _instance = new Entrust_Query();
-        public static Entrust_Query Instance{
-            get{
+        public static Entrust_Query Instance
+        {
+            get
+            {
                 return _instance;
             }
         }
@@ -42,11 +45,12 @@ namespace Stork_Future_TaoLi.Entrust
         #region 线程执行函数
         private void threadproc()
         {
-            while (true) {
+            while (true)
+            {
 
                 Thread.Sleep(1);
-            
-                if((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 5)
+
+                if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 5)
                 {
                     log.LogEvent("由于供血不足，委托查询线程即将退出。");
                     break;
@@ -54,7 +58,7 @@ namespace Stork_Future_TaoLi.Entrust
 
                 //单次循环最多查询100个交易的委托情况
                 int maxCount = 100;
-                
+
 
                 while (maxCount > 0 && queue_query_entrust.GetQueueNumber() > 0)
                 {
@@ -67,29 +71,38 @@ namespace Stork_Future_TaoLi.Entrust
                     string err = string.Empty;
 
                     //查询委托及获取实例
-                    List<managedEntrustreturnstruct> rets = _classTradeStock.QueryEntrust(item, err).ToList();
+                    managedEntrustreturnstruct rets = _classTradeStock.QueryEntrust(item, err).ToList()[0];
 
+
+                    //目前仅考虑 1对1 返回的情况，不考虑出现1对多 ，类似基金交易的情况
                     //将委托变动返回更新数据库
                     if (DBAccessLayer.DBEnable == true)
                     {
-                        foreach(var rec in rets){
+                        //更新数据，记录入数据库
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(rets));
 
-                            //更新数据，记录入数据库
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(rec));
-
-                            //此处判断，相应代码的委托是否完成
-                            //此处逻辑需要待返回报文内容确认后修改
-                            if (rec.cOrderStatus.ToString() != "end")
-                            {
-                                queue_query_entrust.GetQueue().Enqueue((object)item);
-                                continue;
-                            }
+                        //此处判断，相应代码的委托是否完成
+                        //此处逻辑需要待返回报文内容确认后修改
+                        if (rets.cOrderStatus.ToString() != "end")
+                        {
+                            queue_query_entrust.GetQueue().Enqueue((object)item);
+                            continue;
+                        }
 
 
-                            //委托已经完成，进入成交状态查询
+                        //委托已经完成，进入成交状态查询
+                        var retbargin = _classTradeStock.QueryTrader(item, err).ToList();
 
-                            //更新持仓表
-                            
+                        //将查询信息记录成交表
+                        if (retbargin.Count > 0)
+                        {
+                            managedBargainreturnstruct bargin = retbargin.ToList()[0];
+                            bargin.strategyId = item.StrategyId;
+                            bargin.direction = item.Direction;
+                            DBAccessLayer.CreateDLRecord((object)bargin);
+
+                            //更新持仓列表
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
                         }
                     }
                 }
