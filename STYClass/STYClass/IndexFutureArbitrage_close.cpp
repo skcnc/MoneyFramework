@@ -82,9 +82,9 @@ namespace STYClass
 		return true;
 	}
 
-	bool     CIndexFutureArbitrage_close::init(IndexFutureArbitragecloseinputargs      indexfuturearbitragecloseargs)	//初始化设置，导入权重数据  更新股票列表  
+	bool     CIndexFutureArbitrage_close::init()	//初始化设置，导入权重数据  更新股票列表  
 	{
-
+		IndexFutureArbitragecloseinputargs  indexfuturearbitragecloseargs = *m_args;
 		this->nHands = indexfuturearbitragecloseargs.nHands;  //手数
 		this->dStockBonus = indexfuturearbitragecloseargs.dStockBonus;
 		this->dGiftValue = indexfuturearbitragecloseargs.dGiftValue;

@@ -74,6 +74,20 @@ namespace Stork_Future_TaoLi.Controllers
             }
         }
 
+        public string MatchOpenPara(String strategyId)
+        {
+            try
+            {
+
+
+                return string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
         public string AjaxTest(FileStream file)
         {
             string s = file.Name;

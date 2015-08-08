@@ -128,6 +128,9 @@
     <ClCompile Include="managedSTYClass.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="IndexFutureArbitrage_close.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

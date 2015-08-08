@@ -152,9 +152,9 @@ namespace Stork_Future_TaoLi
         public Basic basic { get; set; }
 
         /// <summary>
-        /// 平仓关联开仓ID
+        /// 权重文件
         /// </summary>
-        public string OpenStraID { get; set; }
+        public String WEIGHT { get; set; }
 
         /// <summary>
         /// 合约
@@ -204,16 +204,32 @@ namespace Stork_Future_TaoLi
         /// Open Basis
         /// </summary>
         public float OB { get; set; }
+
+        /// <summary>
+        /// 预付费率
+        /// </summary>
+        public float CHARGE { get; set; }
     }
 
     public class CLOSEMODIFY
     {
-        public Basic basic { get; set; }
 
         /// <summary>
         /// 修改平仓实例ID
         /// </summary>
         public String ID { get; set; }
+
+        public Basic basic { get; set; }
+
+        /// <summary>
+        /// 权重文件
+        /// </summary>
+        public String WEIGHT { get; set; }
+
+        /// <summary>
+        /// 合约
+        /// </summary>
+        public string CT { get; set; }
 
         /// <summary>
         /// 空头点位
@@ -253,12 +269,16 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public decimal PROSPECTIVEARNINGS { get; set; }
 
-
         /// <summary>
         /// 开仓基差
         /// Open Basis
         /// </summary>
         public float OB { get; set; }
+
+        /// <summary>
+        /// 预付费率
+        /// </summary>
+        public float CHARGE { get; set; }
     }
 
     /// <summary>

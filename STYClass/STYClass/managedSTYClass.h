@@ -69,6 +69,29 @@ namespace managedSTY
 		bool bTradingAllowed;  //是否允许交易
 	};
 
+	public ref struct close_args{
+		array<managedIndexWeights^>^ weightlist;//权重文件
+		int weightlistnum; //权重文件数量
+
+		array<managedstockposition^>^ positionlist; //显示持仓
+		int positionlistNUM;
+
+		int nHands; //手数
+		String^ indexCode; //指数
+		String^ contractCode; //期货合约
+
+		double dStockBonus = 0;		//分红
+		double dGiftValue = 0;		//送股
+		double dStockOpenCost = 0;  //开仓成本
+		double dFutureSellPoint = 0; //期货开仓点
+
+		double dOpenedPoint = 0;   //开仓基差点位
+		double dExpectedGain = 0;  //预计收益
+		double dShortCharge = 0;  //预估费率
+
+		bool  bTradingAllowed;//是否允许交易,勾"允许"时置为true	
+	};
+
 	public ref struct managedMarketInforStruct{
 		managedsecurityindex^ msecurity;
 		String^    security_name;		//名称
@@ -198,6 +221,24 @@ namespace managedSTY
 		}
 	};
 
+
+	//界面显示变量
+	public ref struct managedIndexFutureArbitragecloseshowargs
+	{
+		double dTotalStockMarketValue = 0;  //股票市值
+		double 	dStopedStockValue = 0;   //停牌市值
+		double 	dDownlimitStockValue = 0;   //跌停市值
+		double dTotalStockSellStrike = 0;  //股票冲击
+		double drealStockIncome = 0; //真实股票卖出收益
+		double dActualStockGain = 0; //真实股票收益（考虑费用 冲击）
+
+		double dFutureBuyStrike = 0; //期货买入冲击
+		double dActualFutureGain = 0;  //真实期货收益
+		double dtotalgain = 0;		 //全部收益
+		double  dzerobpgain = 0;	 //到0基差收益
+		String^ statusmsg;			//错误原因 或状态
+	};
+
 	public ref class Strategy_OPEN
 	{
 	public:
@@ -205,22 +246,51 @@ namespace managedSTY
 		virtual ~Strategy_OPEN();
 
 	public:
+		/************行情部分********/
 		void updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num); //获得行情信息
+		array<managedsecurityindex^>^ getsubscribelist();
 		//bool getsubscribelist(array<managedsecurityindex^>^ securityIndex, int num);//获得订阅的股票，必须在初始化后调用
 
-		array<managedsecurityindex^>^ getsubscribelist();
-
+		/**********策略执行*******/
 		void init(open_args^ m); //初始化设置，导入权重数据  更新股票列表  
 		void calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
 		void isOpenPointReached(bool^ open); //是否达到开仓点，行情，资金
 
+		/*****显示参数****/
 		//bool   gettaderargs(open_args^ realargs);    //获得实际运行中的参数 包含samp文件
 		void getshowstatus(String^ status); 
 
-		//bool getTradeList(array<managedTraderorderstruct^>^ orderlist, int^ num);
+		/**********获取交易*******/
 		array<managedTraderorderstruct^>^ getTradeList();
 
 	private:
 		CIndexFutureArbitrage_open* m_open_strategy;
+	};
+
+	public ref class Strategy_CLOSE
+	{
+	public :
+		Strategy_CLOSE();
+		virtual ~Strategy_CLOSE();
+
+	public:
+		/************行情部分********/
+		void updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num);//获得行情信息
+		array<managedsecurityindex^>^ getsubscribelist();
+
+		/**********策略执行*******/
+		void init(close_args^ m);
+		void calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
+		void isOpenPointReached(bool^ open); //是否达到开仓点，行情，资金
+
+		/*****显示参数****/
+		close_args^ gettradeargs();
+		managedIndexFutureArbitragecloseshowargs^ getshowstatus();
+
+		/**********获取交易*******/
+		array<managedTraderorderstruct^>^ getTradeList();
+
+	private:
+		CIndexFutureArbitrage_close* m_close_strategy;
 	};
 }

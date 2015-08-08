@@ -102,6 +102,7 @@
     <ClCompile Include="DepthMarketData.cpp" />
     <ClCompile Include="Future.cpp" />
     <ClCompile Include="Index.cpp" />
+    <ClCompile Include="IndexFutureArbitrage_close.cpp" />
     <ClCompile Include="IndexFutureArbitrage_open.cpp" />
     <ClCompile Include="Log4C.cpp" />
     <ClCompile Include="managedSTYClass.cpp" />
