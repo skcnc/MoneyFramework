@@ -51,7 +51,6 @@ namespace Stork_Future_TaoLi
                 //策略管理线程启动检测未完成策略
                 List<OPENCREATE> remainOpenStra = DBAccessLayer.GetInCompletedOPENStrategy();
 
-
                 foreach (var item in remainOpenStra)
                 {
                     QCommands.Enqueue((object)item);
@@ -138,6 +137,7 @@ namespace Stork_Future_TaoLi
                 newWorker.close_para.SP = value.SP;
                 newWorker.HD = value.HD;
                 Dictionary<string, int> oli = new Dictionary<string, int>();
+                Dictionary<string, double> weili = new Dictionary<string, double>();
 
                 foreach (var item in value.POSITION.Split('\n'))
                 {
@@ -148,7 +148,17 @@ namespace Stork_Future_TaoLi
                     }
                 }
 
+                //foreach (var item in value.WEIGHT.Split('\n'))
+                //{
+                //    if (item.Trim() == string.Empty) { continue; }
+                //    else
+                //    {
+                //        weili.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToDouble(item.Split(';')[2]));
+                //    }
+                //}
+
                 newWorker.LiStockOrder = oli;
+                newWorker.close_para.WeightList = weili;
                 newWorker.Type = "CLOSE";
 
                 newWorker.bAllow = false;
@@ -160,6 +170,7 @@ namespace Stork_Future_TaoLi
                 newWorker.close_para.SA = value.STOCKALLOTMENT;
                 newWorker.close_para.PE = value.PROSPECTIVEARNINGS;
                 newWorker.close_para.BASIS = value.OB;
+                newWorker.close_para.Charge = value.CHARGE;
 
                 if (DBAccessLayer.DBEnable)
                 {

@@ -98,30 +98,59 @@ array<managedEntrustreturnstruct^>^  managedStockClass::QueryEntrust(managedQuer
 		{
 			managedRet[i] = gcnew managedEntrustreturnstruct();
 
-			managedRet[i]->cSecurity_code = gcnew String(ret->cSecurity_code);
-			managedRet[i]->security_name = gcnew String(ret->security_name);
-			managedRet[i]->cOrderSysID = gcnew String(ret->cOrderSysID);
-			managedRet[i]->cInsertDate = gcnew String(ret->cInsertDate);
-			managedRet[i]->cInsertTime = gcnew String(ret->cInsertTime);
-			managedRet[i]->cCancelTime = gcnew String(ret->cCancelTime);
+			managedRet[i]->cSecurity_code = gcnew String(ret[i].cSecurity_code);
+			managedRet[i]->security_name = gcnew String(ret[i].security_name);
+			managedRet[i]->cOrderSysID = gcnew String(ret[i].cOrderSysID);
+			managedRet[i]->cInsertDate = gcnew String(ret[i].cInsertDate);
+			managedRet[i]->cInsertTime = gcnew String(ret[i].cInsertTime);
+			managedRet[i]->cCancelTime = gcnew String(ret[i].cCancelTime);
 
-			managedRet[i]->nVolumeTotalOriginal = (int)(ret->nVolumeTotalOriginal);
-			managedRet[i]->nVolumeTraded = (int)(ret->nVolumeTraded);
-			managedRet[i]->nVolumeTotal = (int)(ret->nVolumeTotal);
-			managedRet[i]->withdraw_ammount = (int)(ret->withdraw_ammount);
-			managedRet[i]->frozen_money = (float)(ret->frozen_money);
-			managedRet[i]->frozen_amount = (int)(ret->frozen_amount);
+			managedRet[i]->nVolumeTotalOriginal = (int)(ret[i].nVolumeTotalOriginal);
+			managedRet[i]->nVolumeTraded = (int)(ret[i].nVolumeTraded);
+			managedRet[i]->nVolumeTotal = (int)(ret[i].nVolumeTotal);
+			managedRet[i]->withdraw_ammount = (int)(ret[i].withdraw_ammount);
+			managedRet[i]->frozen_money = (float)(ret[i].frozen_money);
+			managedRet[i]->frozen_amount = (int)(ret[i].frozen_amount);
 
-			managedRet[i]->cOrderStatus = ret->cOrderStatus;
-			managedRet[i]->cOrderType = ret->cOrderType;
+			managedRet[i]->cOrderStatus = ret[i].cOrderStatus;
+			managedRet[i]->cOrderType = ret[i].cOrderType;
 		}
+	}
+	return managedRet;
+}
 
-		return managedRet;
-	}
-	else
+array<managedBargainreturnstruct^>^ managedStockClass::QueryTrader(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg){
+	QueryEntrustorderstruct query = queryEntrust->createInstance();
+	Bargainreturnstruct* ret = new Bargainreturnstruct[1];
+
+	int count = 0;
+	char* errmsg;
+
+	array<managedBargainreturnstruct^>^ managedRet;
+
+	//C++ 版成交查询还未完成
+	//bool b = m_cstockTrader->querytrader(query, ret, count, errmsg);
+
+	bool b = true;
+
+	if (b == true)
 	{
-		return managedRet;
+		for (int i = 0; i < count; i++){
+			managedRet[i] = gcnew managedBargainreturnstruct();
+			managedRet[i]->Security_code = gcnew String(ret[i].cSecurity_code);
+			managedRet[i]->Security_name = gcnew String(ret[i].security_name);
+			managedRet[i]->OrderSysID = gcnew String(ret[i].cOrderSysID);
+			managedRet[i]->OrderStatus = ret[i].cOrderStatus;
+			managedRet[i]->OrderType = ret[i].cOrderType;
+			managedRet[i]->stock_amount = ret[i].stock_ammount;
+			managedRet[i]->bargain_price = ret[i].bargain_price;
+			managedRet[i]->bargain_money = ret[i].bargain_money;
+			managedRet[i]->bargain_time = gcnew String(ret[i].bargain_time);
+			managedRet[i]->bargain_no = ret[i].bargain_no;
+		}
 	}
+	
+	return managedRet;
 }
 
 //查询连接状态

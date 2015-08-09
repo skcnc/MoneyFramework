@@ -31,5 +31,6 @@ namespace Stork_Future_TaoLi.Database
         public Nullable<System.DateTime> ER_ORDER_TIME { get; set; }
         public Nullable<System.DateTime> ER_CANCEL_TIME { get; set; }
         public Nullable<bool> ER_COMPLETED { get; set; }
+        public Nullable<int> ER_DIRECTION { get; set; }
     }
 }

@@ -15,8 +15,8 @@ namespace Stork_Future_TaoLi.Database
     public partial class OL_TAOLI_LIST_TABLE
     {
         public System.Guid OL_GUID { get; set; }
+        public string SG_ID { get; set; }
         public string OL_LIST { get; set; }
         public Nullable<System.DateTime> OL_TIME { get; set; }
-        public string SG_ID { get; set; }
     }
 }

@@ -5,13 +5,13 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="2200c20331cf4a2fb147f2ad2b8d1679" Name="Diagram1" ZoomLevel="91">
-        <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_STATUS_TABLE" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="MoneyEntityModel.CC_TAOLI_TABLE" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.DL_TAOLI_TABLE" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.ER_TAOLI_TABLE" Width="1.5" PointX="4.75" PointY="0.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" Width="1.5" PointX="0.75" PointY="5.75" />
-        <EntityTypeShape EntityType="MoneyEntityModel.ER_TAOLI_TABLE" Width="1.5" PointX="3.375" PointY="4.75" />
-        <EntityTypeShape EntityType="MoneyEntityModel.DL_TAOLI_TABLE" Width="1.5" PointX="5.375" PointY="3.75" />
-        <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" Width="1.5" PointX="0.75" PointY="0.75" />
-        <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_OPEN_TABLE" Width="1.5" PointX="7.75" PointY="0.75" />
-        <EntityTypeShape EntityType="MoneyEntityModel.CC_TAOLI_TABLE" Width="1.5" PointX="7.375" PointY="5.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_OPEN_TABLE" Width="1.5" PointX="6.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_STATUS_TABLE" Width="1.5" PointX="2.75" PointY="6.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" Width="1.5" PointX="4.75" PointY="6.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

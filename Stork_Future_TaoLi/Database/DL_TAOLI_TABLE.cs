@@ -26,5 +26,6 @@ namespace Stork_Future_TaoLi.Database
         public Nullable<double> DL_BARGAIN_MONEY { get; set; }
         public string DL_BARGAIN_TIME { get; set; }
         public string DL_NO { get; set; }
+        public Nullable<bool> DL_LOAD { get; set; }
     }
 }

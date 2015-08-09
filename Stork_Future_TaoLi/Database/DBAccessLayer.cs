@@ -79,7 +79,7 @@ namespace Stork_Future_TaoLi
             {
                 SG_GUID = Guid.NewGuid(),
                 SG_ID = close.basic.ID,
-                SG_OPEN_ID = close.OpenStraID,
+                SG_OPEN_ID = close.Open_ID,
                 SG_INIT_POSITION_LIST = close.POSITION,
                 SG_LATEST_POSITION_LIST = close.POSITION,
                 SG_FUTURE_CONTRACT = close.CT,
@@ -161,7 +161,6 @@ namespace Stork_Future_TaoLi
         /// <param name="orderId">委托编号</param>
         /// <param name="ordertype">委托类型</param>
         /// <param name="exchangeid">交易所</param>
-        //public static void CreateERRecord(string strategyId,string orderId,string ordertype,string exchangeid,string code)
         public static void CreateERRecord(object item)
         {
             if (item == null) return;
@@ -175,7 +174,8 @@ namespace Stork_Future_TaoLi
                 ER_STRATEGY = entrust.StrategyId,
                 ER_ORDER_TYPE = entrust.cSecurityType.ToString(),
                 ER_ORDER_EXCHANGE_ID = entrust.cExchangeID,
-                ER_CODE = entrust.Code
+                ER_CODE = entrust.Code,
+                ER_DIRECTION = entrust.Direction
             };
 
             DbEntity.ER_TAOLI_TABLE.Add(record);
@@ -223,19 +223,37 @@ namespace Stork_Future_TaoLi
 
         /// <summary>
         /// 添加交易记录
+        /// 成交记录只在委托完成后记录，如果委托未完成，就等它完成
+        /// 因此这张表只会增加，不会删除或者修改
+        /// --2015.08-07
         /// </summary>
         /// <param name="ret"></param>
         public static void CreateDLRecord(object ret)
         {
+            managedBargainreturnstruct record = (managedBargainreturnstruct)ret;
 
+            if (record != null)
+            {
+                DL_TAOLI_TABLE item = new DL_TAOLI_TABLE() { 
+                    DL_GUID = Guid.NewGuid(),
+                    DL_STRATEGY = record.strategyId,
+                    DL_DIRECTION = record.direction,
+                    DL_CODE=record.Security_code,
+                    DL_NAME = record.Security_name,
+                    DL_STATUS = record.OrderStatus.ToString(),
+                    DL_TYPE = record.OrderType.ToString(),
+                    DL_STOCK_AMOUNT = record.stock_amount,
+                    DL_BARGAIN_PRICE = record.bargain_price,
+                    DL_BARGAIN_MONEY = record.bargain_money,
+                    DL_BARGAIN_TIME = record.bargain_time,
+                    DL_NO  = record.bargain_no.ToString(),
+                    DL_LOAD = true
+                };
+
+                DbEntity.DL_TAOLI_TABLE.Add(item);
+                DbEntity.SaveChanges();
+            }
         }
-
-        /// <summary>
-        /// 更新持仓
-        /// </summary>
-        /// <param name="change"></param>
-        public static void UpdateCCRecord(object change) { }
-
 
         /// <summary>
         /// 获得上次退出时未完成的开仓实例
@@ -305,6 +323,115 @@ namespace Stork_Future_TaoLi
             }
 
             return IncompletedStrategies;
+        }
+
+        /// <summary>
+        /// 单笔成交查询回报更新持仓文件
+        /// </summary>
+        /// <param name="v"></param>
+        public static void UpdateCCRecords(object v)
+        {
+
+            managedBargainreturnstruct bargin = (managedBargainreturnstruct)v;
+
+            if(bargin == null)
+            {
+                return;
+            }
+
+            string code = bargin.Security_code;
+            string type = bargin.OrderType.ToString();
+            int amount = bargin.stock_amount;
+            double price = bargin.bargain_price;
+            int direction = bargin.direction;
+            string user = string.Empty;
+            string strategy = bargin.strategyId;
+
+
+            var sg_open_li = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == bargin.strategyId && item.SG_STATUS == 0 select item);
+            var sg_close_li = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == bargin.strategyId && item.SG_STATUS == 0 select item);
+
+            if(sg_open_li.Count() == 0 && sg_close_li.Count() == 0)
+            {
+                GlobalErrorLog.LogInstance.LogEvent("策略不存在--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
+                return;
+            }
+
+            if(sg_close_li.Count()!=0)
+            {
+                user = sg_close_li.ToList()[0].SG_USER;
+            }
+            else
+            {
+                user = sg_open_li.ToList()[0].SG_USER;
+            }
+
+            var selectedrecord = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_TYPE == type && item.CC_USER == user select item);
+
+            if(selectedrecord.Count() == 0)
+            {
+                //说明数据库中不存在当前票券的持仓
+                if (direction == (int)TradeDirection.Buy)
+                {
+                    CC_TAOLI_TABLE record = new CC_TAOLI_TABLE()
+                    {
+                        CC_CODE = code,
+                        CC_TYPE = type,
+                        CC_AMOUNT = amount,
+                        CC_BUY_PRICE = price,
+                        CC_USER = user
+                    };
+
+                    DbEntity.CC_TAOLI_TABLE.Add(record);
+                    DbEntity.SaveChanges();
+                    return;
+                }
+                else
+                {
+                    //不可能持仓列表是负值，肯定有问题
+                    GlobalErrorLog.LogInstance.LogEvent("对空仓卖出--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
+                    return;
+                }
+            }
+            else
+            {
+                var record = selectedrecord.ToList()[0];
+
+                int? db_amount = record.CC_AMOUNT;
+                double? db_price = record.CC_BUY_PRICE;
+
+                if (db_amount == null || db_price == null)
+                { return; }
+
+                //对该券有仓位
+                if(direction == (int)TradeDirection.Buy)
+                {
+                    record.CC_BUY_PRICE = (db_amount * db_price + amount * price) / (db_amount + amount);
+                    record.CC_AMOUNT = db_amount + amount;
+
+                    DbEntity.SaveChanges();
+                }
+                else
+                {
+                    if (db_amount < amount)
+                    {
+                        GlobalErrorLog.LogInstance.LogEvent("持仓小于卖出--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
+                        return;
+                    }
+
+                    else
+                    {
+                        record.CC_BUY_PRICE = (db_amount * db_price - amount * price) / (db_amount - amount);
+                        record.CC_AMOUNT = db_amount - amount;
+
+                        DbEntity.SaveChanges();
+                        return;
+                    }
+                }
+
+            }
+            
+            
         }
 
     }

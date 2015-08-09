@@ -6,6 +6,18 @@ namespace STYClass
 {
 	CIndexFutureArbitrage_close::CIndexFutureArbitrage_close(void)
 	{
+		dTotalStockMarketValue=0;  //股票市值
+		dStopedStockValue=0;   //停牌市值
+		dDownlimitStockValue=0;   //跌停市值
+		dTotalStockSellStrike=0;  //股票冲击
+		drealStockIncome=0; //真实股票卖出收益
+		dActualStockGain=0; //真实股票收益（考虑费用 冲击）
+
+		dFutureBuyStrike=0; //期货买入冲击
+		dActualFutureGain=0;  //真实期货收益
+
+		 dzerobpgain=0;  //到0基差收益
+	
 
 	}
 
@@ -70,9 +82,9 @@ namespace STYClass
 		return true;
 	}
 
-	bool     CIndexFutureArbitrage_close::init(IndexFutureArbitragecloseinputargs      indexfuturearbitragecloseargs)	//初始化设置，导入权重数据  更新股票列表  
+	bool     CIndexFutureArbitrage_close::init()	//初始化设置，导入权重数据  更新股票列表  
 	{
-
+		IndexFutureArbitragecloseinputargs  indexfuturearbitragecloseargs = *m_args;
 		this->nHands = indexfuturearbitragecloseargs.nHands;  //手数
 		this->dStockBonus = indexfuturearbitragecloseargs.dStockBonus;
 		this->dGiftValue = indexfuturearbitragecloseargs.dGiftValue;
@@ -113,19 +125,25 @@ namespace STYClass
 	{
 		if (!this->m_SyntheticIndex.isupdated() || !this->m_future.isupdated()) //行情
 		{
+			strcpy(this->statusmsg, "行情有问题");
 			return false;
 		}
 
 		if (!CTimeUtil::isAutoTradingTime())  //交易时间
 		{
+			strcpy(this->statusmsg, "非交易时间");
 			return false;
 		}
 		if (dActualFutureGain + dActualStockGain < this->dExpectedGain)
 		{
+			strcpy(this->statusmsg, "等待交易");
 			return false;
 		}
 		else
+		{
+			strcpy(this->statusmsg, "正常运行");
 			return true;
+		}
 	}
 
 	/*****显示参数****/
@@ -181,7 +199,15 @@ namespace STYClass
 			m_stockorders[stockordernum].dOrderprice = itor->dlastprice*0.98;   //以2%的溢价限价卖出
 			if (m_stockorders[stockordernum].dOrderprice< itor->ddownlimitprice)
 				m_stockorders[stockordernum].dOrderprice = itor->ddownlimitprice;  //跌停价
+			strcpy(m_stockorders[stockordernum].cExchangeID, getExchangeNumByStockCode(itor->sSecurity.cSecurity_code));
 
+			m_stockorders[stockordernum].cOffsetFlag = 0;  //股票不需要
+			m_stockorders[stockordernum].cOrderexecutedetail = 0; //保留 暂不使用
+			m_stockorders[stockordernum].cOrderlevel = 1;  //优先级
+			m_stockorders[stockordernum].cOrderPriceType = 0; //股票只有限价单  不需要
+			m_stockorders[stockordernum].cTraderdirection = '2';
+			//‘1’---- - 买入（所有市场，特殊使用参见功能号0x201录入委托功能号的说明）
+			//‘2’---- - 卖出（所有市场，特殊使用参见功能号0x20
 			/**********************/
 			itor++;
 			stockordernum++;

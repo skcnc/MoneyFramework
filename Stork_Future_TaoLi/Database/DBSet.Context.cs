@@ -25,12 +25,12 @@ namespace Stork_Future_TaoLi.Database
             throw new UnintentionalCodeFirstException();
         }
     
-        public DbSet<SG_TAOLI_STATUS_TABLE> SG_TAOLI_STATUS_TABLE { get; set; }
-        public DbSet<OL_TAOLI_LIST_TABLE> OL_TAOLI_LIST_TABLE { get; set; }
-        public DbSet<ER_TAOLI_TABLE> ER_TAOLI_TABLE { get; set; }
-        public DbSet<DL_TAOLI_TABLE> DL_TAOLI_TABLE { get; set; }
-        public DbSet<SG_TAOLI_CLOSE_TABLE> SG_TAOLI_CLOSE_TABLE { get; set; }
-        public DbSet<SG_TAOLI_OPEN_TABLE> SG_TAOLI_OPEN_TABLE { get; set; }
         public DbSet<CC_TAOLI_TABLE> CC_TAOLI_TABLE { get; set; }
+        public DbSet<DL_TAOLI_TABLE> DL_TAOLI_TABLE { get; set; }
+        public DbSet<ER_TAOLI_TABLE> ER_TAOLI_TABLE { get; set; }
+        public DbSet<OL_TAOLI_LIST_TABLE> OL_TAOLI_LIST_TABLE { get; set; }
+        public DbSet<SG_TAOLI_OPEN_TABLE> SG_TAOLI_OPEN_TABLE { get; set; }
+        public DbSet<SG_TAOLI_STATUS_TABLE> SG_TAOLI_STATUS_TABLE { get; set; }
+        public DbSet<SG_TAOLI_CLOSE_TABLE> SG_TAOLI_CLOSE_TABLE { get; set; }
     }
 }

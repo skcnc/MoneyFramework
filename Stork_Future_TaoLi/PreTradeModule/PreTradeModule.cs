@@ -5,7 +5,7 @@ using System.Web;
 using Stork_Future_TaoLi.Variables_Type;
 using Stork_Future_TaoLi.Modulars;
 using System.Threading;
-using Stork_Future_TaoLi.Test;
+using Stork_Future_TaoLi;
 
 namespace Stork_Future_TaoLi.PreTradeModule
 {
@@ -156,11 +156,11 @@ namespace Stork_Future_TaoLi.PreTradeModule
                 log.LogEvent("入队交易数量：" + tos.Count.ToString());
 
                 //获取到新的list
-                List<TradeOrderStruct> stocks_sh = (from item in tos where item.cTradeDirection == TradeDirection.Buy && item.cExhcnageID == ExhcnageID.SH select item).OrderBy(i => i.cOrderLevel).ToList();
+                List<TradeOrderStruct> stocks_sh = (from item in tos where item.cTradeDirection == "b" && item.cExhcnageID == ExhcnageID.SH select item).OrderBy(i => i.cOrderLevel).ToList();
 
-                List<TradeOrderStruct> stocks_sz = (from item in tos where item.cTradeDirection == TradeDirection.Buy && item.cExhcnageID == ExhcnageID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
+                List<TradeOrderStruct> stocks_sz = (from item in tos where item.cTradeDirection == "b" && item.cExhcnageID == ExhcnageID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
 
-                List<TradeOrderStruct> future = (from item in tos where item.cTradeDirection == TradeDirection.Buy select item).OrderBy(i => i.cOrderLevel).ToList();
+                List<TradeOrderStruct> future = (from item in tos where item.cTradeDirection == "b" select item).OrderBy(i => i.cOrderLevel).ToList();
 
                 //将新的list推送到对应的线程控制器
                 #region 交易送入队列

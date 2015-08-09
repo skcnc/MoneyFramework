@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using Stork_Future_TaoLi.Test;
+using Stork_Future_TaoLi;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -71,6 +71,20 @@ namespace Stork_Future_TaoLi.Controllers
             catch(Exception ex)
             {
                 return ex.ToString();
+            }
+        }
+
+        public string MatchOpenPara(String strategyId)
+        {
+            try
+            {
+
+
+                return string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
             }
         }
 

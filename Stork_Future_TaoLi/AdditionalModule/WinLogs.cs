@@ -77,6 +77,7 @@ namespace Stork_Future_TaoLi
         {
             get
             {
+                
                 if (errLog == null)
                     errLog = new LogWirter();
 

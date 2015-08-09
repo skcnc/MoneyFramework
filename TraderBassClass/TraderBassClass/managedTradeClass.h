@@ -23,6 +23,7 @@ namespace MCStockLib
 		void HeartBeat();
 		int cal(String^ msg);
 		array<managedEntrustreturnstruct^>^  QueryEntrust(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg);
+		array<managedBargainreturnstruct^>^ QueryTrader(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg);
 
 		
 	private:

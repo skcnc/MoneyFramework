@@ -113,6 +113,7 @@ namespace MCStockLib
 		String^ cOrderSysID;
 		String^ Code;
 		String^ StrategyId;
+		int Direction;
 
 		managedQueryEntrustorderstruct(char mcSecurityType, String^ mcExchangeID ,String^ mcOrderSysID)
 		{
@@ -178,6 +179,42 @@ namespace MCStockLib
 			strcpy_s(instance.cCancelTime, 9, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cCancelTime));
 
 			return instance;
+		}
+	};
+
+
+	public ref struct managedBargainreturnstruct{
+		
+		String^ Security_code;
+		String^ Security_name;
+		String^ OrderSysID;
+		char OrderStatus;
+		char OrderType;
+		long stock_amount;
+		double bargain_price;
+		double bargain_money;
+		String^ bargain_time;
+		long bargain_no;
+		String^ strategyId;
+		int direction;
+
+
+		Bargainreturnstruct CreateInstance(){
+			Bargainreturnstruct instance;
+
+			strcpy_s(instance.cSecurity_code, 31, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Security_code));
+			strcpy_s(instance.security_name, 31, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Security_name));
+			strcpy_s(instance.cOrderSysID, 31, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(OrderSysID));
+			instance.cOrderStatus = OrderStatus;
+			instance.cOrderType = OrderType;
+			instance.stock_ammount = stock_amount;
+			instance.bargain_price = bargain_price;
+			instance.bargain_money = bargain_money;
+			strcpy_s(instance.bargain_time, 9, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(bargain_time));
+			instance.bargain_no = bargain_no;
+
+			return instance;
+
 		}
 	};
 }

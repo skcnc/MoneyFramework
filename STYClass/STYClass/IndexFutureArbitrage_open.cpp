@@ -6,7 +6,7 @@ namespace STYClass
 {
 CIndexFutureArbitrage_open::CIndexFutureArbitrage_open(void)
 {
-//   bTradingAllowed=false;//是否允许交易,勾"允许"时置为true	 用于返回 
+   bTradingAllowed=false;//是否允许交易,勾"允许"时置为true	 用于返回 
    dSimIndex=0;			   //模拟指数大小
    dSimerrorPre=0;           //模拟误差，百分比 
    dSimtraderPre = 0;		 	   //交易指数大小
@@ -77,22 +77,36 @@ bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex* subscribelist
 	 return true;
  }
 
-bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs* m)
+//bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs* m)
+void  CIndexFutureArbitrage_open::init()
 {
-	IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs = *m;
-	this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
-	this->dExpectOpenDelta = indexfuturearbitrageopenargs.dPositiveOpenDelta; //开仓点位
+	//IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs = *m;
+	//this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
+	//this->dExpectOpenDelta = indexfuturearbitrageopenargs.dPositiveOpenDelta; //开仓点位
 	//this->bTradingAllowed = indexfuturearbitrageopenargs.bTradingAllowed;
-	m_future.setcode(indexfuturearbitrageopenargs.contractCode); //初始期货
-	m_index.setcode(indexfuturearbitrageopenargs.indexCode);     //初始化指数
-	//初始化position文件 
-	if(indexfuturearbitrageopenargs.weightlistnum==0)  //对于期现套利，必须有权重文件
-		return false;   //如果权重文件为空 
+	//m_future.setcode(indexfuturearbitrageopenargs.contractCode); //初始期货
+	//m_index.setcode(indexfuturearbitrageopenargs.indexCode);     //初始化指数
+	////初始化position文件 
+	//if(indexfuturearbitrageopenargs.weightlistnum==0)  //对于期现套利，必须有权重文件
+	//	return false;   //如果权重文件为空 
 
-	if (!m_SyntheticIndex.init(indexfuturearbitrageopenargs.weightlist, indexfuturearbitrageopenargs.weightlistnum, indexfuturearbitrageopenargs.positionlist, indexfuturearbitrageopenargs.positionlistnum, indexfuturearbitrageopenargs.indexCode))
-		return  false;
-		// 初始化模拟指数类型
-	return   true;
+	//if (!m_SyntheticIndex.init(indexfuturearbitrageopenargs.weightlist, indexfuturearbitrageopenargs.weightlistnum, indexfuturearbitrageopenargs.positionlist, indexfuturearbitrageopenargs.positionlistnum, indexfuturearbitrageopenargs.indexCode))
+	//	return  false;
+	//	// 初始化模拟指数类型
+	//return   true;
+
+	this->nHands = m_args->nHands;  //手数
+	this->dExpectOpenDelta = m_args->dPositiveOpenDelta; //开仓点位
+	this->bTradingAllowed = m_args->bTradingAllowed;
+	m_future.setcode(m_args->contractCode); //初始期货
+	m_index.setcode(m_args->indexCode);     //初始化指数
+	//初始化position文件 
+	if (m_args->weightlistnum == 0)  //对于期现套利，必须有权重文件
+		return;
+
+	if (!m_SyntheticIndex.init(m_args->weightlist, m_args->weightlistnum, m_args->positionlist, m_args->positionlistnum, m_args->indexCode))
+		return;
+
 }
 
 bool CIndexFutureArbitrage_open::calculateSimTradeStrikeAndDelta() //计算模拟指数，交易指数，调整基差
@@ -141,7 +155,7 @@ bool   CIndexFutureArbitrage_open::gettaderargs(IndexFutureArbitrageopeninputarg
 {
 	realargs.nHands=this->nHands;  //手数
 	realargs.dPositiveOpenDelta=this->dExpectOpenDelta; //开仓点位
-	//realargs.bTradingAllowed=this->bTradingAllowed;
+	realargs.bTradingAllowed=this->bTradingAllowed;
 	strcpy(realargs.contractCode, m_future.m_DepthMarketData.msecurity.cSecurity_code); //初始期货
 	strcpy(realargs.indexCode, m_index.m_DepthMarketData.msecurity.cSecurity_code);    //初始化指数
 	//复制position文件  weight文件不返回 
