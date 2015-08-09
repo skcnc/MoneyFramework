@@ -79,7 +79,7 @@ namespace Stork_Future_TaoLi
             {
                 SG_GUID = Guid.NewGuid(),
                 SG_ID = close.basic.ID,
-                SG_OPEN_ID = close.OpenStraID,
+                SG_OPEN_ID = close.Open_ID,
                 SG_INIT_POSITION_LIST = close.POSITION,
                 SG_LATEST_POSITION_LIST = close.POSITION,
                 SG_FUTURE_CONTRACT = close.CT,

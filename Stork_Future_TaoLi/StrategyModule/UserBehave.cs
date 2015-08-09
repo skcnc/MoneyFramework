@@ -209,6 +209,11 @@ namespace Stork_Future_TaoLi
         /// 预付费率
         /// </summary>
         public float CHARGE { get; set; }
+
+        /// <summary>
+        /// 平仓对应的开仓ID
+        /// </summary>
+        public string Open_ID { get; set; }
     }
 
     public class CLOSEMODIFY

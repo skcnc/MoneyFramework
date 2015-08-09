@@ -135,7 +135,7 @@ namespace STYClass
 
 		/**********策略执行*******/
 		//bool    init(IndexFutureArbitrageopeninputargs* m);		//初始化设置，导入权重数据  更新股票列表  
-		bool    init();		//初始化设置，导入权重数据  更新股票列表  
+		void    init();		//初始化设置，导入权重数据  更新股票列表  
 		bool	calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
 		bool	isOpenPointReached();				//是否达到开仓点，行情，资金
 

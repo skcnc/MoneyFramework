@@ -456,6 +456,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                 {
                     //标记线程状态为正在运行
                     Status = 2;
+                    Thread.Sleep(1);
 
                     //策略实例运算
                     List<managedMarketInforStruct> infos = new List<managedMarketInforStruct>();
@@ -748,7 +749,7 @@ namespace Stork_Future_TaoLi.StrategyModule
             args.bTradingAllowed = false;
 
             args.contractCode = CT;
-            args.indexCode = INDEX;
+            args.indexCode = (INDEX == null) ? "300" : INDEX;
             args.nHands = HD;
             args.positionlist = position.ToArray();
             args.positionlistNUM = LiStockOrder.Count;

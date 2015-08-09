@@ -284,7 +284,7 @@ namespace managedSTY
 		void isOpenPointReached(bool^ open); //是否达到开仓点，行情，资金
 
 		/*****显示参数****/
-		close_args^ gettradeargs();
+		//close_args^ gettradeargs();
 		managedIndexFutureArbitragecloseshowargs^ getshowstatus();
 
 		/**********获取交易*******/

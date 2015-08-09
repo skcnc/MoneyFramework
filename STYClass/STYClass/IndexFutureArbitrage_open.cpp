@@ -78,7 +78,7 @@ bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex* subscribelist
  }
 
 //bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs* m)
-bool   CIndexFutureArbitrage_open::init()
+void  CIndexFutureArbitrage_open::init()
 {
 	//IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs = *m;
 	//this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
@@ -102,12 +102,11 @@ bool   CIndexFutureArbitrage_open::init()
 	m_index.setcode(m_args->indexCode);     //初始化指数
 	//初始化position文件 
 	if (m_args->weightlistnum == 0)  //对于期现套利，必须有权重文件
-		return false;   //如果权重文件为空 
+		return;
 
 	if (!m_SyntheticIndex.init(m_args->weightlist, m_args->weightlistnum, m_args->positionlist, m_args->positionlistnum, m_args->indexCode))
-		return  false;
-		// 初始化模拟指数类型
-	return   true;
+		return;
+
 }
 
 bool CIndexFutureArbitrage_open::calculateSimTradeStrikeAndDelta() //计算模拟指数，交易指数，调整基差
