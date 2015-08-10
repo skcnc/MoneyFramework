@@ -141,6 +141,9 @@
     <ClInclude Include="defines.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="ThostFtdcTraderApi.h" />
+    <ClInclude Include="ThostFtdcUserApiDataType.h" />
+    <ClInclude Include="ThostFtdcUserApiStruct.h" />
     <ClInclude Include="TraderBassClass.h" />
   </ItemGroup>
   <ItemGroup>

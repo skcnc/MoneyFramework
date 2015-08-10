@@ -31,18 +31,18 @@ struct Logininfor // 登陆信息
 	char * serverAddr;// 地址
 	int nPort;//端口
 	char * ZjAccount; //资金
-	char * BROKER_ID  ;   //部门编号
-	char *  PASSWORD ;    //密码
-	char * INVESTOR_ID ;  //账户
+	char * BROKER_ID;   //部门编号
+	char *  PASSWORD;    //密码
+	char * INVESTOR_ID;  //账户
 
 	Logininfor()
 	{
-		serverAddr="0";
-		nPort=0;
-		ZjAccount="0";
-		BROKER_ID="0";
-		PASSWORD="0";
-		INVESTOR_ID="0";
+		serverAddr = "0";
+		nPort = 0;
+		ZjAccount = "0";
+		BROKER_ID = "0";
+		PASSWORD = "0";
+		INVESTOR_ID = "0";
 	}
 
 	void getInit(Logininfor info)
@@ -54,15 +54,15 @@ struct Logininfor // 登陆信息
 		strcpy_s(ZjAccount, strlen(info.ZjAccount), info.ZjAccount);
 		//strcpy(BROKER_ID,info.BROKER_ID);
 		strcpy_s(BROKER_ID, strlen(info.BROKER_ID), info.BROKER_ID);
-		strcpy(PASSWORD,info.PASSWORD);
-		strcpy(INVESTOR_ID,info.INVESTOR_ID);
+		strcpy(PASSWORD, info.PASSWORD);
+		strcpy(INVESTOR_ID, info.INVESTOR_ID);
 	}
-	
+
 };
 
 struct Traderorderstruct   //交易报单（买卖 申购 ）
-{	 
-	
+{
+
 	//交易部分
 	char    cExchangeID[21];            //交易所
 	char    cSecurity_code[31];     // 证券代码
@@ -82,9 +82,9 @@ struct Traderorderstruct   //交易报单（买卖 申购 ）
 
 	void getInit(Traderorderstruct stu)
 	{
-		memcpy(cExchangeID,stu.cExchangeID,21);
-		memcpy(cSecurity_code,stu.cSecurity_code,31);
-		memcpy(security_name,stu.security_name,55);
+		memcpy(cExchangeID, stu.cExchangeID, 21);
+		memcpy(cSecurity_code, stu.cSecurity_code, 31);
+		memcpy(security_name, stu.security_name, 55);
 		nSecurity_amount = stu.nSecurity_amount;
 		dOrderprice = stu.dOrderprice;
 		cTraderdirection = stu.cTraderdirection;
@@ -99,7 +99,7 @@ struct Traderorderstruct   //交易报单（买卖 申购 ）
 	}
 };
 
-struct  QueryEntrustorderstruct 
+struct  QueryEntrustorderstruct
 {
 	char    cSecuritytype;          //证券类型	
 	char    cExchangeID[21];            //交易所
@@ -110,8 +110,8 @@ struct  QueryEntrustorderstruct
 	void getInit(QueryEntrustorderstruct entrust)
 	{
 		cSecuritytype = entrust.cSecuritytype;
-		memcpy(cExchangeID,entrust.cExchangeID,21);
-		memcpy(cOrderSysID, entrust.cOrderSysID,21);
+		memcpy(cExchangeID, entrust.cExchangeID, 21);
+		memcpy(cOrderSysID, entrust.cOrderSysID, 21);
 		myclientinfor = entrust.myclientinfor;
 	}
 };
@@ -132,6 +132,7 @@ struct Entrustreturnstruct //委托回报
 	char	cInsertDate[9];	///报单日期
 	char	cInsertTime[9];	///委托时间
 	char	cCancelTime[9];///撤销时间
+	char  error_msg[255];   //错误原因
 	//标志信息
 	Clientinfor myclientinfor;
 };
@@ -148,6 +149,8 @@ struct Bargainreturnstruct  //成交回报
 	double  bargain_money;             	// 成交金额
 	char    bargain_time[9];       		// 成交时间
 	long    bargain_no;            		// 成交编号
+	double  unfrozen_money;        //解冻资金金额(A股有效，B股返回0)
+	long    unfrozen_amount;         //解冻证券数量(A股有效，B股返回0)
 	//标志信息
 	Clientinfor myclientinfor;
 };
@@ -169,8 +172,8 @@ struct  FuTuremapinfor
 	Bargainreturnstruct      mytraderreturn;
 	FuTuremapinfor()
 	{
-		issendfail=false;
-		isreject=false;
+		issendfail = false;
+		isreject = false;
 	}
 
 };

@@ -385,7 +385,10 @@ namespace Stork_Future_TaoLi
                     else if (obj is CLOSEMODIFY) {
                         UpdateWorker(obj);
                     }
-                    else if (obj is CLOSERUN) { CLOSERUN value = (CLOSERUN)obj; }
+                    else if (obj is CLOSERUN) { 
+                        CLOSERUN value = (CLOSERUN)obj;
+                        RunOperater((object)value);
+                    }
                     else if (obj is CLOSEALLOW) { CLOSEALLOW value = (CLOSEALLOW)obj; }
                     else if (obj is CLOSEDELETE) { DeleteWorker(obj); }
                     else

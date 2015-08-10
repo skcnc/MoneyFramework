@@ -17,17 +17,17 @@ Strategy_OPEN::~Strategy_OPEN()
 };
 
 void Strategy_OPEN::updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num){
-	MarketInforStruct * MarketInfo = new MarketInforStruct();
+	MarketInforStruct * MarketInfo = new MarketInforStruct[num];
 	
-	for (int i = 0; i < 10; i++)
-	{
-		MarketInfo->dAskPrice[i] = 0;
-		MarketInfo->dAskVol[i] = 0;
-		MarketInfo->dBidPrice[i] = 0;
-		MarketInfo->dBidVol[i] = 0;
+	for (int m = 0; m < num; m++){
+		for (int i = 0; i < 10; i++)
+		{
+			MarketInfo->dAskPrice[i] = 0;
+			MarketInfo->dAskVol[i] = 0;
+			MarketInfo->dBidPrice[i] = 0;
+			MarketInfo->dBidVol[i] = 0;
+		}
 	}
-
-	MarketInfo = new MarketInforStruct();
 
 	for (int i = 0; i < num; i++)
 	{
@@ -172,17 +172,18 @@ Strategy_CLOSE::~Strategy_CLOSE(){
 }
 
 void Strategy_CLOSE::updateSecurityInfo(array<managedMarketInforStruct^>^ marketinfo, int num){
-	MarketInforStruct * MarketInfo = new MarketInforStruct();
+	
 
-	for (int i = 0; i < 10; i++)
-	{
-		MarketInfo->dAskPrice[i] = 0;
-		MarketInfo->dAskVol[i] = 0;
-		MarketInfo->dBidPrice[i] = 0;
-		MarketInfo->dBidVol[i] = 0;
+	MarketInforStruct * MarketInfo = new MarketInforStruct[num];
+	for (int m = 0; m < num; m++){
+		for (int i = 0; i < 10; i++)
+		{
+			MarketInfo[m].dAskPrice[i] = 0;
+			MarketInfo[m].dAskVol[i] = 0;
+			MarketInfo[m].dBidPrice[i] = 0;
+			MarketInfo[m].dBidVol[i] = 0;
+		}
 	}
-
-	MarketInfo = new MarketInforStruct();
 
 	for (int i = 0; i < num; i++)
 	{
