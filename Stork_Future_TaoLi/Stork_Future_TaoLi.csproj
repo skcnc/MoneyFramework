@@ -398,6 +398,10 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CTP_CLI_Wrapper\CTP_CLI_Wrapper\CTP_CLI.vcxproj">
+      <Project>{b12612b4-fa9c-4049-a598-0131009a75c3}</Project>
+      <Name>CTP_CLI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\STYClass\STYClass\STYClass.vcxproj">
       <Project>{c3c736a6-43fd-44f7-8aab-94c4d78063da}</Project>
       <Name>STYClass</Name>

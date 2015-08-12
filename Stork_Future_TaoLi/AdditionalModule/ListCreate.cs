@@ -18,6 +18,5 @@ namespace Stork_Future_TaoLi
 
     public class LocalMarketPrice
     {
-
     }
 }
