@@ -367,6 +367,7 @@ void CCTPClient::Connect()
 		return tradeApi->ReqOrderInsert(pOrder, ++iRequestID);
 	}
 	
+
 	//限价单
 	int CCTPClient::OrderInsert( System::String^ InstrumentID, EnumOffsetFlagType OffsetFlag, EnumDirectionType Direction, System::Double Price, System::Int32 Volume )
 	{
