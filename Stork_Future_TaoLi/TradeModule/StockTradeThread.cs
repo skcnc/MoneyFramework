@@ -34,11 +34,11 @@ namespace Stork_Future_TaoLi.TradeModule
             StockTradeControl.Start();
 
             //日志初始化
-            log.EventSourceName = "交易线程控制模块";
+            log.EventSourceName = "股票交易线程控制模块";
             log.EventLogType = System.Diagnostics.EventLogEntryType.Information;
             log.EventLogID = 62302;
 
-            sublog.EventSourceName = "交易线程模块";
+            sublog.EventSourceName = "股票交易线程模块";
             sublog.EventLogType = System.Diagnostics.EventLogEntryType.Information;
             sublog.EventLogID = 62303;
         }
@@ -53,7 +53,7 @@ namespace Stork_Future_TaoLi.TradeModule
 
 
             List<Task> TradeThreads = new List<Task>();
-            log.LogEvent("交易控制子线程启动： 初始化交易线程数 :" + stockNum.ToString());
+            log.LogEvent("股票交易控制子线程启动： 初始化交易线程数 :" + stockNum.ToString());
 
             //启动心跳和交易线程
             Task.Factory.StartNew(() => HeartBeatThreadProc((object)stockNum));
@@ -86,10 +86,10 @@ namespace Stork_Future_TaoLi.TradeModule
                 }
 
                 //向心跳发起线程发送心跳
-                if (DateTime.Now.Second % 2 == 0 && Queue_Trade_Heart_Beat.GetQueueNumber() < 2)
-                {
-                    Queue_Trade_Heart_Beat.GetQueue().Enqueue(new object());
-                }
+                //if (DateTime.Now.Second % 2 == 0 && Queue_Trade_Heart_Beat.GetQueueNumber() < 2)
+                //{
+                //    Queue_Trade_Heart_Beat.GetQueue().Enqueue(new object());
+                //}
 
                 //获取下一笔交易
                 List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
@@ -159,12 +159,12 @@ namespace Stork_Future_TaoLi.TradeModule
                 //************************************
                 //将交易发送到相应执行线程后需要做的事情
                 //************************************
-                if (DateTime.Now.Second % 3 == 0)
-                {
-                    //每3秒更新一次线程使用状况
-                    Console.WriteLine(DateTime.Now.ToString());
-                    Console.WriteLine("Thread Busy Rate : " + queue_stock_excuteThread.GetBusyNum().ToString() + "/" + stockNum.ToString());
-                }
+                //if (DateTime.Now.Second % 3 == 0)
+                //{
+                //    //每3秒更新一次线程使用状况
+                //    Console.WriteLine(DateTime.Now.ToString());
+                //    Console.WriteLine("Thread Busy Rate : " + queue_stock_excuteThread.GetBusyNum().ToString() + "/" + stockNum.ToString());
+                //}
 
               
 
@@ -387,14 +387,16 @@ namespace Stork_Future_TaoLi.TradeModule
                     lastSubHeartBeat = DateTime.Now;
                 }
 
-                if (Queue_Trade_Heart_Beat.GetQueueNumber() > 0)
-                {
-                    lastHeartBeat = DateTime.Now;
-                    Queue_Trade_Heart_Beat.GetQueue().Dequeue();
-                }
+                //if (Queue_Trade_Heart_Beat.GetQueueNumber() > 0)
+                //{
+                //    lastHeartBeat = DateTime.Now;
+                //    Queue_Trade_Heart_Beat.GetQueue().Dequeue();
+                //}
+
+                lastHeartBeat = GlobalHeartBeat.GetGlobalTime();
             }
 
-            Thread.CurrentThread.Abort();
+            //Thread.CurrentThread.Abort();
         }
 
         private static managedTraderorderstruct CreateTradeUnit(TradeOrderStruct unit)

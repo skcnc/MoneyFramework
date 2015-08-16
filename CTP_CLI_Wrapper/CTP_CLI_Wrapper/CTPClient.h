@@ -33,7 +33,7 @@ namespace CTP_CLI
 	public:
 		void Connect();
 		void Disconnect();
-		int ReqUserLogin();
+		int ReqUserLogin(); 
 		int ReqUserLogOut();
 		int OrderInsert(CThostFtdcInputOrderField_M^ Order);
 		int SettlementInfoConfirm();

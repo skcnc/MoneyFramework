@@ -99,8 +99,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>thosttraderapi.lib;thostmduserapi.lib;thosttraderapi.dll;thostmduserapi.dll;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Administrator\Desktop\金融套利系统\CTP_CLI_Wrapper\CTP_CLI_Wrapper\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>thosttraderapi.lib;thostmduserapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs</AdditionalLibraryDirectories>
       <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
   </ItemDefinitionGroup>
@@ -114,7 +114,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>thosttraderapi.lib;thostmduserapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Administrator\Desktop\CTP_CLI_Wrapper\CTP_CLI_Wrapper\CTP_CLI_Wrapper\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Administrator\Desktop\金融套利系统\CTP_CLI_Wrapper\CTP_CLI_Wrapper\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
   </ItemDefinitionGroup>
@@ -126,9 +126,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Administrator\Desktop\金融套利系统\CTP_CLI_Wrapper\CTP_CLI_Wrapper\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>thosttraderapi.lib;thostmduserapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,7 +139,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>thosttraderapi.lib;thostmduserapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Administrator\Desktop\CTP_CLI_Wrapper\CTP_CLI_Wrapper\CTP_CLI_Wrapper\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Administrator\Desktop\金融套利系统\CTP_CLI_Wrapper\CTP_CLI_Wrapper\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

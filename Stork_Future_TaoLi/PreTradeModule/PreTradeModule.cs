@@ -258,9 +258,9 @@ namespace Stork_Future_TaoLi.PreTradeModule
 
                         if (unit.Count == 15)
                         {
-                            lock (queue_prdTrade_FutureTradeMonitor.GetQueue().SyncRoot)
+                            lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
                             {
-                                queue_prdTrade_FutureTradeMonitor.GetQueue().Enqueue((object)unit);
+                                QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)unit);
                             }
 
                             unit.Clear();
@@ -269,9 +269,9 @@ namespace Stork_Future_TaoLi.PreTradeModule
 
                     if (unit.Count != 0)
                     {
-                        lock (queue_prdTrade_FutureTradeMonitor.GetQueue().SyncRoot)
+                        lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
                         {
-                            queue_prdTrade_FutureTradeMonitor.GetQueue().Enqueue((object)unit);
+                            QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)unit);
                         }
 
                         unit.Clear();

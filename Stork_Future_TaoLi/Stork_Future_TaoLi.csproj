@@ -253,6 +253,8 @@
     </Compile>
     <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
+    <Compile Include="Queues\queue_future_excuteThread.cs" />
+    <Compile Include="TradeModule\FutureMonitor.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -278,6 +280,7 @@
     <Compile Include="StrategyModule\strategyTestClass.cs" />
     <Compile Include="StrategyModule\StrategyWorker.cs" />
     <Compile Include="StrategyModule\UserBehave.cs" />
+    <Compile Include="TradeModule\FutureTrade.cs" />
     <Compile Include="TradeModule\StockTradeThread.cs" />
     <Compile Include="Variables Type\CONFIG.cs" />
     <Compile Include="Variables Type\ListType.cs" />

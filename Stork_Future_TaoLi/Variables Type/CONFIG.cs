@@ -23,7 +23,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// 期货交易最大线程数
         /// </summary>
         public static int FUTURE_TRADE_THREAD_NUM { get { return future_trade_thread_num; } }
-        private static int future_trade_thread_num = 0;
+        private static int future_trade_thread_num = 1;
 
         /// <summary>
         /// 股票交易等待响应的最大超时时间
