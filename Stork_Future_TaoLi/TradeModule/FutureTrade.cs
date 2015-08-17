@@ -1,8 +1,10 @@
 ﻿using Stork_Future_TaoLi.TradeModule;
+using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Stork_Future_TaoLi.Modulars;
 using System.Web;
 
 namespace Stork_Future_TaoLi
@@ -11,13 +13,14 @@ namespace Stork_Future_TaoLi
     {
         private LogWirter sublog = new LogWirter();//子线程日志记录
         private CTP_CLI.CCTPClient _client;
+        private FutureTradeStatus status = FutureTradeStatus.DISCONNECTED;
 
         private string BROKER = "0292";
         private string INVESTOR = "";
         private string PASSWORD = "";
         private string ADDRESS = "tcp://222.240.130.22:41205";
 
-        private bool ConnectState = false;
+        
 
         /// <summary>
         /// 期货交易工作线程
@@ -44,6 +47,31 @@ namespace Stork_Future_TaoLi
             DateTime _markedTime = DateTime.Now;
 
             _client.Connect();
+
+            //状态 DISCONNECTED -> CONNECTED
+            while(this.status != FutureTradeStatus.CONNECTED)
+            {
+                Thread.Sleep(10);
+            }
+
+            _client.ReqUserLogin();
+
+            //状态 CONNECTED -> LOGIN
+            while (this.status != FutureTradeStatus.LOGIN)
+            {
+                Thread.Sleep(10);
+            }
+
+            while (true)
+            {
+                Thread.Sleep(10);
+
+                //获取下一笔交易
+                List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
+                bool b_get = false;
+
+                
+            }
         }
 
         /// <summary>
@@ -72,8 +100,7 @@ namespace Stork_Future_TaoLi
         /// </summary>
         void _client_FrontConnected()
         {
-            //throw new NotImplementedException();
-            this.ConnectState = true;
+            this.status = FutureTradeStatus.CONNECTED;
         }
 
         /// <summary>
@@ -83,8 +110,6 @@ namespace Stork_Future_TaoLi
         void _client_FrontDisconnected(int nReason)
         {
             sublog.LogEvent("期货交易所链接失败，失败码：" + nReason.ToString());
-            this.ConnectState = false;
-            //throw new NotImplementedException();
         }
 
         void _client_RspOrderInsert(CTP_CLI.CThostFtdcInputOrderField_M pInputOrder, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
@@ -112,7 +137,11 @@ namespace Stork_Future_TaoLi
 
         void _client_RspUserLogin(CTP_CLI.CThostFtdcRspUserLoginField_M pRspUserLogin, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
-            throw new NotImplementedException();
+            if (pRspInfo.ErrorID == 0 && bIsLast == true)
+            {
+                status = FutureTradeStatus.LOGIN;
+            }
+            //throw new NotImplementedException();
         }
 
         void _client_RspError(CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)

@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Stork_Future_TaoLi
 {
-    class LogWirter
+    public class LogWirter
     {
         /// <summary>
         /// 事件源名称
