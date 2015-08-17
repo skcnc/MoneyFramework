@@ -325,7 +325,7 @@ namespace CTP_CLI
 #pragma region public functions
 void CCTPClient::Connect()
 	{
-		this->tradeApi = CThostFtdcTraderApi::CreateFtdcTraderApi(".\\futuresData\\");			// 创建UserApi
+		this->tradeApi = CThostFtdcTraderApi::CreateFtdcTraderApi("");			// 创建UserApi
 		this->tradeApi->RegisterSpi((CThostFtdcTraderSpi*)spi);			// 注册事件类
 		this->tradeApi->SubscribePublicTopic(THOST_TERT_QUICK/*THOST_TERT_RESTART*/);					// 注册公有流
 		this->tradeApi->SubscribePrivateTopic(THOST_TERT_QUICK/*THOST_TERT_RESTART*/);					// 注册私有流
