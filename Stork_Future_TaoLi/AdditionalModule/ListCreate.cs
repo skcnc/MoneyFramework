@@ -16,6 +16,19 @@ namespace Stork_Future_TaoLi
         Sell = 1
     };
 
+    public enum FutureTradeStatus
+    {
+        DISCONNECTED = 0,
+        CONNECTED = 1 ,
+        LOGIN = 2,
+        ORDERINSERT = 3,
+        ORDERWRONG = 4,
+        ORDERDONE = 5,
+        TRADEINSERT = 6,
+        TRADEDONE = 7,
+        SYSERROR = 8
+    }
+
     public class LocalMarketPrice
     {
     }
