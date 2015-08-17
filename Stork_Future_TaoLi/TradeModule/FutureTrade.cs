@@ -1,8 +1,10 @@
 ﻿using Stork_Future_TaoLi.TradeModule;
+using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Stork_Future_TaoLi.Modulars;
 using System.Web;
 
 namespace Stork_Future_TaoLi
@@ -58,6 +60,17 @@ namespace Stork_Future_TaoLi
             while (this.status != FutureTradeStatus.LOGIN)
             {
                 Thread.Sleep(10);
+            }
+
+            while (true)
+            {
+                Thread.Sleep(10);
+
+                //获取下一笔交易
+                List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
+                bool b_get = false;
+
+                
             }
         }
 
@@ -124,6 +137,10 @@ namespace Stork_Future_TaoLi
 
         void _client_RspUserLogin(CTP_CLI.CThostFtdcRspUserLoginField_M pRspUserLogin, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
+            if (pRspInfo.ErrorID == 0 && bIsLast == true)
+            {
+                status = FutureTradeStatus.LOGIN;
+            }
             //throw new NotImplementedException();
         }
 
