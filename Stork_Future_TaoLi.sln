@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stork_Future_TaoLi", "Stork_Future_TaoLi\Stork_Future_TaoLi.csproj", "{384B5217-F6EA-4254-B4F8-F9FC60619971}"
 EndProject
@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "STYClass", "STYClass\STYCla
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CTP_CLI", "CTP_CLI_Wrapper\CTP_CLI_Wrapper\CTP_CLI.vcxproj", "{B12612B4-FA9C-4049-A598-0131009A75C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{64D71983-BE67-467E-9247-4BA14726513A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication2", "ConsoleApplication2\ConsoleApplication2.csproj", "{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,20 +112,20 @@ Global
 		{B12612B4-FA9C-4049-A598-0131009A75C3}.Release|Win32.Build.0 = Release|Win32
 		{B12612B4-FA9C-4049-A598-0131009A75C3}.Release|x64.ActiveCfg = Release|x64
 		{B12612B4-FA9C-4049-A598-0131009A75C3}.Release|x64.Build.0 = Release|x64
-		{64D71983-BE67-467E-9247-4BA14726513A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Release|ARM.ActiveCfg = Release|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Release|Win32.ActiveCfg = Release|Any CPU
-		{64D71983-BE67-467E-9247-4BA14726513A}.Release|x64.ActiveCfg = Release|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Release|ARM.ActiveCfg = Release|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Release|Win32.ActiveCfg = Release|Any CPU
+		{02CEDAC8-050D-47B8-80CA-3F0A9FA21962}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
