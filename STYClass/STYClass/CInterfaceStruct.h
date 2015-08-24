@@ -10,6 +10,8 @@ struct IndexFutureArbitrageopeninputargs  //界面输入参数
 	stockpotionstruct   *    positionlist;		 //显示持仓
 	int   positionlistnum = 0;  //列表数量
 
+	char *  weightliststr;
+	char *  positionliststr;
 	int    nHands = 0;      //手数
 	char   indexCode[32];   //指数
 	char   contractCode[32]; //期货合约
@@ -47,7 +49,8 @@ struct IndexFutureArbitragecloseinputargs
 	stockpotionstruct   *    positionlist;		 //显示持仓
 	int   positionlistnum = 0;  //列表数量
 
-
+	char * weightliststr;
+	char *  positionliststr;
 	int    nHands = 0;			//手数
 	char   indexCode[32];   //指数
 	char   contractCode[32]; //期货合约

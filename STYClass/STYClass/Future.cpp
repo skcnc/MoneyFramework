@@ -5,7 +5,7 @@
 CFuture::CFuture(void)
 {
 	this->m_DepthMarketData.msecurity.cSecuritytype = 'f';
-	this->m_DepthMarketData.nMarketdepth = 1;
+	this->m_DepthMarketData.nMarketdepth = 5;
 }
 
 
@@ -20,7 +20,7 @@ int  CFuture::getfuturetime()
 
 double  CFuture::getrealmarketvalue(int namount)
 {
-	return this->getlastprice()*(this->indextimes)*namount;
+	return this->getlastprice()*namount;
 
 }
 bool  CFuture::setcode(char * temp)
