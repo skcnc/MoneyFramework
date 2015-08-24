@@ -23,6 +23,118 @@ inline char *  getExchangeNumByStockCode(char *Security_code)
 	return "SH";
 }
 
+
+inline  char *  weightlisttostring(indexweightstruct *weightlist, int  weightlistnum)
+{
+	char tempstr[65535];
+	tempstr[0] = 0;  //INIT
+	char temprow[255];
+	for (int i = 0; i <weightlistnum; i++)  //获取权重列表
+	{
+		sprintf(temprow, "%s;%c;%.12f|", weightlist[i].sSecurity.cSecurity_code, weightlist[i].sSecurity.cSecuritytype,
+			weightlist[i].dweight);
+		strcat(tempstr, temprow);
+
+	}
+	strcat(tempstr, "*/0");
+	return tempstr;
+}
+
+inline  char *  positionlisttostring(stockpotionstruct  *positionlist, int   positionlistnum)
+{
+	
+	char tempstr[65535];
+	tempstr[0] = 0;  //INIT
+	char temprow[255];
+	for (int i = 0; i < positionlistnum; i++)  //获取权重列表
+	{
+		sprintf(temprow, "%s;%c;%d|", positionlist[i].sSecurity.cSecurity_code, positionlist[i].sSecurity.cSecuritytype, positionlist[i].ntradervolume);
+		strcat(tempstr, temprow);
+
+	}
+	strcat(tempstr, "*/0");
+	return tempstr;
+}
+
+inline  bool stringtoweightlist(char * tempstr,  indexweightstruct *weightlist, int & weightlistnum)
+{
+	int colnun[2];
+	weightlistnum = 0;
+	string strtypetemp(tempstr);
+	int rowflag,preflag = 0; 
+	if (tempstr = 0)
+		return 0;
+	int i = 0;
+	while (tempstr[i] != '/0')
+	{
+		if (tempstr[i] == '*')
+			break;
+		if (tempstr[i] == '|')  //row
+		{
+			preflag = rowflag;
+			rowflag = i;
+			int  k = 0;
+			for (int j = preflag; j < rowflag; j++)
+			{
+				if (tempstr[j] == ';')
+				{
+					colnun[k] = j;
+					k++;
+				}
+			}
+			if (k != 2)
+				return false;
+
+			strcpy(weightlist[weightlistnum].sSecurity.cSecurity_code, strtypetemp.substr(preflag+1, colnun[0] - preflag - 1).c_str());
+			weightlist[weightlistnum].sSecurity.cSecuritytype = tempstr[colnun[0]+1];
+			weightlist[weightlistnum].dweight = atof(strtypetemp.substr(colnun[1] + 1, rowflag - colnun[1] - 1).c_str());
+			weightlistnum++;
+		}
+		
+	}
+	return true;
+}
+
+inline  bool  stringtopositionlist(char * tempstr,stockpotionstruct  *positionlist, int  & positionlistnum)
+{
+
+	int colnun[2];
+	positionlistnum = 0;
+	string strtypetemp(tempstr);
+	int rowflag, preflag = 0;
+	if (tempstr = 0)
+		return 0;
+	int i = 0;
+	while (tempstr[i] != '/0')
+	{
+		if (tempstr[i] == '*')
+			break;
+		if (tempstr[i] == '|')  //row
+		{
+			preflag = rowflag;
+			rowflag = i;
+			int  k = 0;
+			for (int j = preflag; j < rowflag; j++)
+			{
+				if (tempstr[j] == ';')
+				{
+					colnun[k] = j;
+					k++;
+				}
+			}
+			if (k != 2)
+				return false;
+
+			strcpy(positionlist[positionlistnum].sSecurity.cSecurity_code, strtypetemp.substr(preflag + 1, colnun[0] - preflag - 1).c_str());
+			positionlist[positionlistnum].sSecurity.cSecuritytype = tempstr[colnun[0] + 1];
+			positionlist[positionlistnum].ntradervolume= atoi(strtypetemp.substr(colnun[1] + 1, rowflag - colnun[1] - 1).c_str());
+			positionlistnum++;
+		}
+
+	}
+	return true;
+}
+
 namespace STYClass
 {
 
@@ -135,7 +247,7 @@ namespace STYClass
 
 		/**********策略执行*******/
 		//bool    init(IndexFutureArbitrageopeninputargs* m);		//初始化设置，导入权重数据  更新股票列表  
-		void    init();		//初始化设置，导入权重数据  更新股票列表  
+		bool   init();		//初始化设置，导入权重数据  更新股票列表  
 		bool	calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
 		bool	isOpenPointReached();				//是否达到开仓点，行情，资金
 

@@ -78,7 +78,7 @@ namespace STYClass
 	}
 
 	//bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs* m)
-	void  CIndexFutureArbitrage_open::init()
+	bool  CIndexFutureArbitrage_open::init()
 	{
 		//IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs = *m;
 		//this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
@@ -102,10 +102,15 @@ namespace STYClass
 		m_index.setcode(m_args->indexCode);     //初始化指数
 		//初始化position文件 
 		if (m_args->weightlistnum == 0)  //对于期现套利，必须有权重文件
-			return;
+			return false;
+		if (!stringtoweightlist(m_args->weightliststr, m_args->weightlist, m_args->weightlistnum))
+			return false;
+		if (!stringtopositionlist(m_args->positionliststr, m_args->positionlist, m_args->positionlistnum))
+			return false;
 
 		if (!m_SyntheticIndex.init(m_args->weightlist, m_args->weightlistnum, m_args->positionlist, m_args->positionlistnum, m_args->indexCode))
-			return;
+			return false;
+		return true;
 
 	}
 

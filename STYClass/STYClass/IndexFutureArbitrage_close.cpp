@@ -99,6 +99,9 @@ namespace STYClass
 		//初始化position文件 
 		indexfuturearbitragecloseargs.weightlistnum = 0;//对于期现平仓套利，无须权重文件
 		 
+		//stringtoweightlist(indexfuturearbitragecloseargs.weightliststr, indexfuturearbitragecloseargs.weightlist, indexfuturearbitragecloseargs.weightlistnum);
+		if (!stringtopositionlist(indexfuturearbitragecloseargs.positionliststr, indexfuturearbitragecloseargs.positionlist, indexfuturearbitragecloseargs.positionlistnum))
+			return false;
 		if (!m_SyntheticIndex.init(indexfuturearbitragecloseargs.weightlist, indexfuturearbitragecloseargs.weightlistnum, indexfuturearbitragecloseargs.positionlist, indexfuturearbitragecloseargs.positionlistnum, indexfuturearbitragecloseargs.indexCode))
 			return  false;
 		// 初始化模拟指数类型
