@@ -641,22 +641,9 @@ namespace Stork_Future_TaoLi.StrategyModule
                 double weightvalue = item.Value;
 
                 weightString += (code + ";" + type + ";" + weightvalue.ToString() + "|");
-
-                //managedIndexWeights w = new managedIndexWeights();
-                //managedsecurityindex si = new managedsecurityindex();
-
-                //string code = item.Key.Substring(1);
-                //string type = item.Key.Substring(0, 1);
-                //double weightvalue = item.Value;
-
-                //si.cSecuritytype = Convert.ToSByte(type[0]);
-                //si.cSecurity_code = code;
-                //w.sSecurity = si;
-                //w.dweight = weightvalue;
-
-                //weight.Add(w);
             }
 
+            weightString += "*";
             foreach (var item in LiStockOrder)
             {
                 string code = item.Key.Substring(1);
@@ -664,23 +651,9 @@ namespace Stork_Future_TaoLi.StrategyModule
                 int tradeVolume = item.Value;
 
                 positionString += (code + ";" + type + ";" + tradeVolume.ToString() + "|");
-                //managedstockposition s = new managedstockposition();
-                //managedsecurityindex si = new managedsecurityindex();
-
-                //si.cSecurity_code = item.Key.Substring(1);
-                //si.cSecuritytype = Convert.ToSByte(item.Key.Substring(0, 1)[0]);
-
-                //s.sSecurity = si;
-
-                //s.tradevolume = item.Value;
-
-                ///*****************************
-                // * TODO: 是否停盘和最新价格
-                // *          尚未赋值
-                // * **************************/
-
-                //position.Add(s);
             }
+
+            positionString += "*";
 
             args.bTradingAllowed = false;
 
@@ -692,7 +665,8 @@ namespace Stork_Future_TaoLi.StrategyModule
             args.positionlistNUM = LiStockOrder.Count;
             args.weightlist = weight.ToArray();
             args.weightlistnum = WeightList.Count;
-
+            args.WEIGHTLIST = weightString;
+            args.POSITIONLIST = positionString;
             return args;
 
         }

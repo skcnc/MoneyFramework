@@ -55,11 +55,15 @@ namespace managedSTY
 	};
 
 	public ref struct open_args{
-		array<managedIndexWeights^>^ weightlist; //权重文件
-		int weightlistnum; //权重文件数量
+		//array<managedIndexWeights^>^ weightlist; //权重文件
+		//int weightlistnum; //权重文件数量
 
-		array<managedstockposition^>^ positionlist; //显示持仓
-		int positionlistNUM;
+		String^ WEIGHTLIST; //权重参数 
+
+		//array<managedstockposition^>^ positionlist; //显示持仓
+		//int positionlistNUM;
+
+		String^ POSITIONLIST; //持仓参数
 
 		int nHands; //手数
 		String^ indexCode; //指数
