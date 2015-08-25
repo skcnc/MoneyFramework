@@ -59,11 +59,14 @@ namespace managedSTY
 		//int weightlistnum; //权重文件数量
 
 		String^ WEIGHTLIST; //权重参数 
+		int WEIGHTNUM; //权重数量
+
 
 		//array<managedstockposition^>^ positionlist; //显示持仓
 		//int positionlistNUM;
 
 		String^ POSITIONLIST; //持仓参数
+		int POSITIONNUM; //持仓数量
 
 		int nHands; //手数
 		String^ indexCode; //指数
@@ -74,11 +77,14 @@ namespace managedSTY
 	};
 
 	public ref struct close_args{
-		array<managedIndexWeights^>^ weightlist;//权重文件
-		int weightlistnum; //权重文件数量
+		//array<managedIndexWeights^>^ weightlist;//权重文件
+		//int weightlistnum; //权重文件数量
 
-		array<managedstockposition^>^ positionlist; //显示持仓
-		int positionlistNUM;
+		//array<managedstockposition^>^ positionlist; //显示持仓
+		//int positionlistNUM;
+
+		String^ POSITION;
+		int positionNum;
 
 		int nHands; //手数
 		String^ indexCode; //指数
