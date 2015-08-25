@@ -98,7 +98,14 @@ namespace STYClass
 		m_index.setcode(indexfuturearbitragecloseargs.indexCode);     //初始化指数
 		//初始化position文件 
 		indexfuturearbitragecloseargs.weightlistnum = 0;//对于期现平仓套利，无须权重文件
-		 
+
+		if (indexfuturearbitragecloseargs.positionlist != 0)
+			delete indexfuturearbitragecloseargs.positionlist;
+
+		if (indexfuturearbitragecloseargs.positionlistnum <= 0)
+			return false;
+
+		indexfuturearbitragecloseargs.positionlist= new  stockpotionstruct[indexfuturearbitragecloseargs.positionlistnum];
 		//stringtoweightlist(indexfuturearbitragecloseargs.weightliststr, indexfuturearbitragecloseargs.weightlist, indexfuturearbitragecloseargs.weightlistnum);
 		if (!stringtopositionlist(indexfuturearbitragecloseargs.positionliststr, indexfuturearbitragecloseargs.positionlist, indexfuturearbitragecloseargs.positionlistnum))
 			return false;
@@ -187,8 +194,11 @@ namespace STYClass
 	/**********获取交易*******/
 	bool    CIndexFutureArbitrage_close::gettaderlist(Traderorderstruct * m_stockorders, int &num)
 	{
-		int stockordernum = 0;						   //委托数量
+		if (m_stockorders != 0)
+			delete m_stockorders;
+		m_stockorders = new Traderorderstruct[this->m_SyntheticIndex.m_positionlist.size() + 1];   //shen qing  nei cun 
 
+		int stockordernum = 0;						   //委托数量
 		list<stockpotionstruct>::iterator itor;
 		itor = this->m_SyntheticIndex.m_positionlist.begin();
 		while (itor != this->m_SyntheticIndex.m_positionlist.end())
@@ -215,6 +225,7 @@ namespace STYClass
 			itor++;
 			stockordernum++;
 		}
+
 
 		num = stockordernum;
 
