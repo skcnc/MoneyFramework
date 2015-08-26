@@ -58,6 +58,8 @@ namespace managedSTY
 		array<managedIndexWeights^>^ weightlist; //权重文件
 		int weightlistnum; //权重文件数量
 
+		
+
 		array<managedstockposition^>^ positionlist; //显示持仓
 		int positionlistNUM;
 
@@ -67,6 +69,28 @@ namespace managedSTY
 		double dPositiveOpenDelta; //开仓点位
 
 		bool bTradingAllowed;  //是否允许交易
+	};
+
+	[StructLayout(LayoutKind::Sequential)]
+	public ref struct OPEN_ARGS_M{
+		//权重文件
+		[MarshalAs(UnmanagedType::ByValTStr)]
+		System::String^ WEIGHT;
+		//持仓文件
+		[MarshalAs(UnmanagedType::ByValTStr)]
+		System::String^ POSITION;
+		//手数
+		int nHands;
+		//指数
+		[MarshalAs(UnmanagedType::ByValTStr)]
+		System::String^ indexCode;
+		//期货合约
+		[MarshalAs(UnmanagedType::ByValTStr)]
+		System::String^ contractCode;
+		//开仓点位
+		double dPositiveOpenDelta;
+		//是否允许交易
+		bool bTradingAllowed;
 	};
 
 	public ref struct close_args{
