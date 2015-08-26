@@ -4,12 +4,14 @@
 
 struct IndexFutureArbitrageopeninputargs  //界面输入参数
 {
-	indexweightstruct *       weightlist;			 //权重文件
+	indexweightstruct *       weightlist=0;			 //权重文件
 	int   weightlistnum = 0;  //列表数量
 
-	stockpotionstruct   *    positionlist;		 //显示持仓
+	stockpotionstruct   *    positionlist=0;		 //显示持仓
 	int   positionlistnum = 0;  //列表数量
 
+	char   weightliststr[65525];
+	char   positionliststr[65535];
 	int    nHands = 0;      //手数
 	char   indexCode[32];   //指数
 	char   contractCode[32]; //期货合约
@@ -41,13 +43,14 @@ struct IndexFutureArbitrageopenshowargs  //界面显示变量
 
 struct IndexFutureArbitragecloseinputargs
 {
-	indexweightstruct *       weightlist;			 //权重文件
+	indexweightstruct *       weightlist=0;			 //权重文件
 	int   weightlistnum = 0;  //列表数量
 
-	stockpotionstruct   *    positionlist;		 //显示持仓
+	stockpotionstruct   *    positionlist=0;		 //显示持仓
 	int   positionlistnum = 0;  //列表数量
 
-
+	char  weightliststr[65525];
+	char   positionliststr[65535];
 	int    nHands = 0;			//手数
 	char   indexCode[32];   //指数
 	char   contractCode[32]; //期货合约

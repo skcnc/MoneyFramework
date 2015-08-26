@@ -78,7 +78,7 @@ namespace STYClass
 	}
 
 	//bool   CIndexFutureArbitrage_open::init(IndexFutureArbitrageopeninputargs* m)
-	void  CIndexFutureArbitrage_open::init()
+	bool  CIndexFutureArbitrage_open::init()
 	{
 		//IndexFutureArbitrageopeninputargs      indexfuturearbitrageopenargs = *m;
 		//this->nHands = indexfuturearbitrageopenargs.nHands;  //手数
@@ -101,11 +101,25 @@ namespace STYClass
 		m_future.setcode(m_args->contractCode); //初始期货
 		m_index.setcode(m_args->indexCode);     //初始化指数
 		//初始化position文件 
-		if (m_args->weightlistnum == 0)  //对于期现套利，必须有权重文件
-			return;
+		if (m_args->weightlistnum <= 0 || m_args->positionlistnum<=0)  //对于期现套利，必须有权重文件
+			return false;
+		if (m_args->weightlist != 0)
+			delete m_args->weightlist;
+
+		if (m_args->positionlist != 0)
+			delete m_args->positionlist;
+
+		m_args->weightlist = new  indexweightstruct[m_args->weightlistnum];
+		m_args->positionlist = new  stockpotionstruct[m_args->positionlistnum];
+
+		if (!stringtoweightlist(m_args->weightliststr, m_args->weightlist, m_args->weightlistnum))
+			return false;
+		if (!stringtopositionlist(m_args->positionliststr, m_args->positionlist, m_args->positionlistnum))
+			return false;
 
 		if (!m_SyntheticIndex.init(m_args->weightlist, m_args->weightlistnum, m_args->positionlist, m_args->positionlistnum, m_args->indexCode))
-			return;
+			return false;
+		return true;
 
 	}
 
@@ -196,7 +210,9 @@ namespace STYClass
 	bool   CIndexFutureArbitrage_open::gettaderlist(Traderorderstruct *m_stockorders, int &num)
 	{
 		int stockordernum = 0;						   //委托数量
-
+		if (m_stockorders != 0)
+			delete m_stockorders;
+		m_stockorders = new Traderorderstruct[this->m_SyntheticIndex.m_positionlist.size() + 1];   //shen qing  nei cun 
 		list<stockpotionstruct>::iterator itor;
 		itor = this->m_SyntheticIndex.m_positionlist.begin();
 		while (itor != this->m_SyntheticIndex.m_positionlist.end())
