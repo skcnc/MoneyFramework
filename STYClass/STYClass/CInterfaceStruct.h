@@ -10,12 +10,31 @@ struct IndexFutureArbitrageopeninputargs  //界面输入参数
 	stockpotionstruct   *    positionlist=0;		 //显示持仓
 	int   positionlistnum = 0;  //列表数量
 
-	char   weightliststr[65525];
+	char   weightliststr[65535];
 	char   positionliststr[65535];
 	int    nHands = 0;      //手数
 	char   indexCode[32];   //指数
 	char   contractCode[32]; //期货合约
 	double dPositiveOpenDelta = 0;    //开仓点位
+
+	bool  bTradingAllowed;//是否允许交易,勾"允许"时置为true	 用于返回 
+};
+
+struct OPENARGS
+{
+	
+
+	char weightliststr[65535];
+	char positionliststr[65535];
+
+	char   indexCode[32];   //指数
+	char   contractCode[32]; //期货合约
+
+	int    nHands = 0;      //手数
+	double dPositiveOpenDelta = 0;    //开仓点位
+
+	int   weightlistnum = 0;  //列表数量
+	int   positionlistnum = 0;  //列表数量
 
 	bool  bTradingAllowed;//是否允许交易,勾"允许"时置为true	 用于返回 
 };
