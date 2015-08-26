@@ -5,6 +5,7 @@
 
 using namespace System;
 using namespace STYClass;
+using namespace System::Runtime::InteropServices;
 
 namespace managedSTY
 {
@@ -57,16 +58,25 @@ namespace managedSTY
 	[StructLayout(LayoutKind::Sequential)]
 	public ref struct open_args{
 
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 65535)]
 		String^ WEIGHTLIST; //权重参数 
-		int WEIGHTNUM; //权重数量
 
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 65535)]
 		String^ POSITIONLIST; //持仓参数
-		int POSITIONNUM; //持仓数量
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 32)]
+		String^ indexCode; //指数
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 32)]
+		String^ contractCode; //期货合约
 
 		int nHands; //手数
-		String^ indexCode; //指数
-		String^ contractCode; //期货合约
+
 		double dPositiveOpenDelta; //开仓点位
+		
+		int WEIGHTNUM; //权重数量
+
+		int POSITIONNUM; //持仓数量
 
 		bool bTradingAllowed;  //是否允许交易
 	};
