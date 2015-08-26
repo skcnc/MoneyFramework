@@ -48,10 +48,13 @@ namespace STYClass
 
 		return true;
 	}
-	bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex* subscribelist, int& num)            //获得订阅的股票 
+	bool   CIndexFutureArbitrage_open::getsubscribelist(securityindex* * psubscribelist, int& num)            //获得订阅的股票 
 	{
 		int totalnum = this->m_SyntheticIndex.stockDb.size() + 2;
-		//securityindex * subscribelist = new securityindex[totalnum];
+		if (*psubscribelist != 0)
+			delete *psubscribelist;
+		*psubscribelist = new securityindex[totalnum];
+		securityindex *subscribelist = *psubscribelist;
 
 
 		map<securityindex, CSecurity * >::iterator itor;
@@ -101,8 +104,17 @@ namespace STYClass
 		m_future.setcode(m_args->contractCode); //初始期货
 		m_index.setcode(m_args->indexCode);     //初始化指数
 		//初始化position文件 
-		if (m_args->weightlistnum == 0)  //对于期现套利，必须有权重文件
+		if (m_args->weightlistnum <= 0 || m_args->positionlistnum<=0)  //对于期现套利，必须有权重文件
 			return false;
+		if (m_args->weightlist != 0)
+			delete m_args->weightlist;
+
+		if (m_args->positionlist != 0)
+			delete m_args->positionlist;
+
+		m_args->weightlist = new  indexweightstruct[m_args->weightlistnum];
+		m_args->positionlist = new  stockpotionstruct[m_args->positionlistnum];
+
 		if (!stringtoweightlist(m_args->weightliststr, m_args->weightlist, m_args->weightlistnum))
 			return false;
 		if (!stringtopositionlist(m_args->positionliststr, m_args->positionlist, m_args->positionlistnum))
@@ -198,10 +210,13 @@ namespace STYClass
 		return true;
 	}
 	/**********获取交易*******/
-	bool   CIndexFutureArbitrage_open::gettaderlist(Traderorderstruct *m_stockorders, int &num)
+	bool   CIndexFutureArbitrage_open::gettaderlist(Traderorderstruct **mp_stockorders, int &num)
 	{
 		int stockordernum = 0;						   //委托数量
-
+		if (*mp_stockorders != 0)
+			delete (*mp_stockorders);
+		*mp_stockorders = new Traderorderstruct[this->m_SyntheticIndex.m_positionlist.size() + 1];   //shen qing  nei cun 
+		Traderorderstruct * m_stockorders = *mp_stockorders;
 		list<stockpotionstruct>::iterator itor;
 		itor = this->m_SyntheticIndex.m_positionlist.begin();
 		while (itor != this->m_SyntheticIndex.m_positionlist.end())
@@ -216,11 +231,30 @@ namespace STYClass
 			if (m_stockorders[stockordernum].dOrderprice > itor->duplimitprice)
 				m_stockorders[stockordernum].dOrderprice = itor->duplimitprice;  //涨停价
 
+			strcpy(m_stockorders[stockordernum].cExchangeID, getExchangeNumByStockCode(itor->sSecurity.cSecurity_code));
+
+			m_stockorders[stockordernum].cOffsetFlag = 0;  //股票不需要
+			m_stockorders[stockordernum].cOrderexecutedetail = 0; //保留 暂不使用
+			m_stockorders[stockordernum].cOrderlevel = 1;  //优先级
+			m_stockorders[stockordernum].cOrderPriceType = 0; //股票只有限价单  不需要
+			m_stockorders[stockordernum].cTraderdirection = '1'; //买入
 			/**********************/
 			itor++;
 			stockordernum++;
 		}
 
+		/**************期货********/
+		strcpy(m_stockorders[stockordernum].cSecurity_code, this->m_future.m_DepthMarketData.msecurity.cSecurity_code);
+		m_stockorders[stockordernum].cSecuritytype = this->m_future.m_DepthMarketData.msecurity.cSecuritytype;
+		strcpy(m_stockorders[stockordernum].cExchangeID, "cf");
+		m_stockorders[stockordernum].cOffsetFlag = '0'; //0  开 1 平
+		m_stockorders[stockordernum].cOrderPriceType = '2'; //限价
+		m_stockorders[stockordernum].dOrderprice = this->m_future.getlastprice() - 5; //已低于实时价5报单
+		m_stockorders[stockordernum].cTraderdirection = '1'; //0 买入 1 卖出
+		m_stockorders[stockordernum].cOrderlevel = 1;  //优先级
+		m_stockorders[stockordernum].cOrderexecutedetail = 0; //保留 暂不使用
+		m_stockorders[stockordernum].nSecurity_amount = nHands;
+		stockordernum++;
 		num = stockordernum;
 
 		return true;

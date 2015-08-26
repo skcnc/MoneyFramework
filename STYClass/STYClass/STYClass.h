@@ -56,17 +56,20 @@ inline  char *  positionlisttostring(stockpotionstruct  *positionlist, int   pos
 	return tempstr;
 }
 
-inline  bool stringtoweightlist(char * tempstr,  indexweightstruct *weightlist, int & weightlistnum)
+inline  bool stringtoweightlist(const char * tempstr,  indexweightstruct *weightlist, int & realweightlistnum)
 {
 	int colnun[2];
-	weightlistnum = 0;
-	string strtypetemp(tempstr);
-	int rowflag,preflag = 0; 
-	if (tempstr = 0)
-		return 0;
 	int i = 0;
+	int weightlistnum = 0;
+	string strtypetemp(tempstr);
+	int rowflag = -1, preflag = -1;
+	if (tempstr == 0)
+		return 0;
+
+	char temp = tempstr[i];
 	while (tempstr[i] != '/0')
 	{
+		temp = tempstr[i];
 		if (tempstr[i] == '*')
 			break;
 		if (tempstr[i] == '|')  //row
@@ -85,24 +88,26 @@ inline  bool stringtoweightlist(char * tempstr,  indexweightstruct *weightlist, 
 			if (k != 2)
 				return false;
 
-			strcpy(weightlist[weightlistnum].sSecurity.cSecurity_code, strtypetemp.substr(preflag+1, colnun[0] - preflag - 1).c_str());
-			weightlist[weightlistnum].sSecurity.cSecuritytype = tempstr[colnun[0]+1];
+			strcpy(weightlist[weightlistnum].sSecurity.cSecurity_code, strtypetemp.substr(preflag + 1, colnun[0] - preflag - 1).c_str());
+			weightlist[weightlistnum].sSecurity.cSecuritytype = tempstr[colnun[0] + 1];
 			weightlist[weightlistnum].dweight = atof(strtypetemp.substr(colnun[1] + 1, rowflag - colnun[1] - 1).c_str());
 			weightlistnum++;
+		if (weightlistnum > realweightlistnum)
+				return false;
 		}
-		
+		i++;
 	}
 	return true;
 }
 
-inline  bool  stringtopositionlist(char * tempstr,stockpotionstruct  *positionlist, int  & positionlistnum)
+inline  bool  stringtopositionlist(const char * tempstr,stockpotionstruct  *positionlist, int  & realpositionlistnum)
 {
 
 	int colnun[2];
-	positionlistnum = 0;
+	int positionlistnum = 0;
 	string strtypetemp(tempstr);
-	int rowflag, preflag = 0;
-	if (tempstr = 0)
+	int rowflag=-1, preflag = -1;
+	if (tempstr == 0)
 		return 0;
 	int i = 0;
 	while (tempstr[i] != '/0')
@@ -130,7 +135,9 @@ inline  bool  stringtopositionlist(char * tempstr,stockpotionstruct  *positionli
 			positionlist[positionlistnum].ntradervolume= atoi(strtypetemp.substr(colnun[1] + 1, rowflag - colnun[1] - 1).c_str());
 			positionlistnum++;
 		}
-
+		i++;
+		if (positionlistnum > realpositionlistnum)
+			return false;
 	}
 	return true;
 }
@@ -180,7 +187,7 @@ namespace STYClass
 	public:
 		/************行情部分********/
 		bool    updateSecurityInfo(MarketInforStruct *, int &num);      //获得行情信息  
-		bool    getsubscribelist(securityindex*, int& num);            //获得订阅的股票 必须在初始化结束后调用
+		bool    getsubscribelist(securityindex**, int& num);            //获得订阅的股票 必须在初始化结束后调用
 
 
 		/**********策略执行*******/
@@ -194,7 +201,7 @@ namespace STYClass
 		bool   getshowstatus(IndexFutureArbitragecloseshowargs & msg);
 
 		/**********获取交易*******/
-		bool   gettaderlist(Traderorderstruct *, int &num);
+		bool   gettaderlist(Traderorderstruct * *, int &num);
 
 	public:
 		IndexFutureArbitragecloseinputargs* m_args;
@@ -242,7 +249,7 @@ namespace STYClass
 	public:
 		/************行情部分********/
 		bool    updateSecurityInfo(MarketInforStruct *, int &num);      //获得行情信息  
-		bool    getsubscribelist(securityindex*, int& num);            //获得订阅的股票 必须在初始化结束后调用
+		bool    getsubscribelist(securityindex**, int& num);            //获得订阅的股票 必须在初始化结束后调用
 
 
 		/**********策略执行*******/
@@ -257,7 +264,7 @@ namespace STYClass
 		bool   getshowstatus(IndexFutureArbitrageopenshowargs & msg);
 
 		/**********获取交易*******/
-		bool   gettaderlist(Traderorderstruct *, int &num);
+		bool   gettaderlist(Traderorderstruct **, int &num);
 	};
 
 }
