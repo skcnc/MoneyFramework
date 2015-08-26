@@ -8,7 +8,7 @@ using namespace STYClass;
 
 namespace managedSTY
 {
-	
+
 
 	public ref struct managedsecurityindex{
 		char cSecuritytype;
@@ -43,7 +43,7 @@ namespace managedSTY
 		bool bstoped;    //当前状态(是否停盘)
 		double dlastprice;  //当前价格
 
-	     stockpotionstruct  GetInstance(){
+		stockpotionstruct  GetInstance(){
 			stockpotionstruct* m = new stockpotionstruct();
 			m->sSecurity = sSecurity->GetInstance();
 			m->ntradervolume = tradevolume;
@@ -54,14 +54,14 @@ namespace managedSTY
 		}
 	};
 
+	[StructLayout(LayoutKind::Sequential)]
 	public ref struct open_args{
-		array<managedIndexWeights^>^ weightlist; //权重文件
-		int weightlistnum; //权重文件数量
 
-		
+		String^ WEIGHTLIST; //权重参数 
+		int WEIGHTNUM; //权重数量
 
-		array<managedstockposition^>^ positionlist; //显示持仓
-		int positionlistNUM;
+		String^ POSITIONLIST; //持仓参数
+		int POSITIONNUM; //持仓数量
 
 		int nHands; //手数
 		String^ indexCode; //指数
@@ -71,34 +71,15 @@ namespace managedSTY
 		bool bTradingAllowed;  //是否允许交易
 	};
 
-	[StructLayout(LayoutKind::Sequential)]
-	public ref struct OPEN_ARGS_M{
-		//权重文件
-		[MarshalAs(UnmanagedType::ByValTStr)]
-		System::String^ WEIGHT;
-		//持仓文件
-		[MarshalAs(UnmanagedType::ByValTStr)]
-		System::String^ POSITION;
-		//手数
-		int nHands;
-		//指数
-		[MarshalAs(UnmanagedType::ByValTStr)]
-		System::String^ indexCode;
-		//期货合约
-		[MarshalAs(UnmanagedType::ByValTStr)]
-		System::String^ contractCode;
-		//开仓点位
-		double dPositiveOpenDelta;
-		//是否允许交易
-		bool bTradingAllowed;
-	};
-
 	public ref struct close_args{
-		array<managedIndexWeights^>^ weightlist;//权重文件
-		int weightlistnum; //权重文件数量
+		//array<managedIndexWeights^>^ weightlist;//权重文件
+		//int weightlistnum; //权重文件数量
 
-		array<managedstockposition^>^ positionlist; //显示持仓
-		int positionlistNUM;
+		//array<managedstockposition^>^ positionlist; //显示持仓
+		//int positionlistNUM;
+
+		String^ POSITION;
+		int positionNum;
 
 		int nHands; //手数
 		String^ indexCode; //指数
@@ -142,7 +123,7 @@ namespace managedSTY
 			m.nStatus = nStatus;
 			m.nPreClose = nPreClose;
 			m.dLastPrice = dLastPrice;
-			
+
 			for (int i = 0; i < 10; i++)
 			{
 				m.dAskPrice[i] = dAskPrice[i];
@@ -157,7 +138,7 @@ namespace managedSTY
 			m.bStoped = bstoped;
 			m.nInfotLag = nInfotLag;
 			m.LastUpdateTime = LastUpdateTime;
-		
+
 
 			m.msecurity = msecurity->GetInstance();
 
@@ -282,7 +263,7 @@ namespace managedSTY
 
 		/*****显示参数****/
 		//bool   gettaderargs(open_args^ realargs);    //获得实际运行中的参数 包含samp文件
-		void getshowstatus(String^ status); 
+		void getshowstatus(String^ status);
 
 		/**********获取交易*******/
 		array<managedTraderorderstruct^>^ getTradeList();
@@ -293,7 +274,7 @@ namespace managedSTY
 
 	public ref class Strategy_CLOSE
 	{
-	public :
+	public:
 		Strategy_CLOSE();
 		virtual ~Strategy_CLOSE();
 
