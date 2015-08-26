@@ -41,7 +41,7 @@ array<managedsecurityindex^>^ Strategy_OPEN::getsubscribelist(){
 	securityindex*  subscribelist = new securityindex[1];
 	array<managedsecurityindex^>^ securityIndexs;
 	int num;
-	if (m_open_strategy->getsubscribelist(subscribelist, num))
+	if (m_open_strategy->getsubscribelist(&subscribelist, num))
 	{
 		securityIndexs = gcnew array<managedsecurityindex^>(num);
 		for (int i = 0; i < num; i++){
@@ -111,7 +111,7 @@ array<managedTraderorderstruct^>^ Strategy_OPEN::getTradeList(){
 
 	int m_num;
 
-	bool b = m_open_strategy->gettaderlist(m_list, m_num);
+	bool b = m_open_strategy->gettaderlist(&m_list, m_num);
 
 	if (b == true){
 		for (int i = 0; i < m_num; i++){
@@ -156,7 +156,7 @@ array<managedsecurityindex^>^ Strategy_CLOSE::getsubscribelist(){
 	securityindex*  subscribelist = new securityindex[1];
 	array<managedsecurityindex^>^ securityIndexs;
 	int num;
-	if (m_close_strategy->getsubscribelist(subscribelist, num))
+	if (m_close_strategy->getsubscribelist(&subscribelist, num))
 	{
 		securityIndexs = gcnew array<managedsecurityindex^>(num);
 		for (int i = 0; i < num; i++){
@@ -243,7 +243,7 @@ array<managedTraderorderstruct^>^ Strategy_CLOSE::getTradeList(){
 
 	int m_num;
 
-	bool b = m_close_strategy->gettaderlist(m_list, m_num);
+	bool b = m_close_strategy->gettaderlist(&m_list, m_num);
 
 	if (b == true){
 		for (int i = 0; i < m_num; i++){

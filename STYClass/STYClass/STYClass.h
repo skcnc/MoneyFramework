@@ -187,7 +187,7 @@ namespace STYClass
 	public:
 		/************行情部分********/
 		bool    updateSecurityInfo(MarketInforStruct *, int &num);      //获得行情信息  
-		bool    getsubscribelist(securityindex*, int& num);            //获得订阅的股票 必须在初始化结束后调用
+		bool    getsubscribelist(securityindex**, int& num);            //获得订阅的股票 必须在初始化结束后调用
 
 
 		/**********策略执行*******/
@@ -201,7 +201,7 @@ namespace STYClass
 		bool   getshowstatus(IndexFutureArbitragecloseshowargs & msg);
 
 		/**********获取交易*******/
-		bool   gettaderlist(Traderorderstruct *, int &num);
+		bool   gettaderlist(Traderorderstruct * *, int &num);
 
 	public:
 		IndexFutureArbitragecloseinputargs* m_args;
@@ -249,7 +249,7 @@ namespace STYClass
 	public:
 		/************行情部分********/
 		bool    updateSecurityInfo(MarketInforStruct *, int &num);      //获得行情信息  
-		bool    getsubscribelist(securityindex*, int& num);            //获得订阅的股票 必须在初始化结束后调用
+		bool    getsubscribelist(securityindex**, int& num);            //获得订阅的股票 必须在初始化结束后调用
 
 
 		/**********策略执行*******/
@@ -264,7 +264,7 @@ namespace STYClass
 		bool   getshowstatus(IndexFutureArbitrageopenshowargs & msg);
 
 		/**********获取交易*******/
-		bool   gettaderlist(Traderorderstruct *, int &num);
+		bool   gettaderlist(Traderorderstruct **, int &num);
 	};
 
 }
