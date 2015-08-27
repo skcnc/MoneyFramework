@@ -82,6 +82,9 @@ void Strategy_OPEN::init(open_args^ m){
 	m_open_strategy->m_args->dPositiveOpenDelta = p->dPositiveOpenDelta;
 	m_open_strategy->m_args->bTradingAllowed = p->bTradingAllowed;
 
+	m_open_strategy->m_args->positionlistnum = p->positionlistnum;
+	m_open_strategy->m_args->weightlistnum = p->weightlistnum;
+
 	m_open_strategy->init();
 
 }
