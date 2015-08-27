@@ -36,7 +36,7 @@ double  CSyntheticIndex::getSimIndex()
 		   dSimIndex+=itor->dweight*stockDb[itor->sSecurity]->getlastprice();
 		  itor++;
        } 
-	 return dSimIndex;
+	 return dSimIndex/300;
 }
 
 double  CSyntheticIndex::getrealmarketvalue(double & stopmarketvalue)
