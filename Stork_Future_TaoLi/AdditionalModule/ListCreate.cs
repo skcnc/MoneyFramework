@@ -16,17 +16,32 @@ namespace Stork_Future_TaoLi
         Sell = 1
     };
 
-    public enum FutureTradeStatus
+    /// <summary>
+    /// 交易线程的流程控制参数
+    /// </summary>
+    public enum FutureTradeThreadStatus
     {
-        DISCONNECTED = 0,
-        CONNECTED = 1 ,
-        LOGIN = 2,
-        ORDERINSERT = 3,
-        ORDERWRONG = 4,
-        ORDERDONE = 5,
-        TRADEINSERT = 6,
-        TRADEDONE = 7,
-        SYSERROR = 8
+        DISCONNECTED = 0,   //线程尚未连接到CTP后台
+        CONNECTED = 1 ,     //线程连入CTP，未登陆
+        LOGIN = 2,          //线程连入CTP，已登陆
+        BUSY = 3,
+        FREE = 4,
+        SYSERROR = 5
+    }
+
+    /// <summary>
+    /// 交易状态
+    /// PREORDER        ：   已经下单
+    /// ORDERING        :    正在交易中
+    /// ORDERFAILURE    :    交易失败
+    /// ORDERCOMPLETED  :    交易完成
+    /// </summary>
+    public enum TradeDealStatus
+    {
+        PREORDER = 0,
+        ORDERING = 1,
+        ORDERFAILURE = 2,
+        ORDERCOMPLETED = 3
     }
 
     public class LocalMarketPrice
