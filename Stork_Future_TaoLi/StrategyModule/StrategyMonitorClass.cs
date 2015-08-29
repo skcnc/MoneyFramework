@@ -237,6 +237,29 @@ namespace Stork_Future_TaoLi
             }
         }
 
+        public void AllowOperater(object v)
+        {
+            string id = string.Empty;
+            bool oper = false;
+            if (v is OPENALLOW)
+            {
+                OPENALLOW value = (OPENALLOW)v;
+                id = value.basic.ID;
+                oper = value.ALLOW;
+            }
+            else
+            {
+                CLOSEALLOW value = (CLOSEALLOW)v;
+                id = value.basic.ID;
+                oper = value.ALLOW;
+            }
+
+            if (Workers.Keys.Contains(id))
+            {
+                Workers[id].bAllow = oper;
+            }
+        }
+
         public void DeleteWorker(object v)
         {
             string id = string.Empty;
@@ -367,7 +390,7 @@ namespace Stork_Future_TaoLi
                     else if (obj is OPENALLOW)
                     {
                         OPENALLOW value = (OPENALLOW)obj;
-
+                        AllowOperater((object)obj);
                     }
                     else if (obj is OPENRUN)
                     {
@@ -389,8 +412,15 @@ namespace Stork_Future_TaoLi
                         CLOSERUN value = (CLOSERUN)obj;
                         RunOperater((object)value);
                     }
-                    else if (obj is CLOSEALLOW) { CLOSEALLOW value = (CLOSEALLOW)obj; }
-                    else if (obj is CLOSEDELETE) { DeleteWorker(obj); }
+                    else if (obj is CLOSEALLOW) 
+                    {
+                        CLOSEALLOW value = (CLOSEALLOW)obj;
+                        AllowOperater((object)obj);
+                    }
+                    else if (obj is CLOSEDELETE) 
+                    {
+                        DeleteWorker(obj); 
+                    }
                     else
                     { continue; }
 
