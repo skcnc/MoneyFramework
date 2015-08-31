@@ -475,9 +475,9 @@ namespace Stork_Future_TaoLi.StrategyModule
                             for (int i = 0; i < data.AskPrice.Count(); i++)
                             {
                                 info.dAskPrice[i] = Convert.ToDouble(data.AskPrice[i]) / 10000;
-                                info.dAskVol[i] = Convert.ToDouble(data.AskVol[i]) / 10000;
+                                info.dAskVol[i] = Convert.ToDouble(data.AskVol[i]) ;
                                 info.dBidPrice[i] = Convert.ToDouble(data.BidPrice[i]) / 10000;
-                                info.dBidVol[i] = Convert.ToDouble(data.BidVol[i]) / 10000;
+                                info.dBidVol[i] = Convert.ToDouble(data.BidVol[i]) ;
                             }
                         }
 
