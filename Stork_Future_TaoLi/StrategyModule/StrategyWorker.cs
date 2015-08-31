@@ -630,43 +630,34 @@ namespace Stork_Future_TaoLi.StrategyModule
             List<managedIndexWeights> weight = new List<managedIndexWeights>();
             List<managedstockposition> position = new List<managedstockposition>();
 
+            string weightString = String.Empty;
+            string positionString = String.Empty;
+            int weightNum = 0;
+            int positionNum = 0;
+
             foreach (var item in WeightList)
             {
-
-                managedIndexWeights w = new managedIndexWeights();
-                managedsecurityindex si = new managedsecurityindex();
 
                 string code = item.Key.Substring(1);
                 string type = item.Key.Substring(0, 1);
                 double weightvalue = item.Value;
 
-                si.cSecuritytype = Convert.ToSByte(type[0]);
-                si.cSecurity_code = code;
-                w.sSecurity = si;
-                w.dweight = weightvalue;
-
-                weight.Add(w);
+                weightString += (code + ";" + type + ";" + weightvalue.ToString() + "|");
+                weightNum++;
             }
 
+            weightString += "*";
             foreach (var item in LiStockOrder)
             {
-                managedstockposition s = new managedstockposition();
-                managedsecurityindex si = new managedsecurityindex();
+                string code = item.Key.Substring(1);
+                string type = item.Key.Substring(0, 1);
+                int tradeVolume = item.Value;
 
-                si.cSecurity_code = item.Key.Substring(1);
-                si.cSecuritytype = Convert.ToSByte(item.Key.Substring(0, 1)[0]);
-
-                s.sSecurity = si;
-
-                s.tradevolume = item.Value;
-
-                /*****************************
-                 * TODO: 是否停盘和最新价格
-                 *          尚未赋值
-                 * **************************/
-
-                position.Add(s);
+                positionString += (code + ";" + type + ";" + tradeVolume.ToString() + "|");
+                positionNum++;
             }
+
+            positionString += "*";
 
             args.bTradingAllowed = false;
 
@@ -674,11 +665,11 @@ namespace Stork_Future_TaoLi.StrategyModule
             args.dPositiveOpenDelta = OP;
             args.indexCode = INDEX;
             args.nHands = HD;
-            args.positionlist = position.ToArray();
-            args.positionlistNUM = LiStockOrder.Count;
-            args.weightlist = weight.ToArray();
-            args.weightlistnum = WeightList.Count;
-
+            args.WEIGHTLIST = weightString;
+            args.POSITIONLIST = positionString;
+            args.WEIGHTNUM = weightNum;
+            args.POSITIONNUM = positionNum;
+            
             return args;
 
         }
@@ -705,26 +696,11 @@ namespace Stork_Future_TaoLi.StrategyModule
             String CT, string INDEX, int HD, double dStockBonus, double dGiftValue, double dStockOpenCost, double dFutureSellPoint, double dOpenedPoint, double dExpectedGain, double dShortCharge)
         {
             close_args args = new close_args();
-            List<managedIndexWeights> weight = new List<managedIndexWeights>();
-            List<managedstockposition> position = new List<managedstockposition>();
 
-            foreach (var item in WeightList)
-            {
+            //List<managedstockposition> position = new List<managedstockposition>();
 
-                managedIndexWeights w = new managedIndexWeights();
-                managedsecurityindex si = new managedsecurityindex();
-
-                string code = item.Key.Substring(1);
-                string type = item.Key.Substring(0, 1);
-                double weightvalue = item.Value;
-
-                si.cSecuritytype = Convert.ToSByte(type[0]);
-                si.cSecurity_code = code;
-                w.sSecurity = si;
-                w.dweight = weightvalue;
-
-                weight.Add(w);
-            }
+            String POSITIONLIST = string.Empty;
+            int positionNum = 0;
 
             foreach (var item in LiStockOrder)
             {
@@ -738,23 +714,18 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                 s.tradevolume = item.Value;
 
-                /*****************************
-                 * TODO: 是否停盘和最新价格
-                 *          尚未赋值
-                 * **************************/
-
-                position.Add(s);
+                POSITIONLIST += (si.cSecurity_code + ";" + si.cSecuritytype + ";" + s.tradevolume + "|");
+                positionNum++;
             }
+
+            POSITIONLIST += "*";
 
             args.bTradingAllowed = false;
 
             args.contractCode = CT;
             args.indexCode = (INDEX == null) ? "300" : INDEX;
             args.nHands = HD;
-            args.positionlist = position.ToArray();
-            args.positionlistNUM = LiStockOrder.Count;
-            args.weightlist = weight.ToArray();
-            args.weightlistnum = WeightList.Count;
+           
 
             args.dStockBonus = dStockBonus;
             args.dGiftValue = dGiftValue;
@@ -763,9 +734,9 @@ namespace Stork_Future_TaoLi.StrategyModule
             args.dOpenedPoint = dOpenedPoint;
             args.dExpectedGain = dExpectedGain;
             args.dShortCharge = dShortCharge;
-
+            args.positionNum = positionNum;
             args.bTradingAllowed = false;
-
+            args.POSITION = POSITIONLIST;
 
             return args;
 
