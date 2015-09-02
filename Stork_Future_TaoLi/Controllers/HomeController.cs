@@ -109,6 +109,12 @@ namespace Stork_Future_TaoLi.Controllers
             return View();
         }
 
+        public ActionResult TradeMonitor()
+        {
+            ViewBag.ID = Request.QueryString["USER"];
+            return View();
+        }
+
         public ActionResult MarketView()
         {
             return View();

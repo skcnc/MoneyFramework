@@ -6,76 +6,125 @@ using System.Collections.Concurrent;
 
 namespace Stork_Future_TaoLi
 {
-    public class TradeRecord : ConcurrentDictionary<String, RecordItem>
+    /// <summary>
+    /// 自然日交易记录，记录当日交易的所有进度，处委托回报、成交回报 在部分成交的状态外，其余均同步至数据库。
+    /// </summary>
+    public class TradeRecord : ConcurrentDictionary<int, RecordItem>
     {
+
+        //全局记录采用单例模式
         private static readonly TradeRecord Instance = new TradeRecord();
+
         public static TradeRecord GetInstance()
         {
             return Instance;
         }
 
+        /// <summary>
+        /// 创建新的委托
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="code"></param>
+        /// <param name="orientation"></param>
+        /// <param name="amount"></param>
+        /// <param name="price"></param>
+        /// <param name="StrID"></param>
         public void CreateOrder(String type, String code, String orientation, int amount, decimal price, String StrID)
         {
             RecordItem _record = new RecordItem()
             {
                 StrategyId = StrID,
-                LocalRequestID = StrID + code,
                 OrderTime_Start = DateTime.Now,
                 Type = type,
                 Code = code,
                 Orientation = orientation,
-                Amount = amount,
+                VolumeTotalOriginal = amount,
                 Price = price,
-                ParialDealAmount = 0,
+                VolumeTraded = 0,
                 QuitAmount = 0,
+                ErrMsg = String.Empty,
+                RequestID = REQUEST_ID.ApplyNewID(),
                 Status = TradeDealStatus.PREORDER
             };
 
-            if (this.Keys.Contains(_record.LocalRequestID))
+            if (this.Keys.Contains(_record.RequestID))
             {
                 //已经存在Key，采用新的记录
                 RecordItem _oldRecord = new RecordItem();
-                this.TryRemove(_record.LocalRequestID, out _oldRecord);
+                this.TryRemove(_record.RequestID, out _oldRecord);
             }
 
-            this.TryAdd(_record.LocalRequestID, _record);
+            this.TryAdd(_record.RequestID, _record);
 
         }
 
-        public void UpdateOrder(int partialAmount, int quitAmount, string key)
+        /// <summary>
+        /// 更新委托信息
+        /// </summary>
+        /// <param name="partialAmount"></param>
+        /// <param name="quitAmount"></param>
+        /// <param name="key"></param>
+        public void UpdateOrder(int volumeTraded,int requestId, String LocalRequstId, String StatusMsg)
         {
             RecordItem _record = new RecordItem();
-            _record = this.GetOrAdd(key, _record);
-            _record.ParialDealAmount = partialAmount;
-            _record.QuitAmount = quitAmount;
+            _record = this.GetOrAdd(requestId, _record);
+            _record.VolumeTraded = volumeTraded;
+            _record.ErrMsg = StatusMsg;
+            _record.LocalRequestID = LocalRequstId;
             _record.Status = TradeDealStatus.ORDERING;
 
-            this.TryAdd(_record.LocalRequestID, _record);
+            this.TryAdd(_record.RequestID, _record);
         }
 
-        public void MarkFailure(String key, String Err)
+        public void UpdateTrade(int volumeTraded, int requestId, double tradePrice, String OrderRef)
         {
             RecordItem _record = new RecordItem();
-            _record = this.GetOrAdd(key, _record);
+            _record = this.GetOrAdd(requestId, _record);
+            _record.VolumeTraded = volumeTraded;
+            _record.DealPrice = Convert.ToDecimal(tradePrice);
+            _record.OrderRef = OrderRef;
+
+            if (_record.VolumeTotalOriginal == _record.VolumeTraded)
+            {
+                _record.Status = TradeDealStatus.ORDERCOMPLETED;
+            }
+
+        }
+
+        /// <summary>
+        /// 更新失败记录
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Err"></param>
+        public void MarkFailure(int requestId, String Err)
+        {
+            RecordItem _record = new RecordItem();
+            _record = this.GetOrAdd(requestId, _record);
             _record.ErrMsg = Err;
             _record.Status = TradeDealStatus.ORDERFAILURE;
         }
 
-        public void CompleteOrder(String key, decimal dealPrice, int partialAmount, int quitAmount)
+        /// <summary>
+        /// 记录完成
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="dealPrice"></param>
+        /// <param name="partialAmount"></param>
+        /// <param name="quitAmount"></param>
+        public void CompleteOrder(int requestId, decimal dealPrice, int partialAmount, int quitAmount)
         {
             RecordItem _record = new RecordItem();
-            _record = this.GetOrAdd(key, _record);
+            _record = this.GetOrAdd(requestId, _record);
 
             _record.DealPrice = dealPrice;
-            _record.ParialDealAmount = partialAmount;
+            _record.VolumeTraded = partialAmount;
             _record.QuitAmount = quitAmount;
             _record.Status = TradeDealStatus.ORDERCOMPLETED;
         }
     }
 
-
     /// <summary>
-    /// 交易管理控制类
+    /// 交易记录内容
     /// </summary>
     public class RecordItem
     {
@@ -85,7 +134,7 @@ namespace Stork_Future_TaoLi
         public String StrategyId { get; set; }
 
         /// <summary>
-        ///KEY 策略ID号+CODE 
+        /// 系统交易号
         /// </summary>
         public String LocalRequestID { get; set; }
 
@@ -115,9 +164,14 @@ namespace Stork_Future_TaoLi
         public String Orientation { get; set; }
 
         /// <summary>
-        /// 数量
+        /// 原始交易数量
         /// </summary>
-        public int Amount { get; set; }
+        public int VolumeTotalOriginal { get; set; }
+
+        /// <summary>
+        /// 最新交易数量，存在撤单情况
+        /// </summary>
+        public int VolumeTotal { get; set; }
 
         /// <summary>
         /// 设定价格
@@ -132,7 +186,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 部分成交量
         /// </summary>
-        public int ParialDealAmount { get; set; }
+        public int VolumeTraded { get; set; }
 
         /// <summary>
         /// 撤销量
@@ -150,10 +204,37 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public int RequestID { get; set; }
 
+        /// <summary>
+        /// 报单引用
+        /// </summary>
+        public String OrderRef { get; set; }
 
         /// <summary>
         /// 交易状态
         /// </summary>
         public TradeDealStatus Status { get; set; }
+    }
+
+    /// <summary>
+    /// 期货交易RequestID 分发类
+    /// </summary>
+    public class REQUEST_ID
+    {
+        private static object _syncRoot = new object();
+        private static int _id = 0;
+
+        /// <summary>
+        /// 申请新的ID值
+        /// </summary>
+        /// <returns>id值</returns>
+        public static int ApplyNewID()
+        {
+            lock (_syncRoot)
+            {
+                _id++;
+                return _id;
+            }
+        }
+
     }
 }

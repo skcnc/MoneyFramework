@@ -1019,6 +1019,17 @@ $('#btnSubmit_close').click(function (e) {
     alert('参数已写入，请刷新控制页面')
 })
 
+$('#tm_btnMakeOrder').click(function (e) {
+    var type = $('input[name="RadioType"]:checked').val();
+    var code = $('#tm_input_code').text().trim();
+    var direction = $('input[name="RadioDirection"]:checked').val();
+    var mark = $('input[name="RadioMark"]:checked').val();
+    var hd = $('tm_input_volume').text().trim();
+    var price = $('tm_input_price').text().trim();
+
+
+})
+
 //辅助函数
 function GetIndexFullName(briefName)
 {

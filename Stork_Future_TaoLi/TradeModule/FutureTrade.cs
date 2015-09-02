@@ -148,8 +148,6 @@ namespace Stork_Future_TaoLi
 
         #endregion
 
-
-
         /// <summary>
         /// 期货交易工作线程
         /// </summary>
@@ -290,7 +288,20 @@ namespace Stork_Future_TaoLi
             _client.RspOrderAction += _client_RspOrderAction;
             //报单失败回调函数
             _client.RspOrderInsert += _client_RspOrderInsert;
+            //报单问题回调函数
+            _client.ErrRtnOrderInsert += _client_ErrRtnOrderInsert;
           
+        }
+
+        /// <summary>
+        /// 发出报单出现问题回调函数
+        /// </summary>
+        /// <param name="pInputOrder"></param>
+        /// <param name="pRspInfo"></param>
+        void _client_ErrRtnOrderInsert(CThostFtdcInputOrderField_M pInputOrder, CThostFtdcRspInfoField_M pRspInfo)
+        {
+            //throw new NotImplementedException();
+            
         }
 
 
@@ -341,7 +352,16 @@ namespace Stork_Future_TaoLi
         /// <param name="pTrade"></param>
         static void _client_RtnTrade(CTP_CLI.CThostFtdcTradeField_M pTrade)
         {
-            throw new NotImplementedException();
+
+            int tradeCompleted = pTrade.Volume;
+            double tradePrice = pTrade.Price;
+            String RequestID = pTrade.OrderSysID;
+
+            String OrderRef = pTrade.OrderRef;
+
+
+            TradeRecord.GetInstance().UpdateTrade(tradeCompleted, Convert.ToInt16(RequestID), tradePrice, OrderRef);
+            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -355,10 +375,9 @@ namespace Stork_Future_TaoLi
             int tradeRemain = pOrder.VolumeTotal;
             int requestID = pOrder.RequestID;
             String localRequestID = pOrder.OrderLocalID;
+            String Msg = pOrder.StatusMsg;
 
-
-            //TradeRecord.GetInstance().UpdateOrder(tradeCompleted,)
-
+            TradeRecord.GetInstance().UpdateOrder(tradeCompleted, requestID, localRequestID, Msg);
         }
 
 

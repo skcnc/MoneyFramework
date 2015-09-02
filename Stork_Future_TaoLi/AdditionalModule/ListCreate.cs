@@ -44,26 +44,5 @@ namespace Stork_Future_TaoLi
         ORDERCOMPLETED = 3
     }
 
-    /// <summary>
-    /// 期货交易RequestID 分发类
-    /// </summary>
-    public class REQUEST_ID
-    {
-        private static object _syncRoot = new object();
-        private static int _id = 0;
-
-        /// <summary>
-        /// 申请新的ID值
-        /// </summary>
-        /// <returns>id值</returns>
-        public int ApplyNewID()
-        {
-            lock (_syncRoot)
-            {
-                _id++;
-                return _id;
-            }
-        }
-
-    }
+    
 }
