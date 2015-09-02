@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Stork_Future_TaoLi;
 using Newtonsoft.Json;
 using System.IO;
+using Stork_Future_TaoLi.Modulars;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -74,6 +75,24 @@ namespace Stork_Future_TaoLi.Controllers
             }
         }
 
+        public string ImportTrade(String InputJson)
+        {
+            try
+            {
+                string mark = InputJson.Substring(0, 2);
+                string jsonString = InputJson.Substring(2);
+                object obj = new object();
+
+                if (mark == "C1") { obj = (object)(JsonConvert.DeserializeObject<MakeOrder>(jsonString)); }
+                queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue(obj);
+                return "SUCCESS";
+
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
         public string MatchOpenPara(String strategyId)
         {
             try

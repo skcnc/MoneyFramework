@@ -590,6 +590,8 @@ namespace Stork_Future_TaoLi.StrategyModule
                             order.cOrderLevel = item.cOrderlevel.ToString();
                             order.cOrderexecutedetail = item.cOrderexecutedetail.ToString();
                             order.belongStrategy = StrategyInstanceID;
+                            order.OrderRef = REQUEST_ID.ApplyNewID();
+
                             orderli.Add(order);
                         }
 

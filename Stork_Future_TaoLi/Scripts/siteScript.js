@@ -1021,12 +1021,30 @@ $('#btnSubmit_close').click(function (e) {
 
 $('#tm_btnMakeOrder').click(function (e) {
     var type = $('input[name="RadioType"]:checked').val();
-    var code = $('#tm_input_code').text().trim();
+    var code = $('#tm_input_code')[0].value.trim();
     var direction = $('input[name="RadioDirection"]:checked').val();
     var mark = $('input[name="RadioMark"]:checked').val();
-    var hd = $('tm_input_volume').text().trim();
-    var price = $('tm_input_price').text().trim();
+    var volume = $('#tm_input_volume')[0].value.trim();
+    var price = $('#tm_input_price')[0].value.trim();
 
+    var trade = {
+        cSecurityCode: code,
+        nSecurityAmount: volume,
+        dOrderPrice: price,
+        cTradeDirection: direction,
+        cOffsetFlag: mark,
+        cSecurityType: type,
+        belongStrategy: "00",
+        OrderRef:"0"
+    }
+
+    var JSONSTRING = "C1" + JSON.stringify(trade);
+
+    $.post("/Home/ImportTrade", {
+        InputJson:JSONSTRING    
+    },function(data,status){
+        alert("数据：" + data + "\n状态：" + status);
+    })
 
 })
 
