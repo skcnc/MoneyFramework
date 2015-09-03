@@ -1100,6 +1100,16 @@ $('#login_btnLogin').click(function (e) {
     window.location.href = '/Home/MonitorConsole'
 })
 
+$('#tm_btnMaketest').click(function (e) {
+    var length = $('#tm_tb_inComplete')[0].children.length;
+    var x = -1;
+    for (var i = 0 ; i < length; i++) {
+        var item = $('#tm_tb_inComplete')[0].children[i].cells[0].textContent;
+
+    }
+    var t = tb.children;
+})
+
 //辅助函数
 function GetIndexFullName(briefName)
 {

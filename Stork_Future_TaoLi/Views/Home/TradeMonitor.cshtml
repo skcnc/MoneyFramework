@@ -72,6 +72,7 @@
             </div>
             <div class="col-md-12">
                 <button class="btn btn-success" type="submit" id="tm_btnMakeOrder">下单</button>
+                <button class="btn btn-success" type="submit" id="tm_btnMaketest">get</button>
             </div>
         </div>
         <div class="col-md-8">
@@ -86,10 +87,23 @@
                         <th>报单手数</th>
                         <th>未成交手数</th>
                         <th>报单价格</th>
+                        <th>报单状态</th>
                         <th>报单时间</th>
                     </tr>
                 </thead>
-                <tbody id="tm_tb_inComplete"></tbody>
+                <tbody id="tm_tb_inComplete">
+                    <tr>
+                        <td>19001</td>
+                        <td>277</td>
+                        <td>IF1509</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>100</td>
+                        <td>20</td>
+                        <td>17.50</td>
+                        <td>2015-09-03 10:07:07</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -115,6 +129,7 @@
                 <!--成交记录-->
                 <thead>
                     <tr>
+                        <th>系统号</th>
                         <th>成交编号</th>
                         <th>合约/代码</th>
                         <th>买卖</th>
@@ -142,18 +157,52 @@
         $(function () {
             var chat = $.connection.tradeMonitorHub;
             //更新委托列表
-            chat.client.updateOrderList = function (name, jsonString) {
+            chat.client.updateOrderList = function (jsonString) {
+                var _order = eval('(' + jsonString + ')');
 
+                var _orderRef = _order.OrderRef;
+                var _orderSysId = _order.OrderSysID;
+                var _code = _order.CODE;
+                var _direction = _order.Direction;
+                var _combOff = _order.ComboOff;
+                var _volumeTotalOrigin = _order.VolumeTotalOrigin;
+                var _volumeTotal = _order.VolumeTotal;
+                var _Price = _order.Price;
+                var _DealTime = _order.DealTime;
+                var _msg = _order.MSG;
+
+
+
+                var length = $('#tm_tb_inComplete')[0].children.length;
+                var x = undefined;
+
+                for (var i = 0 ; i < length; i++) {
+                    if (_orderRef == $('#tm_tb_inComplete')[0].children[i].cells[0].textContent) {
+                        x = i;
+                        break;
+                    }
+                }
+
+                if(x != undefined)
+                {
+                    //已经存在该记录
+                    $('#tm_tb_inComplete')[0].children[x].cells[6] = _volumeTotal;
+
+                    if (_volumeTotal == _volumeTotalOrigin || _msg == "已撤销") {
+                        $('#tm_tb_inComplete')[0].children[x].removeNode();
+                    }
+                }
+                else
+                {
+                    //增加新的记录
+                    var newRow = "<tr><td>" + _orderRef + "</td><td>" + _orderSysId + "</td><td>" + _code + "</td><td>" + _direction + "</td><td>" + _combOff + "</td><td>" + _volumeTotalOrigin + "</td><td>" + _volumeTotal + "</td><td>" + _Price + "</td><td>" + _msg + "</td><td>" + _DealTime + "</td></tr>";
+                    $('#tm_tb_inComplete').after(newRow);
+                }
             };
 
             //更新交易列表
-            chat.client.updateTradeList = function (name, jsonString) {
-
-            };
-
-            //更新持仓列表
-            chat.client.updatePositionList = function (name, jsonString) {
-
+            chat.client.updateTradeList = function (jsonString) {
+                var _trade = eval('(' + jsonString + ')');
             };
 
             $.connection.hub.start().done(function () {

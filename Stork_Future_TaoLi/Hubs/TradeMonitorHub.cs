@@ -8,21 +8,6 @@ namespace Stork_Future_TaoLi.Hubs
 {
     public class TradeMonitorHub : Hub
     {
-        public void updateOrderList(String name, String JsonString)
-        {
-            TradeMonitor.Instance.updateOrderList(name, JsonString);
-        }
-
-        public void updateTradeList(String name, String JsonString)
-        {
-            TradeMonitor.Instance.updateTradeList(name, JsonString);
-        }
-
-        public void updatePositionList(String name,String JsonString)
-        {
-            TradeMonitor.Instance.updatePositionList(name, JsonString);
-        }
-
         public void linkin()
         {
             String name = Clients.CallerState.USERNAME;
@@ -47,7 +32,7 @@ namespace Stork_Future_TaoLi.Hubs
             {
                 if (!UserConnectionRelation.ContainsKey(name)) { return; }
 
-                _context.Clients.Client(UserConnectionRelation[name]).updateOrderList(name, JsonString);
+                _context.Clients.Client(UserConnectionRelation[name]).updateOrderList(JsonString);
             }
             catch (Exception ex) { GlobalErrorLog.LogInstance.LogEvent(ex.ToString()); }
         }
@@ -57,20 +42,7 @@ namespace Stork_Future_TaoLi.Hubs
             try
             {
                 if (!UserConnectionRelation.ContainsKey(name)) { return; }
-                _context.Clients.Client(UserConnectionRelation[name]).updateTradeList(name, JsonString);
-            }
-            catch (Exception ex)
-            {
-                GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
-            }
-        }
-
-        public void  updatePositionList(String name,String JsonString)
-        {
-            try
-            {
-                if (!UserConnectionRelation.ContainsKey(name)) { return; }
-                _context.Clients.Client(UserConnectionRelation[name]).updatePositionList(name, JsonString);
+                _context.Clients.Client(UserConnectionRelation[name]).updateTradeList(JsonString);
             }
             catch (Exception ex)
             {

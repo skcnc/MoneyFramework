@@ -120,8 +120,8 @@ namespace Stork_Future_TaoLi
             );
 
             String USERNAME = UserRequestMap.GetInstance()[OrderRef];
-
-            String JSONString = JsonConvert.SerializeObject()
+            OrderViewItem order = new OrderViewItem(_record.OrderRef.ToString(),_record.OrderSysID,_record.Code,_record.Orientation,_record.CombOffsetFlag.ToString(),_record.VolumeTotalOriginal.ToString(),_record.VolumeTotal.ToString(),_record.Price.ToString(),_record.ErrMsg,_record.OrderTime_Start.ToString());
+            String JSONString = JsonConvert.SerializeObject(order);
 
             TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
 
@@ -160,6 +160,13 @@ namespace Stork_Future_TaoLi
             }
 
             _record.AveragePrice = (totalCost / totalVolume);
+
+            String UserName = UserRequestMap.GetInstance()[OrderRef];
+            TradeViewItem trade = new TradeViewItem(OrderRef.ToString(), TradeId, _record.Code, _record.Orientation, _record.CombOffsetFlag.ToString(), Price.ToString(), Volume.ToString(), _record.OrderSysID);
+
+            String JsonString = JsonConvert.SerializeObject(trade);
+
+            TradeMonitor.Instance.updateTradeList(UserName, JsonString);
 
             this.AddOrUpdate(OrderRef, _record, (key, oldValue) =>
                 oldValue = _record
@@ -248,6 +255,7 @@ namespace Stork_Future_TaoLi
     /// </summary>
     public class RecordItem
     {
+
         /// <summary>
         /// 策略号
         /// </summary>
@@ -371,9 +379,149 @@ namespace Stork_Future_TaoLi
     /// <summary>
     /// 交易委托数据类型
     /// </summary>
-    public class OrderItem
+    public class OrderViewItem
+    {
+        public OrderViewItem(String _orderRef, String _orderSysID, String _code, String _direction, String _comboOff, String _volumeTotalOrigin, String _volumeTotal, String _price, String _dealTime,String _MSG)
+        {
+            OrderRef = _orderRef;
+            OrderSysID = _orderSysID;
+            CODE = _code;
+            Direction = _direction;
+            ComboOff = _comboOff;
+            VolumeTotalOrigin = _volumeTotalOrigin;
+            VolumeTotal = _volumeTotal;
+            Price = _price;
+            DealTime = _dealTime;
+            MSG = _MSG;
+        }
+
+        /// <summary>
+        /// 标注类型为委托回报
+        /// </summary>
+        String TYPE {
+            get
+            {
+                return "ORDER";
+            }
+        }
+
+        /// <summary>
+        /// 系统号
+        /// </summary>
+        String OrderRef { get; set; }
+
+        /// <summary>
+        /// 报单编号
+        /// </summary>
+        String OrderSysID { get; set; }
+
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        String CODE { get; set; }
+
+        /// <summary>
+        /// 买卖
+        /// </summary>
+        String Direction { get; set; }
+
+        /// <summary>
+        /// 开平
+        /// </summary>
+        String ComboOff { get; set; }
+
+        /// <summary>
+        /// 报单手数
+        /// </summary>
+        String VolumeTotalOrigin { get; set; }
+
+        /// <summary>
+        /// 未成交数
+        /// </summary>
+        String VolumeTotal { get; set; }
+
+        /// <summary>
+        /// 报单价格
+        /// </summary>
+        String Price { get; set; }
+
+        /// <summary>
+        /// 报单时间
+        /// </summary>
+        String DealTime { get; set; }
+
+        /// <summary>
+        /// 状态说明
+        /// </summary>
+        String MSG { get; set; }
+    }
+
+    /// <summary>
+    /// 标记为成交回报
+    /// </summary>
+    public class TradeViewItem
     {
 
+        public TradeViewItem(String _OrderRef, String _TradeID, String _Code, String _Direction, String _CombOff, String _Price, String _Volume, String _OrderSysID)
+        {
+            OrderRef = _OrderRef;
+            TradeID = _TradeID;
+            Code = _Code;
+            Direction = _Direction;
+            CombOff = _CombOff;
+            Price = _Price;
+            Volume = _Volume;
+            OrderSysID = _OrderSysID;
+        }
+        /// <summary>
+        /// 标记成交回报
+        /// </summary>
+        String TYPE
+        {
+            get
+            {
+                return "TRADE";
+            }
+        }
+        /// <summary>
+        /// 系统号
+        /// </summary>
+        String OrderRef { get; set; }
+
+        /// <summary>
+        /// 成交编号
+        /// </summary>
+        String TradeID { get; set; }
+
+        /// <summary>
+        /// 合约/代码
+        /// </summary>
+        String Code { get; set; }
+
+        /// <summary>
+        /// 买卖
+        /// </summary>
+        String Direction { get; set; }
+
+        /// <summary>
+        /// 开平
+        /// </summary>
+        String CombOff { get; set; }
+
+        /// <summary>
+        /// 成交价格
+        /// </summary>
+        String Price { get; set; }
+
+        /// <summary>
+        /// 成交手数
+        /// </summary>
+        String Volume { get; set; }
+
+        /// <summary>
+        /// 报单编号
+        /// </summary>
+        String OrderSysID { get; set; }
     }
 
     /// <summary>
