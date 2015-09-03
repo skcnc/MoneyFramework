@@ -571,6 +571,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         List<managedTraderorderstruct> ol = (Type == "OPEN") ? m_strategy_open.getTradeList().ToList() : m_strategy_close.getTradeList().ToList();
 
 
+                        
                         //交易列表送往交易线程下单（下单的线程，股票和期货是分开的）
                         List<TradeOrderStruct> orderli = new List<TradeOrderStruct>();
 
