@@ -314,6 +314,8 @@ namespace Stork_Future_TaoLi
 
     public class MakeOrder
     {
+        //用户名
+        public String User { get; set; }
         //交易所代码
         public string exchangeId { get; set; }
         //证券代码

@@ -24,7 +24,14 @@ textarea {
     max-width: 280px;
 }
 
-
+    .form-signin{
+        max-width:330px;
+        padding:15px;
+        margin:0 auto;
+    }
+    input{
+        margin-bottom:10px;
+    }
 
 /*html {
     background-color: #e2e2e2;

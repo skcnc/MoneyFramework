@@ -396,6 +396,7 @@
     <Content Include="Views\Home\CLOSE_EDIT.cshtml" />
     <Content Include="Views\Home\MarketView.cshtml" />
     <Content Include="Views\Home\TradeMonitor.cshtml" />
+    <Content Include="Views\Home\SysLogin.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
