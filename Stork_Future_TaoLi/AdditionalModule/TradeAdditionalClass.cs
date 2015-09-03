@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections.Concurrent;
+using Stork_Future_TaoLi.Hubs;
+using Newtonsoft.Json;
 
 namespace Stork_Future_TaoLi
 {
@@ -116,6 +118,12 @@ namespace Stork_Future_TaoLi
             this.AddOrUpdate(OrderRef, _record, (key, oldValue) =>
                 oldValue = _record
             );
+
+            String USERNAME = UserRequestMap.GetInstance()[OrderRef];
+
+            String JSONString = JsonConvert.SerializeObject()
+
+            TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
 
             if (_record.Status == TradeDealStatus.ORDERCOMPLETED)
             {
@@ -358,6 +366,14 @@ namespace Stork_Future_TaoLi
         /// 成交数量
         /// </summary>
         public int Volume { get; set; }
+    }
+
+    /// <summary>
+    /// 交易委托数据类型
+    /// </summary>
+    public class OrderItem
+    {
+
     }
 
     /// <summary>
