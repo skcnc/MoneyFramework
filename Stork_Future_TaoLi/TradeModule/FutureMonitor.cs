@@ -10,6 +10,7 @@ using System.Threading;
 using Stork_Future_TaoLi.TradeModule;
 using Stork_Future_TaoLi.Modulars;
 
+
 namespace Stork_Future_TaoLi
 {
     public class FutureMonitor
@@ -24,7 +25,7 @@ namespace Stork_Future_TaoLi
             queue_future_excuteThread.Init();
 
             //创建线程任务
-            Task FutureTradeControl = new Task(ThreadProc);
+            Thread FutureTradeControl = new Thread(new ThreadStart(ThreadProc));
 
             //启动主线程
             FutureTradeControl.Start();

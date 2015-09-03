@@ -402,7 +402,37 @@ $('#category_panel_close').delegate('button.modify-strategy', 'click', function 
 
 //页面重新进入
 window.onload = function (e) {
-    if (e.currentTarget.location.pathname == "/") {
+
+    if (e.currentTarget.location.pathname != "/" && e.currentTarget.location.pathname != "/home/Syslogin")
+    {
+        if (Modernizr.localstorage) {
+            var userName = localStorage["USERNAME"];
+            var loginTime = localStorage["TIMESTAMP"];
+            var dNow = new Date();
+
+            if (userName == "" || userName == undefined) {
+                window.location.href = "/";
+                return;
+            }
+            if (loginTime == "" || loginTime == undefined) {
+                window.location.href = "/";
+                return;
+            }
+            var days = Math.floor((dNow.getTime() - loginTime) / (24 * 3600 * 1000));
+
+            if (days > 0) {
+                window.location.href = "/";
+                return;
+            }
+        }
+        else
+        {
+            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+            window.location.href = "/";
+        }
+    }
+
+    if (e.currentTarget.location.pathname == "/home/MonitorConsole") {
         if (Modernizr.localstorage) {
             localStorage.setItem("IDCollection", "");
             UpdateOPENStrategies(false);
@@ -1017,6 +1047,57 @@ $('#btnSubmit_close').click(function (e) {
         return;
     }
     alert('参数已写入，请刷新控制页面')
+})
+
+$('#tm_btnMakeOrder').click(function (e) {
+    var type = $('input[name="RadioType"]:checked').val();
+    var code = $('#tm_input_code')[0].value.trim();
+    var direction = $('input[name="RadioDirection"]:checked').val();
+    var mark = $('input[name="RadioMark"]:checked').val();
+    var volume = $('#tm_input_volume')[0].value.trim();
+    var price = $('#tm_input_price')[0].value.trim();
+
+    var user = localStorage["USERNAME"];
+
+    var trade = {
+        User:user,
+        cSecurityCode: code,
+        nSecurityAmount: volume,
+        dOrderPrice: price,
+        cTradeDirection: direction,
+        cOffsetFlag: mark,
+        cSecurityType: type,
+        belongStrategy: "00",
+        OrderRef:"0"
+    }
+
+    var JSONSTRING = "C1" + JSON.stringify(trade);
+
+    $.post("/Home/ImportTrade", {
+        InputJson:JSONSTRING    
+    },function(data,status){
+        alert("数据：" + data + "\n状态：" + status);
+    })
+
+})
+
+$('#login_btnLogin').click(function (e) {
+    var username = $('#login_user')[0].value.trim();
+    var password = $('#login_password')[0].value.trim();
+
+    if (username == "" || password == "" || username == undefined || password == undefined) return;
+
+    var dt = new Date();
+    if (Modernizr.localstorage) {
+        localStorage.setItem("USERNAME", username);
+        localStorage.setItem("TIMESTAMP", dt.getTime());
+    }
+    else {
+        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+        return;
+    }
+
+    window.location.href = '/Home/MonitorConsole'
 })
 
 //辅助函数

@@ -59,6 +59,8 @@ namespace Stork_Future_TaoLi.Variables_Type
         public string cOrderexecutedetail { get; set; }
         // 列表所属策略实例ID
         public string belongStrategy { get; set; }
+        //本地委托编号
+        public int OrderRef { get; set; }
 
     }
 
@@ -74,7 +76,7 @@ namespace Stork_Future_TaoLi.Variables_Type
     /// <summary>
     /// 交易所： SH 上海 ， SZ 深圳
     /// </summary>
-    public static class ExhcnageID
+    public static class ExchangeID
     {
         //上证
         public static string SH { get { return "SH"; } }
