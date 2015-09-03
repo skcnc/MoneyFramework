@@ -6,6 +6,16 @@ using System.Collections.Concurrent;
 
 namespace Stork_Future_TaoLi
 {
+
+    /// <summary>
+    /// 用户委托映射表
+    /// </summary>
+    public class UserRequestMap : ConcurrentDictionary<int, String>
+    {
+        private static readonly UserRequestMap Instance = new UserRequestMap();
+        public static UserRequestMap GetInstance() { return Instance; }
+    }
+
     /// <summary>
     /// 进行中的交易记录
     /// </summary>

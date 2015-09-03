@@ -654,7 +654,7 @@ function UpdateOPENStrategies(changeFlag)
             var length = _ul.find('li.list-group-item').length
             _ul.find('span.badge_count').text(length + 1);
 
-            var user = $('#userName')[0].innerText;
+            var user = localStorage["USERNAME"];
 
             var activity = undefined;
 
@@ -795,7 +795,7 @@ function UpdateOPENStrategies(changeFlag)
             var length = _ul.find('li.list-group-item').length
             _ul.find('span.badge_count').text(length + 1);
 
-            var user = $('#userName')[0].innerText;
+            var user = localStorage["USERNAME"];
 
             var activity = undefined;
 

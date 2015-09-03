@@ -594,6 +594,8 @@ namespace Stork_Future_TaoLi.StrategyModule
                             order.OrderRef = REQUEST_ID.ApplyNewID();
 
                             orderli.Add(order);
+
+                            UserRequestMap.GetInstance().AddOrUpdate(order.OrderRef, User, (key, oldvalue) => oldvalue = User);
                         }
 
                         if (DBAccessLayer.DBEnable == true)

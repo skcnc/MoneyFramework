@@ -330,6 +330,8 @@ namespace Stork_Future_TaoLi
                         OrderRef = REQUEST_ID.ApplyNewID()
                     };
 
+                    UserRequestMap.GetInstance().AddOrUpdate(_tradeUnit.OrderRef, mo.User,(key,oldValue) => oldValue = mo.User);
+
                     _TradeList.Add(_tradeUnit);
 
                     log.LogEvent("来自交易管理页面的交易");
