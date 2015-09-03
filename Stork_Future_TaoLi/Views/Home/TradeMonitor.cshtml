@@ -139,7 +139,7 @@
 <!--SignalR script to update the chat page and send messages.-->
     <script>
         $(function () {
-            var chat = $.connection.TradeMonitorHub;
+            var chat = $.connection.tradeMonitorHub;
             //更新委托列表
             chat.client.updateOrderList = function (name, jsonString) {
 
@@ -155,7 +155,10 @@
 
             };
 
-            $.connection.hub.start().done(function () { });
+            $.connection.hub.start().done(function () {
+                chat.state.USERNAME = localStorage["USERNAME"];
+                chat.server.linkin();
+            });
         });
     </script>
 }
