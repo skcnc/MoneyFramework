@@ -39,11 +39,20 @@ namespace Stork_Future_TaoLi
                 PushStrategyInfo.Instance.UpdateStrategyInfo(name, DateTime.Now.ToString());
                 Thread.Sleep(1000);
 
-                if(k == 10)
+                if(k >= 10)
                 {
-                    OrderViewItem order = new OrderViewItem("20001","37","AD1509","0","0","100","20","18.08","部分提交","2015-09-03 23:51:10");
-                    String JSONString = JsonConvert.SerializeObject(order);
-                    TradeMonitor.Instance.updateOrderList("sa", JSONString);
+                    List<OrderViewItem> orders = new List<OrderViewItem>();
+                    orders.Add(new OrderViewItem("20001", "37", "AD1509", "0", "0", "100", "20", "18.08", "部分提交", DateTime.Now.ToString()));
+                    orders.Add(new OrderViewItem("20002", "37", "AD1509", "0", "0", "100", "20", "18.08", "部分提交", DateTime.Now.ToString()));
+                    orders.Add(new OrderViewItem("20003", "37", "AD1509", "0", "0", "100", "20", "18.08", "部分提交", DateTime.Now.ToString()));
+                    orders.Add(new OrderViewItem("20004", "37", "AD1509", "0", "0", "100", "20", "18.08", "部分提交", DateTime.Now.ToString()));
+                    orders.Add(new OrderViewItem("20005", "37", "AD1509", "0", "0", "100", "20", "18.08", "部分提交", DateTime.Now.ToString()));
+
+                    foreach (OrderViewItem item in orders)
+                    {
+                        String JSONString = JsonConvert.SerializeObject(item);
+                        TradeMonitor.Instance.updateOrderList("sa", JSONString);
+                    }
                    
                 }
 

@@ -403,7 +403,7 @@ $('#category_panel_close').delegate('button.modify-strategy', 'click', function 
 //页面重新进入
 window.onload = function (e) {
 
-    if (e.currentTarget.location.pathname != "/" && e.currentTarget.location.pathname != "/home/Syslogin")
+    if (e.currentTarget.location.pathname != "/" && e.currentTarget.location.pathname.toLocaleLowerCase() != "/home/syslogin")
     {
         if (Modernizr.localstorage) {
             var userName = localStorage["USERNAME"];
@@ -432,7 +432,7 @@ window.onload = function (e) {
         }
     }
 
-    if (e.currentTarget.location.pathname == "/home/MonitorConsole") {
+    if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/monitorconsole") {
         if (Modernizr.localstorage) {
             localStorage.setItem("IDCollection", "");
             UpdateOPENStrategies(false);
@@ -442,7 +442,7 @@ window.onload = function (e) {
             return
         }
     }
-    else if (e.currentTarget.location.pathname == "/home/OPEN_EDIT") {
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/open_edit") {
         if (Modernizr.localstorage) {
             var _queryString = e.currentTarget.location.href.split('?')[1];
             var _id = _queryString.split('&')[0].split('=')[1];
@@ -472,7 +472,7 @@ window.onload = function (e) {
 
         
     }
-    else if (e.currentTarget.location.pathname == "/home/CLOSE_EDIT") {
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/close_edit") {
         if (Modernizr.localstorage) {
             var _queryString = e.currentTarget.location.href.split('?')[1];
             var _id = _queryString.split('&')[0].split('=')[1];
@@ -1097,18 +1097,9 @@ $('#login_btnLogin').click(function (e) {
         return;
     }
 
-    window.location.href = '/Home/MonitorConsole'
+    window.location.href = '/home/MonitorConsole'
 })
 
-$('#tm_btnMaketest').click(function (e) {
-    var length = $('#tm_tb_inComplete')[0].children.length;
-    var x = -1;
-    for (var i = 0 ; i < length; i++) {
-        var item = $('#tm_tb_inComplete')[0].children[i].cells[0].textContent;
-
-    }
-    var t = tb.children;
-})
 
 //辅助函数
 function GetIndexFullName(briefName)

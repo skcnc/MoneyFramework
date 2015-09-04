@@ -381,7 +381,8 @@ namespace Stork_Future_TaoLi
     /// </summary>
     public class OrderViewItem
     {
-        public OrderViewItem(String _orderRef, String _orderSysID, String _code, String _direction, String _comboOff, String _volumeTotalOrigin, String _volumeTotal, String _price, String _dealTime,String _MSG)
+        public OrderViewItem(String _orderRef, String _orderSysID, String _code, String _direction
+            , String _comboOff, String _volumeTotalOrigin, String _volumeTotal, String _price, String _MSG,String _dealTime)
         {
             OrderRef = _orderRef;
             OrderSysID = _orderSysID;
@@ -398,7 +399,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 标注类型为委托回报
         /// </summary>
-        String TYPE {
+        public String TYPE {
             get
             {
                 return "ORDER";
@@ -408,52 +409,52 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 系统号
         /// </summary>
-        String OrderRef { get; set; }
+        public String OrderRef { get; set; }
 
         /// <summary>
         /// 报单编号
         /// </summary>
-        String OrderSysID { get; set; }
+        public String OrderSysID { get; set; }
 
         /// <summary>
         /// 合约代码
         /// </summary>
-        String CODE { get; set; }
+        public String CODE { get; set; }
 
         /// <summary>
         /// 买卖
         /// </summary>
-        String Direction { get; set; }
+        public String Direction { get; set; }
 
         /// <summary>
         /// 开平
         /// </summary>
-        String ComboOff { get; set; }
+        public String ComboOff { get; set; }
 
         /// <summary>
         /// 报单手数
         /// </summary>
-        String VolumeTotalOrigin { get; set; }
+        public String VolumeTotalOrigin { get; set; }
 
         /// <summary>
         /// 未成交数
         /// </summary>
-        String VolumeTotal { get; set; }
+        public String VolumeTotal { get; set; }
 
         /// <summary>
         /// 报单价格
         /// </summary>
-        String Price { get; set; }
+        public String Price { get; set; }
 
         /// <summary>
         /// 报单时间
         /// </summary>
-        String DealTime { get; set; }
+        public String DealTime { get; set; }
 
         /// <summary>
         /// 状态说明
         /// </summary>
-        String MSG { get; set; }
+        public String MSG { get; set; }
     }
 
     /// <summary>
@@ -476,7 +477,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 标记成交回报
         /// </summary>
-        String TYPE
+        public String TYPE
         {
             get
             {
@@ -486,42 +487,42 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 系统号
         /// </summary>
-        String OrderRef { get; set; }
+        public String OrderRef { get; set; }
 
         /// <summary>
         /// 成交编号
         /// </summary>
-        String TradeID { get; set; }
+        public String TradeID { get; set; }
 
         /// <summary>
         /// 合约/代码
         /// </summary>
-        String Code { get; set; }
+        public String Code { get; set; }
 
         /// <summary>
         /// 买卖
         /// </summary>
-        String Direction { get; set; }
+        public String Direction { get; set; }
 
         /// <summary>
         /// 开平
         /// </summary>
-        String CombOff { get; set; }
+        public String CombOff { get; set; }
 
         /// <summary>
         /// 成交价格
         /// </summary>
-        String Price { get; set; }
+        public String Price { get; set; }
 
         /// <summary>
         /// 成交手数
         /// </summary>
-        String Volume { get; set; }
+        public String Volume { get; set; }
 
         /// <summary>
         /// 报单编号
         /// </summary>
-        String OrderSysID { get; set; }
+        public String OrderSysID { get; set; }
     }
 
     /// <summary>

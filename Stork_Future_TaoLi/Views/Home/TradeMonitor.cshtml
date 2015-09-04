@@ -5,7 +5,7 @@
 <h2 style="text-align:center;margin-bottom:20px;font-size: xx-large" ><b>交易操作台</b></h2>
 <hr />
 <div class="container">
-    <div class="col-md-12">
+    <div class="col-md-12" >
         <div class="col-md-4">
             <div class="col-md-12 form-inline">
                 交易类型：&nbsp;&nbsp;
@@ -75,8 +75,8 @@
                 <button class="btn btn-success" type="submit" id="tm_btnMaketest">get</button>
             </div>
         </div>
-        <div class="col-md-8">
-            <table class="table table-striped table-hover">
+        <div class="col-md-8 table-responsive">
+            <table class="table table-striped table-hover " >
                 <thead>
                     <tr>
                         <th>系统号</th>
@@ -91,19 +91,7 @@
                         <th>报单时间</th>
                     </tr>
                 </thead>
-                <tbody id="tm_tb_inComplete">
-                    <tr>
-                        <td>19001</td>
-                        <td>277</td>
-                        <td>IF1509</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>100</td>
-                        <td>20</td>
-                        <td>17.50</td>
-                        <td>2015-09-03 10:07:07</td>
-                    </tr>
-                </tbody>
+                <tbody id="tm_tb_inComplete" style="overflow-y:scroll;height:300px;position:relative"></tbody>
             </table>
         </div>
     </div>
@@ -171,8 +159,6 @@
                 var _DealTime = _order.DealTime;
                 var _msg = _order.MSG;
 
-
-
                 var length = $('#tm_tb_inComplete')[0].children.length;
                 var x = undefined;
 
@@ -186,9 +172,10 @@
                 if(x != undefined)
                 {
                     //已经存在该记录
-                    $('#tm_tb_inComplete')[0].children[x].cells[6] = _volumeTotal;
+                    $('#tm_tb_inComplete')[0].children[x].cells[6].textContent = _volumeTotal;
+                    $('#tm_tb_inComplete')[0].children[x].cells[9].textContent = _DealTime;
 
-                    if (_volumeTotal == _volumeTotalOrigin || _msg == "已撤销") {
+                    if (_volumeTotal == 0 || _msg == "已撤销") {
                         $('#tm_tb_inComplete')[0].children[x].removeNode();
                     }
                 }
@@ -196,7 +183,7 @@
                 {
                     //增加新的记录
                     var newRow = "<tr><td>" + _orderRef + "</td><td>" + _orderSysId + "</td><td>" + _code + "</td><td>" + _direction + "</td><td>" + _combOff + "</td><td>" + _volumeTotalOrigin + "</td><td>" + _volumeTotal + "</td><td>" + _Price + "</td><td>" + _msg + "</td><td>" + _DealTime + "</td></tr>";
-                    $('#tm_tb_inComplete').after(newRow);
+                    $('#tm_tb_inComplete').append(newRow);
                 }
             };
 
