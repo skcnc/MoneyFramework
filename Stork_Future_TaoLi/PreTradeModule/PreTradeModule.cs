@@ -7,7 +7,7 @@ using Stork_Future_TaoLi.Modulars;
 using System.Threading;
 using Stork_Future_TaoLi;
 
-namespace Stork_Future_TaoLi.PreTradeModule
+namespace Stork_Future_TaoLi
 {
     /// <summary>
     /// 模块名称：   交易预处理模块 
@@ -56,7 +56,7 @@ namespace Stork_Future_TaoLi.PreTradeModule
         }
 
         /// <summary>
-        /// 从消息队列中获取数据
+        /// 从消息队列中策略实例生成交易列表
         /// </summary>
         /// <returns>
         /// NULL : 说明队列中无值
@@ -72,6 +72,26 @@ namespace Stork_Future_TaoLi.PreTradeModule
                  tos = (List<TradeOrderStruct>)queue_prd_trade.GetQueue().Dequeue();
             }
           
+            if (tos != null) return tos;
+            else return null;
+        }
+
+        /// <summary>
+        /// 从消息队列中获取交易管理页面生成的交易
+        /// </summary>
+        /// <returns>
+        /// NULL : 说明队列中无值
+        /// 其他 ：返回队列中首值</returns>
+        private MakeOrder DeQueue2()
+        {
+            MakeOrder tos;
+
+            lock(queue_prd_trade_from_tradeMonitor.GetQueue().SyncRoot)
+            {
+                if (queue_prd_trade_from_tradeMonitor.GetQueue().Count == 0) return null;
+                tos = (MakeOrder)queue_prd_trade_from_tradeMonitor.GetQueue().Dequeue();
+            }
+
             if (tos != null) return tos;
             else return null;
         }
@@ -93,6 +113,7 @@ namespace Stork_Future_TaoLi.PreTradeModule
             t.nSecurityAmount = tos.nSecurityAmount;
             t.SecurityName = tos.SecurityName;
             t.belongStrategy = tos.belongStrategy;
+            t.OrderRef = tos.OrderRef;
             return t;
         }
 
@@ -147,77 +168,92 @@ namespace Stork_Future_TaoLi.PreTradeModule
                     lastHeartBeat = DateTime.Now;
                 }
 
+
+                #region 策略生成交易队列
                 List<TradeOrderStruct> tos = PreTradeModule.instance.DeQueue();
-                if (tos == null)
+                if (tos != null)
                 {
-                    continue;
-                }
 
-                log.LogEvent("入队交易数量：" + tos.Count.ToString());
 
-                //获取到新的list
-                List<TradeOrderStruct> stocks_sh = (from item in tos where item.cTradeDirection == "b" && item.cExhcnageID == ExhcnageID.SH select item).OrderBy(i => i.cOrderLevel).ToList();
+                    log.LogEvent("来自策略的交易数：" + tos.Count.ToString());
 
-                List<TradeOrderStruct> stocks_sz = (from item in tos where item.cTradeDirection == "b" && item.cExhcnageID == ExhcnageID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
+                    //获取到新的list
+                    List<TradeOrderStruct> stocks_sh = (from item in tos where item.cExhcnageID == ExchangeID.SH select item).OrderBy(i => i.cOrderLevel).ToList();
 
-                List<TradeOrderStruct> future = (from item in tos where item.cTradeDirection == "b" select item).OrderBy(i => i.cOrderLevel).ToList();
+                    List<TradeOrderStruct> stocks_sz = (from item in tos where item.cExhcnageID == ExchangeID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
 
-                //将新的list推送到对应的线程控制器
-                #region 交易送入队列
+                    List<TradeOrderStruct> future = (from item in tos select item).OrderBy(i => i.cOrderLevel).ToList();
 
-                List<TradeOrderStruct> unit = new List<TradeOrderStruct>();
+                    //将新的list推送到对应的线程控制器
+                    #region 交易送入队列
 
-                #region SH股票交易送入队列
-                if (stocks_sh.Count > 0)
-                {
-                    log.LogEvent("上海交易所入队交易数量：" + stocks_sh.Count.ToString());
-                    
-                    foreach (TradeOrderStruct stu in stocks_sh)
+                    List<TradeOrderStruct> unit = new List<TradeOrderStruct>();
+
+                    #region SH股票交易送入队列
+                    if (stocks_sh.Count > 0)
                     {
-                        
-                        TradeOrderStruct _tos = CreateNewTrade(stu);
-                        unit.Add(_tos);
+                        log.LogEvent("上海交易所入队交易数量：" + stocks_sh.Count.ToString());
 
-                        if (unit.Count == 15)
+                        foreach (TradeOrderStruct stu in stocks_sh)
+                        {
+
+                            TradeOrderStruct _tos = CreateNewTrade(stu);
+                            unit.Add(_tos);
+
+                            if (unit.Count == 15)
+                            {
+                                List<TradeOrderStruct> _li = CreateList(unit);
+                                unit.Clear();
+
+                                lock (QUEUE_SH_TRADE.GetQueue().SyncRoot)
+                                {
+
+                                    QUEUE_SH_TRADE.GetQueue().Enqueue((object)_li);
+                                }
+
+                            }
+                        }
+
+                        if (unit.Count != 0)
                         {
                             List<TradeOrderStruct> _li = CreateList(unit);
                             unit.Clear();
 
                             lock (QUEUE_SH_TRADE.GetQueue().SyncRoot)
                             {
-
                                 QUEUE_SH_TRADE.GetQueue().Enqueue((object)_li);
                             }
 
                         }
+
                     }
+                    #endregion
 
-                    if (unit.Count != 0)
+                    #region SZ股票交易送入队列
+                    if (stocks_sz.Count > 0)
                     {
-                        List<TradeOrderStruct> _li = CreateList(unit);
-                        unit.Clear();
-
-                        lock (QUEUE_SH_TRADE.GetQueue().SyncRoot)
+                        log.LogEvent("深圳交易所入队交易数量：" + stocks_sz.Count.ToString());
+                        foreach (TradeOrderStruct stu in stocks_sz)
                         {
-                            QUEUE_SH_TRADE.GetQueue().Enqueue((object)_li);
+
+                            TradeOrderStruct _tos = CreateNewTrade(stu);
+                            unit.Add(_tos);
+
+                            if (unit.Count == 15)
+                            {
+                                List<TradeOrderStruct> _li = CreateList(unit);
+                                unit.Clear();
+
+                                lock (QUEUE_SZ_TRADE.GetQueue().SyncRoot)
+                                {
+                                    QUEUE_SZ_TRADE.GetQueue().Enqueue((object)_li);
+                                }
+
+                                unit.Clear();
+                            }
                         }
 
-                    }
-
-                }
-                #endregion
-
-                #region SZ股票交易送入队列
-                if (stocks_sz.Count > 0)
-                {
-                    log.LogEvent("深圳交易所入队交易数量：" + stocks_sz.Count.ToString());
-                    foreach (TradeOrderStruct stu in stocks_sz)
-                    {
-
-                        TradeOrderStruct _tos = CreateNewTrade(stu);
-                        unit.Add(_tos);
-
-                        if (unit.Count == 15)
+                        if (unit.Count != 0)
                         {
                             List<TradeOrderStruct> _li = CreateList(unit);
                             unit.Clear();
@@ -227,36 +263,33 @@ namespace Stork_Future_TaoLi.PreTradeModule
                                 QUEUE_SZ_TRADE.GetQueue().Enqueue((object)_li);
                             }
 
-                            unit.Clear();
+                            //unit.Clear();
                         }
+
                     }
+                    #endregion
 
-                    if (unit.Count != 0)
+                    #region 期货交易送入队列
+                    if (future.Count > 0)
                     {
-                        List<TradeOrderStruct> _li = CreateList(unit);
-                        unit.Clear();
-
-                        lock (QUEUE_SZ_TRADE.GetQueue().SyncRoot)
+                        log.LogEvent("期货交易入队交易数量：" + future.Count.ToString());
+                        foreach (TradeOrderStruct stu in future)
                         {
-                            QUEUE_SZ_TRADE.GetQueue().Enqueue((object)_li);
+                            TradeOrderStruct _tos = stu;
+                            unit.Add(_tos);
+
+                            if (unit.Count == 15)
+                            {
+                                lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
+                                {
+                                    QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)unit);
+                                }
+
+                                unit.Clear();
+                            }
                         }
 
-                        //unit.Clear();
-                    }
-
-                }
-                #endregion
-
-                #region 期货交易送入队列
-                if (future.Count > 0)
-                {
-                    log.LogEvent("期货交易入队交易数量：" + future.Count.ToString());
-                    foreach (TradeOrderStruct stu in future)
-                    {
-                        TradeOrderStruct _tos = stu;
-                        unit.Add(_tos);
-
-                        if (unit.Count == 15)
+                        if (unit.Count != 0)
                         {
                             lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
                             {
@@ -265,22 +298,72 @@ namespace Stork_Future_TaoLi.PreTradeModule
 
                             unit.Clear();
                         }
-                    }
 
-                    if (unit.Count != 0)
+                    }
+                    #endregion
+
+                    #endregion
+
+
+                }
+
+                #endregion
+
+                #region 交易管理界面直接发起交易
+                MakeOrder mo = PreTradeModule.instance.DeQueue2();
+                if (mo != null)
+                {
+                    List<TradeOrderStruct> _TradeList = new List<TradeOrderStruct>();
+                    TradeOrderStruct _tradeUnit = new TradeOrderStruct()
+                    {
+                        cExhcnageID = mo.exchangeId,
+                        cSecurityCode = mo.cSecurityCode,
+                        nSecurityAmount = mo.nSecurityAmount,
+                        dOrderPrice = mo.dOrderPrice,
+                        cTradeDirection = mo.cTradeDirection,
+                        cOffsetFlag = mo.cOffsetFlag,
+
+                        cSecurityType = mo.cSecurityType,
+                        cOrderLevel = "1",
+                        cOrderexecutedetail = String.Empty,
+                        belongStrategy = mo.belongStrategy,
+                        OrderRef = REQUEST_ID.ApplyNewID()
+                    };
+
+                    UserRequestMap.GetInstance().AddOrUpdate(_tradeUnit.OrderRef, mo.User,(key,oldValue) => oldValue = mo.User);
+
+                    _TradeList.Add(_tradeUnit);
+
+                    log.LogEvent("来自交易管理页面的交易");
+                    if (mo.cSecurityType == "s" || mo.cSecurityType == "S")
+                    {
+                        if (mo.exchangeId == ExchangeID.SH)
+                        {
+                            lock (QUEUE_SH_TRADE.GetQueue().SyncRoot)
+                            {
+                                QUEUE_SH_TRADE.GetQueue().Enqueue((object)_TradeList);
+                            }
+                        }
+                        else if (mo.exchangeId == ExchangeID.SZ)
+                        {
+                            lock (QUEUE_SZ_TRADE.GetQueue().SyncRoot)
+                            {
+                                QUEUE_SZ_TRADE.GetQueue().Enqueue((object)_TradeList);
+                            }
+                        }
+
+                    }
+                    else if (mo.cSecurityType == "f" || mo.cSecurityType == "F")
                     {
                         lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
                         {
-                            QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)unit);
+                            QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)_TradeList);
                         }
-
-                        unit.Clear();
                     }
-
                 }
+                
                 #endregion
 
-                #endregion
                 if (DateTime.Now.Second != PreTradeModule.isRunning.Second)
                 {
                     PreTradeModule.isRunning = DateTime.Now;

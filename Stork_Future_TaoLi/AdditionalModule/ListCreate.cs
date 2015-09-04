@@ -44,7 +44,5 @@ namespace Stork_Future_TaoLi
         ORDERCOMPLETED = 3
     }
 
-    public class LocalMarketPrice
-    {
-    }
+    
 }

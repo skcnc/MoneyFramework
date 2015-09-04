@@ -1,0 +1,201 @@
+﻿@{
+    ViewBag.Title = "交易控制台";
+}
+
+<h2 style="text-align:center;margin-bottom:20px;font-size: xx-large" ><b>交易操作台</b></h2>
+<hr />
+<div class="container">
+    <div class="col-md-12" >
+        <div class="col-md-4">
+            <div class="col-md-12 form-inline">
+                交易类型：&nbsp;&nbsp;
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="RadioType" id="tm_radio_stock" value="0" checked>
+                        股票
+                    </label>
+                </div>
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="RadioType" id="tm_radio_future" value="1">
+                        期货
+                    </label>
+                </div>
+                <div class="radio-inline disabled">
+                    <label>
+                        <input type="radio" name="RadioType" id="tm_radio_index" value="2" disabled>
+                        指数
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-12 form-inline" style="margin-top:5px">
+                合约代码：&nbsp;&nbsp;
+                <input type="text" class="form-control" id="tm_input_code" placeholder="交易代码" />
+            </div>
+            <div class="col-md-12 form-inline" style="margin-top:5px">
+                买卖：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="RadioDirection" id="tm_radio_buy" value="0" checked/>
+                        买入
+                    </label>
+                </div>
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="RadioDirection" id="tm_radio_sell" value="1" />
+                        卖出
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-12 form-inline" style="margin-top:5px">
+                开平：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="RadioMark" id="tm_radio_open" value="0" checked/>
+                        开仓
+                    </label>
+                </div>
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="RadioMark" id="tm_radio_close" value="1" />
+                        平仓
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-12 form-inline" style="margin-top:5px">
+                手数：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="text" class="form-control" id="tm_input_volume" placeholder="手数" />
+            </div>
+            <div class="col-md-12 form-inline" style="margin-top:5px">
+                指定价：&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="text" class="form-control" id="tm_input_price" placeholder="交易价格" />
+            </div>
+            <div class="col-md-12">
+                <button class="btn btn-success" type="submit" id="tm_btnMakeOrder">下单</button>
+                <button class="btn btn-success" type="submit" id="tm_btnMaketest">get</button>
+            </div>
+        </div>
+        <div class="col-md-8 table-responsive">
+            <table class="table table-striped table-hover " >
+                <thead>
+                    <tr>
+                        <th>系统号</th>
+                        <th>报单编号</th>
+                        <th>合约/代码</th>
+                        <th>买卖</th>
+                        <th>开平</th>
+                        <th>报单手数</th>
+                        <th>未成交手数</th>
+                        <th>报单价格</th>
+                        <th>报单状态</th>
+                        <th>报单时间</th>
+                    </tr>
+                </thead>
+                <tbody id="tm_tb_inComplete" style="overflow-y:scroll;height:300px;position:relative"></tbody>
+            </table>
+        </div>
+    </div>
+    <hr />
+    <div class="col-md-12" style="margin-top:10px">
+        <div class="col-md-6">
+            <table class="table table-striped table-hover">
+                <!--持仓列表-->
+                <thead>
+                    <tr>
+                        <th>合约/代码</th>
+                        <th>买卖</th>
+                        <th>总持仓</th>
+                        <th>持仓均价</th>
+                        <th>持仓盈亏</th>
+                    </tr>
+                </thead>
+                <tbody id="tm_tb_position"></tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table class="table table-striped table-hover">
+                <!--成交记录-->
+                <thead>
+                    <tr>
+                        <th>系统号</th>
+                        <th>成交编号</th>
+                        <th>合约/代码</th>
+                        <th>买卖</th>
+                        <th>开平</th>
+                        <th>成交价格</th>
+                        <th>成交手数</th>
+                        <th>报单编号</th>
+                    </tr>
+                </thead>
+                <tbody id="tm_tb_tradeRecord"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+<!--Script references. -->
+<!--The jQuery library is required and is referenced by default in _Layout.cshtml. -->
+<!--Reference the SignalR library. -->
+<script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
+<!--Reference the autogenerated SignalR hub script. -->
+<script src="~/signalr/hubs"></script>
+<!--SignalR script to update the chat page and send messages.-->
+    <script>
+        $(function () {
+            var chat = $.connection.tradeMonitorHub;
+            //更新委托列表
+            chat.client.updateOrderList = function (jsonString) {
+                var _order = eval('(' + jsonString + ')');
+
+                var _orderRef = _order.OrderRef;
+                var _orderSysId = _order.OrderSysID;
+                var _code = _order.CODE;
+                var _direction = _order.Direction;
+                var _combOff = _order.ComboOff;
+                var _volumeTotalOrigin = _order.VolumeTotalOrigin;
+                var _volumeTotal = _order.VolumeTotal;
+                var _Price = _order.Price;
+                var _DealTime = _order.DealTime;
+                var _msg = _order.MSG;
+
+                var length = $('#tm_tb_inComplete')[0].children.length;
+                var x = undefined;
+
+                for (var i = 0 ; i < length; i++) {
+                    if (_orderRef == $('#tm_tb_inComplete')[0].children[i].cells[0].textContent) {
+                        x = i;
+                        break;
+                    }
+                }
+
+                if(x != undefined)
+                {
+                    //已经存在该记录
+                    $('#tm_tb_inComplete')[0].children[x].cells[6].textContent = _volumeTotal;
+                    $('#tm_tb_inComplete')[0].children[x].cells[9].textContent = _DealTime;
+
+                    if (_volumeTotal == 0 || _msg == "已撤销") {
+                        $('#tm_tb_inComplete')[0].children[x].removeNode();
+                    }
+                }
+                else
+                {
+                    //增加新的记录
+                    var newRow = "<tr><td>" + _orderRef + "</td><td>" + _orderSysId + "</td><td>" + _code + "</td><td>" + _direction + "</td><td>" + _combOff + "</td><td>" + _volumeTotalOrigin + "</td><td>" + _volumeTotal + "</td><td>" + _Price + "</td><td>" + _msg + "</td><td>" + _DealTime + "</td></tr>";
+                    $('#tm_tb_inComplete').append(newRow);
+                }
+            };
+
+            //更新交易列表
+            chat.client.updateTradeList = function (jsonString) {
+                var _trade = eval('(' + jsonString + ')');
+            };
+
+            $.connection.hub.start().done(function () {
+                chat.state.USERNAME = localStorage["USERNAME"];
+                chat.server.linkin();
+            });
+        });
+    </script>
+}

@@ -7,7 +7,6 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Stork_Future_TaoLi;
-using Stork_Future_TaoLi.PreTradeModule;
 using Stork_Future_TaoLi.TradeModule;
 using System.Threading;
 using Stork_Future_TaoLi.Entrust;
@@ -34,9 +33,13 @@ namespace Stork_Future_TaoLi
             //ListCreate.Main();
 
 
-            PreTradeModule.PreTradeModule.getInstance().Run();
+            PreTradeModule.getInstance().Run();
 
             StockTradeThread.Main();
+
+            FutureMonitor FM = new FutureMonitor();
+            FM.Main();
+
 
             StrategyMonitorClass strategyMonitor = new StrategyMonitorClass();
             strategyMonitor.Run();

@@ -21,6 +21,7 @@ namespace Stork_Future_TaoLi.Variables_Type
 
         /// <summary>
         /// 期货交易最大线程数
+        /// 期货交易无需在线程中等待回报，少量交易数即可
         /// </summary>
         public static int FUTURE_TRADE_THREAD_NUM { get { return future_trade_thread_num; } }
         private static int future_trade_thread_num = 1;
