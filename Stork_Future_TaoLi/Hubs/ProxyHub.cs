@@ -75,6 +75,7 @@ namespace Stork_Future_TaoLi
             get { return _instance; }
         }
 
+        //策略名和链接id的字典
         private Dictionary<String, String> RegisterRelation = new Dictionary<string, string>();
 
         /// <summary>

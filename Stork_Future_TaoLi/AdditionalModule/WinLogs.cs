@@ -51,12 +51,16 @@ namespace Stork_Future_TaoLi
         /// <param name="message">事件内容</param>
         public void LogEvent(string message)
         {
-            if (!EventLog.SourceExists(eventSourceName))
+            try
             {
-                EventLog.CreateEventSource(eventSourceName, "Application");
+                if (!EventLog.SourceExists(eventSourceName))
+                {
+                    EventLog.CreateEventSource(eventSourceName, "Application");
+                }
+                //EventLog.WriteEntry(eventSourceName, message, EventLogEntryType.Error);
+                EventLog.WriteEntry(eventSourceName, message, eventLogType, eventLogId);
             }
-            //EventLog.WriteEntry(eventSourceName, message, EventLogEntryType.Error);
-            EventLog.WriteEntry(eventSourceName, message, eventLogType, eventLogId);
+            catch { }
         }
     }
 

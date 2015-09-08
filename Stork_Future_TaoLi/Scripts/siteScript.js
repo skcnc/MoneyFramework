@@ -402,7 +402,37 @@ $('#category_panel_close').delegate('button.modify-strategy', 'click', function 
 
 //页面重新进入
 window.onload = function (e) {
-    if (e.currentTarget.location.pathname == "/") {
+
+    if (e.currentTarget.location.pathname != "/" && e.currentTarget.location.pathname.toLocaleLowerCase() != "/home/syslogin")
+    {
+        if (Modernizr.localstorage) {
+            var userName = localStorage["USERNAME"];
+            var loginTime = localStorage["TIMESTAMP"];
+            var dNow = new Date();
+
+            if (userName == "" || userName == undefined) {
+                window.location.href = "/";
+                return;
+            }
+            if (loginTime == "" || loginTime == undefined) {
+                window.location.href = "/";
+                return;
+            }
+            var days = Math.floor((dNow.getTime() - loginTime) / (24 * 3600 * 1000));
+
+            if (days > 0) {
+                window.location.href = "/";
+                return;
+            }
+        }
+        else
+        {
+            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+            window.location.href = "/";
+        }
+    }
+
+    if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/monitorconsole") {
         if (Modernizr.localstorage) {
             localStorage.setItem("IDCollection", "");
             UpdateOPENStrategies(false);
@@ -412,7 +442,7 @@ window.onload = function (e) {
             return
         }
     }
-    else if (e.currentTarget.location.pathname == "/home/OPEN_EDIT") {
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/open_edit") {
         if (Modernizr.localstorage) {
             var _queryString = e.currentTarget.location.href.split('?')[1];
             var _id = _queryString.split('&')[0].split('=')[1];
@@ -442,7 +472,7 @@ window.onload = function (e) {
 
         
     }
-    else if (e.currentTarget.location.pathname == "/home/CLOSE_EDIT") {
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/close_edit") {
         if (Modernizr.localstorage) {
             var _queryString = e.currentTarget.location.href.split('?')[1];
             var _id = _queryString.split('&')[0].split('=')[1];
@@ -624,7 +654,7 @@ function UpdateOPENStrategies(changeFlag)
             var length = _ul.find('li.list-group-item').length
             _ul.find('span.badge_count').text(length + 1);
 
-            var user = $('#userName')[0].innerText;
+            var user = localStorage["USERNAME"];
 
             var activity = undefined;
 
@@ -765,7 +795,7 @@ function UpdateOPENStrategies(changeFlag)
             var length = _ul.find('li.list-group-item').length
             _ul.find('span.badge_count').text(length + 1);
 
-            var user = $('#userName')[0].innerText;
+            var user = localStorage["USERNAME"];
 
             var activity = undefined;
 
@@ -1018,6 +1048,58 @@ $('#btnSubmit_close').click(function (e) {
     }
     alert('参数已写入，请刷新控制页面')
 })
+
+$('#tm_btnMakeOrder').click(function (e) {
+    var type = $('input[name="RadioType"]:checked').val();
+    var code = $('#tm_input_code')[0].value.trim();
+    var direction = $('input[name="RadioDirection"]:checked').val();
+    var mark = $('input[name="RadioMark"]:checked').val();
+    var volume = $('#tm_input_volume')[0].value.trim();
+    var price = $('#tm_input_price')[0].value.trim();
+
+    var user = localStorage["USERNAME"];
+
+    var trade = {
+        User:user,
+        cSecurityCode: code,
+        nSecurityAmount: volume,
+        dOrderPrice: price,
+        cTradeDirection: direction,
+        cOffsetFlag: mark,
+        cSecurityType: type,
+        belongStrategy: "00",
+        OrderRef:"0"
+    }
+
+    var JSONSTRING = "C1" + JSON.stringify(trade);
+
+    $.post("/Home/ImportTrade", {
+        InputJson:JSONSTRING    
+    },function(data,status){
+        alert("数据：" + data + "\n状态：" + status);
+    })
+
+})
+
+$('#login_btnLogin').click(function (e) {
+    var username = $('#login_user')[0].value.trim();
+    var password = $('#login_password')[0].value.trim();
+
+    if (username == "" || password == "" || username == undefined || password == undefined) return;
+
+    var dt = new Date();
+    if (Modernizr.localstorage) {
+        localStorage.setItem("USERNAME", username);
+        localStorage.setItem("TIMESTAMP", dt.getTime());
+    }
+    else {
+        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+        return;
+    }
+
+    window.location.href = '/home/MonitorConsole'
+})
+
 
 //辅助函数
 function GetIndexFullName(briefName)

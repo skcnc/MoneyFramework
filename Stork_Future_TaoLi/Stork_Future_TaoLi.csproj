@@ -207,6 +207,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalModule\TradeAdditionalClass.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -253,6 +254,7 @@
     </Compile>
     <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
+    <Compile Include="Hubs\TradeMonitorHub.cs" />
     <Compile Include="Queues\queue_future_excuteThread.cs" />
     <Compile Include="TradeModule\FutureMonitor.cs" />
     <Compile Include="Global.asax.cs">
@@ -393,6 +395,8 @@
     <Content Include="Views\Home\OPEN_EDIT.cshtml" />
     <Content Include="Views\Home\CLOSE_EDIT.cshtml" />
     <Content Include="Views\Home\MarketView.cshtml" />
+    <Content Include="Views\Home\TradeMonitor.cshtml" />
+    <Content Include="Views\Home\SysLogin.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
