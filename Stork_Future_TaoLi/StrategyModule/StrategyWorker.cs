@@ -463,6 +463,8 @@ namespace Stork_Future_TaoLi.StrategyModule
                     while (_marketQueue.Count > 0)
                     {
                         MarketData data = (MarketData)DeQueueInfo();
+                        if (data == null)
+                            continue;
                         managedMarketInforStruct info = new managedMarketInforStruct();
 
                         info.dAskPrice = new double[10];
@@ -470,7 +472,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         info.dBidPrice  = new double[10];
                         info.dBidVol = new double[10];
 
-                        if (data.AskPrice != null)
+                        if (data.AskPrice != null) //xiu gai data!=null&&
                         {
                             for (int i = 0; i < data.AskPrice.Count(); i++)
                             {
