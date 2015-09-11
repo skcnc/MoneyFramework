@@ -143,6 +143,8 @@ namespace Stork_Future_TaoLi
             RecordItem _record = new RecordItem();
             _record = this.GetOrAdd(OrderRef, _record);
 
+         if (_record.Trades == null) { _record.Trades = new List<TradeItem>(); }
+
             _record.Trades.Add(new TradeItem()
             {
                 TradeID = TradeId,
