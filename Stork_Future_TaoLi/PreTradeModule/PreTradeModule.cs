@@ -82,14 +82,14 @@ namespace Stork_Future_TaoLi
         /// <returns>
         /// NULL : 说明队列中无值
         /// 其他 ：返回队列中首值</returns>
-        private MakeOrder DeQueue2()
+        private MakeFutureOrder DeQueue2()
         {
-            MakeOrder tos;
+            MakeFutureOrder tos;
 
-            lock(queue_prd_trade_from_tradeMonitor.GetQueue().SyncRoot)
+            lock(queue_prd_trade_from_tradeMonitor_future.GetQueue().SyncRoot)
             {
-                if (queue_prd_trade_from_tradeMonitor.GetQueue().Count == 0) return null;
-                tos = (MakeOrder)queue_prd_trade_from_tradeMonitor.GetQueue().Dequeue();
+                if (queue_prd_trade_from_tradeMonitor_future.GetQueue().Count == 0) return null;
+                tos = (MakeFutureOrder)queue_prd_trade_from_tradeMonitor_future.GetQueue().Dequeue();
             }
 
             if (tos != null) return tos;
@@ -310,7 +310,7 @@ namespace Stork_Future_TaoLi
                 #endregion
 
                 #region 交易管理界面直接发起交易
-                MakeOrder mo = PreTradeModule.instance.DeQueue2();
+                MakeFutureOrder mo = PreTradeModule.instance.DeQueue2();
                 if (mo != null)
                 {
                     List<TradeOrderStruct> _TradeList = new List<TradeOrderStruct>();

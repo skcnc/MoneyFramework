@@ -2,15 +2,42 @@
 #include "TraderBassClass.h"
 
 using namespace System;
+using namespace System::Runtime::InteropServices;
 
 
 
 namespace MCStockLib
 {
 
-	
+	[StructLayout(LayoutKind::Sequential)]
+	public ref struct TradeOrderStruct_M{
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ ExchangeID;
 
-	public ref struct managedTraderorderstruct
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 31)]
+		String^ SecurityCode;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 55)]
+		String^ SecurityName;
+
+		long SecurityAmount;
+
+		double OrderPrice;
+
+		char TradeDirection;
+
+		char OffsetFlag;
+
+		char OrderPriceType;
+
+		char SecurityType;
+
+		char OrderLevel;
+
+		char OrderExecutedDetail;
+	};
+
+	/*public ref struct managedTraderorderstruct
 	{
 		//交易部分
 		char*    cExchangeID;            //交易所
@@ -67,8 +94,7 @@ namespace MCStockLib
 
 			return unmanagedTraderorderstruct;
 		};
-	};
-
+	};*/
 
 
 	public ref struct managedLogin
@@ -144,6 +170,19 @@ namespace MCStockLib
 		}
 	};
 
+	[StructLayout(LayoutKind::Sequential)]
+	public ref struct QueryEntrustOrderStruct_M
+	{
+		char SecurityType;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ ExchangeID;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ OrderSysID;
+	};
+
+
 	public ref struct managedEntrustreturnstruct{
 		String^ cSecurity_code;
 		String^ security_name;
@@ -182,6 +221,37 @@ namespace MCStockLib
 		}
 	};
 
+	[StructLayout(LayoutKind::Sequential)]
+	public ref struct BargainReturnStruct_M
+	{
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 31)]
+		String^ SecurityCode;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 18)]
+		String^ SecurityName;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ OrderSysID;
+
+		char OrderStatus;
+
+		char OrderType;
+
+		long StockAmount;
+
+		double BargainPrice;
+
+		double BargainMoney;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 9)]
+		String^ BargainTime;
+
+		long BargainNo;
+
+		double UnFrozenMoney;
+
+		long UnFrozenAmount;
+	};
 
 	public ref struct managedBargainreturnstruct{
 		

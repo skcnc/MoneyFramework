@@ -39,41 +39,53 @@ void managedStockClass::HeartBeat()
 }
 
 //单笔交易
-bool managedStockClass::SingleTrade(managedTraderorderstruct^  mytraderoder, managedQueryEntrustorderstruct^ myEntrust, String^ Errormsg)
+bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, managedQueryEntrustorderstruct^ myEntrust, String^ Errormsg)
 {
-	Traderorderstruct trade ;
+	Traderorderstruct* trade ;
 	QueryEntrustorderstruct entrust;
 	//trade.getInit(mytraderoder);
 	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
 	char err[255];
-	trade = mytraderoder->createInstance();
+
+	IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(mytraderoder));
+	Marshal::StructureToPtr(mytraderoder, ptr, false);
+	trade = (Traderorderstruct*)(ptr.ToPointer());
+
+	//trade = mytraderoder->createInstance();
 	//(entrust).getInit(myEntrust);
 
 	entrust = myEntrust->createInstance();
 
 	bool rt_value = false;
 
-	rt_value = m_cstockTrader->trader(trade,entrust,err);
+	rt_value = m_cstockTrader->trader(*trade,entrust,err);
 
 	return rt_value;
 
 }
 
 //批量交易： 大于单支股票走该接口
-bool managedStockClass::BatchTrade(array<managedTraderorderstruct^>^ mytraderoder, int nSize, array<managedQueryEntrustorderstruct^>^ myEntrust, String^ Errormsg)
+bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<managedQueryEntrustorderstruct^>^ myEntrust, String^ Errormsg)
 {
 	bool rt_value = false;
-	Traderorderstruct* trades = new Traderorderstruct[nSize];
+	Traderorderstruct** trades;// = new Traderorderstruct[nSize];
 	QueryEntrustorderstruct* query = new QueryEntrustorderstruct[nSize];
+
+	for (int i = 0; i < nSize; i++){
+		trades[i] = new Traderorderstruct();
+	}
 	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
 	int num = 0;
 	char err[255];
 	for (int i = 0; i < nSize; i++)
 	{
-		trades[i] = mytraderoder[i]->createInstance();
+		IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(mytraderoder[i]));
+		Marshal::StructureToPtr(mytraderoder, ptr, false);
+		trades[i] = (Traderorderstruct*)(ptr.ToPointer());
+
 		query[i] = myEntrust[i]->createInstance();
 	}
-	rt_value = m_cstockTrader->Batchstocktrader(trades, nSize, query, num, err);
+	rt_value = m_cstockTrader->Batchstocktrader(*trades, nSize, query, num, err);
 
 
 	return rt_value;
