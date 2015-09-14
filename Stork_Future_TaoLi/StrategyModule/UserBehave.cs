@@ -312,7 +312,7 @@ namespace Stork_Future_TaoLi
         public Basic basic { get; set; }
     }
 
-    public class MakeFutureOrder
+    public class MakeOrder
     {
         //用户名
         public String User { get; set; }
@@ -332,12 +332,8 @@ namespace Stork_Future_TaoLi
         public string cSecurityType { get; set; }
         // 列表所属策略实例ID
         public string belongStrategy { get; set; }
-        //本地委托编号
+        // 本地委托编号
         public int OrderRef { get; set; }
     }
 
-    public class MakeStockOrder
-    {
-
-    }
 }

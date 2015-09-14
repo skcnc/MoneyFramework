@@ -68,7 +68,7 @@ bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, managedQu
 bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<managedQueryEntrustorderstruct^>^ myEntrust, String^ Errormsg)
 {
 	bool rt_value = false;
-	Traderorderstruct** trades;// = new Traderorderstruct[nSize];
+	Traderorderstruct** trades = new Traderorderstruct*[nSize];
 	QueryEntrustorderstruct* query = new QueryEntrustorderstruct[nSize];
 
 	for (int i = 0; i < nSize; i++){
