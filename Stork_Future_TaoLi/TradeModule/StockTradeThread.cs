@@ -79,7 +79,7 @@ namespace Stork_Future_TaoLi.TradeModule
             while (true)
             {
                 Thread.Sleep(10);
-                if ((DateTime.Now - lastHeartBeat).TotalSeconds > 10)
+                if ((DateTime.Now - lastHeartBeat).TotalMinutes > 10)
                 {
                     log.LogEvent("本模块供血不足，线程即将死亡");
                     break;
@@ -159,20 +159,10 @@ namespace Stork_Future_TaoLi.TradeModule
                 //************************************
                 //将交易发送到相应执行线程后需要做的事情
                 //************************************
-                //if (DateTime.Now.Second % 3 == 0)
-                //{
-                //    //每3秒更新一次线程使用状况
-                //    Console.WriteLine(DateTime.Now.ToString());
-                //    Console.WriteLine("Thread Busy Rate : " + queue_stock_excuteThread.GetBusyNum().ToString() + "/" + stockNum.ToString());
-                //}
-
               
-
             }
 
             Thread.CurrentThread.Abort();
-
-
 
         }
 
@@ -211,7 +201,7 @@ namespace Stork_Future_TaoLi.TradeModule
             while (true)
             {
                 Thread.Sleep(10);
-                if ((DateTime.Now - lastHeartBeat).TotalSeconds > 30)
+                if ((DateTime.Now - lastHeartBeat).TotalMinutes > 10)
                 {
                     sublog.LogEvent("线程 ：" + _threadNo.ToString() + "心跳停止 ， 最后心跳 ： " + lastHeartBeat.ToString());
                     break;
@@ -284,7 +274,7 @@ namespace Stork_Future_TaoLi.TradeModule
                         }
                         else
                         {
-                            managedTraderorderstruct[] tradesUnit = new managedTraderorderstruct[15];
+                            TradeOrderStruct_M[] tradesUnit = new TradeOrderStruct_M[15];
                             int i = 0;
                             managedQueryEntrustorderstruct[] entrustUnit = new managedQueryEntrustorderstruct[15];
                             string s = string.Empty;
@@ -313,7 +303,7 @@ namespace Stork_Future_TaoLi.TradeModule
                         }
                         else
                         {
-                            managedTraderorderstruct tradesUnit = CreateTradeUnit(trades[0]);
+                            TradeOrderStruct_M tradesUnit = CreateTradeUnit(trades[0]);
                             managedQueryEntrustorderstruct entrustUnit = new managedQueryEntrustorderstruct();
                             string s = string.Empty;
                             _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
@@ -399,23 +389,26 @@ namespace Stork_Future_TaoLi.TradeModule
             //Thread.CurrentThread.Abort();
         }
 
-        private static managedTraderorderstruct CreateTradeUnit(TradeOrderStruct unit)
+        private static TradeOrderStruct_M CreateTradeUnit(TradeOrderStruct unit)
         {
 
-            string cExhcnageID = (unit.cExhcnageID.Length != 0) ? unit.cExhcnageID : "0";
-            string cSecurityCode = (unit.cSecurityCode.Length != 0) ? unit.cSecurityCode : "0";
-            string SecurityName = (unit.SecurityName.Length != 0) ? unit.SecurityName : "0"; 
-            int nSecurityAmount = (int)(unit.nSecurityAmount);
-            double dOrderPrice = unit.dOrderPrice;
-            sbyte cTradeDirection = (unit.cTradeDirection.Length != 0) ? Convert.ToSByte(unit.cTradeDirection) : Convert.ToSByte("0");
-            sbyte cOffsetFlag = (unit.cOffsetFlag.Length != 0) ? Convert.ToSByte(unit.cOffsetFlag) : Convert.ToSByte("0") ;
-            sbyte cOrderPriceType = (unit.cOrderPriceType.Length != 0) ? Convert.ToSByte(unit.cOrderPriceType) : Convert.ToSByte("0");
-            sbyte cSecurityType = (unit.cSecurityType.Length != 0) ? Convert.ToSByte(unit.cSecurityType) : Convert.ToSByte("0");
-            sbyte cOrderLevel = (unit.cOrderLevel.Length != 0) ? Convert.ToSByte(unit.cOrderLevel) : Convert.ToSByte("0");
-            sbyte cOrderexecutedetail = Convert.ToSByte("0");
+            
+            TradeOrderStruct_M _sorder = new TradeOrderStruct_M();
 
-            managedTraderorderstruct _sorder = new managedTraderorderstruct(cExhcnageID, cSecurityCode, SecurityName, nSecurityAmount,
-dOrderPrice, cTradeDirection, cOffsetFlag, cOrderPriceType, cSecurityType, cOrderLevel, cOrderexecutedetail);
+            _sorder.ExchangeID = (unit.cExhcnageID.Length != 0) ? unit.cExhcnageID : "0";
+            _sorder.OffsetFlag = (unit.cOffsetFlag.Length != 0) ? Convert.ToSByte(unit.cOffsetFlag) : Convert.ToSByte("0");
+            _sorder.OrderExecutedDetail = (sbyte)0;
+            _sorder.OrderLevel = (unit.cOrderLevel.Length != 0) ? Convert.ToSByte(unit.cOrderLevel) : Convert.ToSByte("0");
+            _sorder.OrderPrice = unit.dOrderPrice;
+            _sorder.OrderPriceType = (unit.cOrderPriceType.Length != 0) ? Convert.ToSByte(unit.cOrderPriceType) : Convert.ToSByte("0");
+            _sorder.SecurityAmount = (int)(unit.nSecurityAmount);
+            _sorder.SecurityCode = (unit.cSecurityCode.Length != 0) ? unit.cSecurityCode : "0";
+            _sorder.SecurityName = (unit.SecurityName.Length != 0) ? unit.SecurityName : "0";
+            _sorder.SecurityType = (unit.cSecurityType.Length != 0) ? Convert.ToSByte(unit.cSecurityType == "S" ? "0" : "1") : Convert.ToSByte("0");
+            _sorder.TradeDirection = (unit.cTradeDirection.Length != 0) ? Convert.ToSByte(unit.cTradeDirection) : Convert.ToSByte("0");
+
+
+
             return _sorder;
 
             //return new managedTraderorderstruct(unit.cExhcnageID, unit.cSecurityCode, unit.SecurityName, (int)(unit.nSecurityAmount), unit.dOrderPrice

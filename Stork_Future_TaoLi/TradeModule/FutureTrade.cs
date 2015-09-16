@@ -352,7 +352,8 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo">返回信息</param>
         /// <param name="nRequestID"></param>
         /// <param name="bIsLast"></param>
-        void _client_RspOrderAction(CTP_CLI.CThostFtdcInputOrderActionField_M pInputOrderAction, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        void _client_RspOrderAction(CTP_CLI.CThostFtdcInputOrderActionField_M pInputOrderAction, 
+            CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             //throw new NotImplementedException();
         }
