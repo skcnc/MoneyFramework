@@ -109,9 +109,9 @@ bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstru
 
 	pReqMsg->bs_type = mytraderoder.cTraderdirection;   // 买卖类别（见数据字典说明）
 	strcpy(pReqMsg->security_code, mytraderoder.cSecurity_code);  //证券代码
-	pReqMsg->stock_amount = mytraderoder.nSecurity_amount; //数量
+	pReqMsg->stock_amount = 100;// mytraderoder.nSecurity_amount; //数量
 	if (mytraderoder.cSecuritytype == 's')
-		pReqMsg->price = ((int)(mytraderoder.dOrderprice * 100)) * 10;  //股票只有两位精度
+		pReqMsg->price = 2850;// ((int)(mytraderoder.dOrderprice * 100)) * 10;  //股票只有两位精度
 	else
 		pReqMsg->price = (int)(mytraderoder.dOrderprice * 1000);
 
@@ -156,7 +156,7 @@ bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstru
 		}
 		else
 		{
-			strcpy(Errormsg, getErrorCodeMsg(pAddEntrustRtn->return_status));
+			//strcpy(Errormsg, getErrorCodeMsg(pAddEntrustRtn->return_status));
 			bRunning = false;
 			return false;
 		}
@@ -884,7 +884,7 @@ bool CStockTrader::login(){//查询上证和深圳账号
 
 //暂时没有使用，要用需要再改改
 char * CStockTrader::getErrorCodeMsg(int nErrorCode){
-	char * msg = "error code查询失败";
+	char msg[255] = "error code查询失败";
 	int    len, in_len;
 	char   buf[1024], buf2[100];
 	memset(buf, 0x00, sizeof(buf));

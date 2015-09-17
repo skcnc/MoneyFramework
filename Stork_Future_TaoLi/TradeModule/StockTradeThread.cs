@@ -225,7 +225,7 @@ namespace Stork_Future_TaoLi.TradeModule
 
                 if (queue_stock_excuteThread.GetQueue(_threadNo).Count > 0)
                 {
-                   
+
 
                     List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_stock_excuteThread.StockExcuteQueues[_threadNo].Dequeue();
 
@@ -253,7 +253,7 @@ namespace Stork_Future_TaoLi.TradeModule
                     //当内容大于1 ，调用批量接口
                     //当内容等于1， 调用单笔接口
                     queue_stock_excuteThread.SetUpdateTime(_threadNo);
-                    List<managedQueryEntrustorderstruct> entrustorli = new List<managedQueryEntrustorderstruct>();
+                    List<QueryEntrustOrderStruct_M> entrustorli = new List<QueryEntrustOrderStruct_M>();
 
                     if (trades.Count > 1)
                     {
@@ -276,7 +276,7 @@ namespace Stork_Future_TaoLi.TradeModule
                         {
                             TradeOrderStruct_M[] tradesUnit = new TradeOrderStruct_M[15];
                             int i = 0;
-                            managedQueryEntrustorderstruct[] entrustUnit = new managedQueryEntrustorderstruct[15];
+                            QueryEntrustOrderStruct_M[] entrustUnit = new QueryEntrustOrderStruct_M[15];
                             string s = string.Empty;
                             foreach (TradeOrderStruct unit in trades)
                             {
@@ -286,10 +286,11 @@ namespace Stork_Future_TaoLi.TradeModule
 
                             _classTradeStock.BatchTrade(tradesUnit, 15, entrustUnit, s);
 
-                            if(entrustUnit != null && entrustUnit.ToList().Count() > 0){
+                            if (entrustUnit != null && entrustUnit.ToList().Count() > 0)
+                            {
                                 entrustorli = entrustUnit.ToList();
                             }
-                            
+
                         }
                     }
                     else if (trades.Count == 1)
@@ -304,11 +305,14 @@ namespace Stork_Future_TaoLi.TradeModule
                         else
                         {
                             TradeOrderStruct_M tradesUnit = CreateTradeUnit(trades[0]);
-                            managedQueryEntrustorderstruct entrustUnit = new managedQueryEntrustorderstruct();
+
+                            
+                            QueryEntrustOrderStruct_M entrustUnit = new QueryEntrustOrderStruct_M();
                             string s = string.Empty;
                             _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
 
-                            if(entrustUnit != null){
+                            if (entrustUnit != null)
+                            {
                                 entrustorli.Add(entrustUnit);
                             }
                         }
@@ -323,23 +327,20 @@ namespace Stork_Future_TaoLi.TradeModule
                     if (trades.Count != 0)
                     {
                         //存入数据库
-                        if(entrustorli.Count() == 0){continue;}
+                        if (entrustorli.Count() == 0) { continue; }
 
-                        if (DBAccessLayer.DBEnable == true)
+                        for (int i = 0; i < trades.Count; i++)
                         {
-
-                            for (int i = 0; i < trades.Count; i++)
-                            {
-                                entrustorli[i].Code = trades[i].cSecurityCode;
-                                entrustorli[i].StrategyId = trades[0].belongStrategy;
-                                entrustorli[i].Direction = Convert.ToInt32(trades[0].cTradeDirection);
-                                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateERRecord), (object)(entrustorli[i]));
-                                queue_query_entrust.GetQueue().Enqueue((object)entrustorli[i]);
-                            }
-
+                            entrustorli[i].Code = trades[i].cSecurityCode;
+                            entrustorli[i].StrategyId = trades[0].belongStrategy;
+                            entrustorli[i].Direction = Convert.ToInt32(trades[0].cTradeDirection);
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateERRecord), (object)(entrustorli[i]));
+                            queue_query_entrust.GetQueue().Enqueue((object)entrustorli[i]);
                         }
 
                     }
+
+
                 }
             }
 
@@ -404,8 +405,12 @@ namespace Stork_Future_TaoLi.TradeModule
             _sorder.SecurityAmount = (int)(unit.nSecurityAmount);
             _sorder.SecurityCode = (unit.cSecurityCode.Length != 0) ? unit.cSecurityCode : "0";
             _sorder.SecurityName = (unit.SecurityName.Length != 0) ? unit.SecurityName : "0";
-            _sorder.SecurityType = (unit.cSecurityType.Length != 0) ? Convert.ToSByte(unit.cSecurityType == "S" ? "0" : "1") : Convert.ToSByte("0");
-            _sorder.TradeDirection = (unit.cTradeDirection.Length != 0) ? Convert.ToSByte(unit.cTradeDirection) : Convert.ToSByte("0");
+            _sorder.SecurityType = (unit.cSecurityType.Length != 0) ? (unit.cSecurityType == "S" ? (sbyte)115 : (sbyte)102) : (sbyte)115;
+
+
+            if (unit.cTradeDirection == "0") { _sorder.TradeDirection = Convert.ToSByte("1"); }
+            else if (unit.cTradeDirection == "1") { _sorder.TradeDirection = Convert.ToSByte("2"); }
+            else { _sorder.TradeDirection = Convert.ToSByte("1"); }
 
 
 

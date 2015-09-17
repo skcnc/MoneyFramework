@@ -39,33 +39,66 @@ void managedStockClass::HeartBeat()
 }
 
 //单笔交易
-bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, managedQueryEntrustorderstruct^ myEntrust, String^ Errormsg)
+bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntrustOrderStruct_M^ myEntrust, String^ Errormsg)
 {
-	Traderorderstruct* trade ;
-	QueryEntrustorderstruct entrust;
+	Traderorderstruct* trade = new Traderorderstruct();
+	QueryEntrustorderstruct* entrust;
 	//trade.getInit(mytraderoder);
 	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
 	char err[255];
+
+	TradeOrderStructT^ t = gcnew TradeOrderStructT();
+
+	mytraderoder->ExchangeID = t->ExchangeID = "sh";
+	mytraderoder->SecurityCode = t->SecurityCode = "600000";
+	mytraderoder->SecurityAmount = t->SecurityAmount = 1000;
+	mytraderoder->OffsetFlag =  t->OffsetFlag = '3';
+	mytraderoder->OrderExecutedDetail =  t->OrderExecutedDetail = '0';
+	mytraderoder->OrderLevel = t->OrderLevel = '2';
+	mytraderoder->OrderPriceType = t->OrderPriceType = '1';
+	mytraderoder->SecurityType = t->SecurityType = 's';
+	mytraderoder->TradeDirection = t->TradeDirection = '5';
+	mytraderoder->OrderPrice = t->OrderPrice = 13;
+	mytraderoder->SecurityName = "hello world!";
+
+	IntPtr ptr2 = Marshal::AllocHGlobal(Marshal::SizeOf(t));
+	Marshal::StructureToPtr(t, ptr2, false);
+	TraderorderstructT* tt = (TraderorderstructT*)(ptr2.ToPointer());
 
 	IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(mytraderoder));
 	Marshal::StructureToPtr(mytraderoder, ptr, false);
 	trade = (Traderorderstruct*)(ptr.ToPointer());
 
+	/*trade->nSecurity_amount = mytraderoder->SecurityAmount;
+
+	trade->nSecurity_amount = 100;
+	trade->dOrderprice = mytraderoder->OrderPrice;
+	trade->cTraderdirection = mytraderoder->TradeDirection;
+	trade->cOffsetFlag = mytraderoder->OffsetFlag;
+	trade->cOrderPriceType = mytraderoder->OrderPriceType;
+	trade->cSecuritytype = mytraderoder->SecurityType;
+	trade->cOrderlevel = mytraderoder->OrderLevel;
+	trade->cOrderexecutedetail = mytraderoder->OrderExecutedDetail;*/
+
 	//trade = mytraderoder->createInstance();
 	//(entrust).getInit(myEntrust);
 
-	entrust = myEntrust->createInstance();
-
+	entrust = new  QueryEntrustorderstruct();
+	   
 	bool rt_value = false;
 
-	rt_value = m_cstockTrader->trader(*trade,entrust,err);
+	rt_value = m_cstockTrader->trader(*trade,*entrust,err);
+
+	myEntrust->OrderSysID = gcnew String(entrust->cOrderSysID);
+	myEntrust->ExchangeID = gcnew String(trade->cExchangeID);
+	
 
 	return rt_value;
 
 }
 
 //批量交易： 大于单支股票走该接口
-bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<managedQueryEntrustorderstruct^>^ myEntrust, String^ Errormsg)
+bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<QueryEntrustOrderStruct_M^>^ myEntrust, String^ Errormsg)
 {
 	bool rt_value = false;
 	Traderorderstruct** trades = new Traderorderstruct*[nSize];
@@ -83,7 +116,9 @@ bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int
 		Marshal::StructureToPtr(mytraderoder, ptr, false);
 		trades[i] = (Traderorderstruct*)(ptr.ToPointer());
 
-		query[i] = myEntrust[i]->createInstance();
+		strcpy_s(query[i].cExchangeID, 21, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(myEntrust[i]->ExchangeID));
+		strcpy_s(query[i].cOrderSysID, 21, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(myEntrust[i]->OrderSysID));
+		query[i].cSecuritytype = myEntrust[i]->SecurityType;
 	}
 	rt_value = m_cstockTrader->Batchstocktrader(*trades, nSize, query, num, err);
 
@@ -92,17 +127,21 @@ bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int
 }
 
 //查询交易回报
-array<managedEntrustreturnstruct^>^  managedStockClass::QueryEntrust(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg)
+array<managedEntrustreturnstruct^>^  managedStockClass::QueryEntrust(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg)
 {
-	QueryEntrustorderstruct query = queryEntrust->createInstance();
+	QueryEntrustorderstruct* query = new QueryEntrustorderstruct();
+
+	IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(queryEntrust));
+	Marshal::StructureToPtr(queryEntrust, ptr, false);
+	query = (QueryEntrustorderstruct*)(ptr.ToPointer());
+
 	Entrustreturnstruct* ret = new Entrustreturnstruct[1];
 	int count = 0;
-	char* errmsg;
-	array<managedEntrustreturnstruct^>^ managedRet;
+	char errmsg[255];
+	array<managedEntrustreturnstruct^>^ managedRet = gcnew array<managedEntrustreturnstruct^>(1);
 
-	//C++ 版查询委托函数尚未实现
-	//bool  b= m_cstockTrader->queryorder(query, ret, count, errmsg);
-	bool b = true;
+	bool  b= m_cstockTrader->queryorder(*query, ret, count, errmsg);
+
 
 	if (b == true)
 	{
@@ -131,19 +170,16 @@ array<managedEntrustreturnstruct^>^  managedStockClass::QueryEntrust(managedQuer
 	return managedRet;
 }
 
-array<managedBargainreturnstruct^>^ managedStockClass::QueryTrader(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg){
-	QueryEntrustorderstruct query = queryEntrust->createInstance();
+array<managedBargainreturnstruct^>^ managedStockClass::QueryTrader(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg){
+	QueryEntrustorderstruct* query = new QueryEntrustorderstruct();
 	Bargainreturnstruct* ret = new Bargainreturnstruct[1];
 
 	int count = 0;
 	char* errmsg;
 
-	array<managedBargainreturnstruct^>^ managedRet;
+	array<managedBargainreturnstruct^>^ managedRet = gcnew array<managedBargainreturnstruct^>(1);
 
-	//C++ 版成交查询还未完成
-	//bool b = m_cstockTrader->querytrader(query, ret, count, errmsg);
-
-	bool b = true;
+	bool b = m_cstockTrader->querytrader(*query, ret, count, errmsg);
 
 	if (b == true)
 	{

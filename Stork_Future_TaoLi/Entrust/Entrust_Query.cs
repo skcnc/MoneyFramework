@@ -1,6 +1,7 @@
 ﻿using MCStockLib;
 using Stork_Future_TaoLi.Database;
 using Stork_Future_TaoLi.Queues;
+using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace Stork_Future_TaoLi.Entrust
         #region 变量
         private static LogWirter log = new LogWirter();
         MCStockLib.managedStockClass _classTradeStock = new managedStockClass();
+        MCStockLib.managedLogin login = new managedLogin(CommConfig.Stock_ServerAddr, CommConfig.Stock_Port, CommConfig.Stock_Account, CommConfig.Stock_BrokerID, CommConfig.Stock_Password, CommConfig.Stock_InvestorID);
+        string ErrorMsg = string.Empty;
         #endregion
 
         #region 单例模式
@@ -59,19 +62,29 @@ namespace Stork_Future_TaoLi.Entrust
                 //单次循环最多查询100个交易的委托情况
                 int maxCount = 100;
 
+                if (!_classTradeStock.getConnectStatus())
+                {
+                    _classTradeStock.Init(login, ErrorMsg);
+                }
+
 
                 while (maxCount > 0 && queue_query_entrust.GetQueueNumber() > 0)
                 {
                     maxCount--;
 
                     //获取新委托
-                    managedQueryEntrustorderstruct item = (managedQueryEntrustorderstruct)queue_query_entrust.GetQueue().Dequeue();
+                    QueryEntrustOrderStruct_M item = (QueryEntrustOrderStruct_M)queue_query_entrust.GetQueue().Dequeue();
 
 
                     string err = string.Empty;
 
                     //查询委托及获取实例
-                    managedEntrustreturnstruct rets = _classTradeStock.QueryEntrust(item, err).ToList()[0];
+                    var temps = _classTradeStock.QueryEntrust(item, err);
+
+                    if(temps.Length == 0) continue;
+
+                    managedEntrustreturnstruct rets = temps.ToList()[0];
+                        
 
 
                     //目前仅考虑 1对1 返回的情况，不考虑出现1对多 ，类似基金交易的情况
