@@ -199,7 +199,7 @@ namespace Stork_Future_TaoLi
                 {
                     Thread.Sleep(10);
 
-                    if ((DateTime.Now - lastHeartBeat).TotalSeconds > 30)
+                    if ((DateTime.Now - lastHeartBeat).TotalMinutes > 10)
                     {
                         sublog.LogEvent("线程 ：" + _threadNo.ToString() + "心跳停止 ， 最后心跳 ： " + lastHeartBeat.ToString());
                         _threadRunControl = false;
@@ -246,17 +246,17 @@ namespace Stork_Future_TaoLi
                             args.InvestorID = INVESTOR;
                             args.InstrumentID = order.cSecurityCode;
                             args.Direction = Convert.ToByte(order.cTradeDirection[0]);
-                            args.CombOffsetFlag_0 = Convert.ToByte(order.cOrderPriceType[0]);
+                            args.CombOffsetFlag_0 = Convert.ToByte(order.cOffsetFlag[0]);
                             args.VolumeTotalOriginal = Convert.ToInt16(order.nSecurityAmount);
                             args.LimitPrice = Convert.ToDouble(order.dOrderPrice);
                             args.OrderRef = order.OrderRef.ToString();
-                            args.OrderPriceType = Convert.ToByte("2");
-                            args.CombHedgeFlag_0 = Convert.ToByte("1");
-                            args.TimeCondition = Convert.ToByte("3");
-                            args.VolumeCondition = Convert.ToByte("1");
+                            args.OrderPriceType = Convert.ToByte('2');
+                            args.CombHedgeFlag_0 = Convert.ToByte('1');
+                            args.TimeCondition = Convert.ToByte('3');
+                            args.VolumeCondition = Convert.ToByte('1');
                             args.MinVolume = 1;
-                            args.ContingentCondition = Convert.ToByte("1");
-                            args.ForceCloseReason = Convert.ToByte("0");
+                            args.ContingentCondition = Convert.ToByte('1');
+                            args.ForceCloseReason = Convert.ToByte('0');
                             args.IsAutoSuspend = 0;
                             args.UserForceClose = 0;
 
@@ -352,7 +352,8 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo">返回信息</param>
         /// <param name="nRequestID"></param>
         /// <param name="bIsLast"></param>
-        void _client_RspOrderAction(CTP_CLI.CThostFtdcInputOrderActionField_M pInputOrderAction, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        void _client_RspOrderAction(CTP_CLI.CThostFtdcInputOrderActionField_M pInputOrderAction, 
+            CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             //throw new NotImplementedException();
         }

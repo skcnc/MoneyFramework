@@ -11,19 +11,19 @@
                 交易类型：&nbsp;&nbsp;
                 <div class="radio-inline">
                     <label>
-                        <input type="radio" name="RadioType" id="tm_radio_stock" value="0" checked>
+                        <input type="radio" name="RadioType" id="tm_radio_stock" value="S" checked>
                         股票
                     </label>
                 </div>
                 <div class="radio-inline">
                     <label>
-                        <input type="radio" name="RadioType" id="tm_radio_future" value="1">
+                        <input type="radio" name="RadioType" id="tm_radio_future" value="F">
                         期货
                     </label>
                 </div>
                 <div class="radio-inline disabled">
                     <label>
-                        <input type="radio" name="RadioType" id="tm_radio_index" value="2" disabled>
+                        <input type="radio" name="RadioType" id="tm_radio_index" value="I" disabled>
                         指数
                     </label>
                 </div>
@@ -33,8 +33,9 @@
                 <input type="text" class="form-control" id="tm_input_code" placeholder="交易代码" />
             </div>
             <div class="col-md-12 form-inline" style="margin-top:5px">
-                买卖：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                买卖：  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <div class="radio-inline">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                     <label>
                         <input type="radio" name="RadioDirection" id="tm_radio_buy" value="0" checked/>
                         买入
@@ -47,11 +48,12 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-12 form-inline" style="margin-top:5px">
-                开平：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <div class="col-md-12 form-inline open_close_panel" style="margin-top:5px">
+                开平：  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <div class="radio-inline">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                     <label>
-                        <input type="radio" name="RadioMark" id="tm_radio_open" value="0" checked/>
+                        <input type="radio" name="RadioMark" id="tm_radio_open" value="0" checked />
                         开仓
                     </label>
                 </div>
@@ -59,6 +61,22 @@
                     <label>
                         <input type="radio" name="RadioMark" id="tm_radio_close" value="1" />
                         平仓
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-12 form-inline exchange_select_panel" style="margin-top:5px">
+                交易所：&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="radio-inline">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <label>
+                        <input type="radio" name="ExchangeID" id="tm_radio_SH" value="SH" checked />
+                        上交所
+                    </label>
+                </div>
+                <div class="radio-inline">
+                    <label>
+                        <input type="radio" name="ExchangeID" id="tm_radio_SZ" value="SZ" />
+                        深交所
                     </label>
                 </div>
             </div>
@@ -72,7 +90,6 @@
             </div>
             <div class="col-md-12">
                 <button class="btn btn-success" type="submit" id="tm_btnMakeOrder">下单</button>
-                <button class="btn btn-success" type="submit" id="tm_btnMaketest">get</button>
             </div>
         </div>
         <div class="col-md-8 table-responsive">
@@ -190,6 +207,18 @@
             //更新交易列表
             chat.client.updateTradeList = function (jsonString) {
                 var _trade = eval('(' + jsonString + ')');
+
+                var _orderRef = _trade.OrderRef;
+                var _tradeID = _trade.TradeID;
+                var _code = _trade.Code;
+                var _direction = _trade.Direction;
+                var _combOff = _trade.CombOff;
+                var _price = _trade.Price;
+                var _volume = _trade.Volume;
+                var _orderSysId = _trade.OrderSysID;
+
+                var newRow = "<tr><td>" + _orderRef + "</td><td>" + _tradeID + "</td><td>" + _code + "</td><td>" + _direction + "</td><td>" + _combOff + "</td><td>" + _price + "</td><td>" + _volume + "</td><td>" + _orderSysId + "</td></tr>";
+                $('#tm_tb_tradeRecord').append(newRow);
             };
 
             $.connection.hub.start().done(function () {

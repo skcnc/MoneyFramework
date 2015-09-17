@@ -78,7 +78,7 @@ namespace Stork_Future_TaoLi
             {
                 Thread.Sleep(10);
 
-                if ((DateTime.Now - lastHeartBeat).TotalSeconds > 10)
+                if ((DateTime.Now - lastHeartBeat).TotalMinutes > 10)
                 {
                     log.LogEvent("本模块供血不足，线程即将死亡");
                     break;

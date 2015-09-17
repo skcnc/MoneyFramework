@@ -36,7 +36,7 @@ double  CSyntheticIndex::getSimIndex()
 		   dSimIndex+=itor->dweight*stockDb[itor->sSecurity]->getlastprice();
 		  itor++;
        } 
-	 return dSimIndex;
+	 return dSimIndex/300;
 }
 
 double  CSyntheticIndex::getrealmarketvalue(double & stopmarketvalue)
@@ -151,7 +151,6 @@ bool   CSyntheticIndex::init(indexweightstruct * indexweightlist,int weightnum, 
 	 return true;
 }
 
-
 bool   CSyntheticIndex::updatepositioninfor()
 {
 	 list<stockpotionstruct>::iterator itor;
@@ -162,6 +161,7 @@ bool   CSyntheticIndex::updatepositioninfor()
 		   itor->dlastprice=stockDb[itor->sSecurity]->getlastprice(); 
 		   itor->ddownlimitprice = stockDb[itor->sSecurity]->m_DepthMarketData.marketinfor.dLowLimited;
 		   itor->duplimitprice = stockDb[itor->sSecurity]->m_DepthMarketData.marketinfor.dHighLimited;
+		   itor->isupdate = stockDb[itor->sSecurity]->isupdated();
 		   itor++;
        } 
 

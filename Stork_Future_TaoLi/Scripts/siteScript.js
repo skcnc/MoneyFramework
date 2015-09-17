@@ -442,6 +442,10 @@ window.onload = function (e) {
             return
         }
     }
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/trademonitor") {
+        $('.open_close_panel').hide();
+        $('.exchange_select_panel').show();
+    }
     else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/open_edit") {
         if (Modernizr.localstorage) {
             var _queryString = e.currentTarget.location.href.split('?')[1];
@@ -920,7 +924,7 @@ $('#CloseStrategyCreate').click(function (e) {
     $(this).attr('href', href);
 })
 
-//确认交易列表
+//确认交易列表S
 //用户确认后，会回到主页面，进行下一步添加操作
 //权重信息和交易列表会保存在本地
 $('#btnSubmit_open').click(function (e) {
@@ -1049,6 +1053,21 @@ $('#btnSubmit_close').click(function (e) {
     alert('参数已写入，请刷新控制页面')
 })
 
+$('input[name="RadioType"]').change(function (e) {
+    var type = $('input[name="RadioType"]:checked').val();
+
+    if(type == "S")
+    {
+        $('.open_close_panel').hide();
+        $('.exchange_select_panel').show();
+    }
+    else if(type == "F")
+    {
+        $('.open_close_panel').show();
+        $('.exchange_select_panel').hide();
+    }
+})
+
 $('#tm_btnMakeOrder').click(function (e) {
     var type = $('input[name="RadioType"]:checked').val();
     var code = $('#tm_input_code')[0].value.trim();
@@ -1056,11 +1075,12 @@ $('#tm_btnMakeOrder').click(function (e) {
     var mark = $('input[name="RadioMark"]:checked').val();
     var volume = $('#tm_input_volume')[0].value.trim();
     var price = $('#tm_input_price')[0].value.trim();
+    var exchangeid = $('input[name="ExchangeID"]:checked').val();
 
     var user = localStorage["USERNAME"];
 
     var trade = {
-        User:user,
+        User: user,
         cSecurityCode: code,
         nSecurityAmount: volume,
         dOrderPrice: price,
@@ -1068,7 +1088,9 @@ $('#tm_btnMakeOrder').click(function (e) {
         cOffsetFlag: mark,
         cSecurityType: type,
         belongStrategy: "00",
-        OrderRef:"0"
+        OrderRef: "0",
+        exchangeId: exchangeid
+
     }
 
     var JSONSTRING = "C1" + JSON.stringify(trade);

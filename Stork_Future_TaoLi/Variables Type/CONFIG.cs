@@ -104,7 +104,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// <summary>
         /// 股票帐户
         /// </summary>
-        private static string stock_investor_id = "test user";
+        private static string stock_investor_id = "201509";
         public static string Stock_InvestorID { get { return stock_investor_id; } }
     }
 

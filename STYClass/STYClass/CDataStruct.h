@@ -43,6 +43,7 @@ struct stockpotionstruct    //持仓显示文件
 	double     duplimitprice;             // 当前价格
 	double     ddownlimitprice;             // 当前价格
 	double     dlastprice;             // 当前价格
+	bool       isupdate;
 };
 
 /*****************交易相关***********************************************/

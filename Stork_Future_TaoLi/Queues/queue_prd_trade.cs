@@ -127,6 +127,7 @@ namespace Stork_Future_TaoLi.Modulars
         }
     }
 
+
     /// <summary>
     /// 交易预处理模块与上海交易所股票交易线程控制模块的消息队列
     /// </summary>

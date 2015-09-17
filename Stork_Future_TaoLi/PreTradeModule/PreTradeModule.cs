@@ -77,12 +77,12 @@ namespace Stork_Future_TaoLi
         }
 
         /// <summary>
-        /// 从消息队列中获取交易管理页面生成的交易
+        /// 从消息队列中获取交易管理页面生成的交易(期货 & 股票)
         /// </summary>
         /// <returns>
         /// NULL : 说明队列中无值
         /// 其他 ：返回队列中首值</returns>
-        private MakeOrder DeQueue2()
+        private MakeOrder DeQueueMonitorOrder()
         {
             MakeOrder tos;
 
@@ -95,7 +95,7 @@ namespace Stork_Future_TaoLi
             if (tos != null) return tos;
             else return null;
         }
-
+        
 
 
         private static TradeOrderStruct CreateNewTrade(TradeOrderStruct tos)
@@ -156,8 +156,6 @@ namespace Stork_Future_TaoLi
                 /*****************************
                  * 生成交易List之前的例行工作
                  * **************************/
-
-                
 
                 //发送心跳
                 if (DateTime.Now.Second % 5 == 0 && DateTime.Now.Second != lastHeartBeat.Second)
@@ -310,7 +308,7 @@ namespace Stork_Future_TaoLi
                 #endregion
 
                 #region 交易管理界面直接发起交易
-                MakeOrder mo = PreTradeModule.instance.DeQueue2();
+                MakeOrder mo = PreTradeModule.instance.DeQueueMonitorOrder();
                 if (mo != null)
                 {
                     List<TradeOrderStruct> _TradeList = new List<TradeOrderStruct>();
@@ -322,10 +320,12 @@ namespace Stork_Future_TaoLi
                         dOrderPrice = mo.dOrderPrice,
                         cTradeDirection = mo.cTradeDirection,
                         cOffsetFlag = mo.cOffsetFlag,
+                        SecurityName = String.Empty,
+                        cOrderPriceType = "0",
 
                         cSecurityType = mo.cSecurityType,
                         cOrderLevel = "1",
-                        cOrderexecutedetail = String.Empty,
+                        cOrderexecutedetail = "0",
                         belongStrategy = mo.belongStrategy,
                         OrderRef = REQUEST_ID.ApplyNewID()
                     };
@@ -370,8 +370,6 @@ namespace Stork_Future_TaoLi
                 }
 
             }
-
-            Thread.CurrentThread.Abort();
         }
         
     }

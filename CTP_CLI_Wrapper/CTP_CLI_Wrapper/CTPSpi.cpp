@@ -82,14 +82,18 @@ void CCTPSpi::SetRspErrorCallback( RspErrorCallback pt2F )
 
 void CCTPSpi::OnRtnOrder( CThostFtdcOrderField *pOrder )
 {
-	if(pOrder==nullptr)
+	try
 	{
-		CThostFtdcOrderField req;
-		memset(&req,0,sizeof(req));
-		this->rtnOrderCallback(&req);
+		if (pOrder == nullptr)
+		{
+			CThostFtdcOrderField req;
+			memset(&req, 0, sizeof(req));
+			this->rtnOrderCallback(&req);
+		}
+		else
+			this->rtnOrderCallback(pOrder);
 	}
-	else
-		this->rtnOrderCallback(pOrder);
+	catch(int e){}
 }
 
 void CCTPSpi::SetRtnOrderCallback( RtnOrderCallback pt2F )
@@ -99,14 +103,18 @@ void CCTPSpi::SetRtnOrderCallback( RtnOrderCallback pt2F )
 
 void CCTPSpi::OnRtnTrade( CThostFtdcTradeField *pTrade )
 {
-	if(pTrade==nullptr)
+	try
 	{
-		CThostFtdcTradeField req;
-		memset(&req,0,sizeof(req));
-		this->rtnTradeCallback(&req);
+		if (pTrade == nullptr)
+		{
+			CThostFtdcTradeField req;
+			memset(&req, 0, sizeof(req));
+			this->rtnTradeCallback(&req);
+		}
+		else
+			this->rtnTradeCallback(pTrade);
 	}
-	else
-		this->rtnTradeCallback(pTrade);
+	catch (int e){}
 }
 
 void CCTPSpi::SetRtnTradeCallback( RtnTradeCallback pt2F )
