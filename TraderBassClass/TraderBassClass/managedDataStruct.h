@@ -10,7 +10,38 @@ namespace MCStockLib
 {
 
 	[StructLayout(LayoutKind::Sequential)]
+	public ref struct TradeOrderStructT{
+
+		int SecurityAmount = 0;
+		
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ ExchangeID;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 31)]
+		String^ SecurityCode;
+
+		//[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 55)]
+		//String^ SecurityName;
+
+		char TradeDirection;
+		char OffsetFlag;
+		char OrderPriceType;
+		char SecurityType;
+		char OrderLevel;
+		char OrderExecutedDetail;
+
+		int OrderPrice = 0;
+		
+
+	};
+
+
+	[StructLayout(LayoutKind::Sequential)]
 	public ref struct TradeOrderStruct_M{
+
+		int SecurityAmount = 0;
+
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
 		String^ ExchangeID;
 
@@ -20,23 +51,17 @@ namespace MCStockLib
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 55)]
 		String^ SecurityName;
 
-		long SecurityAmount;
-
-		double OrderPrice;
-
 		char TradeDirection;
-
 		char OffsetFlag;
-
 		char OrderPriceType;
-
 		char SecurityType;
-
 		char OrderLevel;
-
 		char OrderExecutedDetail;
-	};
 
+		double OrderPrice = 0;
+
+
+	};
 	/*public ref struct managedTraderorderstruct
 	{
 		//交易部分
@@ -130,45 +155,46 @@ namespace MCStockLib
 		}
 	};
 
-	public ref struct managedQueryEntrustorderstruct
-	{
-		char cSecurityType;
-		/*char* cExchangeID;
-		char* cOrderSysID;*/
-		String^ cExchangeID;
-		String^ cOrderSysID;
-		String^ Code;
-		String^ StrategyId;
-		int Direction;
+	//public ref struct managedQueryEntrustorderstruct
+	//{
+	//	char cSecurityType;
+	//	/*char* cExchangeID;
+	//	char* cOrderSysID;*/
 
-		managedQueryEntrustorderstruct(char mcSecurityType, String^ mcExchangeID ,String^ mcOrderSysID)
-		{
-			//cExchangeID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcExchangeID);
-			cExchangeID = mcExchangeID;
-			cOrderSysID = mcOrderSysID;
-			//cOrderSysID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcOrderSysID);
-			cSecurityType = mcSecurityType;
-		}
+	//	String^ cExchangeID;
+	//	String^ cOrderSysID;
+	//	/*String^ Code;
+	//	String^ StrategyId;
+	//	int Direction;*/
 
-		managedQueryEntrustorderstruct()
-		{
-			//cExchangeID = new char[255];
-			//cOrderSysID = new char[255];
-			cSecurityType = 's';
-		}
+	//	//managedQueryEntrustorderstruct(char mcSecurityType, String^ mcExchangeID ,String^ mcOrderSysID)
+	//	//{
+	//	//	//cExchangeID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcExchangeID);
+	//	//	cExchangeID = mcExchangeID;
+	//	//	cOrderSysID = mcOrderSysID;
+	//	//	//cOrderSysID = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(mcOrderSysID);
+	//	//	cSecurityType = mcSecurityType;
+	//	//}
 
-		QueryEntrustorderstruct createInstance()
-		{
-			QueryEntrustorderstruct queryEntrust;
+	//	//managedQueryEntrustorderstruct()
+	//	//{
+	//	//	//cExchangeID = new char[255];
+	//	//	//cOrderSysID = new char[255];
+	//	//	cSecurityType = 's';
+	//	//}
 
-			memset(queryEntrust.cExchangeID,0,21);
-			memset(queryEntrust.cOrderSysID,0,21);
-			
-			queryEntrust.cSecuritytype = 0;
+	//	//QueryEntrustorderstruct createInstance()
+	//	//{
+	//	//	QueryEntrustorderstruct queryEntrust;
 
-			return queryEntrust;
-		}
-	};
+	//	//	memset(queryEntrust.cExchangeID,0,21);
+	//	//	memset(queryEntrust.cOrderSysID,0,21);
+	//	//	
+	//	//	queryEntrust.cSecuritytype = 0;
+
+	//	//	return queryEntrust;
+	//	//}
+	//};
 
 	[StructLayout(LayoutKind::Sequential)]
 	public ref struct QueryEntrustOrderStruct_M
@@ -180,6 +206,14 @@ namespace MCStockLib
 
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
 		String^ OrderSysID;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ Code;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ StrategyId;
+
+		int Direction;
 	};
 
 

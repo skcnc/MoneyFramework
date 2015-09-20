@@ -16,14 +16,14 @@ namespace MCStockLib
 		virtual ~managedStockClass(void);
 
 		bool Init(managedLogin^ mylogininfor,String^ Errormsg);
-		bool SingleTrade(TradeOrderStruct_M^  mytraderoder, managedQueryEntrustorderstruct^ myEntrust, String^ Errormsg);
-		bool BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<managedQueryEntrustorderstruct^>^ myEntrust, String^ Errormsg);
+		bool SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntrustOrderStruct_M^ myEntrust, String^ Errormsg);
+		bool BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<QueryEntrustOrderStruct_M^>^ myEntrust, String^ Errormsg);
 		bool getConnectStatus();
 		bool getWorkStatus();
 		void HeartBeat();
 		int cal(String^ msg);
-		array<managedEntrustreturnstruct^>^  QueryEntrust(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg);
-		array<managedBargainreturnstruct^>^ QueryTrader(managedQueryEntrustorderstruct^ queryEntrust, String^ Errormsg);
+		array<managedEntrustreturnstruct^>^  QueryEntrust(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg);
+		array<managedBargainreturnstruct^>^ QueryTrader(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg);
 
 		
 	private:

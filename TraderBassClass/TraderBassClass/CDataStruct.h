@@ -60,15 +60,16 @@ struct Logininfor // 登陆信息
 
 };
 
-struct Traderorderstruct   //交易报单（买卖 申购 ）
-{
 
+struct TraderorderstructT   
+{
+	int    nSecurity_amount;      // 委托数量
+	
 	//交易部分
 	char    cExchangeID[21];            //交易所
 	char    cSecurity_code[31];     // 证券代码
 	char    security_name[55];      //证券名称
-	long    nSecurity_amount;      // 委托数量
-	double  dOrderprice;           // 委托价格
+
 	char    cTraderdirection;      // 买卖类别（见数据字典说明）
 	char    cOffsetFlag;           //开平标志
 	char    cOrderPriceType;       //报单条件(限价  市价)
@@ -77,26 +78,33 @@ struct Traderorderstruct   //交易报单（买卖 申购 ）
 	char    cSecuritytype;          //证券类型	
 	char    cOrderlevel;             //报单优先级 执行顺序
 	char    cOrderexecutedetail;     //报单执行细节
-	//标志信息
-	Clientinfor myclientinfor; //
 
-	void getInit(Traderorderstruct stu)
-	{
-		memcpy(cExchangeID, stu.cExchangeID, 21);
-		memcpy(cSecurity_code, stu.cSecurity_code, 31);
-		memcpy(security_name, stu.security_name, 55);
-		nSecurity_amount = stu.nSecurity_amount;
-		dOrderprice = stu.dOrderprice;
-		cTraderdirection = stu.cTraderdirection;
-		cOffsetFlag = stu.cOffsetFlag;
-		cOrderPriceType = stu.cOrderPriceType;
+	
+	int  dOrderprice;           // 委托价格
+	
 
-		cSecuritytype = stu.cSecuritytype;
-		cOrderlevel = stu.cOrderlevel;
-		cOrderexecutedetail = stu.cOrderexecutedetail;
+};
+struct Traderorderstruct   //交易报单（买卖 申购 ）
+{
 
-		myclientinfor = stu.myclientinfor;
-	}
+	int    nSecurity_amount;      // 委托数量
+
+	//交易部分
+	char    cExchangeID[21];            //交易所
+	char    cSecurity_code[31];     // 证券代码
+	char    security_name[55];      //证券名称
+
+	char    cTraderdirection;      // 买卖类别（见数据字典说明）
+	char    cOffsetFlag;           //开平标志
+	char    cOrderPriceType;       //报单条件(限价  市价)
+
+	//控制部分
+	char    cSecuritytype;          //证券类型	
+	char    cOrderlevel;             //报单优先级 执行顺序
+	char    cOrderexecutedetail;     //报单执行细节
+
+	double  dOrderprice;           // 委托价格
+
 };
 
 struct  QueryEntrustorderstruct
@@ -104,16 +112,19 @@ struct  QueryEntrustorderstruct
 	char    cSecuritytype;          //证券类型	
 	char    cExchangeID[21];            //交易所
 	char	cOrderSysID[21];  	   ///报单编号
+	char	cCode[21];
+	char	cStrategyId[21];
+	int		Direction;
 	//标志信息
-	Clientinfor myclientinfor;
+	//Clientinfor myclientinfor;
 
-	void getInit(QueryEntrustorderstruct entrust)
-	{
-		cSecuritytype = entrust.cSecuritytype;
-		memcpy(cExchangeID, entrust.cExchangeID, 21);
-		memcpy(cOrderSysID, entrust.cOrderSysID, 21);
-		myclientinfor = entrust.myclientinfor;
-	}
+	//void getInit(QueryEntrustorderstruct entrust)
+	//{
+	//	cSecuritytype = entrust.cSecuritytype;
+	//	memcpy(cExchangeID, entrust.cExchangeID, 21);
+	//	memcpy(cOrderSysID, entrust.cOrderSysID, 21);
+	//	myclientinfor = entrust.myclientinfor;
+	//}
 };
 
 struct Entrustreturnstruct //委托回报
