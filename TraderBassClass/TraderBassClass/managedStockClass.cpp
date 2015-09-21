@@ -41,47 +41,33 @@ void managedStockClass::HeartBeat()
 //µ¥±Ê½»Ò×
 bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntrustOrderStruct_M^ myEntrust, String^ Errormsg)
 {
-	Traderorderstruct* trade = new Traderorderstruct();
+	TraderorderstructT* tradeM = new TraderorderstructT();
 	QueryEntrustorderstruct* entrust;
 	//trade.getInit(mytraderoder);
 	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
 	char err[255];
 
-	TradeOrderStructT^ t = gcnew TradeOrderStructT();
-
-	mytraderoder->ExchangeID = t->ExchangeID = "sh";
-	mytraderoder->SecurityCode = t->SecurityCode = "600000";
-	mytraderoder->SecurityAmount = t->SecurityAmount = 1000;
-	mytraderoder->OffsetFlag =  t->OffsetFlag = '3';
-	mytraderoder->OrderExecutedDetail =  t->OrderExecutedDetail = '0';
-	mytraderoder->OrderLevel = t->OrderLevel = '2';
-	mytraderoder->OrderPriceType = t->OrderPriceType = '1';
-	mytraderoder->SecurityType = t->SecurityType = 's';
-	mytraderoder->TradeDirection = t->TradeDirection = '5';
-	mytraderoder->OrderPrice = t->OrderPrice = 13;
-	mytraderoder->SecurityName = "hello world!";
-
-	IntPtr ptr2 = Marshal::AllocHGlobal(Marshal::SizeOf(t));
-	Marshal::StructureToPtr(t, ptr2, false);
-	TraderorderstructT* tt = (TraderorderstructT*)(ptr2.ToPointer());
-
 	IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(mytraderoder));
 	Marshal::StructureToPtr(mytraderoder, ptr, false);
-	trade = (Traderorderstruct*)(ptr.ToPointer());
+	tradeM = (TraderorderstructT*)(ptr.ToPointer());
 
-	/*trade->nSecurity_amount = mytraderoder->SecurityAmount;
 
-	trade->nSecurity_amount = 100;
-	trade->dOrderprice = mytraderoder->OrderPrice;
-	trade->cTraderdirection = mytraderoder->TradeDirection;
-	trade->cOffsetFlag = mytraderoder->OffsetFlag;
-	trade->cOrderPriceType = mytraderoder->OrderPriceType;
-	trade->cSecuritytype = mytraderoder->SecurityType;
-	trade->cOrderlevel = mytraderoder->OrderLevel;
-	trade->cOrderexecutedetail = mytraderoder->OrderExecutedDetail;*/
+	Traderorderstruct* trade = new Traderorderstruct();
 
-	//trade = mytraderoder->createInstance();
-	//(entrust).getInit(myEntrust);
+	strcpy_s(trade->cExchangeID, 21, tradeM->cExchangeID);
+	strcpy_s(trade->cSecurity_code, 31, tradeM->cSecurity_code);
+	memset(trade->security_name, 0, 55);
+
+	trade->cTraderdirection = (char)(tradeM->cTraderdirection);
+	trade->cOffsetFlag = (char)(tradeM->cOffsetFlag);
+	trade->cOrderPriceType = (char)(tradeM->cOrderPriceType);
+	trade->cSecuritytype = (char)(tradeM->cSecuritytype);
+	trade->cOrderlevel = (char)(tradeM->cOrderlevel);
+
+	trade->cOrderexecutedetail = (char)(tradeM->cOrderexecutedetail);
+	trade->nSecurity_amount = tradeM->nSecurity_amount;
+	trade->dOrderprice = tradeM->dOrderprice;
+
 
 	entrust = new  QueryEntrustorderstruct();
 	   

@@ -10,56 +10,23 @@ namespace MCStockLib
 {
 
 	[StructLayout(LayoutKind::Sequential)]
-	public ref struct TradeOrderStructT{
-
-		int SecurityAmount = 0;
-		
-
-		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
-		String^ ExchangeID;
-
-		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 31)]
-		String^ SecurityCode;
-
-		//[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 55)]
-		//String^ SecurityName;
-
-		char TradeDirection;
-		char OffsetFlag;
-		char OrderPriceType;
-		char SecurityType;
-		char OrderLevel;
-		char OrderExecutedDetail;
-
-		int OrderPrice = 0;
-		
-
-	};
-
-
-	[StructLayout(LayoutKind::Sequential)]
 	public ref struct TradeOrderStruct_M{
 
-		int SecurityAmount = 0;
-
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
 		String^ ExchangeID;
 
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 31)]
 		String^ SecurityCode;
 
-		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 55)]
-		String^ SecurityName;
+		int TradeDirection;
+		int OffsetFlag;
+		int OrderPriceType;
+		int SecurityType;
+		int OrderLevel;
+		int OrderExecutedDetail;
 
-		char TradeDirection;
-		char OffsetFlag;
-		char OrderPriceType;
-		char SecurityType;
-		char OrderLevel;
-		char OrderExecutedDetail;
-
+		int SecurityAmount = 0;
 		double OrderPrice = 0;
-
 
 	};
 	/*public ref struct managedTraderorderstruct

@@ -63,31 +63,27 @@ struct Logininfor // 登陆信息
 
 struct TraderorderstructT   
 {
-	int    nSecurity_amount;      // 委托数量
-	
 	//交易部分
 	char    cExchangeID[21];            //交易所
 	char    cSecurity_code[31];     // 证券代码
-	char    security_name[55];      //证券名称
-
-	char    cTraderdirection;      // 买卖类别（见数据字典说明）
-	char    cOffsetFlag;           //开平标志
-	char    cOrderPriceType;       //报单条件(限价  市价)
+	
+	int    cTraderdirection;      // 买卖类别（见数据字典说明）
+	int    cOffsetFlag;           //开平标志
+	int    cOrderPriceType;       //报单条件(限价  市价)
 
 	//控制部分
-	char    cSecuritytype;          //证券类型	
-	char    cOrderlevel;             //报单优先级 执行顺序
-	char    cOrderexecutedetail;     //报单执行细节
+	int    cSecuritytype;          //证券类型	
+	int    cOrderlevel;             //报单优先级 执行顺序
+	int    cOrderexecutedetail;     //报单执行细节
 
-	
-	int  dOrderprice;           // 委托价格
-	
-
+	int    nSecurity_amount;      // 委托数量
+	double  dOrderprice;           // 委托价格
 };
+
 struct Traderorderstruct   //交易报单（买卖 申购 ）
 {
 
-	int    nSecurity_amount;      // 委托数量
+	
 
 	//交易部分
 	char    cExchangeID[21];            //交易所
@@ -103,6 +99,7 @@ struct Traderorderstruct   //交易报单（买卖 申购 ）
 	char    cOrderlevel;             //报单优先级 执行顺序
 	char    cOrderexecutedetail;     //报单执行细节
 
+	int    nSecurity_amount;      // 委托数量
 	double  dOrderprice;           // 委托价格
 
 };

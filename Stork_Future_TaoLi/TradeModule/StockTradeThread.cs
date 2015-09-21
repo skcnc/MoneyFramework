@@ -404,7 +404,6 @@ namespace Stork_Future_TaoLi.TradeModule
             _sorder.OrderPriceType = (unit.cOrderPriceType.Length != 0) ? Convert.ToSByte(unit.cOrderPriceType) : Convert.ToSByte("0");
             _sorder.SecurityAmount = (int)(unit.nSecurityAmount);
             _sorder.SecurityCode = (unit.cSecurityCode.Length != 0) ? unit.cSecurityCode : "0";
-            _sorder.SecurityName = (unit.SecurityName.Length != 0) ? unit.SecurityName : "0";
             _sorder.SecurityType = (unit.cSecurityType.Length != 0) ? (unit.cSecurityType == "S" ? (sbyte)115 : (sbyte)102) : (sbyte)115;
 
 
