@@ -153,7 +153,7 @@ bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstru
 			bRunning = false;
 			sprintf(myEntrust.cOrderSysID, "%d", pAddEntrustRtn->entrust_sn);
 			sprintf(myEntrust.cExchangeID, "%s", mytraderoder.cExchangeID);
-			sprintf(myEntrust.cSecuritytype, "%c", mytraderoder.cSecuritytype);
+			myEntrust.cSecuritytype = mytraderoder.cSecuritytype;
 			sprintf(myEntrust.cCode, "%s", mytraderoder.cSecurity_code);
 			return true;
 		}
