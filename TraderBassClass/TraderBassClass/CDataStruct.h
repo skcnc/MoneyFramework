@@ -5,6 +5,8 @@
 #ifndef __DATASTRUCT_H
 #define __DATASTRUCT_H
 
+#pragma pack(8)
+
 struct indexweightstruct  //指数型配置文件
 {
 	char       cSecuritytype;          // 证券类型
@@ -88,6 +90,7 @@ struct Traderorderstruct   //交易报单（买卖 申购 ）
 {
 
 	int    nSecurity_amount;      // 委托数量
+	double    dOrderprice;           // 委托价格
 
 	//交易部分
 	char    cExchangeID[21];            //交易所
@@ -103,7 +106,7 @@ struct Traderorderstruct   //交易报单（买卖 申购 ）
 	char    cOrderlevel;             //报单优先级 执行顺序
 	char    cOrderexecutedetail;     //报单执行细节
 
-	double  dOrderprice;           // 委托价格
+	
 
 };
 

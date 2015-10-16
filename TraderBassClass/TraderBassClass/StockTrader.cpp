@@ -109,9 +109,9 @@ bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstru
 
 	pReqMsg->bs_type = mytraderoder.cTraderdirection;   // 买卖类别（见数据字典说明）
 	strcpy(pReqMsg->security_code, mytraderoder.cSecurity_code);  //证券代码
-	pReqMsg->stock_amount = 100;// mytraderoder.nSecurity_amount; //数量
+	pReqMsg->stock_amount = mytraderoder.nSecurity_amount; //数量
 	if (mytraderoder.cSecuritytype == 's')
-		pReqMsg->price = 2850;// ((int)(mytraderoder.dOrderprice * 100)) * 10;  //股票只有两位精度
+		pReqMsg->price =  ((int)(mytraderoder.dOrderprice * 100)) * 10;  //股票只有两位精度
 	else
 		pReqMsg->price = (int)(mytraderoder.dOrderprice * 1000);
 
@@ -152,6 +152,9 @@ bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstru
 		{
 			bRunning = false;
 			sprintf(myEntrust.cOrderSysID, "%d", pAddEntrustRtn->entrust_sn);
+			sprintf(myEntrust.cExchangeID, "%s", mytraderoder.cExchangeID);
+			sprintf(myEntrust.cSecuritytype, "%c", mytraderoder.cSecuritytype);
+			sprintf(myEntrust.cCode, "%s", mytraderoder.cSecurity_code);
 			return true;
 		}
 		else

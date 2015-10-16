@@ -2,7 +2,6 @@
 
 #include "managedTradeClass.h"
 
-
 using namespace MCStockLib;
 using namespace System::Collections::Generic;
 using namespace System;
@@ -47,41 +46,9 @@ bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntr
 	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
 	char err[255];
 
-	TradeOrderStructT^ t = gcnew TradeOrderStructT();
-
-	mytraderoder->ExchangeID = t->ExchangeID = "sh";
-	mytraderoder->SecurityCode = t->SecurityCode = "600000";
-	mytraderoder->SecurityAmount = t->SecurityAmount = 1000;
-	mytraderoder->OffsetFlag =  t->OffsetFlag = '3';
-	mytraderoder->OrderExecutedDetail =  t->OrderExecutedDetail = '0';
-	mytraderoder->OrderLevel = t->OrderLevel = '2';
-	mytraderoder->OrderPriceType = t->OrderPriceType = '1';
-	mytraderoder->SecurityType = t->SecurityType = 's';
-	mytraderoder->TradeDirection = t->TradeDirection = '5';
-	mytraderoder->OrderPrice = t->OrderPrice = 13;
-	mytraderoder->SecurityName = "hello world!";
-
-	IntPtr ptr2 = Marshal::AllocHGlobal(Marshal::SizeOf(t));
-	Marshal::StructureToPtr(t, ptr2, false);
-	TraderorderstructT* tt = (TraderorderstructT*)(ptr2.ToPointer());
-
 	IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(mytraderoder));
 	Marshal::StructureToPtr(mytraderoder, ptr, false);
 	trade = (Traderorderstruct*)(ptr.ToPointer());
-
-	/*trade->nSecurity_amount = mytraderoder->SecurityAmount;
-
-	trade->nSecurity_amount = 100;
-	trade->dOrderprice = mytraderoder->OrderPrice;
-	trade->cTraderdirection = mytraderoder->TradeDirection;
-	trade->cOffsetFlag = mytraderoder->OffsetFlag;
-	trade->cOrderPriceType = mytraderoder->OrderPriceType;
-	trade->cSecuritytype = mytraderoder->SecurityType;
-	trade->cOrderlevel = mytraderoder->OrderLevel;
-	trade->cOrderexecutedetail = mytraderoder->OrderExecutedDetail;*/
-
-	//trade = mytraderoder->createInstance();
-	//(entrust).getInit(myEntrust);
 
 	entrust = new  QueryEntrustorderstruct();
 	   

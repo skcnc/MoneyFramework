@@ -4,7 +4,7 @@
 using namespace System;
 using namespace System::Runtime::InteropServices;
 
-
+#pragma pack(8)
 
 namespace MCStockLib
 {
@@ -31,16 +31,16 @@ namespace MCStockLib
 		char OrderLevel;
 		char OrderExecutedDetail;
 
-		int OrderPrice = 0;
+		int OrderPrice;
 		
 
 	};
-
 
 	[StructLayout(LayoutKind::Sequential)]
 	public ref struct TradeOrderStruct_M{
 
 		int SecurityAmount = 0;
+		Double OrderPrice = 0;
 
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
 		String^ ExchangeID;
@@ -58,7 +58,7 @@ namespace MCStockLib
 		char OrderLevel;
 		char OrderExecutedDetail;
 
-		double OrderPrice = 0;
+		
 
 
 	};
