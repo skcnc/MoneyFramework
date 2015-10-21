@@ -4,13 +4,16 @@
 using namespace System;
 using namespace System::Runtime::InteropServices;
 
-
+#pragma pack(8)
 
 namespace MCStockLib
 {
 
 	[StructLayout(LayoutKind::Sequential)]
-	public ref struct TradeOrderStruct_M{
+	public ref struct TradeOrderStructT{
+
+		int SecurityAmount = 0;
+		
 
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
 		String^ ExchangeID;
@@ -18,15 +21,45 @@ namespace MCStockLib
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 31)]
 		String^ SecurityCode;
 
-		int TradeDirection;
-		int OffsetFlag;
-		int OrderPriceType;
-		int SecurityType;
-		int OrderLevel;
-		int OrderExecutedDetail;
+		//[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 55)]
+		//String^ SecurityName;
+
+		char TradeDirection;
+		char OffsetFlag;
+		char OrderPriceType;
+		char SecurityType;
+		char OrderLevel;
+		char OrderExecutedDetail;
+
+		int OrderPrice;
+		
+
+	};
+
+	[StructLayout(LayoutKind::Sequential)]
+	public ref struct TradeOrderStruct_M{
 
 		int SecurityAmount = 0;
-		double OrderPrice = 0;
+		Double OrderPrice = 0;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ ExchangeID;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 31)]
+		String^ SecurityCode;
+
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 55)]
+		String^ SecurityName;
+
+		char TradeDirection;
+		char OffsetFlag;
+		char OrderPriceType;
+		char SecurityType;
+		char OrderLevel;
+		char OrderExecutedDetail;
+
+		
+
 
 	};
 

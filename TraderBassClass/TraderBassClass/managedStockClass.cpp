@@ -2,7 +2,6 @@
 
 #include "managedTradeClass.h"
 
-
 using namespace MCStockLib;
 using namespace System::Collections::Generic;
 using namespace System;
@@ -41,7 +40,7 @@ void managedStockClass::HeartBeat()
 //µ¥±Ê½»Ò×
 bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntrustOrderStruct_M^ myEntrust, String^ Errormsg)
 {
-	TraderorderstructT* tradeM = new TraderorderstructT();
+	Traderorderstruct* trade = new Traderorderstruct();
 	QueryEntrustorderstruct* entrust;
 	//trade.getInit(mytraderoder);
 	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
@@ -49,25 +48,7 @@ bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntr
 
 	IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(mytraderoder));
 	Marshal::StructureToPtr(mytraderoder, ptr, false);
-	tradeM = (TraderorderstructT*)(ptr.ToPointer());
-
-
-	Traderorderstruct* trade = new Traderorderstruct();
-
-	strcpy_s(trade->cExchangeID, 21, tradeM->cExchangeID);
-	strcpy_s(trade->cSecurity_code, 31, tradeM->cSecurity_code);
-	memset(trade->security_name, 0, 55);
-
-	trade->cTraderdirection = (char)(tradeM->cTraderdirection);
-	trade->cOffsetFlag = (char)(tradeM->cOffsetFlag);
-	trade->cOrderPriceType = (char)(tradeM->cOrderPriceType);
-	trade->cSecuritytype = (char)(tradeM->cSecuritytype);
-	trade->cOrderlevel = (char)(tradeM->cOrderlevel);
-
-	trade->cOrderexecutedetail = (char)(tradeM->cOrderexecutedetail);
-	trade->nSecurity_amount = tradeM->nSecurity_amount;
-	trade->dOrderprice = tradeM->dOrderprice;
-
+	trade = (Traderorderstruct*)(ptr.ToPointer());
 
 	entrust = new  QueryEntrustorderstruct();
 	   
