@@ -1,5 +1,7 @@
 ﻿using MCStockLib;
+using Newtonsoft.Json;
 using Stork_Future_TaoLi.Database;
+using Stork_Future_TaoLi.Hubs;
 using Stork_Future_TaoLi.Queues;
 using Stork_Future_TaoLi.Variables_Type;
 using System;
@@ -84,8 +86,22 @@ namespace Stork_Future_TaoLi.Entrust
                     if(temps.Length == 0) continue;
 
                     managedEntrustreturnstruct rets = temps.ToList()[0];
-                        
 
+                    String USERNAME = UserRequestMap.GetInstance()[item.OrderRef];
+                    OrderViewItem order = new OrderViewItem(
+                        item.OrderRef.ToString(), 
+                        rets.cOrderSysID, 
+                        rets.cSecurity_code, 
+                        item.Direction.ToString(), 
+                        "NA", 
+                        rets.nVolumeTotalOriginal.ToString(), 
+                        rets.nVolumeTotal.ToString(), 
+                        item.OrderPrice.ToString(),
+                        rets.cOrderStatus.ToString(), 
+                        rets.cInsertTime);
+
+                    String JSONString = JsonConvert.SerializeObject(order);
+                    TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
 
                     //目前仅考虑 1对1 返回的情况，不考虑出现1对多 ，类似基金交易的情况
                     //将委托变动返回更新数据库
@@ -96,7 +112,7 @@ namespace Stork_Future_TaoLi.Entrust
 
                         //此处判断，相应代码的委托是否完成
                         //此处逻辑需要待返回报文内容确认后修改
-                        if (rets.cOrderStatus.ToString() != "end")
+                        if ((rets.cOrderStatus.ToString() != "8")||(!(rets.cOrderStatus == '7' && rets.nVolumeTotal == 0)))
                         {
                             queue_query_entrust.GetQueue().Enqueue((object)item);
                             continue;

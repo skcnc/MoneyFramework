@@ -114,22 +114,48 @@ namespace MCStockLib
 		String^ StrategyId;
 
 		int Direction;
+
+		int OrderRef;
+
+		double OrderPrice;
 	};
 
 
 	public ref struct managedEntrustreturnstruct{
+		//证券代码
 		String^ cSecurity_code;
 		String^ security_name;
+		//委托编号
 		String^ cOrderSysID;
+		//委托状态（见数据字典说明）
+		// L -- 委托取消
+		// l -- 委托临时状态
+		// 0 -- 未申报
+		// 1 -- 待申报
+		// 2 -- 已申报
+		// 4 -- 无效委托
+		// 5 -- 部分撤单
+		// 6 -- 已撤单
+		// 7 -- 部分成交
+		// 8 -- 已成交
 		char cOrderStatus;
+		//委托方式（见数据字典说明）
 		char cOrderType;
+		//委托数量
 		int nVolumeTotalOriginal;
+		//已成交数量
 		int nVolumeTraded;
+		//剩余未成交数量 （委托数量-已成交数量-已撤销数量）
 		int nVolumeTotal;
+		//撤单数量
 		int withdraw_ammount;
+		//冻结金额
 		float frozen_money;
+		//冻结证券数量
 		float frozen_amount;
+		//委托日期
 		String^ cInsertDate;
+		//委托时间
 		String^ cInsertTime;
 		String^ cCancelTime;
 
