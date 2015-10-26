@@ -85,8 +85,6 @@ typedef struct SWI_OpenAccountRequest
 	char   st_antu_info[352];     // 当强身份认证类型为‘0’时，表示动态密码仅前6位有效，当强身份认证类型为‘1’时，表示验签信息
 	char   pwd_type;              // ‘0’ 缺省为交易密码认证
 	// ‘1’资金密码认证
-
-
 } SWI_OpenAccountRequest;
 
 typedef struct SWI_ErrorMsgRequest
@@ -111,6 +109,8 @@ struct SWI_OpenAccountReturn
 	char    last_login_time[9];  // 上次登录的时间，格式为：HH:MM:SS
 	char    last_full_note[60];  // 上次的登陆信息，参见注意事项5的说明
 };
+
+
 struct SWI_AccountLoginRequest
 {
 	struct SWI_BlockHead head;	// function_no==0x111, block_type == 1
@@ -130,7 +130,6 @@ struct SWI_AccountLoginRequest
 	// ‘1’资金密码认证
 
 };
-
 struct SWI_AccountLoginResult
 {
 	struct SWI_BlockHead head;     	// function==0x111,block_type==3
