@@ -705,7 +705,7 @@ bool CStockTrader::connectToServer(){
 	pRequest->head.block_size = sizeof(SWI_ConnectRequest);
 	pRequest->head.block_type = 6;//连接请求
 	pRequest->method = 0;		    	   // 加密方式
-	pRequest->entrust_method = '0';      // 委托方式
+	pRequest->entrust_method = 'g';      // 委托方式
 	pRequest->head.crc = CalCRC(&pRequest->head.block_type, pRequest->head.block_size - 4);
 
 	len = sizeof(SWI_ConnectRequest);
@@ -751,7 +751,8 @@ bool CStockTrader::openAccount(){//相当于登陆
 	pReqMsg->account_type = '0';
 	strcpy(pReqMsg->account, ZjAccount);
 	strcpy(pReqMsg->pwd, password);
-
+	strcpy(pReqMsg->note, "IP=10.65.10.39|MAC=9c8e99fcd6");
+	strcpy(pReqMsg->note2, "f4|TEL=");
 	pReqMsg->head.crc = CalCRC(&pReqMsg->head.block_type, pReqMsg->head.block_size - 4);
 	len = pReqMsg->head.block_size;
 	len = (len % 8 == 0) ? len : len + (8 - len % 8);
@@ -795,17 +796,19 @@ bool CStockTrader::login(){//查询上证和深圳账号
 	char   buf[1024], buf2[100];
 	memset(buf, 0x00, sizeof(buf));
 
-	SWI_OpenAccountRequest  *pReqMsg;
-	pReqMsg = (SWI_OpenAccountRequest*)(buf);
+	SWI_AccountLoginRequest  *pReqMsg;
+	pReqMsg = (SWI_AccountLoginRequest*)(buf);
 
 	pReqMsg->head.block_type = 1;
-	pReqMsg->head.block_size = sizeof(SWI_OpenAccountRequest);
+	pReqMsg->head.block_size = sizeof(SWI_AccountLoginRequest);
 	pReqMsg->head.dest_dpt = nDept;
 	pReqMsg->head.function_no = 0x111;
 
 	pReqMsg->account_type = '0';
 	strcpy(pReqMsg->account, ZjAccount);
 	strcpy(pReqMsg->pwd, password);
+	strcpy(pReqMsg->note, "IP=10.65.10.39|MAC=9c8e99fcd6");
+	strcpy(pReqMsg->note2, "f4|TEL=");
 
 	pReqMsg->head.crc = CalCRC(&pReqMsg->head.block_type, pReqMsg->head.block_size - 4);
 	len = pReqMsg->head.block_size;
