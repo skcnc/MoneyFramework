@@ -88,6 +88,8 @@ namespace Stork_Future_TaoLi.Entrust
                     managedEntrustreturnstruct rets = temps.ToList()[0];
 
                     String USERNAME = UserRequestMap.GetInstance()[item.OrderRef];
+
+                    if (rets == null) continue;
                     OrderViewItem order = new OrderViewItem(
                         item.OrderRef.ToString(), 
                         rets.cOrderSysID, 
@@ -97,11 +99,19 @@ namespace Stork_Future_TaoLi.Entrust
                         rets.nVolumeTotalOriginal.ToString(), 
                         rets.nVolumeTotal.ToString(), 
                         item.OrderPrice.ToString(),
-                        rets.cOrderStatus.ToString(), 
+                        GetStatusWord(rets.cOrderStatus), 
                         rets.cInsertTime);
 
                     String JSONString = JsonConvert.SerializeObject(order);
                     TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
+
+                    //测试使用
+                    if ((rets.cOrderStatus.ToString() != EntrustStatus.Dealed.ToString()) || (!(rets.cOrderStatus.ToString() == EntrustStatus.Canceled.ToString() && rets.nVolumeTotal == 0)))
+                    {
+                        queue_query_entrust.GetQueue().Enqueue((object)item);
+                        continue;
+                    }
+
 
                     //目前仅考虑 1对1 返回的情况，不考虑出现1对多 ，类似基金交易的情况
                     //将委托变动返回更新数据库
@@ -112,7 +122,7 @@ namespace Stork_Future_TaoLi.Entrust
 
                         //此处判断，相应代码的委托是否完成
                         //此处逻辑需要待返回报文内容确认后修改
-                        if ((rets.cOrderStatus.ToString() != "8")||(!(rets.cOrderStatus == '7' && rets.nVolumeTotal == 0)))
+                        if ((rets.cOrderStatus.ToString() != EntrustStatus.Dealed.ToString()) || (!(rets.cOrderStatus.ToString() == EntrustStatus.Canceled.ToString() && rets.nVolumeTotal == 0)))
                         {
                             queue_query_entrust.GetQueue().Enqueue((object)item);
                             continue;
@@ -136,6 +146,48 @@ namespace Stork_Future_TaoLi.Entrust
                     }
                 }
             }
+        }
+        #endregion
+
+        #region 辅助函数
+        private string GetStatusWord(sbyte status)
+        {
+            string word = string.Empty;
+            switch (status)
+            {
+                case 76:
+                    word = "委托取消";
+                    break;
+                case 48:
+                    word = "未申报";
+                    break;
+                case 49:
+                    word = "待申报";
+                    break;
+                case 50:
+                    word = "已申报";
+                    break;
+                case 52:
+                    word = "无效委托";
+                    break;
+                case 53:
+                    word = "部分撤销";
+                    break;
+                case 54:
+                    word = "已撤销";
+                    break;
+                case 55:
+                    word = "部分成交";
+                    break;
+                case 56:
+                    word = "已成交";
+                    break;
+                default:
+                    word = "未知状态";
+                    break;
+            }
+
+            return word;
         }
         #endregion
     }

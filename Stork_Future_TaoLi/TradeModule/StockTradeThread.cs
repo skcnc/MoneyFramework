@@ -287,27 +287,17 @@ namespace Stork_Future_TaoLi.TradeModule
                     {
                         //trades
                         Random seed = new Random();
-                        if (CONFIG.IsDebugging())
+
+                        TradeOrderStruct_M tradesUnit = CreateTradeUnit(trades[0]);
+
+                        QueryEntrustOrderStruct_M entrustUnit = new QueryEntrustOrderStruct_M();
+                        string s = string.Empty;
+                        _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
+
+                        if (entrustUnit != null)
                         {
-                            //Thread.Sleep(seed.Next(2000, 5000));
-                            //_classTradeStock.cal(DateTime.Now.ToString());
+                            entrustorli.Add(entrustUnit);
                         }
-                        else
-                        {
-                            TradeOrderStruct_M tradesUnit = CreateTradeUnit(trades[0]);
-
-
-                            QueryEntrustOrderStruct_M entrustUnit = new QueryEntrustOrderStruct_M();
-                            string s = string.Empty;
-                            _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
-
-                            if (entrustUnit != null)
-                            {
-                                entrustorli.Add(entrustUnit);
-                            }
-                        }
-
-
                     }
 
                     //*********************************
