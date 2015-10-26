@@ -21,6 +21,7 @@ namespace Stork_Future_TaoLi
 
         public static void InsertSGOPEN(object v)
         {
+            if (DBAccessLayer.DBEnable == false) { return; }
             OPENCREATE open = (OPENCREATE)v;
             //若发现存在相同策略ID的实例未完成，将未完成实例标记为“删除”，替换以当前实例
             //这种情况在启动自检测时出现
@@ -54,6 +55,7 @@ namespace Stork_Future_TaoLi
 
         public static void DeleteSGOPEN(string ID)
         {
+            if (DBAccessLayer.DBEnable == false) { return; }
             var _selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == ID select item);
 
             if (_selectedItem.Count() > 0)
@@ -66,6 +68,7 @@ namespace Stork_Future_TaoLi
 
         public static void InsertSGCLOSE(object v)
         {
+            if (DBAccessLayer.DBEnable == false) { return; }
             CLOSECREATE close = (CLOSECREATE)v;
 
             //若发现存在相同策略ID的实例未完成，将未完成实例标记为“删除”，替换以当前实例
@@ -103,6 +106,7 @@ namespace Stork_Future_TaoLi
 
         public static void DeleteSGCLOSE(string ID)
         {
+            if (DBAccessLayer.DBEnable == false) { return; }
             var _selectedItem = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == ID && item.SG_STATUS == 0 select item);
 
             if (_selectedItem.Count() > 0)
@@ -131,6 +135,7 @@ namespace Stork_Future_TaoLi
 
         public static void InsertORDERLIST(string strategyId, string orderli)
         {
+            if (DBAccessLayer.DBEnable == false) { return; }
             OL_TAOLI_LIST_TABLE item = new OL_TAOLI_LIST_TABLE()
             {
                 OL_GUID = Guid.NewGuid(),
@@ -145,6 +150,8 @@ namespace Stork_Future_TaoLi
 
         public static void DeleteORDERLIST(string strategyId)
         {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
             var selected = (from item in DbEntity.OL_TAOLI_LIST_TABLE where item.SG_ID == strategyId select item);
 
             if(selected.Count() > 0)
@@ -163,19 +170,22 @@ namespace Stork_Future_TaoLi
         /// <param name="exchangeid">交易所</param>
         public static void CreateERRecord(object item)
         {
+
+            if (DBAccessLayer.DBEnable == false) { return; }
             if (item == null) return;
 
-            managedQueryEntrustorderstruct entrust = (managedQueryEntrustorderstruct)item;
+            QueryEntrustOrderStruct_M entrust = (QueryEntrustOrderStruct_M)item;
 
             ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
             {
                 ER_GUID = Guid.NewGuid(),
-                ER_ID = entrust.cOrderSysID,
-                ER_STRATEGY = entrust.StrategyId,
-                ER_ORDER_TYPE = entrust.cSecurityType.ToString(),
-                ER_ORDER_EXCHANGE_ID = entrust.cExchangeID,
-                ER_CODE = entrust.Code,
-                ER_DIRECTION = entrust.Direction
+                //ER_ID = entrust.,
+                //ER_STRATEGY = entrust.StrategyId,
+                ER_ORDER_TYPE = entrust.SecurityType.ToString(),
+                ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
+
+                //ER_CODE = entrust.Code,
+                //ER_DIRECTION = entrust.Direction
             };
 
             DbEntity.ER_TAOLI_TABLE.Add(record);
@@ -230,6 +240,8 @@ namespace Stork_Future_TaoLi
         /// <param name="ret"></param>
         public static void CreateDLRecord(object ret)
         {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
             managedBargainreturnstruct record = (managedBargainreturnstruct)ret;
 
             if (record != null)
@@ -261,6 +273,8 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public static List<OPENCREATE> GetInCompletedOPENStrategy()
         {
+            if (DBAccessLayer.DBEnable == false) { return null; }
+
             var selected = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_STATUS == 0 select item);
 
             List<OPENCREATE> IncompletedStrategies = new List<OPENCREATE>();
@@ -295,6 +309,7 @@ namespace Stork_Future_TaoLi
         /// <returns></returns>
         public static List<CLOSECREATE> GetInCompletedCLOSEStrategy()
         {
+            if (DBAccessLayer.DBEnable == false) { return null; }
             var selected = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_STATUS == 0 select item);
 
             List<CLOSECREATE> IncompletedStrategies = new List<CLOSECREATE>();
@@ -331,6 +346,7 @@ namespace Stork_Future_TaoLi
         /// <param name="v"></param>
         public static void UpdateCCRecords(object v)
         {
+            if (DBAccessLayer.DBEnable == false) { return; }
 
             managedBargainreturnstruct bargin = (managedBargainreturnstruct)v;
 

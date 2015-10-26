@@ -228,7 +228,7 @@ namespace Stork_Future_TaoLi
                     if (queue_future_excuteThread.GetQueue(_threadNo).Count > 0)
                     {
                         List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_future_excuteThread.FutureExcuteQueue[_threadNo].Dequeue();
-
+                        if (trades == null) continue;
                         if (trades.Count > 0) { sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 执行交易数量 ： " + trades.Count); }
 
                         lastHeartBeat = DateTime.Now;
