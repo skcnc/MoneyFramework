@@ -156,8 +156,6 @@ namespace Stork_Future_TaoLi
         {
             string ErrorMsg = string.Empty;
 
-            DateTime lastHeartBeat = DateTime.Now; //最近心跳时间
-
             //令该线程为前台线程
             Thread.CurrentThread.IsBackground = true;
 
@@ -199,19 +197,13 @@ namespace Stork_Future_TaoLi
                 {
                     Thread.Sleep(10);
 
-                    if ((DateTime.Now - lastHeartBeat).TotalMinutes > 10)
+                    if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
                     {
-                        sublog.LogEvent("线程 ：" + _threadNo.ToString() + "心跳停止 ， 最后心跳 ： " + lastHeartBeat.ToString());
+                        sublog.LogEvent("线程 ：" + _threadNo.ToString() + "心跳停止 ， 最后心跳 ： " + GlobalHeartBeat.GetGlobalTime().ToString());
                         _threadRunControl = false;
                         break;
                     }
 
-                    //TODO: 判断连接是否存在，登陆是否存在，按照设定发送心跳
-                    //if((DateTime.Now - lastHeartBeat).TotalSeconds > 5)
-                    //{ SendHeartBeat(); 发送心跳
-                    //  if(判断链接是否正常)
-                    // 正常 lastHeartBeat = DateTime.Now
-                    // 非正常 FutureTradeStatus.DISCONNECTED  _threadRunControl = true ; break;
 
 
 
@@ -230,8 +222,6 @@ namespace Stork_Future_TaoLi
                         List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_future_excuteThread.FutureExcuteQueue[_threadNo].Dequeue();
                         if (trades == null) continue;
                         if (trades.Count > 0) { sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 执行交易数量 ： " + trades.Count); }
-
-                        lastHeartBeat = DateTime.Now;
 
                         if (trades.Count == 0) { continue; }
 
