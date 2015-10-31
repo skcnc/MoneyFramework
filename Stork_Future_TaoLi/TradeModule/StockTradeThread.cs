@@ -218,10 +218,10 @@ namespace Stork_Future_TaoLi.TradeModule
                 }
 
 
-                if (!_classTradeStock.getConnectStatus())
-                {
-                    _classTradeStock.Init(login, ErrorMsg);
-                }
+                //if (!_classTradeStock.getConnectStatus())
+                //{
+                //    _classTradeStock.Init(login, ErrorMsg);
+                //}
 
                 if (queue_stock_excuteThread.GetQueue(_threadNo).Count < 2)
                 {
