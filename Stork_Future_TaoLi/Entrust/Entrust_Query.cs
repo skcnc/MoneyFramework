@@ -85,7 +85,7 @@ namespace Stork_Future_TaoLi.Entrust
 
                     managedEntrustreturnstruct ret = temps.ToList()[0];
 
-                    if (rets == null) continue;
+                    if (ret == null) continue;
 
                     String USERNAME = UserRequestMap.GetInstance()[item.OrderRef];
 
