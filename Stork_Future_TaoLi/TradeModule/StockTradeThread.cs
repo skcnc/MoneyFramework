@@ -261,10 +261,14 @@ namespace Stork_Future_TaoLi.TradeModule
 
                         if (entrustUnit != null && entrustUnit.ToList().Count() > 0)
                         {
-                            entrustorli = entrustUnit.ToList();
+                            foreach (QueryEntrustOrderStruct_M unit in entrustUnit.ToList())
+                            {
+                                if (unit.OrderSysID != null && unit.OrderSysID != String.Empty && unit.OrderSysID != "0")
+                                {
+                                    entrustorli.Add(unit);
+                                }
+                            }
                         }
-
-
                     }
                     else if (trades.Count == 1)
                     {
@@ -277,7 +281,7 @@ namespace Stork_Future_TaoLi.TradeModule
                         string s = string.Empty;
                         _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
 
-                        if (entrustUnit != null)
+                        if (entrustUnit.OrderSysID != null && entrustUnit.OrderSysID != String.Empty && entrustUnit.OrderSysID != "0")
                         {
                             entrustorli.Add(entrustUnit);
                         }
@@ -289,6 +293,7 @@ namespace Stork_Future_TaoLi.TradeModule
                     //*********************************
                     if (trades.Count != 0)
                     {
+
                         //存入数据库
                         if (entrustorli.Count() == 0) { continue; }
 
@@ -321,7 +326,7 @@ namespace Stork_Future_TaoLi.TradeModule
             {
                 Thread.Sleep(10);
 
-                if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalSeconds > 10)
+                if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
                 {
                     log.LogEvent("心跳线程即将退出");
                     break;

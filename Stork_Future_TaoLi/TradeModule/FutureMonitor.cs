@@ -149,7 +149,7 @@ namespace Stork_Future_TaoLi
             {
                 Thread.Sleep(10);
 
-                if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalSeconds > 10)
+                if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
                 {
                     log.LogEvent("心跳线程即将退出");
                     break;

@@ -65,12 +65,9 @@
           <Property Name="OL_LIST" Type="ntext" />
           <Property Name="OL_TIME" Type="datetime" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'MoneyEntity.dbo.SG_TAOLI_CLOSE_TABLE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="SG_TAOLI_CLOSE_TABLE">
           <Key>
             <PropertyRef Name="SG_GUID" />
-            <PropertyRef Name="SG_ID" />
           </Key>
           <Property Name="SG_GUID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="SG_ID" Type="nvarchar" MaxLength="50" Nullable="false" />
@@ -120,28 +117,9 @@ warning 6002: The table/view 'MoneyEntity.dbo.SG_TAOLI_CLOSE_TABLE' does not hav
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="Self.DL_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="Self.ER_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="Self.OL_TAOLI_LIST_TABLE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="Self.SG_TAOLI_CLOSE_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="Self.SG_TAOLI_OPEN_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="Self.SG_TAOLI_CLOSE_TABLE" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-[SG_TAOLI_CLOSE_TABLE].[SG_GUID] AS [SG_GUID], 
-[SG_TAOLI_CLOSE_TABLE].[SG_ID] AS [SG_ID], 
-[SG_TAOLI_CLOSE_TABLE].[SG_OPEN_ID] AS [SG_OPEN_ID], 
-[SG_TAOLI_CLOSE_TABLE].[SG_INIT_POSITION_LIST] AS [SG_INIT_POSITION_LIST], 
-[SG_TAOLI_CLOSE_TABLE].[SG_LATEST_POSITION_LIST] AS [SG_LATEST_POSITION_LIST], 
-[SG_TAOLI_CLOSE_TABLE].[SG_FUTURE_CONTRACT] AS [SG_FUTURE_CONTRACT], 
-[SG_TAOLI_CLOSE_TABLE].[SG_SHORT_POINT] AS [SG_SHORT_POINT], 
-[SG_TAOLI_CLOSE_TABLE].[SG_HAND] AS [SG_HAND], 
-[SG_TAOLI_CLOSE_TABLE].[SG_COE] AS [SG_COE], 
-[SG_TAOLI_CLOSE_TABLE].[SG_SD] AS [SG_SD], 
-[SG_TAOLI_CLOSE_TABLE].[SG_SA] AS [SG_SA], 
-[SG_TAOLI_CLOSE_TABLE].[SG_PE] AS [SG_PE], 
-[SG_TAOLI_CLOSE_TABLE].[SG_BAS] AS [SG_BAS], 
-[SG_TAOLI_CLOSE_TABLE].[SG_STATUS] AS [SG_STATUS], 
-[SG_TAOLI_CLOSE_TABLE].[SG_CREATE_TIME] AS [SG_CREATE_TIME], 
-[SG_TAOLI_CLOSE_TABLE].[SG_USER] AS [SG_USER]
-FROM [dbo].[SG_TAOLI_CLOSE_TABLE] AS [SG_TAOLI_CLOSE_TABLE]</DefiningQuery>
-          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -245,7 +223,6 @@ FROM [dbo].[SG_TAOLI_CLOSE_TABLE] AS [SG_TAOLI_CLOSE_TABLE]</DefiningQuery>
         <EntityType Name="SG_TAOLI_CLOSE_TABLE">
           <Key>
             <PropertyRef Name="SG_GUID" />
-            <PropertyRef Name="SG_ID" />
           </Key>
           <Property Name="SG_GUID" Type="Guid" Nullable="false" />
           <Property Name="SG_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />

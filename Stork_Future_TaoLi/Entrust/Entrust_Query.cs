@@ -83,46 +83,48 @@ namespace Stork_Future_TaoLi.Entrust
                     //查询委托及获取实例
                     var temps = _classTradeStock.QueryEntrust(item, err);
 
-                    if(temps.Length == 0) continue;
+                    if (temps.Length == 0) continue;
 
-                    managedEntrustreturnstruct rets = temps.ToList()[0];
+                    managedEntrustreturnstruct ret = temps.ToList()[0];
 
                     String USERNAME = UserRequestMap.GetInstance()[item.OrderRef];
 
-                    if (rets == null) continue;
+                    if (ret == null) continue;
+
+
                     OrderViewItem order = new OrderViewItem(
-                        item.OrderRef.ToString(), 
-                        rets.cOrderSysID, 
-                        rets.cSecurity_code, 
-                        item.Direction.ToString(), 
-                        "NA", 
-                        rets.nVolumeTotalOriginal.ToString(), 
-                        rets.nVolumeTotal.ToString(), 
+                        item.OrderRef.ToString(),
+                        ret.cOrderSysID,
+                        ret.cSecurity_code,
+                        item.Direction.ToString(),
+                        "NA",
+                        ret.nVolumeTotalOriginal.ToString(),
+                        ret.nVolumeTotal.ToString(),
                         item.OrderPrice.ToString(),
-                        GetStatusWord(rets.cOrderStatus), 
-                        rets.cInsertTime);
+                        GetStatusWord(ret.cOrderStatus),
+                        ret.cInsertTime);
 
                     String JSONString = JsonConvert.SerializeObject(order);
                     TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
 
-                    //测试使用
-                    if ((rets.cOrderStatus.ToString() != EntrustStatus.Dealed.ToString()) || (!(rets.cOrderStatus.ToString() == EntrustStatus.Canceled.ToString() && rets.nVolumeTotal == 0)))
+
+                    if ((ret.cOrderStatus.ToString() != ((int)(EntrustStatus.Dealed)).ToString()) && (!(ret.cOrderStatus.ToString() == ((int)EntrustStatus.Canceled).ToString() && ret.nVolumeTotal == 0)))
                     {
                         queue_query_entrust.GetQueue().Enqueue((object)item);
                         continue;
                     }
-
 
                     //目前仅考虑 1对1 返回的情况，不考虑出现1对多 ，类似基金交易的情况
                     //将委托变动返回更新数据库
                     if (DBAccessLayer.DBEnable == true)
                     {
                         //更新数据，记录入数据库
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(rets));
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(ret));
 
                         //此处判断，相应代码的委托是否完成
                         //此处逻辑需要待返回报文内容确认后修改
-                        if ((rets.cOrderStatus.ToString() != EntrustStatus.Dealed.ToString()) || (!(rets.cOrderStatus.ToString() == EntrustStatus.Canceled.ToString() && rets.nVolumeTotal == 0)))
+                        //测试使用
+                        if ((ret.cOrderStatus.ToString() != ((int)(EntrustStatus.Dealed)).ToString()) && (!(ret.cOrderStatus.ToString() == ((int)EntrustStatus.Canceled).ToString() && ret.nVolumeTotal == 0)))
                         {
                             queue_query_entrust.GetQueue().Enqueue((object)item);
                             continue;
@@ -145,6 +147,7 @@ namespace Stork_Future_TaoLi.Entrust
                         }
                     }
                 }
+
             }
         }
         #endregion
