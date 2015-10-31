@@ -46,7 +46,7 @@ namespace Stork_Future_TaoLi
             //初始化子线程
             int futureNum = CONFIG.FUTURE_TRADE_THREAD_NUM;
 
-            DateTime lastHeartBeat = DateTime.Now;//本线程最后发送心跳时间
+
 
             List<Task> TradeThreads = new List<Task>();
             log.LogEvent("股票交易控制子线程启动： 初始化交易线程数 :" + futureNum.ToString());
@@ -78,7 +78,7 @@ namespace Stork_Future_TaoLi
             {
                 Thread.Sleep(10);
 
-                if ((DateTime.Now - lastHeartBeat).TotalMinutes > 10)
+                if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
                 {
                     log.LogEvent("本模块供血不足，线程即将死亡");
                     break;
@@ -87,7 +87,7 @@ namespace Stork_Future_TaoLi
                 //获取下一笔交易
                 List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
 
-                bool b_get = false;
+
 
                 if (QUEUE_FUTURE_TRADE.GetQueueNumber() > 0)
                 {
@@ -96,17 +96,10 @@ namespace Stork_Future_TaoLi
                         if (QUEUE_FUTURE_TRADE.GetQueue().Count > 0)
                         {
                             next_trade = (List<TradeOrderStruct>)QUEUE_FUTURE_TRADE.GetQueue().Dequeue();
-                            b_get = true;
                         }
 
                         if (next_trade.Count > 0) { log.LogEvent("期货交易所出队交易数量：" + next_trade.Count.ToString()); }
                     }
-                }
-
-                if (b_get == true)
-                {
-                    //说明是心跳包    
-                    lastHeartBeat = DateTime.Now;   
                 }
 
                 if (next_trade.Count == 0) continue;
@@ -150,13 +143,13 @@ namespace Stork_Future_TaoLi
             int threadCount = (int)para;
 
             DateTime lastSubHeaartBeat = DateTime.Now; //子线程最后发送心跳时间
-            DateTime lastHeartBeat = DateTime.Now;//本线程的最后接收心跳时间
+
 
             while (true)
             {
                 Thread.Sleep(10);
-                 
-                if((DateTime.Now - lastHeartBeat).TotalSeconds > 10)
+
+                if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
                 {
                     log.LogEvent("心跳线程即将退出");
                     break;
@@ -165,6 +158,7 @@ namespace Stork_Future_TaoLi
                 //向子线程发送存活心跳，一旦心跳停止，则子线程死亡
                 if(DateTime.Now.Second %5 == 0 && DateTime.Now.Second != lastSubHeaartBeat.Second)
                 {
+                    lastSubHeaartBeat = DateTime.Now;
                     for(int i = 0;i<threadCount;i++)
                     {
                         //如果发送空列表，则为心跳线程
@@ -172,8 +166,6 @@ namespace Stork_Future_TaoLi
                         queue_future_excuteThread.GetQueue(i).Enqueue((object)o);
                     }
                 }
-
-                lastHeartBeat = GlobalHeartBeat.GetGlobalTime();
             }
 
             Thread.CurrentThread.Abort();

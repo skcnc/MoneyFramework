@@ -105,10 +105,10 @@ array<managedEntrustreturnstruct^>^  managedStockClass::QueryEntrust(QueryEntrus
 	Entrustreturnstruct* ret = new Entrustreturnstruct[1];
 	int count = 0;
 	char errmsg[255];
-	array<managedEntrustreturnstruct^>^ managedRet = gcnew array<managedEntrustreturnstruct^>(1);
+	
 
 	bool  b= m_cstockTrader->queryorder(*query, ret, count, errmsg);
-
+	array<managedEntrustreturnstruct^>^ managedRet = gcnew array<managedEntrustreturnstruct^>(count);
 
 	if (b == true)
 	{

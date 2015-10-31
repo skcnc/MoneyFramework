@@ -69,17 +69,22 @@ typedef struct SWI_ResultHead
 
 typedef struct SWI_OpenAccountRequest
 {
-	SWI_BlockHead  head;    	// 消息头 block_type == 1
+	struct SWI_BlockHead head;	// function_no==0x101, block_type == 1
 	char   account_type;     	// 客户帐号类型
 	char   account[16];      	// 客户帐号
 	char   pwd[8];           	// 交易密码（如为操作员登陆，则为操作员密码）
 	short  op_code;             // 操作员工号
-	unsigned  long  flag;      //"特殊条件"判断标志位组合,每一个二进制位对应一个"特殊条件",缺省值为0表示不判断任何"特殊条件"
-	char   productno[7];		//产品信息编号：5位电脑网络中心产品编码+2位子
-	//  产品编码（共7位字符）；缺省值为空。
-	char   note[30];			//备注：目前用于在客户委托时存放外围客户登陆的MAC地址 或IP 地址或电话号码等信息。
+	unsigned  long   flag;         //"特殊条件"判断标志位组合,每一个二进制位对应一个"特殊条件",缺省值为0表示不判断任何"特殊条件"
+	char   productno[7];		    //产品信息编号：5位电脑网络中心产品编码+2位子
+	//   产品编码（共7位字符）；缺省值为空。
+	char   note[30];				//备注：目前用于在客户委托时存放外围客户登陆的MAC地址 或IP 地址或电话号码等信息。
 	char   note2[30];           // 备注，和note字段共同使用，具体使用方法见注意事项5
-	char   login_flag;          // 记录本此登录信息的标志，'0'--不记录（默认）；'1'--记录，客户界面主动发起的登录应填'1'
+	char   login_flag;          // 记录本此登录信息的标志，‘0’——不记录（默认）；
+	//‘1’——记录，客户界面主动发起的登录应填‘1’
+	char   st_auth_type;          // 强身份认证类型 ‘0’代表令牌，‘1’代表证书
+	char   st_antu_info[352];     // 当强身份认证类型为‘0’时，表示动态密码仅前6位有效，当强身份认证类型为‘1’时，表示验签信息
+	char   pwd_type;              // ‘0’ 缺省为交易密码认证
+	// ‘1’资金密码认证
 } SWI_OpenAccountRequest;
 
 typedef struct SWI_ErrorMsgRequest
@@ -105,6 +110,7 @@ struct SWI_OpenAccountReturn
 	char    last_full_note[60];  // 上次的登陆信息，参见注意事项5的说明
 };
 
+
 struct SWI_AccountLoginRequest
 {
 	struct SWI_BlockHead head;	// function_no==0x111, block_type == 1
@@ -112,14 +118,18 @@ struct SWI_AccountLoginRequest
 	char   account[16];      	// 客户帐号
 	char   pwd[8];           	// 交易密码
 	unsigned  long   flag;         //"特殊条件"判断标志位组合,每一个二进制位对应一个"特殊条件",缺省值为0表示不判断任何"特殊条件"
-	char   productno[7];		    //产品信息编号：5位电脑网络中心产品编码+2位子	产品编码（共7位字符）；缺省值为空。
+	char   productno[7];		    //产品信息编号：5位电脑网络中心产品编码+2位子
+	//  产品编码（共7位字符）；缺省值为空。
 	char   note[30];				//备注：目前用于在客户委托时存放外围客户登陆的MAC地址 或IP 地址或电话号码等信息。
 	char   note2[30];           // 备注，和note字段共同使用，具体使用方法见0x101注意事项5
-	char   login_flag;           // 记录本此登录信息的标志，‘0’——不记录（默认）；	‘1’——记录，客户界面主动发起的登录应填‘1’
-
+	char   login_flag;           // 记录本此登录信息的标志，‘0’——不记录（默认）；
+	//‘1’——记录，客户界面主动发起的登录应填‘1’
+	char   st_auth_type;          // 强身份认证类型 ‘0’代表令牌，‘1’代表证书
+	char   st_antu_info[352];     // 当强身份认证类型为‘0’时，表示动态密码仅前6位有效，当强身份认证类型为‘1’时，表示验签信息
+	char   pwd_type;               // ‘0’ 缺省为交易密码认证
+	// ‘1’资金密码认证
 
 };
-
 struct SWI_AccountLoginResult
 {
 	struct SWI_BlockHead head;     	// function==0x111,block_type==3

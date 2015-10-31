@@ -17,7 +17,7 @@ namespace Stork_Future_TaoLi
         static MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
        
         //数据库测试标记
-        public static bool DBEnable = false;
+        public static bool DBEnable = true;
 
         public static void InsertSGOPEN(object v)
         {
@@ -278,6 +278,7 @@ namespace Stork_Future_TaoLi
             var selected = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_STATUS == 0 select item);
 
             List<OPENCREATE> IncompletedStrategies = new List<OPENCREATE>();
+
 
             foreach (var item in selected.ToList())
             {

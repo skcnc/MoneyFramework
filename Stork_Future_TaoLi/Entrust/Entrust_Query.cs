@@ -81,38 +81,50 @@ namespace Stork_Future_TaoLi.Entrust
                     //查询委托及获取实例
                     var temps = _classTradeStock.QueryEntrust(item, err);
 
-                    if(temps.Length == 0) continue;
+                    if (temps.Length == 0) continue;
 
-                    managedEntrustreturnstruct rets = temps.ToList()[0];
+                    managedEntrustreturnstruct ret = temps.ToList()[0];
 
                     if (rets == null) continue;
 
                     String USERNAME = UserRequestMap.GetInstance()[item.OrderRef];
+
+                    if (ret == null) continue;
+
+
                     OrderViewItem order = new OrderViewItem(
-                        item.OrderRef.ToString(), 
-                        rets.cOrderSysID, 
-                        rets.cSecurity_code, 
-                        item.Direction.ToString(), 
-                        "NA", 
-                        rets.nVolumeTotalOriginal.ToString(), 
-                        rets.nVolumeTotal.ToString(), 
+                        item.OrderRef.ToString(),
+                        ret.cOrderSysID,
+                        ret.cSecurity_code,
+                        item.Direction.ToString(),
+                        "NA",
+                        ret.nVolumeTotalOriginal.ToString(),
+                        ret.nVolumeTotal.ToString(),
                         item.OrderPrice.ToString(),
-                        rets.cOrderStatus.ToString(), 
-                        rets.cInsertTime);
+                        GetStatusWord(ret.cOrderStatus),
+                        ret.cInsertTime);
 
                     String JSONString = JsonConvert.SerializeObject(order);
                     TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
+
+
+                    if ((ret.cOrderStatus.ToString() != ((int)(EntrustStatus.Dealed)).ToString()) && (!(ret.cOrderStatus.ToString() == ((int)EntrustStatus.Canceled).ToString() && ret.nVolumeTotal == 0)))
+                    {
+                        queue_query_entrust.GetQueue().Enqueue((object)item);
+                        continue;
+                    }
 
                     //目前仅考虑 1对1 返回的情况，不考虑出现1对多 ，类似基金交易的情况
                     //将委托变动返回更新数据库
                     if (DBAccessLayer.DBEnable == true)
                     {
                         //更新数据，记录入数据库
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(rets));
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(ret));
 
                         //此处判断，相应代码的委托是否完成
                         //此处逻辑需要待返回报文内容确认后修改
-                        if ((rets.cOrderStatus.ToString() != "8")||(!(rets.cOrderStatus == '7' && rets.nVolumeTotal == 0)))
+                        //测试使用
+                        if ((ret.cOrderStatus.ToString() != ((int)(EntrustStatus.Dealed)).ToString()) && (!(ret.cOrderStatus.ToString() == ((int)EntrustStatus.Canceled).ToString() && ret.nVolumeTotal == 0)))
                         {
                             queue_query_entrust.GetQueue().Enqueue((object)item);
                             continue;
@@ -135,7 +147,50 @@ namespace Stork_Future_TaoLi.Entrust
                         }
                     }
                 }
+
             }
+        }
+        #endregion
+
+        #region 辅助函数
+        private string GetStatusWord(sbyte status)
+        {
+            string word = string.Empty;
+            switch (status)
+            {
+                case 76:
+                    word = "委托取消";
+                    break;
+                case 48:
+                    word = "未申报";
+                    break;
+                case 49:
+                    word = "待申报";
+                    break;
+                case 50:
+                    word = "已申报";
+                    break;
+                case 52:
+                    word = "无效委托";
+                    break;
+                case 53:
+                    word = "部分撤销";
+                    break;
+                case 54:
+                    word = "已撤销";
+                    break;
+                case 55:
+                    word = "部分成交";
+                    break;
+                case 56:
+                    word = "已成交";
+                    break;
+                default:
+                    word = "未知状态";
+                    break;
+            }
+
+            return word;
         }
         #endregion
     }

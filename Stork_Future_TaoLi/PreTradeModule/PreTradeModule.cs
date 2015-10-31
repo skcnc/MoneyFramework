@@ -147,7 +147,6 @@ namespace Stork_Future_TaoLi
         {
             log.LogEvent("交易预处理线程开始执行");
 
-            DateTime lastHeartBeat = DateTime.Now;
 
             while (true)
             {
@@ -156,16 +155,6 @@ namespace Stork_Future_TaoLi
                 /*****************************
                  * 生成交易List之前的例行工作
                  * **************************/
-
-                //发送心跳
-                if (DateTime.Now.Second % 5 == 0 && DateTime.Now.Second != lastHeartBeat.Second)
-                {
-
-                    List<TradeOrderStruct> o = new List<TradeOrderStruct>();
-                    QUEUE_SH_TRADE.GetQueue().Enqueue((object)o);
-                    lastHeartBeat = DateTime.Now;
-                }
-
 
                 #region 策略生成交易队列
                 List<TradeOrderStruct> tos = PreTradeModule.instance.DeQueue();

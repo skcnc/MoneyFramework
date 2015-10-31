@@ -45,4 +45,29 @@ namespace Stork_Future_TaoLi
     }
 
     
+    /// <summary>
+    /// 委托查询返回内容
+    /// OrderCancel     :   委托取消
+    /// UnOrder         :   未申报
+    /// PreOrder        :   待申报
+    /// Ordered         :   已申报
+    /// WrongOrder      :   无效委托
+    /// PartCanceled    :   部分撤销
+    /// Canceled        :   已撤销
+    /// PartDealed      :   部分成交
+    /// Dealed          :   成交
+    /// </summary>
+    public enum EntrustStatus
+    {
+        OrderCancel = 76,
+        UnOrder = 48,
+        PreOrder = 49,
+        Ordered = 50,
+        WrongOrder = 52,
+        PartCanceled = 53,
+        Canceled = 54,
+        PartDealed = 55,
+        Dealed = 56
+    }
+
 }

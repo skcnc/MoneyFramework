@@ -191,6 +191,7 @@
                     //已经存在该记录
                     $('#tm_tb_inComplete')[0].children[x].cells[6].textContent = _volumeTotal;
                     $('#tm_tb_inComplete')[0].children[x].cells[9].textContent = _DealTime;
+                    $('#tm_tb_inComplete')[0].children[x].cells[8].textContent = _msg;
 
                     if (_volumeTotal == 0 || _msg == "已撤销") {
                         $('#tm_tb_inComplete')[0].children[x].removeNode();

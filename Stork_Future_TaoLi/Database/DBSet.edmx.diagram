@@ -11,7 +11,7 @@
         <EntityTypeShape EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" Width="1.5" PointX="0.75" PointY="5.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_OPEN_TABLE" Width="1.5" PointX="6.75" PointY="0.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_STATUS_TABLE" Width="1.5" PointX="2.75" PointY="6.75" />
-        <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" Width="1.5" PointX="4.75" PointY="6.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" Width="1.5" PointX="5.375" PointY="5.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

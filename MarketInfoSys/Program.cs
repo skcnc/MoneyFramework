@@ -68,7 +68,7 @@ namespace MarketInfoSys
                 DateTime dt = DateTime.Now;
                 while (!stop)
                 {
-                    if ((DateTime.Now - dt).TotalSeconds > 10)
+                    if ((DateTime.Now - dt).TotalMinutes > 10)
                     {
                         dt = DateTime.Now;
 
