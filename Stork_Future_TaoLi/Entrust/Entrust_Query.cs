@@ -76,8 +76,6 @@ namespace Stork_Future_TaoLi.Entrust
 
                     //获取新委托
                     QueryEntrustOrderStruct_M item = (QueryEntrustOrderStruct_M)queue_query_entrust.GetQueue().Dequeue();
-
-
                     string err = string.Empty;
 
                     //查询委托及获取实例
@@ -86,6 +84,8 @@ namespace Stork_Future_TaoLi.Entrust
                     if (temps.Length == 0) continue;
 
                     managedEntrustreturnstruct ret = temps.ToList()[0];
+
+                    if (ret == null) continue;
 
                     String USERNAME = UserRequestMap.GetInstance()[item.OrderRef];
 
