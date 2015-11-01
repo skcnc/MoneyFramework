@@ -179,6 +179,8 @@ namespace Stork_Future_TaoLi
                 
             }
 
+
+
             WorkersStratus.Add(newWorker.StrategyInstanceID, 0);
             Workers.Add(newWorker.StrategyInstanceID, newWorker);
 
@@ -288,6 +290,18 @@ namespace Stork_Future_TaoLi
             //行情模块中删除该策略实例的订阅，和消息队列
             DeleteStrategySubscribe(id);
             MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(id, new Queue()));
+
+            if (DBAccessLayer.DBEnable)
+            {
+                if (v is OPENDELETE)
+                {
+                    DBAccessLayer.DeleteSGOPEN(id);
+                }
+                else
+                {
+                    DBAccessLayer.DeleteSGCLOSE(id);
+                }
+            }
 
         }
 

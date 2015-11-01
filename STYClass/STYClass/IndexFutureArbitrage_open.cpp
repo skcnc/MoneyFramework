@@ -249,7 +249,7 @@ namespace STYClass
 		strcpy(m_stockorders[stockordernum].cExchangeID, "cf");
 		m_stockorders[stockordernum].cOffsetFlag = '0'; //0  开 1 平
 		m_stockorders[stockordernum].cOrderPriceType = '2'; //限价
-		m_stockorders[stockordernum].dOrderprice = this->m_future.getlastprice() - 5; //已低于实时价5报单
+		m_stockorders[stockordernum].dOrderprice = this->m_future.getlastprice() -10; //已低于实时价5报单
 		m_stockorders[stockordernum].cTraderdirection = '1'; //0 买入 1 卖出
 		m_stockorders[stockordernum].cOrderlevel = 1;  //优先级
 		m_stockorders[stockordernum].cOrderexecutedetail = 0; //保留 暂不使用

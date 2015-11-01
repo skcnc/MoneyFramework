@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'F:\项目文档\taoli\金融套利系统\Stork_Future_TaoLi\Database\DBSet.edmx'. 
+﻿// T4 code generation is enabled for model 'D:\suncheng\金融套利系统\Stork_Future_TaoLi\Database\DBSet.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.
