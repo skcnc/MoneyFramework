@@ -94,7 +94,7 @@
             this.tbuserName.Name = "tbuserName";
             this.tbuserName.Size = new System.Drawing.Size(118, 21);
             this.tbuserName.TabIndex = 3;
-            this.tbuserName.Text = "TD1033422002";
+            this.tbuserName.Text = "TD1379799055";
             // 
             // label6
             // 
@@ -112,7 +112,7 @@
             this.tbpassword.PasswordChar = '*';
             this.tbpassword.Size = new System.Drawing.Size(100, 21);
             this.tbpassword.TabIndex = 3;
-            this.tbpassword.Text = "27692616";
+            this.tbpassword.Text = "73166101";
             // 
             // rtbSubscribe
             // 
@@ -121,7 +121,7 @@
             this.rtbSubscribe.Name = "rtbSubscribe";
             this.rtbSubscribe.Size = new System.Drawing.Size(347, 432);
             this.rtbSubscribe.TabIndex = 4;
-            this.rtbSubscribe.Text = "600030.sh";
+            this.rtbSubscribe.Text = "";
             // 
             // btnSubmit
             // 
