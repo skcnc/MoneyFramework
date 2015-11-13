@@ -38,3 +38,6 @@ Debug
 /Stork_Future_TaoLi.sdf
 
 /ConsoleApplication1
+/Stork_Future_TaoLi/Web.Debug.config
+/Stork_Future_TaoLi/Web.Release.config
+/Stork_Future_TaoLi/Web.config

@@ -185,9 +185,7 @@ void Strategy_CLOSE::init(close_args^ m){
 
 
 	char* position = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->POSITION);
-	
-	int len = sizeof(position);
-	memset(m_close_strategy->m_args->positionliststr, 0, 65535);
+	memset(m_close_strategy->m_args->positionliststr, 0, sizeof(m_close_strategy->m_args->positionliststr));
 	strcpy_s(m_close_strategy->m_args->positionliststr, strlen(position)+1, position);
 
 	m_close_strategy->m_args->nHands = m->nHands;
