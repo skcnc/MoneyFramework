@@ -29,6 +29,7 @@ namespace Stork_Future_TaoLi
     public class DebugMode
     {
         public static bool debug = false;
+        public static String TestUser = "Testor";
     }
 
     public class StockTradeTest

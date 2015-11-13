@@ -257,6 +257,7 @@ namespace Stork_Future_TaoLi.TradeModule
                             i++;
                         }
 
+
                         _classTradeStock.BatchTrade(tradesUnit, 15, entrustUnit, s);
 
                         if (entrustUnit != null && entrustUnit.ToList().Count() > 0)
