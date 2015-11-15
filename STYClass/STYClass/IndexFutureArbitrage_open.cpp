@@ -193,20 +193,20 @@ namespace STYClass
 	}
 	bool   CIndexFutureArbitrage_open::getshowstatus(IndexFutureArbitrageopenshowargs & msg)
 	{
-		msg.futureprice = this->m_future.getlastprice();
-		msg.indexprice = this->m_index.getlastprice();
-		msg.SimIndex = this->dSimIndex;
-		msg.OrgDeltaPre = this->dOrgDeltaPre;
-		msg.SimerrorPre = this->dSimerrorPre;
+		msg.futureprice = this->m_future.getlastprice(); //期货价格
+		msg.indexprice = this->m_index.getlastprice(); //指数价格
+		msg.SimIndex = this->dSimIndex; //模拟指数
+		msg.OrgDeltaPre = this->dOrgDeltaPre;//原始基差
+		msg.SimerrorPre = this->dSimerrorPre;//模拟误差
 
-		msg.TotalStocksMarketValue = this->dTotalStocksMarketValue;
-		msg.stopmarketvalue = this->stopmarketvalue;
-		msg.uplimitmarketvalue = 0;
-		msg.TotalStockBuyStrike = this->dTotalStockBuyStrike;
-		msg.dFutureSellStrike = this->dFutureSellStrike;
-		msg.dPositiveDelta = this->dPositiveDelta;
-		msg.SimtraderPre = this->dSimtraderPre;
-		strcpy(msg.statusmsg, this->statusmsg);
+		msg.TotalStocksMarketValue = this->dTotalStocksMarketValue; //模拟市值
+		msg.stopmarketvalue = this->stopmarketvalue;//停盘市值
+		msg.uplimitmarketvalue = 0;//
+		msg.TotalStockBuyStrike = this->dTotalStockBuyStrike;//买入冲击
+		msg.dFutureSellStrike = this->dFutureSellStrike;//期货卖出冲击
+		msg.dPositiveDelta = this->dPositiveDelta;//调整基差
+		msg.SimtraderPre = this->dSimtraderPre;//交易误差
+		strcpy(msg.statusmsg, this->statusmsg);//显示状态 
 		return true;
 	}
 	/**********获取交易*******/

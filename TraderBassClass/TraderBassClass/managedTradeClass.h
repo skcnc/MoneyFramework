@@ -25,6 +25,7 @@ namespace MCStockLib
 		array<managedEntrustreturnstruct^>^  QueryEntrust(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg);
 		array<managedBargainreturnstruct^>^ QueryTrader(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg);
 
+
 		
 	private:
 		CStockTrader* m_cstockTrader;

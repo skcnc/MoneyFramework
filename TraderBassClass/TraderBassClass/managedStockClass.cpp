@@ -191,3 +191,5 @@ int managedStockClass::cal(String^ msg)
 	return length;
 
 }
+
+
