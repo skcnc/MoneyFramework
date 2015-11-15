@@ -33,10 +33,10 @@ inline  char *  weightlisttostring(indexweightstruct *weightlist, int  weightlis
 	{
 		sprintf(temprow, "%s;%c;%.12f|", weightlist[i].sSecurity.cSecurity_code, weightlist[i].sSecurity.cSecuritytype,
 			weightlist[i].dweight);
-		strcat(tempstr, temprow);
+		strcat_s(tempstr, temprow);
 
 	}
-	strcat(tempstr, "*/0");
+	strcat_s(tempstr, "*/0");
 	return tempstr;
 }
 
@@ -88,7 +88,7 @@ inline  bool stringtoweightlist(const char * tempstr,  indexweightstruct *weight
 			if (k != 2)
 				return false;
 
-			strcpy(weightlist[weightlistnum].sSecurity.cSecurity_code, strtypetemp.substr(preflag + 1, colnun[0] - preflag - 1).c_str());
+			strcpy_s(weightlist[weightlistnum].sSecurity.cSecurity_code, strtypetemp.substr(preflag + 1, colnun[0] - preflag - 1).c_str());
 			weightlist[weightlistnum].sSecurity.cSecuritytype = tempstr[colnun[0] + 1];
 			weightlist[weightlistnum].dweight = atof(strtypetemp.substr(colnun[1] + 1, rowflag - colnun[1] - 1).c_str());
 			weightlistnum++;
@@ -130,7 +130,7 @@ inline  bool  stringtopositionlist(const char * tempstr,stockpotionstruct  *posi
 			if (k != 2)
 				return false;
 
-			strcpy(positionlist[positionlistnum].sSecurity.cSecurity_code, strtypetemp.substr(preflag + 1, colnun[0] - preflag - 1).c_str());
+			strcpy_s(positionlist[positionlistnum].sSecurity.cSecurity_code, strtypetemp.substr(preflag + 1, colnun[0] - preflag - 1).c_str());
 			positionlist[positionlistnum].sSecurity.cSecuritytype = tempstr[colnun[0] + 1];
 			positionlist[positionlistnum].ntradervolume= atoi(strtypetemp.substr(colnun[1] + 1, rowflag - colnun[1] - 1).c_str());
 			positionlistnum++;
