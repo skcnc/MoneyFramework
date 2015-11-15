@@ -37,7 +37,7 @@ WORD CalCRC(void *pData, int nDataLen)
 	return i;
 }
 
-bool CStockTrader::init(Logininfor mylogininfor, char * Errormsg)  //加载参数,登陆
+bool CStockTrader::init(const Logininfor mylogininfor, char * Errormsg)  //加载参数,登陆
 {
 	//状态设置
 	Errormsg = "success";
@@ -73,10 +73,10 @@ bool CStockTrader::init(Logininfor mylogininfor, char * Errormsg)  //加载参数,登
 	return true;
 }
 
-bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust, char * Errormsg)
+bool CStockTrader::trader(const Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust, char * Errormsg)
 {
 	//状态设置
-	Errormsg = "success";
+	strcpy(Errormsg , "success");
 	bRunning = true;
 
 	//发送交易请求
@@ -159,7 +159,7 @@ bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstru
 		}
 		else
 		{
-			//strcpy(Errormsg, getErrorCodeMsg(pAddEntrustRtn->return_status));
+			strcpy(Errormsg, getErrorCodeMsg(pAddEntrustRtn->return_status));
 			bRunning = false;
 			return false;
 		}
@@ -171,8 +171,9 @@ bool CStockTrader::trader(Traderorderstruct  mytraderoder, QueryEntrustorderstru
 
 }
 
-bool CStockTrader::Batchstocktrader(Traderorderstruct * mytraderoder, int nSize, QueryEntrustorderstruct * myEntrust, int &num, char * Errormsg)
+bool CStockTrader::Batchstocktrader(const Traderorderstruct * mytraderoder, const int nSize, QueryEntrustorderstruct * * pmyEntrust, int &num, char * Errormsg)
 {
+
 	//状态设置
 	strcpy(Errormsg, "success");
 	bRunning = true;
@@ -184,6 +185,13 @@ bool CStockTrader::Batchstocktrader(Traderorderstruct * mytraderoder, int nSize,
 		bRunning = true;
 		return true;
 	}
+
+
+	if (*pmyEntrust != 0)
+		delete *pmyEntrust;
+	*pmyEntrust = new QueryEntrustorderstruct[nSize];
+	QueryEntrustorderstruct * myEntrust = *pmyEntrust;
+
 
 	int    len, in_len;
 	char   buf[2048], buf2[100];
@@ -266,13 +274,16 @@ bool CStockTrader::Batchstocktrader(Traderorderstruct * mytraderoder, int nSize,
 		else  //获得委托编号
 		{
 			sprintf(myEntrust[num].cOrderSysID, "%d", pResult->entrust_sn);// 委托编号: 返回状态<0为失败
+			sprintf(myEntrust[num].cExchangeID, "%s", mytraderoder[num].cExchangeID);
+			myEntrust[num].cSecuritytype = mytraderoder[num].cSecuritytype;
+			sprintf(myEntrust[num].cCode, "%s", mytraderoder[num].cSecurity_code);
 			num++;
 		}
 
 		if (pResult->return_status <= 0)
 		{
 
-			strcpy(Errormsg, pResult->err_msg);
+			strcpy(Errormsg ,pResult->err_msg);
 			bRtn = false;
 		}
 
@@ -309,7 +320,7 @@ bool CStockTrader::Batchstocktrader(Traderorderstruct * mytraderoder, int nSize,
 		}
 		else
 		{
-			strcpy(Errormsg, this->getErrorCodeMsg(pRtn->return_status));
+			strcpy(Errormsg , this->getErrorCodeMsg(pRtn->return_status));
 			bRunning = false;
 			return false;
 		}
@@ -321,7 +332,7 @@ bool CStockTrader::Batchstocktrader(Traderorderstruct * mytraderoder, int nSize,
 
 }
 
-bool  CStockTrader::canceltrader(QueryEntrustorderstruct myEntrust, char * Errormsg)      //撤单 
+bool  CStockTrader::canceltrader(const QueryEntrustorderstruct myEntrust, char * Errormsg)      //撤单 
 {
 	strcpy(Errormsg, "success");
 	bRunning = true;
@@ -357,7 +368,7 @@ bool  CStockTrader::canceltrader(QueryEntrustorderstruct myEntrust, char * Error
 	len = (len % 8 == 0) ? len : len + (8 - len % 8);
 	if (send(sock, buf, len, 0) == SOCKET_ERROR)
 	{
-		strcpy(Errormsg, "rev ::parse length error!");
+		Errormsg= "rev ::parse length error!";
 		bRunning = false;
 		return false;
 	}
@@ -368,7 +379,7 @@ bool  CStockTrader::canceltrader(QueryEntrustorderstruct myEntrust, char * Error
 		//----先接收8bytes,用于des解密等到需要接收的pack包长度
 		len = recv(sock, buf, 8, 0);
 		if (len<8) {
-			strcpy(Errormsg, "rev ::parse length error!");
+			Errormsg="rev ::parse length error!";
 			bRunning = false;
 			return false;
 		}
@@ -381,14 +392,14 @@ bool  CStockTrader::canceltrader(QueryEntrustorderstruct myEntrust, char * Error
 		in_len = (in_len % 8 == 0) ? in_len : in_len + (8 - in_len % 8);
 		len = recv(sock, &buf[8], in_len - 8, 0);
 		if (len<in_len - 8) {
-			strcpy(Errormsg, "rev ::parse length error!");
+			Errormsg= "rev ::parse length error!";
 			bRunning = false;
 			return false;
 		}
 		SWI_WithdrawEntrustReturn * pRetun = (SWI_WithdrawEntrustReturn*)buf;
 		if (pRetun->return_status<0)
 		{
-			strcpy(Errormsg, this->getErrorCodeMsg(pRetun->return_status));
+			strcpy(Errormsg,this->getErrorCodeMsg(pRetun->return_status));
 			bRunning = false;
 			return false;
 		}
@@ -398,7 +409,7 @@ bool  CStockTrader::canceltrader(QueryEntrustorderstruct myEntrust, char * Error
 	bRunning = false;
 	return true;
 }
-bool  CStockTrader::queryorder(QueryEntrustorderstruct myEntrust, Entrustreturnstruct * myoderreturn, int &num, char * Errormsg)     //查询委托
+bool  CStockTrader::queryorder(const QueryEntrustorderstruct myEntrust, Entrustreturnstruct * myoderreturn, int &num, char * Errormsg)     //查询委托
 {
 	strcpy(Errormsg, "success");
 	bRunning = true;
@@ -460,7 +471,7 @@ bool  CStockTrader::queryorder(QueryEntrustorderstruct myEntrust, Entrustreturns
 		in_len = (in_len % 8 == 0) ? in_len : in_len + (8 - in_len % 8);
 		len = recv(sock, &buf[8], in_len - 8, 0);
 		if (len<in_len - 8) {
-			strcpy(Errormsg, " queryEntrustStatus::parse length error!");
+			Errormsg= " queryEntrustStatus::parse length error!";
 			bRunning = false;
 			return false;
 		}
@@ -492,7 +503,7 @@ bool  CStockTrader::queryorder(QueryEntrustorderstruct myEntrust, Entrustreturns
 		//----先接收8bytes,用于des解密等到需要接收的pack包长度
 		len = recv(sock, buf, 8, 0);
 		if (len<8) {
-			strcpy(Errormsg, " queryEntrustStatus::parse length error!");
+			Errormsg= " queryEntrustStatus::parse length error!";
 			bRunning = false;
 			return false;
 		}
@@ -505,14 +516,14 @@ bool  CStockTrader::queryorder(QueryEntrustorderstruct myEntrust, Entrustreturns
 		in_len = (in_len % 8 == 0) ? in_len : in_len + (8 - in_len % 8);
 		len = recv(sock, &buf[8], in_len - 8, 0);
 		if (len<in_len - 8) {
-			strcpy(Errormsg, " queryEntrustStatus::parse length error!");
+			Errormsg=" queryEntrustStatus::parse length error!";
 			bRunning = false;
 			return false;
 		}
 		SWI_QueryEntrustReturn * pRetun = (SWI_QueryEntrustReturn*)buf;
 		if (pRetun->return_status<0)
 		{
-			strcpy(Errormsg, " error!");
+			Errormsg= " error!";
 			bRunning = false;
 			return false;
 		}
@@ -522,9 +533,9 @@ bool  CStockTrader::queryorder(QueryEntrustorderstruct myEntrust, Entrustreturns
 
 	return true;
 }
-bool  CStockTrader::querytrader(QueryEntrustorderstruct myEntrust, Bargainreturnstruct * mytraderreturn, int &num, char * Errormsg)     //查询成交
+bool  CStockTrader::querytrader(const QueryEntrustorderstruct myEntrust, Bargainreturnstruct * mytraderreturn, int &num, char * Errormsg)     //查询成交
 {
-	strcpy(Errormsg, "success");
+	strcpy(Errormsg,"success");
 	bRunning = true;
 	num = 0;
 	int    len, in_len;
@@ -558,7 +569,7 @@ bool  CStockTrader::querytrader(QueryEntrustorderstruct myEntrust, Bargainreturn
 	len = (len % 8 == 0) ? len : len + (8 - len % 8);
 	if (send(sock, buf, len, 0) == SOCKET_ERROR)
 	{
-		strcpy(Errormsg, "queryEntrustStatusByCode::send to agc error!");
+		Errormsg= "queryEntrustStatusByCode::send to agc error!";
 		bRunning = false;
 		return false;
 	}
@@ -568,7 +579,7 @@ bool  CStockTrader::querytrader(QueryEntrustorderstruct myEntrust, Bargainreturn
 		//----先接收8bytes,pack包长度
 		len = recv(sock, buf, 8, 0);
 		if (len<8) {
-			strcpy(Errormsg, "queryEntrustStatusByCode::parse length error!");
+			Errormsg="queryEntrustStatusByCode::parse length error!";
 			bRunning = false;
 			return false;
 		}
@@ -580,7 +591,7 @@ bool  CStockTrader::querytrader(QueryEntrustorderstruct myEntrust, Bargainreturn
 		in_len = (in_len % 8 == 0) ? in_len : in_len + (8 - in_len % 8);
 		len = recv(sock, &buf[8], in_len - 8, 0);
 		if (len<in_len - 8) {
-			strcpy(Errormsg, "queryEntrustStatusByCode::parse length error!");
+			Errormsg="queryEntrustStatusByCode::parse length error!";
 			bRunning = false;
 			return false;
 		}
@@ -611,7 +622,7 @@ bool  CStockTrader::querytrader(QueryEntrustorderstruct myEntrust, Bargainreturn
 		//----先接收8bytes,用于des解密等到需要接收的pack包长度
 		len = recv(sock, buf, 8, 0);
 		if (len<8) {
-			strcpy(Errormsg, "queryEntrustStatusByCode::parse length error!");
+			Errormsg= "queryEntrustStatusByCode::parse length error!";
 			bRunning = false;
 			return false;
 		}
@@ -624,7 +635,7 @@ bool  CStockTrader::querytrader(QueryEntrustorderstruct myEntrust, Bargainreturn
 		in_len = (in_len % 8 == 0) ? in_len : in_len + (8 - in_len % 8);
 		len = recv(sock, &buf[8], in_len - 8, 0);
 		if (len<in_len - 8) {
-			strcpy(Errormsg, "queryEntrustStatusByCode::parse length error!");
+			Errormsg="queryEntrustStatusByCode::parse length error!";
 			bRunning = false;
 			return false;
 		}
@@ -632,7 +643,7 @@ bool  CStockTrader::querytrader(QueryEntrustorderstruct myEntrust, Bargainreturn
 		if (pRetun->return_status<0)
 		{
 			bRunning = false;
-			strcpy(Errormsg, " error!");
+			Errormsg= " error!";
 			return false;
 		}
 		break;
@@ -888,9 +899,9 @@ bool CStockTrader::login(){//查询上证和深圳账号
 }
 
 
-//暂时没有使用，要用需要再改改
 char * CStockTrader::getErrorCodeMsg(int nErrorCode){
-	char msg[255] = "error code查询失败";
+	char msg[255];
+	strcpy(msg, "error");
 	int    len, in_len;
 	char   buf[1024], buf2[100];
 	memset(buf, 0x00, sizeof(buf));

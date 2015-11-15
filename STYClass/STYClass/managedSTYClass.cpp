@@ -106,7 +106,7 @@ void Strategy_OPEN::getshowstatus(String^ status){
 
 array<managedTraderorderstruct^>^ Strategy_OPEN::getTradeList(){
 	array<managedTraderorderstruct^>^ orderlist;
-	Traderorderstruct *m_list;
+	Traderorderstruct *m_list=0;
 
 	memset(m_list->cExchangeID, 0, 21);
 	memset(m_list->cSecurity_code, 0, 31);

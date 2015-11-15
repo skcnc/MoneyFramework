@@ -16,12 +16,13 @@ public:
 
 
 public:
-	bool init(Logininfor mylogininfor, char * Errormsg);  //加载参数,登陆
-	bool trader(Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust, char * Errormsg);      //单个证券交易,myEntrust引用返回委托编号
-	bool Batchstocktrader(Traderorderstruct * mytraderoder, int nSize, QueryEntrustorderstruct * myEntrust, int &num, char * Errormsg); //多个证券交易,myEntrust引用返回委托编号
-	bool canceltrader(QueryEntrustorderstruct myEntrust, char * Errormsg);      //撤单 
-	bool queryorder(QueryEntrustorderstruct myEntrust, Entrustreturnstruct * myoderreturn, int &num, char * Errormsg);      //查询委托
-	bool querytrader(QueryEntrustorderstruct myEntrust, Bargainreturnstruct * mytraderreturn, int &num, char * Errormsg);      //查询成交
+	bool init(const Logininfor mylogininfor, char * Errormsg);  //加载参数,登陆
+	bool trader(const Traderorderstruct  mytraderoder, QueryEntrustorderstruct &myEntrust, char * Errormsg);      //单个证券交易,myEntrust引用返回委托编号
+	bool Batchstocktrader(const Traderorderstruct * mytraderoder,const  int nSize, QueryEntrustorderstruct **  pmyEntrust, int &num, char * Errormsg); //多个证券交易,myEntrust引用返回委托编号
+
+	bool canceltrader(const QueryEntrustorderstruct myEntrust, char * Errormsg);      //撤单 
+	bool queryorder(const QueryEntrustorderstruct myEntrust, Entrustreturnstruct * myoderreturn, int &num, char * Errormsg);      //查询委托
+	bool querytrader(const QueryEntrustorderstruct myEntrust, Bargainreturnstruct * mytraderreturn, int &num, char * Errormsg);      //查询成交
 
 	bool heartBeat();  //心跳函数
 	bool getconnectstate();//  返回交易情况 未连接 

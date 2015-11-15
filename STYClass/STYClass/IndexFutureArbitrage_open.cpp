@@ -151,10 +151,10 @@ namespace STYClass
 		{
 			return false;
 		}
-		if (abs(this->dSimerrorPre) > 0.002)  //模拟误差大于千分之2  
-		{
-			return false;
-		}
+		//if (abs(this->dSimerrorPre) > 0.002)  //模拟误差大于千分之2  
+		//{
+			//return false;
+		//}
 		if (!CTimeUtil::isAutoTradingTime())  //交易时间
 		{
 			return false;
