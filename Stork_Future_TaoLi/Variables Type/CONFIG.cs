@@ -17,14 +17,14 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// 股票交易最大线程数
         /// </summary>
         public static int STOCK_TRADE_THREAD_NUM { get { return stock_trade_thread_num; } }
-        private static int stock_trade_thread_num = 1;
+        private static int stock_trade_thread_num = 2;
 
         /// <summary>货交易最大线程数
         /// 期
         /// 期货交易无需在线程中等待回报，少量交易数即可
         /// </summary>
         public static int FUTURE_TRADE_THREAD_NUM { get { return future_trade_thread_num; } }
-        private static int future_trade_thread_num = 1;
+        private static int future_trade_thread_num = 2;
 
         /// <summary>
         /// 股票交易等待响应的最大超时时间

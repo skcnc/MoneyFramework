@@ -20,6 +20,7 @@ namespace Stork_Future_TaoLi.Entrust
         MCStockLib.managedStockClass _classTradeStock = new managedStockClass();
         MCStockLib.managedLogin login = new managedLogin(CommConfig.Stock_ServerAddr, CommConfig.Stock_Port, CommConfig.Stock_Account, CommConfig.Stock_BrokerID, CommConfig.Stock_Password, CommConfig.Stock_InvestorID);
         string ErrorMsg = string.Empty;
+        StockTradeTest test = new StockTradeTest();
         #endregion
 
         #region 单例模式
@@ -79,11 +80,24 @@ namespace Stork_Future_TaoLi.Entrust
                     string err = string.Empty;
 
                     //查询委托及获取实例
-                    var temps = _classTradeStock.QueryEntrust(item, err);
+                    managedEntrustreturnstruct ret = new managedEntrustreturnstruct();
 
-                    if (temps.Length == 0) continue;
+                    //ordersysid 首字母 为 'T'  是测试交易
+                     if (item.OrderSysID.Length > 0 && item.OrderSysID[0] == 'T')
+                     {
+                         var temps = test.QueryEntrust(item);
+                         ret = temps;
+                     }
+                     else
+                     {
+                         var temps = _classTradeStock.QueryEntrust(item, err);
+                         if (temps.Length == 0) continue;
 
-                    managedEntrustreturnstruct ret = temps.ToList()[0];
+                         ret = temps.ToList()[0];
+                     }
+
+                    
+                   
 
                     if (ret == null) continue;
 
@@ -132,19 +146,29 @@ namespace Stork_Future_TaoLi.Entrust
 
 
                         //委托已经完成，进入成交状态查询
-                        var retbargin = _classTradeStock.QueryTrader(item, err).ToList();
-
-                        //将查询信息记录成交表
-                        if (retbargin.Count > 0)
+                        managedBargainreturnstruct bargin = new managedBargainreturnstruct();
+                        if (item.OrderSysID.Length > 0 && item.OrderSysID[0] == 'T')
                         {
-                            managedBargainreturnstruct bargin = retbargin.ToList()[0];
-                            bargin.strategyId = item.StrategyId;
-                            bargin.direction = item.Direction;
-                            DBAccessLayer.CreateDLRecord((object)bargin);
+                            bargin = test.QueryTrader(item);
 
-                            //更新持仓列表
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
                         }
+                        else
+                        {
+                            var retbargin = _classTradeStock.QueryTrader(item, err).ToList();
+                            //将查询信息记录成交表
+                            if (retbargin.Count > 0)
+                            {
+                                bargin = retbargin.ToList()[0];
+                            }
+                        }
+
+                        bargin.strategyId = item.StrategyId;
+                        bargin.direction = item.Direction;
+                        DBAccessLayer.CreateDLRecord((object)bargin);
+
+                        //更新持仓列表
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
+
                     }
                 }
 
