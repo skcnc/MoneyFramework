@@ -180,15 +180,20 @@ namespace Stork_Future_TaoLi
             }
 
 
+            try
+            {
+                WorkersStratus.Add(newWorker.StrategyInstanceID, 0);
+                Workers.Add(newWorker.StrategyInstanceID, newWorker);
 
-            WorkersStratus.Add(newWorker.StrategyInstanceID, 0);
-            Workers.Add(newWorker.StrategyInstanceID, newWorker);
+                newWorker.RUN();
 
-            newWorker.RUN();
-
-            //向行情模块添加消息列表映射
-            MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(newWorker.StrategyInstanceID, newWorker.GetRefQueue()));
-
+                //向行情模块添加消息列表映射
+                MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(newWorker.StrategyInstanceID, newWorker.GetRefQueue()));
+            }
+            catch(Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(ex.ToString() + ":StrategyMonitorClass.cs" + ":" + newWorker.StrategyInstanceID);
+            }
         }
 
         /// <summary>
@@ -472,14 +477,7 @@ namespace Stork_Future_TaoLi
                 Thread.Sleep(10);
             }
         }
-
-
     }
-
-
-    
-
-   
 }
 
 

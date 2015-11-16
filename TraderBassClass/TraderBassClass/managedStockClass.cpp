@@ -87,7 +87,7 @@ bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int
 		strcpy_s(query[i].cOrderSysID, 21, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(myEntrust[i]->OrderSysID));
 		query[i].cSecuritytype = myEntrust[i]->SecurityType;
 	}
-	rt_value = m_cstockTrader->Batchstocktrader(*trades, nSize, query, num, err);
+	rt_value = m_cstockTrader->Batchstocktrader(*trades, nSize, &query, num, err);
 
 
 	return rt_value;
@@ -142,7 +142,7 @@ array<managedBargainreturnstruct^>^ managedStockClass::QueryTrader(QueryEntrustO
 	Bargainreturnstruct* ret = new Bargainreturnstruct[1];
 
 	int count = 0;
-	char* errmsg;
+	char errmsg[255];
 
 	array<managedBargainreturnstruct^>^ managedRet = gcnew array<managedBargainreturnstruct^>(1);
 

@@ -108,14 +108,19 @@ namespace Stork_Future_TaoLi
                 //判断空闲的线程
                 //利用随机选择，保证线程的平均使用
 
+                
                 Random ran = new Random();
                 bool _bSearch = true;
                 int _tNo = 0;
-                while (_bSearch)
-                {
 
-                    _tNo = ran.Next(0, futureNum);
-                    if (queue_future_excuteThread.GetThreadIsAvailiable(_tNo)) { _bSearch = false; }
+                //默认测试用户下，直接使用0号测试线程
+                if (next_trade[0].cUser != DebugMode.TestUser)
+                {
+                    while (_bSearch)
+                    {
+                        _tNo = ran.Next(0, futureNum);
+                        if (queue_future_excuteThread.GetThreadIsAvailiable(_tNo)) { _bSearch = false; }
+                    }
                 }
 
                 log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + next_trade.Count);

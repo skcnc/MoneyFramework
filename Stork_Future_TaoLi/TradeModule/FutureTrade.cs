@@ -20,7 +20,12 @@ namespace Stork_Future_TaoLi
         private string BROKER = "8890";
         private string INVESTOR = "17730203";
         private string PASSWORD = "111111";
-        private string ADDRESS = "tcp://119.15.140.81:41205"; 
+        private string ADDRESS = "tcp://119.15.140.81:41205";
+
+        private string TEST_BROKER = "";
+        private string TEST_INVESTOR = "";
+        private string TEST_PASSWORD = "";
+        private string TEST_ADDRESS = "";
 
         #region 委托参数
         /// <summary>
@@ -163,6 +168,15 @@ namespace Stork_Future_TaoLi
 
             //当前线程编号
             int _threadNo = _tpp._threadNo;
+
+            if(_threadNo == 0)
+            {
+                //默认0号期货交易线程即测试线程
+                BROKER = TEST_BROKER;
+                INVESTOR = TEST_INVESTOR;
+                ADDRESS = TEST_ADDRESS;
+                PASSWORD = TEST_PASSWORD;
+            }
 
             sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 开始执行");
 

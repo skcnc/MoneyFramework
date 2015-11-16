@@ -311,7 +311,7 @@ namespace Stork_Future_TaoLi
                         cOffsetFlag = mo.cOffsetFlag,
                         SecurityName = String.Empty,
                         cOrderPriceType = "0",
-
+                        cUser = mo.User,
                         cSecurityType = mo.cSecurityType,
                         cOrderLevel = "1",
                         cOrderexecutedetail = "0",

@@ -101,12 +101,25 @@ void Strategy_OPEN::isOpenPointReached(bool^ open){
 void Strategy_OPEN::getshowstatus(String^ status){
 
 	char* str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(status);
-	//return true;// m_open_strategy->getshowstatus(str);
+	IndexFutureArbitrageopenshowargs* _args = new IndexFutureArbitrageopenshowargs();
+	m_open_strategy->getshowstatus(*_args);
+
+	status = "期货价格：" + _args->futureprice + "  " +
+		"指数价格：" + _args->indexprice + "  " +
+		"模拟指数：" + _args->SimIndex + "  " +
+		"原始基差：" + _args->OrgDeltaPre + "  " +
+		"模拟误差：" + _args->SimerrorPre + "  " +
+		"模拟市值：" + _args->TotalStocksMarketValue + "  " +
+		"停盘市值：" + _args->stopmarketvalue + "  " +
+		"买入冲击：" + _args->TotalStockBuyStrike + "  " +
+		"期货卖出冲击：" + _args->dFutureSellStrike + "  " +
+		"调整基差：" + _args->dPositiveDelta + "  " +
+		"交易误差：" + _args->SimtraderPre + "  ";
 }
 
 array<managedTraderorderstruct^>^ Strategy_OPEN::getTradeList(){
 	array<managedTraderorderstruct^>^ orderlist;
-	Traderorderstruct *m_list;
+	Traderorderstruct *m_list=0;
 
 	memset(m_list->cExchangeID, 0, 21);
 	memset(m_list->cSecurity_code, 0, 31);

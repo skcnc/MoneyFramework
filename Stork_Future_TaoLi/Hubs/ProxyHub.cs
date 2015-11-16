@@ -147,7 +147,7 @@ namespace Stork_Future_TaoLi
 
             try
             {
-                _context.Clients.Client(RegisterRelation[name]).updatePara(name, DateTime.Now.ToString());
+                _context.Clients.Client(RegisterRelation[name]).updatePara(name, Info);
             }
             catch(Exception ex)
             {

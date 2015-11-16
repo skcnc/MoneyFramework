@@ -85,4 +85,20 @@ namespace MarketInfoSys
         }
 
     }
+
+    class RunningTime
+    {
+        private static DateTime _lastTime = new DateTime();
+        public static DateTime CurrentTime
+        {
+            get
+            {
+                return _lastTime;
+            }
+            set
+            {
+                _lastTime = value;
+            }
+        }
+    }
 }

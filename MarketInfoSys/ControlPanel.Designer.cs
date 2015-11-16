@@ -94,7 +94,7 @@
             this.tbuserName.Name = "tbuserName";
             this.tbuserName.Size = new System.Drawing.Size(118, 21);
             this.tbuserName.TabIndex = 3;
-            this.tbuserName.Text = "TD1379799055";
+            this.tbuserName.Text = "TD1379799005";
             // 
             // label6
             // 

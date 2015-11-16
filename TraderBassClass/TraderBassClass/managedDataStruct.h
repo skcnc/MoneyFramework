@@ -172,7 +172,7 @@ namespace MCStockLib
 			instance.nVolumeTotal = nVolumeTotal;
 			instance.withdraw_ammount = withdraw_ammount;
 			instance.frozen_money = frozen_money;
-			instance.frozen_amount = frozen_amount;
+			instance.frozen_amount =(int) frozen_amount;
 			strcpy_s(instance.cInsertDate, 9, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cInsertDate));
 			strcpy_s(instance.cInsertTime, 9, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cInsertTime));
 			strcpy_s(instance.cCancelTime, 9, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(cCancelTime));

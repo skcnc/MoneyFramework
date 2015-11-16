@@ -50,6 +50,8 @@ namespace Stork_Future_TaoLi.Variables_Type
         public string cOrderPriceType { get; set; }
 
         //控制部分
+        public string cUser { get; set; }
+
 
         //证券类型
         public string cSecurityType { get; set; }

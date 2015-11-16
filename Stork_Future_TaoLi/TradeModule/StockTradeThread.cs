@@ -16,7 +16,6 @@ namespace Stork_Future_TaoLi.TradeModule
     {
         private static LogWirter log = new LogWirter();  //主线程记录日志
         private static LogWirter sublog = new LogWirter(); //子线程记录日志
-
         
 
         public static void Main()
@@ -167,6 +166,9 @@ namespace Stork_Future_TaoLi.TradeModule
             MCStockLib.managedLogin login = new managedLogin(CommConfig.Stock_ServerAddr, CommConfig.Stock_Port, CommConfig.Stock_Account, CommConfig.Stock_BrokerID, CommConfig.Stock_Password, CommConfig.Stock_InvestorID);
             string ErrorMsg = string.Empty;
 
+            bool DebugMark = false; //测试交易标志
+            StockTradeTest test = new StockTradeTest();//测试类
+
             //令该线程为前台线程
             Thread.CurrentThread.IsBackground = true;
 
@@ -217,15 +219,29 @@ namespace Stork_Future_TaoLi.TradeModule
                 {
                     List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_stock_excuteThread.StockExcuteQueues[_threadNo].Dequeue();
 
-                    if (trades.Count > 0)
-                    {
-                        sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 执行交易数量 ： " + trades.Count);
-                    }
 
                     if (trades.Count == 0)
                     {
                         continue;
                     }
+
+                    if(trades[0].cUser == DebugMode.TestUser)
+                    {
+                        DebugMark = true;
+                    }
+                    else
+                    {
+                        DebugMark = false;
+                    }
+
+
+
+                    if (trades.Count > 0)
+                    {
+                        sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 执行交易数量 ： " + trades.Count);
+                    }
+
+                    
 
                  
 
@@ -257,8 +273,15 @@ namespace Stork_Future_TaoLi.TradeModule
                             i++;
                         }
 
-
-                        _classTradeStock.BatchTrade(tradesUnit, 15, entrustUnit, s);
+                        if (DebugMark == true)
+                        {
+                            
+                            test.BatchTradeTest(tradesUnit, 15, out entrustUnit, out s);
+                        }
+                        else
+                        {
+                            _classTradeStock.BatchTrade(tradesUnit, 15, entrustUnit, s);
+                        }
 
                         if (entrustUnit != null && entrustUnit.ToList().Count() > 0)
                         {
@@ -280,7 +303,16 @@ namespace Stork_Future_TaoLi.TradeModule
 
                         QueryEntrustOrderStruct_M entrustUnit = new QueryEntrustOrderStruct_M();
                         string s = string.Empty;
-                        _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
+
+
+                        if (DebugMark == true)
+                        {
+                            test.SingleTradeTest(tradesUnit, out entrustUnit, out s);
+                        }
+                        else
+                        {
+                            _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
+                        }
 
                         if (entrustUnit.OrderSysID != null && entrustUnit.OrderSysID != String.Empty && entrustUnit.OrderSysID != "0")
                         {

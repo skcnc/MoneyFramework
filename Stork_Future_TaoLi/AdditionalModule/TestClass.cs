@@ -29,7 +29,7 @@ namespace Stork_Future_TaoLi
     public class DebugMode
     {
         public static bool debug = false;
-        public static String TestUser = "Testor";
+        public static String TestUser = "testor";
     }
 
     public class StockTradeTest
@@ -83,7 +83,7 @@ namespace Stork_Future_TaoLi
             entrust.cCancelTime = String.Empty;
             entrust.cInsertDate = DateTime.Now.Year.ToString() + DateTime.Now.Month + DateTime.Now.Day;
             entrust.cInsertTime = DateTime.Now.Hour.ToString() + DateTime.Now.Minute + DateTime.Now.Second;
-            entrust.cOrderStatus = Convert.ToSByte(300);
+            entrust.cOrderStatus = ((int)(EntrustStatus.Dealed));
             entrust.cOrderSysID = queryEntrust.OrderSysID;
             entrust.cOrderType = queryEntrust.SecurityType;
             entrust.frozen_amount = 0;
@@ -106,7 +106,7 @@ namespace Stork_Future_TaoLi
             bargain.bargain_time = DateTime.Now.Hour.ToString() + DateTime.Now.Minute + DateTime.Now.Second;
             bargain.bargain_no = queryEntrust.OrderRef;
             bargain.direction = queryEntrust.Direction;
-            bargain.OrderStatus = Convert.ToSByte(300);
+            bargain.OrderStatus = Convert.ToSByte(EntrustStatus.Dealed);
             bargain.OrderSysID = queryEntrust.OrderSysID;
             bargain.OrderType = queryEntrust.SecurityType;
             bargain.Security_code = queryEntrust.Code;
