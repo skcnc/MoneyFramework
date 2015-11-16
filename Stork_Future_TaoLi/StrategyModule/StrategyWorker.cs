@@ -543,6 +543,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         {
                             m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
                             m_strategy_open.calculateSimTradeStrikeAndDelta();
+                           
                         }
                         else
                         {
@@ -619,6 +620,10 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                 //获取中间显示参数
                 //gettaderargs   getshowstatus
+
+                string status = string.Empty;
+                m_strategy_open.getshowstatus(status);
+                PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
                 Thread.Sleep(1);
             }
         }

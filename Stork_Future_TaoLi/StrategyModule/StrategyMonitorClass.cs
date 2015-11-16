@@ -477,14 +477,7 @@ namespace Stork_Future_TaoLi
                 Thread.Sleep(10);
             }
         }
-
-
     }
-
-
-    
-
-   
 }
 
 
