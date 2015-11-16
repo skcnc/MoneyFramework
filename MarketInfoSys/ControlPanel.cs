@@ -22,7 +22,7 @@ namespace MarketInfoSys
             InitializeComponent();
             btnSubmit.Click += btnSubmit_Click;
             this.FormClosed += ControlPanel_FormClosed;
-            this.rtbSubscribe.Text = "000300.sh\n510300.sh\nIF1512.cf";
+            this.rtbSubscribe.Text = "600690.sh\n000709.sz";
             updateCount.Start();
         }
 

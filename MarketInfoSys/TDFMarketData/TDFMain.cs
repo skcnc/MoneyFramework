@@ -96,79 +96,20 @@ namespace MarketInfoSys
                 while (true)
                 {
                     Thread.Sleep(20);
+
+                    //每隔10s发送一次停盘信息
+                    if ((DateTime.Now - RunningTime.CurrentTime).TotalSeconds > 10)
+                    {
+                        foreach (TDFMarketData data in stop_plate_stocks.GetInstance().GetStopList())
+                        {
+                            EnQueueType obj = new EnQueueType() { Type = "S", value = (object)data };
+                            Queue_Data.GetQueue().Enqueue((object)obj);
+                        }
+                        RunningTime.CurrentTime = DateTime.Now;
+
+                    }
+
                     continue;
-                    #region 以下代码是演示订阅功能，真实使用时需要修改
-                    //主线程阻塞在这里，等待回调消息通知（其他消息）
-//                    String strHelp = @"键入q退出
-//    以下命令，请用逗号分隔
-//    a 添加订阅
-//    d 删除订阅
-//    f 清除订阅
-//    s 设置订阅
-//    hs 显示完全数据
-//    hh 显示万得股票名称";
-//                    Console.WriteLine(strHelp);
-//                    var input = Console.ReadLine();
-
-//                    while (input != "q")
-//                    {
-//                        var inArgs = input.Split(',');
-//                        if (inArgs.Length > 1)
-//                        {
-//                            ToString convert = (String[] ary) =>
-//                            {
-//                                System.Text.StringBuilder sb = new StringBuilder();
-//                                for (int i = 1; i < ary.Length; ++i)
-//                                {
-//                                    sb.AppendFormat("{0};", ary[i]);
-//                                }
-
-//                                return sb.ToString();
-//                            };
-
-//                            switch (inArgs[0])
-//                            {
-//                                case "a":
-//                                    dataSource.SetSubscription(convert(inArgs), SubscriptionType.SUBSCRIPTION_ADD);
-//                                    break;
-//                                case "d":
-//                                    dataSource.SetSubscription(convert(inArgs), SubscriptionType.SUBSCRIPTION_DEL);
-//                                    break;
-//                                case "s":
-//                                    dataSource.SetSubscription(convert(inArgs), SubscriptionType.SUBSCRIPTION_SET);
-//                                    break;
-//                                case "f":
-//                                    dataSource.SetSubscription("", SubscriptionType.SUBSCRIPTION_FULL);
-//                                    break;
-//                                case "hs":
-//                                    dataSource.ShowAllData = true;
-//                                    break;
-//                                case "hh":
-//                                    dataSource.ShowAllData = false;
-//                                    break;
-//                            }
-//                        }
-//                        else if (inArgs.Length == 1)
-//                        {
-//                            switch (inArgs[0])
-//                            {
-//                                case "f":
-//                                    dataSource.SetSubscription("", SubscriptionType.SUBSCRIPTION_FULL);
-//                                    break;
-//                                case "hs":
-//                                    dataSource.ShowAllData = true;
-//                                    break;
-//                                case "hh":
-//                                    dataSource.ShowAllData = false;
-//                                    break;
-//                            }
-//                        }
-
-//                        Console.WriteLine(strHelp);
-//                        input = Console.ReadLine();
-//                    }
-                    #endregion      //演示订阅功能
-                    //Thread.Sleep(100);
                 }
             }
 

@@ -120,6 +120,7 @@ namespace MarketInfoSys
                 {
                     EnQueueType obj = new EnQueueType() { Type = "S", value = (object)data };
                     Queue_Data.GetQueue().Enqueue((object)obj);
+                    stop_plate_stocks.GetInstance().updateStopList(data);
                 }
             }
             else if (msg.MsgID == TDFMSGID.MSG_DATA_FUTURE)

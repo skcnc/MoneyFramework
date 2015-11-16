@@ -90,4 +90,46 @@ namespace MarketInfoSys
             excuteThread.Start();
         }
     }
+
+    class stop_plate_stocks
+    {
+        //停盘列表
+        private static List<TDFMarketData> stop_stocks = new List<TDFMarketData>();
+        private static stop_plate_stocks instance = new stop_plate_stocks();
+
+        public List<TDFMarketData> GetStopList() { return stop_stocks; }
+
+        public static stop_plate_stocks GetInstance()
+        {
+            if (instance == null) instance = new stop_plate_stocks();
+            return instance;
+        }
+
+        /// <summary>
+        /// 更新停盘列表
+        /// </summary>
+        /// <param name="data"></param>
+        public void updateStopList(TDFMarketData data)
+        {
+            if(data.Status != 68)
+            {
+                return;
+            }
+
+            if (stop_stocks.Count != 0)
+            {
+                var temp = (from item in stop_stocks where item.Code == data.Code select item);
+                if (temp.Count() > 0)
+                {
+                    //已经添加 
+                    return;
+                }
+            }
+
+            lock (stop_stocks)
+            {
+                stop_stocks.Add(data);
+            }
+        }
+    }
 }
