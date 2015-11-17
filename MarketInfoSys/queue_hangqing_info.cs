@@ -19,6 +19,12 @@ namespace MarketInfoSys
             set;
         }
 
+        public static bool Suspend
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// 获取队列的实例
         /// </summary>
@@ -31,6 +37,13 @@ namespace MarketInfoSys
             }
 
             return instance;
+        }
+
+        public void EnQueue(object obj)
+        {
+            if (Suspend == true)
+                instance.Enqueue(obj);
+            else return;
         }
 
         /// <summary>

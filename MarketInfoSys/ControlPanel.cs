@@ -33,8 +33,9 @@ namespace MarketInfoSys
         /// <param name="e"></param>
         void ControlPanel_FormClosed(object sender, FormClosedEventArgs e)
         {
+            webservice.abort();
             webservice.STOP = true;
-            //throw new NotImplementedException();
+
         }
 
         /// <summary>
@@ -54,13 +55,22 @@ namespace MarketInfoSys
 
                 this.btnSubmit.Text = "停止运行";
 
-                webservice.STOP = false;
-                webservice.run();
+                if (webservice.STOP == true)
+                {
+                    webservice.STOP = false;
+                    webservice.run();
+
+                }
+                else
+                {
+                    webservice.resume();
+                }
             }
             else
             {
-                webservice.STOP = true;
                 this.btnSubmit.Text = "启动运行";
+                webservice.suspend();
+                
             }
         }
 
