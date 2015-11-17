@@ -148,14 +148,6 @@ namespace Stork_Future_TaoLi
                     }
                 }
 
-                //foreach (var item in value.WEIGHT.Split('\n'))
-                //{
-                //    if (item.Trim() == string.Empty) { continue; }
-                //    else
-                //    {
-                //        weili.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToDouble(item.Split(';')[2]));
-                //    }
-                //}
 
                 newWorker.LiStockOrder = oli;
                 newWorker.close_para.WeightList = weili;

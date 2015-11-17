@@ -26,7 +26,7 @@ namespace Stork_Future_TaoLi
             //若发现存在相同策略ID的实例未完成，将未完成实例标记为“删除”，替换以当前实例
             //这种情况在启动自检测时出现
 
-            DeleteSGOPEN(open.basic.ID);
+            if (!DetectSGOPEN(open.basic.ID)) return;
                 
             //等待上一步操作完成
             Thread.Sleep(10);
@@ -66,6 +66,21 @@ namespace Stork_Future_TaoLi
 
         }
 
+        /// <summary>
+        /// 判断数据是否已经在库中存在
+        /// </summary>
+        /// <param name="ID">策略的UUID值</param>
+        /// <returns>true: 库中已经存在 false: 库中不存在或者不可以写入</returns>
+        public static bool DetectSGOPEN(string ID)
+        {
+            if (DBAccessLayer.DBEnable == false) { return false; }
+
+            var _selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == ID select item);
+
+            if (_selectedItem.Count() > 0) return false;
+            else return true;
+        }
+
         public static void InsertSGCLOSE(object v)
         {
             if (DBAccessLayer.DBEnable == false) { return; }
@@ -74,6 +89,7 @@ namespace Stork_Future_TaoLi
             //若发现存在相同策略ID的实例未完成，将未完成实例标记为“删除”，替换以当前实例
             //这种情况在启动自检测时出现
             DeleteSGCLOSE(close.basic.ID);
+            if (!(DetectSGCLOSE(close.basic.ID))) return;
 
             //等待上一步操作完成
             Thread.Sleep(10);
@@ -117,6 +133,21 @@ namespace Stork_Future_TaoLi
             }
 
 
+        }
+
+
+        /// <summary>
+        /// 判断数据是否已经在库中存在
+        /// </summary>
+        /// <param name="ID">策略的UUID值</param>
+        /// <returns>true: 库中已经存在 false: 库中不存在或者不可以写入</returns>
+        public static bool DetectSGCLOSE(string ID)
+        {
+            if (DBAccessLayer.DBEnable == false) { return false; }
+            var _selectedItem = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == ID && item.SG_STATUS == 0 select item);
+
+            if (_selectedItem.Count() > 0) return false;
+            else return true;
         }
 
         public static void InsertSTATUS(string Id, int status)

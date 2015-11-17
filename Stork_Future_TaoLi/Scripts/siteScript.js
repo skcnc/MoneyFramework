@@ -1122,7 +1122,6 @@ $('#login_btnLogin').click(function (e) {
     window.location.href = '/home/MonitorConsole'
 })
 
-
 //辅助函数
 function GetIndexFullName(briefName)
 {
