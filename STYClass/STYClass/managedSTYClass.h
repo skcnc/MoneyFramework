@@ -273,7 +273,7 @@ namespace managedSTY
 
 		/*****显示参数****/
 		//bool   gettaderargs(open_args^ realargs);    //获得实际运行中的参数 包含samp文件
-		void getshowstatus(String^ status);
+		String^  getshowstatus();
 
 		/**********获取交易*******/
 		array<managedTraderorderstruct^>^ getTradeList();
