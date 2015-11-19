@@ -300,7 +300,7 @@ namespace managedSTY
 
 		/*****显示参数****/
 		//close_args^ gettradeargs();
-		managedIndexFutureArbitragecloseshowargs^ getshowstatus();
+		String^ getshowstatus();
 
 		/**********获取交易*******/
 		array<managedTraderorderstruct^>^ getTradeList();

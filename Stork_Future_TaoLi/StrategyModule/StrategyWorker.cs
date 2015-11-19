@@ -621,8 +621,15 @@ namespace Stork_Future_TaoLi.StrategyModule
                 //获取中间显示参数
                 //gettaderargs   getshowstatus
 
-                string status = m_strategy_open.getshowstatus();
-                PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
+                if (Type == "OPEN")
+                {
+                    string status = m_strategy_open.getshowstatus();
+                    PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
+                }
+                else
+                {
+
+                }
                 Thread.Sleep(1);
             }
         }
