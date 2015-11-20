@@ -142,29 +142,37 @@ namespace STYClass
 		this->dPositiveDelta = m_future.getlastprice()   //调整后的基差
 			- this->dSimIndex
 			- (this->dTotalStockBuyStrike + this->dFutureSellStrike) / (nHands*m_future.getfuturetime());
+		isOpenPointReached();
 		return  true;
 	}
 
 	bool CIndexFutureArbitrage_open::isOpenPointReached()
 	{
-		if (!this->m_SyntheticIndex.isupdated() || !this->m_future.isupdated()) //行情
+		/*if (!this->m_SyntheticIndex.isupdated() || !this->m_future.isupdated()) //行情
 		{
+			strcpy(this->statusmsg, "行情有问题");
 			return false;
-		}
+		}*/
 		//if (abs(this->dSimerrorPre) > 0.002)  //模拟误差大于千分之2  
 		//{
 			//return false;
 		//}
 		if (!CTimeUtil::isAutoTradingTime())  //交易时间
 		{
+			strcpy(this->statusmsg, "非交易时间");
 			return false;
 		}
 		if (this->dPositiveDelta > this->dExpectOpenDelta) // 大于预设值，则允许开仓
 		{
+			strcpy(this->statusmsg, "等待交易");
 			return true;
+
 		}
 		else
+		{
+			strcpy(this->statusmsg, "正常运行");
 			return false;
+		}
 
 	}
 

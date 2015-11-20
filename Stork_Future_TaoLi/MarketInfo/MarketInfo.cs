@@ -102,6 +102,7 @@ namespace Stork_Future_TaoLi
                     log.LogEvent("未能成功返回； "+ ex.ToString());
                     continue;
                 }
+
                 if (info == null)
                     continue;
                 else

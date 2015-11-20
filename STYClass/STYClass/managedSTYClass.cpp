@@ -93,9 +93,9 @@ void Strategy_OPEN::calculateSimTradeStrikeAndDelta(){
 	 m_open_strategy->calculateSimTradeStrikeAndDelta();
 }
 
-void Strategy_OPEN::isOpenPointReached(bool^ open){
+bool Strategy_OPEN::isOpenPointReached(){
 	bool b = m_open_strategy->isOpenPointReached();
-	open = b;
+	return b;
 }
 
 String^  Strategy_OPEN::getshowstatus(){
@@ -124,14 +124,10 @@ array<managedTraderorderstruct^>^ Strategy_OPEN::getTradeList(){
 	array<managedTraderorderstruct^>^ orderlist;
 	Traderorderstruct *m_list=0;
 
-	memset(m_list->cExchangeID, 0, 21);
-	memset(m_list->cSecurity_code, 0, 31);
-	memset(m_list->security_name, 0, 55);
-
 	int m_num;
 
 	bool b = m_open_strategy->gettaderlist(&m_list, m_num);
-
+	orderlist = gcnew array<managedTraderorderstruct^>(m_num);
 	if (b == true){
 		for (int i = 0; i < m_num; i++){
 			orderlist[i] = gcnew managedTraderorderstruct();
@@ -225,9 +221,9 @@ void Strategy_CLOSE::calculateSimTradeStrikeAndDelta(){
 	m_close_strategy->calculateSimTradeStrikeAndDelta();
 }
 
-void Strategy_CLOSE::isOpenPointReached(bool^ open){
+bool Strategy_CLOSE::isOpenPointReached(){
 	bool b = m_close_strategy->isOpenPointReached();
-	open = b;
+	return b;
 }
 
 String^ Strategy_CLOSE::getshowstatus()

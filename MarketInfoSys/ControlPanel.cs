@@ -22,7 +22,7 @@ namespace MarketInfoSys
             InitializeComponent();
             btnSubmit.Click += btnSubmit_Click;
             this.FormClosed += ControlPanel_FormClosed;
-            this.rtbSubscribe.Text = "999987.sh\nIH1512.cf\n600000.sh\n600010.sh\n600015.sh\n600016.sh\n600018.sh\n600028.sh\n600030.sh\n600036.sh\n600048.sh\n600050.sh\n600089.sh\n600104.sh\n600109.sh\n600111.sh\n600150.sh\n600256.sh\n600406.sh\n600518.sh\n600519.sh\n600583.sh\n600585.sh\n600637.sh\n600690.sh\n600837.sh\n600887.sh\n600893.sh\n600958.sh\n600999.sh\n601006.sh\n601088.sh\n601166.sh\n601169.sh\n601186.sh\n601288.sh\n601318.sh\n601328.sh\n601390.sh\n601398.sh\n601601.sh\n601628.sh\n601668.sh\n601688.sh\n601766.sh\n601800.sh\n601818.sh\n601857.sh\n601901.sh\n601988.sh\n601989.sh\n601998.sh\n";
+            this.rtbSubscribe.Text = "510050.sh\n999987.sh\nIH1512.cf\n600000.sh\n600010.sh\n600015.sh\n600016.sh\n600018.sh\n600028.sh\n600030.sh\n600036.sh\n600048.sh\n600050.sh\n600089.sh\n600104.sh\n600109.sh\n600111.sh\n600150.sh\n600256.sh\n600406.sh\n600518.sh\n600519.sh\n600583.sh\n600585.sh\n600637.sh\n600690.sh\n600837.sh\n600887.sh\n600893.sh\n600958.sh\n600999.sh\n601006.sh\n601088.sh\n601166.sh\n601169.sh\n601186.sh\n601288.sh\n601318.sh\n601328.sh\n601390.sh\n601398.sh\n601601.sh\n601628.sh\n601668.sh\n601688.sh\n601766.sh\n601800.sh\n601818.sh\n601857.sh\n601901.sh\n601988.sh\n601989.sh\n601998.sh\n";
             updateCount.Start();
         }
 
