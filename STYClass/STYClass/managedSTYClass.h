@@ -269,7 +269,7 @@ namespace managedSTY
 		/**********策略执行*******/
 		void init(open_args^ m); //初始化设置，导入权重数据  更新股票列表  
 		void calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
-		void isOpenPointReached(bool^ open); //是否达到开仓点，行情，资金
+		bool isOpenPointReached(); //是否达到开仓点，行情，资金
 
 		/*****显示参数****/
 		//bool   gettaderargs(open_args^ realargs);    //获得实际运行中的参数 包含samp文件
@@ -296,7 +296,7 @@ namespace managedSTY
 		/**********策略执行*******/
 		void init(close_args^ m);
 		void calculateSimTradeStrikeAndDelta(); //计算模拟指数，交易指数，调整基差
-		void isOpenPointReached(bool^ open); //是否达到开仓点，行情，资金
+		bool isOpenPointReached(); //是否达到开仓点，行情，资金
 
 		/*****显示参数****/
 		//close_args^ gettradeargs();

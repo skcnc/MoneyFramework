@@ -29,7 +29,7 @@ bool   CSecurity::isupdated()
 {
 	//WaitForSingleObject( hlocalDataMutex, INFINITE ); 	
 	int nCurrentTime = CTimeUtil::getIntTime();
-	if (CTimeUtil::getDeltaSecond(nCurrentTime, this->m_DepthMarketData.marketinfor.LastUpdateTime)>5 || this->m_DepthMarketData.marketinfor.nInfotLag>5)
+	if (CTimeUtil::getDeltaSecond(nCurrentTime, this->m_DepthMarketData.marketinfor.LastUpdateTime)>20 || this->m_DepthMarketData.marketinfor.nInfotLag>15)
 		this->m_DepthMarketData.bupdated = false;
 	else
 		this->m_DepthMarketData.bupdated = true;
