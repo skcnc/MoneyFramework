@@ -74,7 +74,7 @@ namespace MarketInfoSys
 
                 if (dt.DayOfWeek == DayOfWeek.Saturday)
                 {
-                    break;
+                    
                 }
 
                 Thread.Sleep(100);

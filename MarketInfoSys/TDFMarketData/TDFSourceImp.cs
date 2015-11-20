@@ -122,7 +122,10 @@ namespace MarketInfoSys
                     if (Queue_Data.Suspend == false)
                     {
                         Queue_Data.GetQueue().Enqueue((object)obj);
-                        stop_plate_stocks.GetInstance().updateStopList(data);
+                        if (data.Status == 68)
+                        {
+                            stop_plate_stocks.GetInstance().updateStopList(data);
+                        }
                     }
                 }
             }
