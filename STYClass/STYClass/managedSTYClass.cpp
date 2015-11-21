@@ -93,18 +93,18 @@ void Strategy_OPEN::calculateSimTradeStrikeAndDelta(){
 	 m_open_strategy->calculateSimTradeStrikeAndDelta();
 }
 
-void Strategy_OPEN::isOpenPointReached(bool^ open){
+bool Strategy_OPEN::isOpenPointReached(){
 	bool b = m_open_strategy->isOpenPointReached();
-	open = b;
+	return b;
 }
 
-void Strategy_OPEN::getshowstatus(String^ status){
+String^  Strategy_OPEN::getshowstatus(){
 
-	char* str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(status);
+	//char* str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(status);
 	IndexFutureArbitrageopenshowargs* _args = new IndexFutureArbitrageopenshowargs();
 	m_open_strategy->getshowstatus(*_args);
 
-	status = "期货价格：" + _args->futureprice + "  " +
+	String^ status = "期货价格：" + _args->futureprice + "  " +
 		"指数价格：" + _args->indexprice + "  " +
 		"模拟指数：" + _args->SimIndex + "  " +
 		"原始基差：" + _args->OrgDeltaPre + "  " +
@@ -114,21 +114,20 @@ void Strategy_OPEN::getshowstatus(String^ status){
 		"买入冲击：" + _args->TotalStockBuyStrike + "  " +
 		"期货卖出冲击：" + _args->dFutureSellStrike + "  " +
 		"调整基差：" + _args->dPositiveDelta + "  " +
-		"交易误差：" + _args->SimtraderPre + "  ";
+		"交易误差：" + _args->SimtraderPre + "  " +
+		"状态：" + (gcnew String(_args->statusmsg));
+
+	return status;
 }
 
 array<managedTraderorderstruct^>^ Strategy_OPEN::getTradeList(){
 	array<managedTraderorderstruct^>^ orderlist;
 	Traderorderstruct *m_list=0;
 
-	memset(m_list->cExchangeID, 0, 21);
-	memset(m_list->cSecurity_code, 0, 31);
-	memset(m_list->security_name, 0, 55);
-
 	int m_num;
 
 	bool b = m_open_strategy->gettaderlist(&m_list, m_num);
-
+	orderlist = gcnew array<managedTraderorderstruct^>(m_num);
 	if (b == true){
 		for (int i = 0; i < m_num; i++){
 			orderlist[i] = gcnew managedTraderorderstruct();
@@ -222,31 +221,32 @@ void Strategy_CLOSE::calculateSimTradeStrikeAndDelta(){
 	m_close_strategy->calculateSimTradeStrikeAndDelta();
 }
 
-void Strategy_CLOSE::isOpenPointReached(bool^ open){
+bool Strategy_CLOSE::isOpenPointReached(){
 	bool b = m_close_strategy->isOpenPointReached();
-	open = b;
+	return b;
 }
 
-managedIndexFutureArbitragecloseshowargs^ Strategy_CLOSE::getshowstatus()
+String^ Strategy_CLOSE::getshowstatus()
 {
 	IndexFutureArbitragecloseshowargs m;
-	managedIndexFutureArbitragecloseshowargs^ m_args = gcnew managedIndexFutureArbitragecloseshowargs();
+	
 
 	m_close_strategy->getshowstatus(m);
 
-	m_args->dActualFutureGain = m.dActualFutureGain;
-	m_args->dActualStockGain = m.dActualStockGain;
-	m_args->dDownlimitStockValue = m.dDownlimitStockValue;
-	m_args->dFutureBuyStrike = m.dFutureBuyStrike;
-	m_args->drealStockIncome = m.drealStockIncome;
-	m_args->dStopedStockValue = m.dStopedStockValue;
-	m_args->dtotalgain = m.dtotalgain;
-	m_args->dTotalStockMarketValue = m.dTotalStockMarketValue;
-	m_args->dTotalStockSellStrike = m.dTotalStockSellStrike;
-	m_args->dzerobpgain = m.dzerobpgain;
-	m_args->statusmsg = gcnew String(m.statusmsg);
 
-	return m_args;
+	String^ status = "真实期货收益：" + m.dActualFutureGain + "  "
+		+ "真实股票收益：" + m.dActualStockGain + "  "
+		+ "真实股票卖出收益：" + m.drealStockIncome + "  "
+		+ "跌停市值：" + m.dDownlimitStockValue + "  "
+		+ "期货买入冲击：" + m.dFutureBuyStrike + "  "
+		+ "停盘市值：" + m.dStopedStockValue + "  "
+		+ "全部收益：" + m.dtotalgain + "  "
+		+ "股票市值：" + m.dTotalStockMarketValue + "  "
+		+ "股票冲击：" + m.dTotalStockSellStrike + "  "
+		+ "状态：" + (gcnew String(m.statusmsg));
+
+
+	return status;
 }
 
 array<managedTraderorderstruct^>^ Strategy_CLOSE::getTradeList(){

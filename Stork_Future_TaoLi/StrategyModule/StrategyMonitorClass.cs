@@ -148,14 +148,6 @@ namespace Stork_Future_TaoLi
                     }
                 }
 
-                //foreach (var item in value.WEIGHT.Split('\n'))
-                //{
-                //    if (item.Trim() == string.Empty) { continue; }
-                //    else
-                //    {
-                //        weili.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToDouble(item.Split(';')[2]));
-                //    }
-                //}
 
                 newWorker.LiStockOrder = oli;
                 newWorker.close_para.WeightList = weili;
@@ -447,7 +439,7 @@ namespace Stork_Future_TaoLi
                 }
 
 
-                if (DateTime.Now.Second % 5 == 0)
+                if (DateTime.Now.Second == 0)
                 {
                     if (_logUpdateTime.Second != DateTime.Now.Second)
                     {

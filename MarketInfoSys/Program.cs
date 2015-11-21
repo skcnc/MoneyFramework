@@ -38,11 +38,17 @@ namespace MarketInfoSys
     class webservice
     {
         private static  bool stop = true;
+        private static ServiceHost host = new ServiceHost(typeof(StockInfo));
+
         public static bool STOP
         {
             set
             {
                 stop = value;
+            }
+            get
+            {
+                return stop;
             }
         }
 
@@ -52,42 +58,51 @@ namespace MarketInfoSys
             return Queue_Data.GetQueue().Count;
         }
 
+        public static Thread excuteThread = new Thread(new ThreadStart(() =>
+        {
+            //启动行情服务
+            TDFMain.Run();
+
+            //启动WCF服务
+            DateTime dt = DateTime.Now;
+            while (!stop)
+            {
+                if ((DateTime.Now - dt).TotalMinutes > 10)
+                {
+                    dt = DateTime.Now;
+                }
+
+                if (dt.DayOfWeek == DayOfWeek.Saturday)
+                {
+                    
+                }
+
+                Thread.Sleep(100);
+            }
+        }));
+
         public static void run()
         {
-            Thread excuteThread = new Thread(new ThreadStart(() =>
-            {
-                //启动行情服务
-                TDFMain.Run();
-
-                //启动WCF服务
-                ServiceHost host = new ServiceHost(typeof(StockInfo));
-                host.Open();
-
-                //ServiceHost crossDomainserivceHOST = new ServiceHost(typeof(DomainService));
-                //crossDomainserivceHOST.Open();
-                DateTime dt = DateTime.Now;
-                while (!stop)
-                {
-                    if ((DateTime.Now - dt).TotalMinutes > 10)
-                    {
-                        dt = DateTime.Now;
-
-                        //Console.WriteLine(DateTime.Now.ToString("hh:mm:ss") + "  股市队列长度:" + Queue_Market_Data.GetQueue().Count);
-                    }
-
-                    if (dt.DayOfWeek == DayOfWeek.Saturday)
-                    {
-                        break;
-                    }
-
-                    Thread.Sleep(100);
-                }
-                //Console.ReadLine();
-                host.Close();
-
-            }));
-
             excuteThread.Start();
+            host.Open();
+            Queue_Data.Suspend = false;
+        }
+
+        public static void suspend()
+        {
+            Queue_Data.Suspend = true;
+        }
+
+        public static void resume()
+        {
+            Queue_Data.Suspend = false;
+        }
+
+        public static void abort()
+        {
+            stop = true;
+            host.Close();
+            Queue_Data.Suspend = true;
         }
     }
 

@@ -22,10 +22,11 @@ namespace Stork_Future_TaoLi
         private string PASSWORD = "111111";
         private string ADDRESS = "tcp://119.15.140.81:41205";
 
-        private string TEST_BROKER = "";
-        private string TEST_INVESTOR = "";
-        private string TEST_PASSWORD = "";
-        private string TEST_ADDRESS = "";
+        private string TEST_BROKER = "8890";
+        private string TEST_INVESTOR = "17730203";
+        private string TEST_PASSWORD = "111111";
+        private string TEST_ADDRESS = "tcp://119.15.140.81:41205";
+
 
         #region 委托参数
         /// <summary>

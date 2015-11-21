@@ -563,17 +563,16 @@ namespace Stork_Future_TaoLi.StrategyModule
                     bool _reached = false;
                     if (Type == "OPEN")
                     {
-                        m_strategy_open.isOpenPointReached(_reached);
+                        _reached = m_strategy_open.isOpenPointReached();
                     }
                     else
                     {
-                        m_strategy_close.isOpenPointReached(_reached);
+                        _reached = m_strategy_close.isOpenPointReached();
                     }
 
 
                     // 生成交易列表
                     if (_reached)
-                    //if(false)
                     {
                         List<managedTraderorderstruct> ol = (Type == "OPEN") ? m_strategy_open.getTradeList().ToList() : m_strategy_close.getTradeList().ToList();
 
@@ -613,17 +612,25 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                         //下单到交易预处理模块
                         queue_prd_trade.GetQueue().Enqueue((object)orderli);
+
+                        // 列表只会生成一次
+                        breaklabel = true;
                     }
-                    // 列表只会生成一次
-                    breaklabel = true;
+                   
                 }
 
                 //获取中间显示参数
                 //gettaderargs   getshowstatus
 
-                string status = string.Empty;
-                m_strategy_open.getshowstatus(status);
-                PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
+                if (Type == "OPEN")
+                {
+                    string status = m_strategy_open.getshowstatus();
+                    PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
+                }
+                else
+                {
+
+                }
                 Thread.Sleep(1);
             }
         }
