@@ -147,4 +147,114 @@ namespace MarketInfoSys
             }
         }
     }
+
+    class simulate_trade
+    {
+        private static List<Sim_HQ_Struct> _simulate_trade_table = new List<Sim_HQ_Struct>();
+        private static string _futureCode = "IH1512";
+        private static uint _futurePrice = 4000;
+        private static string _indexCode = string.Empty;
+        private static uint _indexPrice = 4000;
+
+        public static int SimMarketPerSecond = 10;
+        public static string SimMarketCode = "600000;s;16.39|600010;s;3.94|600015;s;10.56|600016;s;8.60|600018;s;7.14|600028;s;5.03|600030;s;15.87|600036;s;17.93|600048;s;8.72|601998;s;6.40";
+
+        //模拟行情开关
+        public static bool SimSwitch { get; set; }
+
+        /// <summary>
+        /// 初始化模拟行情列表
+        /// </summary>
+        /// <param name="codes"></param>
+        public static void InitSimTable(string codes)
+        {
+            //code;type;price|code;type;price
+
+            if (codes.Trim() == string.Empty) return;
+
+            List<string> _liCodes = codes.Split('|').ToList();
+
+            _simulate_trade_table.Clear();
+
+            foreach(string s in _liCodes )
+            {
+                Sim_HQ_Struct unit = new Sim_HQ_Struct()
+                {
+                    CODE = s.Split(';')[0],
+                    TYPE = s.Split(';')[1],
+                    PRICE = Convert.ToDecimal(s.Split(';')[2])
+                };
+
+                _simulate_trade_table.Add(unit);
+
+                
+            }
+        }
+
+        //获取股票市场信息
+        public static TDFMarketData GetSimMarketDate()
+        {
+            if (_simulate_trade_table.Count == 0) return null;
+            Random seed = new Random();
+            Sim_HQ_Struct unit = _simulate_trade_table[seed.Next(_simulate_trade_table.Count - 1)];
+            uint price = Convert.ToUInt32(unit.PRICE * 100);
+            double wave = seed.NextDouble(); //涨幅/跌幅
+
+            if(seed.Next(0,1) == 0)
+            {
+                wave *= -1;
+            }
+
+            
+
+            TDFMarketData data = new TDFMarketData()
+            {
+                AskPrice = new uint[5] { price - 1, price - 2, price, price + 1, price + 2 },
+                AskVol = new uint[5] { 100, 100, 100, 100, 100 },
+                BidPrice = new uint[5] { price - 1, price - 2, price, price + 1, price + 2 },
+                BidVol = new uint[5] { 100, 100, 100, 100, 100 },
+                Code = unit.CODE,
+                High = price + 1,
+                HighLimited = Convert.ToUInt32(price * 1.1),
+                IOPV = 1,
+                Low = price - 1,
+                LowLimited = Convert.ToUInt32(price * 0.9),
+                Match = price,
+                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss"))
+            };
+
+            return data;
+
+        }
+
+        //获取模拟期货行情
+        public static TDFFutureData GetSimFutureData()
+        {
+            Random seed = new Random();
+            double wave = seed.NextDouble(); //涨幅/跌幅
+
+            if (seed.Next(0, 1) == 0)
+            {
+                wave *= -1;
+            }
+
+            TDFFutureData data = new TDFFutureData()
+            {
+                AskPrice = new uint[5] { _futurePrice - 1, _futurePrice - 2, _futurePrice, _futurePrice + 1, _futurePrice + 2 },
+                AskVol = new uint[5] { 100, 100, 100, 100, 100 },
+                BidPrice = new uint[5] { _futurePrice - 1, _futurePrice - 2, _futurePrice, _futurePrice + 1, _futurePrice + 2 },
+                BidVol = new uint[5] { 100, 100, 100, 100, 100 },
+                Code = _futureCode,
+                High = _futurePrice + 1,
+                HighLimited = Convert.ToUInt32(_futurePrice * 1.1),
+                Low = _futurePrice - 1,
+                LowLimited = Convert.ToUInt32(_futurePrice * 0.9),
+                Match = _futurePrice,
+                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss"))
+            };
+
+            return data;
+        }
+
+    }
 }

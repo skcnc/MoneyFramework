@@ -17,6 +17,8 @@ namespace MarketInfoSys
         public static String password { get; set; }
         public static string subscribeList { get; set; }
 
+        
+
         public static void Run()
         {
             //启动行情线程
@@ -58,8 +60,9 @@ namespace MarketInfoSys
             theServers[2] = new TDFServerInfo();
             theServers[3] = new TDFServerInfo();
 
-           
 
+            //初始化行情模拟系统
+            simulate_trade.InitSimTable(simulate_trade.SimMarketCode);
 
             /************订阅的类型需要再确认***********/
             var openSetting_ext = new TDFOpenSetting_EXT()
@@ -93,9 +96,12 @@ namespace MarketInfoSys
                     //GlobalErrorLog.LogInstance.LogEvent(String.Format("open returned:{0}, program quit", nOpenRet));
                 }
 
+                
+
                 while (true)
                 {
-                    Thread.Sleep(20);
+                    if (webservice.STOP) { break; }
+                    Thread.Sleep(1000);
 
                     //每隔10s发送一次停盘信息
                     if ((DateTime.Now - RunningTime.CurrentTime).TotalSeconds > 10)
@@ -109,6 +115,22 @@ namespace MarketInfoSys
 
                     }
 
+                    if ((simulate_trade.SimSwitch)&&(Queue_Data.Suspend == false))
+                    {
+                        for (int i = 0; i < simulate_trade.SimMarketPerSecond; i++)
+                        {
+                            TDFMarketData objs = simulate_trade.GetSimMarketDate();
+                            new EnQueueType() { Type = "S", value = (object)objs };
+                            if (Queue_Data.Suspend == false)
+                            {
+                                Queue_Data.GetQueue().Enqueue((object)(new EnQueueType() { Type = "S", value = (object)objs }));
+                            }
+
+                            TDFFutureData objf = simulate_trade.GetSimFutureData();
+                            Queue_Data.GetQueue().Enqueue((object)(new EnQueueType() { Type = "F", value = (object)objf }));
+
+                        }
+                    }
                     continue;
                 }
             }
