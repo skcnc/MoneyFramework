@@ -17,7 +17,7 @@ namespace Stork_Future_TaoLi
         static MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
        
         //数据库测试标记
-        public static bool DBEnable = true;
+        public static bool DBEnable = false;
 
         public static void InsertSGOPEN(object v)
         {
@@ -294,6 +294,7 @@ namespace Stork_Future_TaoLi
                 };
 
                 DbEntity.DL_TAOLI_TABLE.Add(item);
+
                 DbEntity.SaveChanges();
             }
         }

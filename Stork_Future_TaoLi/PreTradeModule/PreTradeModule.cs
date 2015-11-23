@@ -114,6 +114,7 @@ namespace Stork_Future_TaoLi
             t.SecurityName = tos.SecurityName;
             t.belongStrategy = tos.belongStrategy;
             t.OrderRef = tos.OrderRef;
+            t.cUser = tos.cUser;
             return t;
         }
 
@@ -169,7 +170,7 @@ namespace Stork_Future_TaoLi
 
                     List<TradeOrderStruct> stocks_sz = (from item in tos where item.cExhcnageID == ExchangeID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
 
-                    List<TradeOrderStruct> future = (from item in tos select item).OrderBy(i => i.cOrderLevel).ToList();
+                    List<TradeOrderStruct> future = (from item in tos where item.cExhcnageID == ExchangeID.CF select item).OrderBy(i => i.cOrderLevel).ToList();
 
                     //将新的list推送到对应的线程控制器
                     #region 交易送入队列
@@ -265,26 +266,27 @@ namespace Stork_Future_TaoLi
                             TradeOrderStruct _tos = stu;
                             unit.Add(_tos);
 
-                            if (unit.Count == 15)
+                            List<TradeOrderStruct> _li = CreateList(unit);
+                            unit.Clear();
+
+                            if (_li.Count == 15)
                             {
                                 lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
                                 {
-                                    QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)unit);
+                                    QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)_li);
                                 }
-
-                                unit.Clear();
                             }
-                        }
 
-                        if (unit.Count != 0)
-                        {
-                            lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
+                            if (_li.Count != 0)
                             {
-                                QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)unit);
+                                lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
+                                {
+                                    QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)_li);
+                                }
                             }
-
-                            unit.Clear();
                         }
+
+                        
 
                     }
                     #endregion

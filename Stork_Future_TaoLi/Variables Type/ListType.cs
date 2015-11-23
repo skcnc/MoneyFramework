@@ -84,6 +84,8 @@ namespace Stork_Future_TaoLi.Variables_Type
         public static string SH { get { return "SH"; } }
         //深证
         public static string SZ { get { return "SZ"; } }
+
+        public static string CF { get { return "cf"; } }
     }
 
     /// <summary>

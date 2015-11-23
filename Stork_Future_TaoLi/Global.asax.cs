@@ -32,6 +32,7 @@ namespace Stork_Future_TaoLi
             //模块初始化工作
             //ListCreate.Main();
 
+            DBExamination.CheckDB();
 
             PreTradeModule.getInstance().Run();
 

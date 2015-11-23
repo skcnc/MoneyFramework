@@ -441,7 +441,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                 //标记线程状态为正在空转
                 Status = 1;
                 
-                Thread.Sleep(1000); 
+                Thread.Sleep(10); 
             }
             while (!breaklabel)
             { 
@@ -598,6 +598,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                             order.cOrderexecutedetail = item.cOrderexecutedetail.ToString();
                             order.belongStrategy = StrategyInstanceID;
                             order.OrderRef = REQUEST_ID.ApplyNewID();
+                            order.cUser = User;
 
                             orderli.Add(order);
 

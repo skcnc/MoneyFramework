@@ -220,10 +220,10 @@ namespace MarketInfoSys
                 Low = price - 1,
                 LowLimited = Convert.ToUInt32(price * 0.9),
                 Match = price,
-                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss")),
+                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss")) * 1000,
                 WindCode = "60000.SH"
             };
-
+           
             return data;
 
         }
@@ -251,7 +251,7 @@ namespace MarketInfoSys
                 Low = _futurePrice - 1,
                 LowLimited = Convert.ToUInt32(_futurePrice * 0.9),
                 Match = _futurePrice,
-                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss")),
+                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss")) * 1000,
                 WindCode = "60000.SH"
             };
 

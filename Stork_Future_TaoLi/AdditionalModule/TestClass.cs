@@ -7,6 +7,7 @@ using System.Threading;
 using Stork_Future_TaoLi.Hubs;
 using Newtonsoft.Json;
 using MCStockLib;
+using Stork_Future_TaoLi.Database;
 
 namespace Stork_Future_TaoLi
 {
@@ -115,6 +116,76 @@ namespace Stork_Future_TaoLi
             bargain.strategyId = queryEntrust.StrategyId;
 
             return bargain;
+        }
+    }
+
+    public class DBExamination
+    {
+        /// <summary>
+        /// 尝试数据库的访问和修改
+        /// </summary>
+        public static void CheckDB()
+        {
+             MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
+            SG_TAOLI_OPEN_TABLE record = new SG_TAOLI_OPEN_TABLE()
+            {
+                SG_GUID = Guid.NewGuid(),
+                SG_ID = "Test",
+                SG_Contract = "test",
+                SG_OP_POINT = 0,
+                SG_HAND_NUM = 0,
+                SG_INDEX = 0,
+                SG_WEIGHT_LIST = "test",
+                SG_INIT_TRADE_LIST = "test",
+                SG_STATUS = 0,
+                SG_CREATE_TIME = DateTime.Now,
+                SG_LATEST_TRADE_LIST = "test",
+                SG_USER = "test",
+            };
+
+            DbEntity.SG_TAOLI_OPEN_TABLE.Add(record);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+             var _selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == "Test" select item);
+            DbEntity.SG_TAOLI_OPEN_TABLE.Remove((SG_TAOLI_OPEN_TABLE) _selectedItem.ToList()[0]);
+
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+            
+            SG_TAOLI_CLOSE_TABLE item2 = new SG_TAOLI_CLOSE_TABLE()
+            {
+                SG_GUID = Guid.NewGuid(),
+                SG_ID = "test",
+                SG_OPEN_ID = "test",
+                SG_INIT_POSITION_LIST = "test",
+                SG_LATEST_POSITION_LIST = "test",
+                SG_FUTURE_CONTRACT = "test",
+                SG_SHORT_POINT = 0,
+                SG_HAND = 0,
+                SG_COE = 0,
+                SG_SD = 0,
+                SG_SA = 0,
+                SG_PE = 0,
+                SG_BAS = 0,
+                SG_STATUS = 0,
+                SG_CREATE_TIME = DateTime.Now,
+                SG_USER = "test"
+            };
+
+            DbEntity.SG_TAOLI_CLOSE_TABLE.Add(item2);
+            DbEntity.SaveChanges();
+
+            var _selectedItem2 = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == "test" && item.SG_STATUS == 0 select item);
+            
+            if (_selectedItem.Count() > 0)
+            {
+
+                DbEntity.SG_TAOLI_CLOSE_TABLE.Remove(_selectedItem2.ToList()[0]);
+                DbEntity.SaveChanges();
+            }
         }
     }
     
