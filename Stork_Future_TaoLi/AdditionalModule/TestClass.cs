@@ -126,7 +126,7 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public static void CheckDB()
         {
-             MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
+            MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
             SG_TAOLI_OPEN_TABLE record = new SG_TAOLI_OPEN_TABLE()
             {
                 SG_GUID = Guid.NewGuid(),
@@ -148,13 +148,13 @@ namespace Stork_Future_TaoLi
 
             Thread.Sleep(10);
 
-             var _selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == "Test" select item);
-            DbEntity.SG_TAOLI_OPEN_TABLE.Remove((SG_TAOLI_OPEN_TABLE) _selectedItem.ToList()[0]);
+            var _selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == "Test" select item);
+            DbEntity.SG_TAOLI_OPEN_TABLE.Remove((SG_TAOLI_OPEN_TABLE)_selectedItem.ToList()[0]);
 
             DbEntity.SaveChanges();
 
             Thread.Sleep(10);
-            
+
             SG_TAOLI_CLOSE_TABLE item2 = new SG_TAOLI_CLOSE_TABLE()
             {
                 SG_GUID = Guid.NewGuid(),
@@ -179,13 +179,103 @@ namespace Stork_Future_TaoLi
             DbEntity.SaveChanges();
 
             var _selectedItem2 = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == "test" && item.SG_STATUS == 0 select item);
-            
-            if (_selectedItem.Count() > 0)
-            {
 
-                DbEntity.SG_TAOLI_CLOSE_TABLE.Remove(_selectedItem2.ToList()[0]);
-                DbEntity.SaveChanges();
-            }
+
+
+            DbEntity.SG_TAOLI_CLOSE_TABLE.Remove(_selectedItem2.ToList()[0]);
+            DbEntity.SaveChanges();
+
+            SG_TAOLI_STATUS_TABLE item3 = new SG_TAOLI_STATUS_TABLE()
+            {
+                SG_GUID = Guid.NewGuid(),
+                SG_ID = "test",
+                SG_STATUS = 0,
+                SG_UPDATE_TIME = DateTime.Now
+            };
+
+            DbEntity.SG_TAOLI_STATUS_TABLE.Add(item3);
+            DbEntity.SaveChanges();
+
+            var _selectedItem3 = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == "test" select item);
+
+            DbEntity.SG_TAOLI_STATUS_TABLE.Remove(_selectedItem3.ToList()[0]);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            OL_TAOLI_LIST_TABLE item4 = new OL_TAOLI_LIST_TABLE()
+            {
+                OL_GUID = Guid.NewGuid(),
+                SG_ID = "test",
+                OL_LIST = "test",
+                OL_TIME = DateTime.Now
+            };
+
+            DbEntity.OL_TAOLI_LIST_TABLE.Add(item4);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            var selected4 = (from item in DbEntity.OL_TAOLI_LIST_TABLE where item.SG_ID == "test" select item);
+
+            DbEntity.OL_TAOLI_LIST_TABLE.Remove(selected4.ToList()[0]);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            ER_TAOLI_TABLE record5 = new ER_TAOLI_TABLE()
+            {
+                ER_GUID = Guid.NewGuid(),
+                ER_ID = "test",
+                //ER_STRATEGY = entrust.StrategyId,
+                ER_ORDER_TYPE = "test",
+                ER_ORDER_EXCHANGE_ID = "test",
+
+                //ER_CODE = entrust.Code,
+                //ER_DIRECTION = entrust.Direction
+            };
+
+            DbEntity.ER_TAOLI_TABLE.Add(record5);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            var selected5 = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ID == "test" select item);
+
+            DbEntity.ER_TAOLI_TABLE.Remove(selected5.ToList()[0]);
+            DbEntity.SaveChanges();
+
+
+            Thread.Sleep(10);
+
+            DL_TAOLI_TABLE item6 = new DL_TAOLI_TABLE()
+            {
+                DL_GUID = Guid.NewGuid(),
+                DL_STRATEGY = "test",
+                DL_DIRECTION = 0,
+                DL_CODE = "test",
+                DL_NAME = "test",
+                DL_STATUS = "test",
+                DL_TYPE = "test",
+                DL_STOCK_AMOUNT = 0,
+                DL_BARGAIN_PRICE = 0,
+                DL_BARGAIN_MONEY = 0,
+                DL_BARGAIN_TIME = "test",
+                DL_NO = "test",
+                DL_LOAD = true
+            };
+
+            DbEntity.DL_TAOLI_TABLE.Add(item6);
+
+            DbEntity.SaveChanges();
+
+
+            Thread.Sleep(10);
+
+            var _selecteditem6 = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_STRATEGY == "test" select item);
+
+            DbEntity.DL_TAOLI_TABLE.Remove(_selecteditem6.ToList()[0]);
+            DbEntity.SaveChanges();
         }
     }
     

@@ -6,6 +6,7 @@ using Stork_Future_TaoLi.Database;
 using MCStockLib;
 using System.Threading;
 
+
 namespace Stork_Future_TaoLi
 {
     /// <summary>
@@ -17,7 +18,7 @@ namespace Stork_Future_TaoLi
         static MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
        
         //数据库测试标记
-        public static bool DBEnable = false;
+        public static bool DBEnable = true;
 
         public static void InsertSGOPEN(object v)
         {
@@ -210,13 +211,13 @@ namespace Stork_Future_TaoLi
             ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
             {
                 ER_GUID = Guid.NewGuid(),
-                //ER_ID = entrust.,
-                //ER_STRATEGY = entrust.StrategyId,
+                ER_ID = entrust.OrderSysID,
+                ER_STRATEGY = entrust.StrategyId,
                 ER_ORDER_TYPE = entrust.SecurityType.ToString(),
                 ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
 
-                //ER_CODE = entrust.Code,
-                //ER_DIRECTION = entrust.Direction
+                ER_CODE = entrust.Code,
+                ER_DIRECTION = entrust.Direction
             };
 
             DbEntity.ER_TAOLI_TABLE.Add(record);
