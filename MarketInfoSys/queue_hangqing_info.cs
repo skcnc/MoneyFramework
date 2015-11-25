@@ -65,4 +65,17 @@ namespace MarketInfoSys
             }
         }
     }
+
+    /// <summary>
+    /// 模拟行情数据结构
+    /// </summary>
+    public class Sim_HQ_Struct
+    {
+        //代码
+        public string CODE { get; set; }
+        //类型
+        public string TYPE { get; set; }
+        //价格
+        public decimal PRICE { get; set; }
+    }
 }

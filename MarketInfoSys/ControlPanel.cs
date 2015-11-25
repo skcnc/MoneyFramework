@@ -87,5 +87,10 @@ namespace MarketInfoSys
                 this.login.Text = "未连接";
             }
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            simulate_trade.SimSwitch = ((CheckBox)sender).Checked;
+        }
     }
 }

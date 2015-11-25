@@ -865,7 +865,6 @@ function UpdateOPENStrategies(changeFlag)
     
 }
 
-
 //刷新界面
 $('#refresh').click(function (e) {
     UpdateOPENStrategies(true);
@@ -911,17 +910,17 @@ $('#btnViewList').click(function (e) {
 //创建新开仓实例对路径的修改
 $('#OpenStrategyCreate').click(function (e) {
     var user = $.trim($('#userName')[0].innerText);
-    var href = $(this).attr('href') + user;
-
-    $(this).attr('href', href);
+    var href = $(this).attr('href')
+    var url = href.split('?')[0] + '?' + href.split('?')[1].split('&')[0] + '&' + href.split('?')[1].split('&')[1].split('=')[0] + '=' + user;
+    $(this).attr('href', url);
 
 })
 
 $('#CloseStrategyCreate').click(function (e) {
     var user = $.trim($('#userName')[0].innerText);
-    var href = $(this).attr('href') + user;
-
-    $(this).attr('href', href);
+    var href = $(this).attr('href')
+    var url = href.split('?')[0] + '?' + href.split('?')[1].split('&')[0] + '&' + href.split('?')[1].split('&')[1].split('=')[0] + '=' + user;
+    $(this).attr('href', url);
 })
 
 //确认交易列表S
@@ -1125,10 +1124,9 @@ $('#login_btnLogin').click(function (e) {
 //辅助函数
 function GetIndexFullName(briefName)
 {
-    if(briefName == 500)
-    { return "中证500" }
+    if(briefName == 990905){ return "中证500" }
     else if(briefName == 300){ return "沪深300";}
-    else if (briefName == 50) { return "上证50" }
+    else if (briefName == 999987) { return "上证50" }
     else { return "未知";}
 }
 
