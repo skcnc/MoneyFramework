@@ -174,6 +174,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// 标记当前状态
         /// </summary>
         public int Status { get; set; }
+
         #endregion
 
         #region private variables
