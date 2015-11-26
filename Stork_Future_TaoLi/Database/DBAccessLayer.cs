@@ -6,6 +6,7 @@ using Stork_Future_TaoLi.Database;
 using MCStockLib;
 using System.Threading;
 
+
 namespace Stork_Future_TaoLi
 {
     /// <summary>
@@ -17,7 +18,7 @@ namespace Stork_Future_TaoLi
         static MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
        
         //数据库测试标记
-        public static bool DBEnable = false;
+        public static bool DBEnable = true;
 
         public static void InsertSGOPEN(object v)
         {
@@ -210,13 +211,13 @@ namespace Stork_Future_TaoLi
             ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
             {
                 ER_GUID = Guid.NewGuid(),
-                //ER_ID = entrust.,
-                //ER_STRATEGY = entrust.StrategyId,
+                ER_ID = entrust.OrderSysID,
+                ER_STRATEGY = entrust.StrategyId,
                 ER_ORDER_TYPE = entrust.SecurityType.ToString(),
                 ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
 
-                //ER_CODE = entrust.Code,
-                //ER_DIRECTION = entrust.Direction
+                ER_CODE = entrust.Code,
+                ER_DIRECTION = entrust.Direction
             };
 
             DbEntity.ER_TAOLI_TABLE.Add(record);
@@ -294,7 +295,63 @@ namespace Stork_Future_TaoLi
                 };
 
                 DbEntity.DL_TAOLI_TABLE.Add(item);
+
                 DbEntity.SaveChanges();
+            }
+        }
+
+        public static void UpdateStrategyStatusRecord(string str_id , int status)
+        {
+            if (DBAccessLayer.DBEnable == false) return;
+            if(status == 0)
+            {
+                SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
+                {
+                    SG_GUID = Guid.NewGuid(),
+                    SG_ID = str_id,
+                    SG_STATUS = status,
+                    SG_UPDATE_TIME = DateTime.Now
+                };
+
+                DbEntity.SG_TAOLI_STATUS_TABLE.Add(record);
+            }
+            else
+            {
+                var _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
+
+                if (_rec.Count() == 0)
+                {
+                    SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
+                    {
+                        SG_GUID = Guid.NewGuid(),
+                        SG_ID = str_id,
+                        SG_STATUS = 0,
+                        SG_UPDATE_TIME = DateTime.Now
+                    };
+
+                    _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
+                }
+
+                var _unit = _rec.ToList()[0];
+
+                switch (status)
+                {
+                    case 1:
+                        _unit.SG_STATUS = 1;
+                        break;
+                    case 2:
+                        _unit.SG_STATUS = 2;
+                        break;
+                    case 3:
+                        _unit.SG_STATUS = 3;
+                        break;
+                    default:
+                        _unit.SG_STATUS = 0;
+                        break;
+                }
+
+                DbEntity.SaveChanges();
+                
             }
         }
 

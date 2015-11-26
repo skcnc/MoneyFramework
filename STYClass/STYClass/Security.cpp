@@ -46,7 +46,7 @@ double  CSecurity::getrealbuycost(int namount)
 	if (this->m_DepthMarketData.marketinfor.bStoped)
 		return getrealmarketvalue(namount);
 	if (!this->m_DepthMarketData.bupdated)//没有更新
-		return getrealmarketvalue(namount)*1.02;
+		return getrealmarketvalue(namount)*1.02; 
 	if (this->m_DepthMarketData.marketinfor.dLastPrice == this->m_DepthMarketData.marketinfor.dHighLimited) //涨停冲击为0
 		return getrealmarketvalue(namount);
 	int nQtyLeft = namount;

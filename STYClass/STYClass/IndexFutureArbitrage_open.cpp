@@ -148,11 +148,11 @@ namespace STYClass
 
 	bool CIndexFutureArbitrage_open::isOpenPointReached()
 	{
-		/*if (!this->m_SyntheticIndex.isupdated() || !this->m_future.isupdated()) //行情
-		{
-			strcpy(this->statusmsg, "行情有问题");
-			return false;
-		}*/
+		//if (!this->m_SyntheticIndex.isupdated() || !this->m_future.isupdated()) //行情
+		//{
+		//	strcpy(this->statusmsg, "行情有问题");
+		//	return false;
+		//}
 		//if (abs(this->dSimerrorPre) > 0.002)  //模拟误差大于千分之2  
 		//{
 			//return false;

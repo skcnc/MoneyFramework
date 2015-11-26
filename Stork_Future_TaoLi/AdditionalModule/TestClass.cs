@@ -7,6 +7,7 @@ using System.Threading;
 using Stork_Future_TaoLi.Hubs;
 using Newtonsoft.Json;
 using MCStockLib;
+using Stork_Future_TaoLi.Database;
 
 namespace Stork_Future_TaoLi
 {
@@ -115,6 +116,166 @@ namespace Stork_Future_TaoLi
             bargain.strategyId = queryEntrust.StrategyId;
 
             return bargain;
+        }
+    }
+
+    public class DBExamination
+    {
+        /// <summary>
+        /// 尝试数据库的访问和修改
+        /// </summary>
+        public static void CheckDB()
+        {
+            MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
+            SG_TAOLI_OPEN_TABLE record = new SG_TAOLI_OPEN_TABLE()
+            {
+                SG_GUID = Guid.NewGuid(),
+                SG_ID = "Test",
+                SG_Contract = "test",
+                SG_OP_POINT = 0,
+                SG_HAND_NUM = 0,
+                SG_INDEX = 0,
+                SG_WEIGHT_LIST = "test",
+                SG_INIT_TRADE_LIST = "test",
+                SG_STATUS = 0,
+                SG_CREATE_TIME = DateTime.Now,
+                SG_LATEST_TRADE_LIST = "test",
+                SG_USER = "test",
+            };
+
+            DbEntity.SG_TAOLI_OPEN_TABLE.Add(record);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            var _selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == "Test" select item);
+            DbEntity.SG_TAOLI_OPEN_TABLE.Remove((SG_TAOLI_OPEN_TABLE)_selectedItem.ToList()[0]);
+
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            SG_TAOLI_CLOSE_TABLE item2 = new SG_TAOLI_CLOSE_TABLE()
+            {
+                SG_GUID = Guid.NewGuid(),
+                SG_ID = "test",
+                SG_OPEN_ID = "test",
+                SG_INIT_POSITION_LIST = "test",
+                SG_LATEST_POSITION_LIST = "test",
+                SG_FUTURE_CONTRACT = "test",
+                SG_SHORT_POINT = 0,
+                SG_HAND = 0,
+                SG_COE = 0,
+                SG_SD = 0,
+                SG_SA = 0,
+                SG_PE = 0,
+                SG_BAS = 0,
+                SG_STATUS = 0,
+                SG_CREATE_TIME = DateTime.Now,
+                SG_USER = "test"
+            };
+
+            DbEntity.SG_TAOLI_CLOSE_TABLE.Add(item2);
+            DbEntity.SaveChanges();
+
+            var _selectedItem2 = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == "test" && item.SG_STATUS == 0 select item);
+
+
+
+            DbEntity.SG_TAOLI_CLOSE_TABLE.Remove(_selectedItem2.ToList()[0]);
+            DbEntity.SaveChanges();
+
+            SG_TAOLI_STATUS_TABLE item3 = new SG_TAOLI_STATUS_TABLE()
+            {
+                SG_GUID = Guid.NewGuid(),
+                SG_ID = "test",
+                SG_STATUS = 0,
+                SG_UPDATE_TIME = DateTime.Now
+            };
+
+            DbEntity.SG_TAOLI_STATUS_TABLE.Add(item3);
+            DbEntity.SaveChanges();
+
+            var _selectedItem3 = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == "test" select item);
+
+            DbEntity.SG_TAOLI_STATUS_TABLE.Remove(_selectedItem3.ToList()[0]);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            OL_TAOLI_LIST_TABLE item4 = new OL_TAOLI_LIST_TABLE()
+            {
+                OL_GUID = Guid.NewGuid(),
+                SG_ID = "test",
+                OL_LIST = "test",
+                OL_TIME = DateTime.Now
+            };
+
+            DbEntity.OL_TAOLI_LIST_TABLE.Add(item4);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            var selected4 = (from item in DbEntity.OL_TAOLI_LIST_TABLE where item.SG_ID == "test" select item);
+
+            DbEntity.OL_TAOLI_LIST_TABLE.Remove(selected4.ToList()[0]);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            ER_TAOLI_TABLE record5 = new ER_TAOLI_TABLE()
+            {
+                ER_GUID = Guid.NewGuid(),
+                ER_ID = "test",
+                //ER_STRATEGY = entrust.StrategyId,
+                ER_ORDER_TYPE = "test",
+                ER_ORDER_EXCHANGE_ID = "test",
+
+                //ER_CODE = entrust.Code,
+                //ER_DIRECTION = entrust.Direction
+            };
+
+            DbEntity.ER_TAOLI_TABLE.Add(record5);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            var selected5 = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ID == "test" select item);
+
+            DbEntity.ER_TAOLI_TABLE.Remove(selected5.ToList()[0]);
+            DbEntity.SaveChanges();
+
+
+            Thread.Sleep(10);
+
+            DL_TAOLI_TABLE item6 = new DL_TAOLI_TABLE()
+            {
+                DL_GUID = Guid.NewGuid(),
+                DL_STRATEGY = "test",
+                DL_DIRECTION = 0,
+                DL_CODE = "test",
+                DL_NAME = "test",
+                DL_STATUS = "test",
+                DL_TYPE = "test",
+                DL_STOCK_AMOUNT = 0,
+                DL_BARGAIN_PRICE = 0,
+                DL_BARGAIN_MONEY = 0,
+                DL_BARGAIN_TIME = "test",
+                DL_NO = "test",
+                DL_LOAD = true
+            };
+
+            DbEntity.DL_TAOLI_TABLE.Add(item6);
+
+            DbEntity.SaveChanges();
+
+
+            Thread.Sleep(10);
+
+            var _selecteditem6 = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_STRATEGY == "test" select item);
+
+            DbEntity.DL_TAOLI_TABLE.Remove(_selecteditem6.ToList()[0]);
+            DbEntity.SaveChanges();
         }
     }
     

@@ -197,7 +197,7 @@ namespace MarketInfoSys
             if (_simulate_trade_table.Count == 0) return null;
             Random seed = new Random();
             Sim_HQ_Struct unit = _simulate_trade_table[seed.Next(_simulate_trade_table.Count - 1)];
-            uint price = Convert.ToUInt32(unit.PRICE * 100);
+            uint price = Convert.ToUInt32(unit.PRICE * 10000);
             double wave = seed.NextDouble(); //涨幅/跌幅
 
             if(seed.Next(0,1) == 0)
@@ -209,20 +209,21 @@ namespace MarketInfoSys
 
             TDFMarketData data = new TDFMarketData()
             {
-                AskPrice = new uint[5] { price - 1, price - 2, price, price + 1, price + 2 },
+                AskPrice = new uint[5] { price - 100, price - 200, price, price + 100, price + 200 },
                 AskVol = new uint[5] { 100, 100, 100, 100, 100 },
-                BidPrice = new uint[5] { price - 1, price - 2, price, price + 1, price + 2 },
+                BidPrice = new uint[5] { price - 100, price - 200, price, price + 100, price + 200 },
                 BidVol = new uint[5] { 100, 100, 100, 100, 100 },
                 Code = unit.CODE,
                 High = price + 1,
                 HighLimited = Convert.ToUInt32(price * 1.1),
-                IOPV = 1,
+                IOPV = 0,
                 Low = price - 1,
                 LowLimited = Convert.ToUInt32(price * 0.9),
                 Match = price,
-                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss"))
+                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss")) * 1000,
+                WindCode = "60000.SH"
             };
-
+           
             return data;
 
         }
@@ -250,7 +251,8 @@ namespace MarketInfoSys
                 Low = _futurePrice - 1,
                 LowLimited = Convert.ToUInt32(_futurePrice * 0.9),
                 Match = _futurePrice,
-                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss"))
+                Time = Convert.ToInt32(DateTime.Now.ToString("HHmmss")) * 1000,
+                WindCode = "60000.SH"
             };
 
             return data;
