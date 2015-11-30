@@ -502,6 +502,11 @@ namespace Stork_Future_TaoLi.StrategyModule
                         info.dLowLimited = Convert.ToDouble(data.LowLimited) /10000;
                         info.exchangeID = data.WindCode.Split('.')[1];
 
+                        if (data.Status == 68)
+                        {
+                            info.bstoped = true;
+                        }
+
                         switch(data.IOPV)
                         {
                             case 0:

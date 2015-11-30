@@ -207,6 +207,7 @@ namespace MarketInfoSys
             SD2 = _mData.SD2;
             WindCode = _mData.WindCode;
             Time = _mData.Time;
+            Status = _mData.Status;
             IOPV = 0;
         }
 
