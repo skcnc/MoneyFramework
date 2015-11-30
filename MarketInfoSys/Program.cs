@@ -143,6 +143,7 @@ namespace MarketInfoSys
 
             lock (stop_stocks)
             {
+                data.Match = data.PreClose;
                 stop_stocks.Add(data);
             }
         }
@@ -158,6 +159,7 @@ namespace MarketInfoSys
 
         public static int SimMarketPerSecond = 10;
         public static string SimMarketCode = "600000;s;16.39|600010;s;3.94|600015;s;10.56|600016;s;8.60|600018;s;7.14|600028;s;5.03|600030;s;15.87|600036;s;17.93|600048;s;8.72|601998;s;6.40";
+       
 
         //模拟行情开关
         public static bool SimSwitch { get; set; }
