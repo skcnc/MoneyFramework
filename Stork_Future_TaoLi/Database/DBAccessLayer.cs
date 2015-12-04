@@ -16,12 +16,14 @@ namespace Stork_Future_TaoLi
     public static class DBAccessLayer
     {
         static MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
-       
+        static object ERtableLock = new object();
         //数据库测试标记
         public static bool DBEnable = true;
 
         public static void InsertSGOPEN(object v)
         {
+
+            
             if (DBAccessLayer.DBEnable == false) { return; }
             OPENCREATE open = (OPENCREATE)v;
             //若发现存在相同策略ID的实例未完成，将未完成实例标记为“删除”，替换以当前实例
@@ -206,22 +208,37 @@ namespace Stork_Future_TaoLi
             if (DBAccessLayer.DBEnable == false) { return; }
             if (item == null) return;
 
+
             QueryEntrustOrderStruct_M entrust = (QueryEntrustOrderStruct_M)item;
 
-            ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
+            lock (ERtableLock)
             {
-                ER_GUID = Guid.NewGuid(),
-                ER_ID = entrust.OrderSysID,
-                ER_STRATEGY = entrust.StrategyId,
-                ER_ORDER_TYPE = entrust.SecurityType.ToString(),
-                ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
+                ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
+                {
+                    ER_GUID = Guid.NewGuid(),
+                    ER_ID = entrust.OrderSysID,
+                    ER_STRATEGY = entrust.StrategyId,
+                    ER_ORDER_TYPE = entrust.SecurityType.ToString(),
+                    ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
 
-                ER_CODE = entrust.Code,
-                ER_DIRECTION = entrust.Direction
-            };
+                    ER_CODE = entrust.Code,
+                    ER_DIRECTION = entrust.Direction,
+                    ER_CANCEL_TIME = new DateTime(1900, 1, 1),
+                    ER_COMPLETED = false,
+                    ER_DATE = new DateTime(1900, 1, 1),
+                    ER_FROZEN_AMOUNT = 0,
+                    ER_FROZEN_MONEY = 0,
+                    ER_ORDER_STATUS = string.Empty,
+                    ER_ORDER_TIME = DateTime.Now,
+                    ER_VOLUME_REMAIN = 0,
+                    ER_VOLUME_TOTAL_ORIGINAL = 0,
+                    ER_VOLUME_TRADED = 0,
+                    ER_WITHDRAW_AMOUNT = 0
+                };
 
-            DbEntity.ER_TAOLI_TABLE.Add(record);
-            DbEntity.SaveChanges();
+                DbEntity.ER_TAOLI_TABLE.Add(record);
+                DbEntity.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -294,6 +311,7 @@ namespace Stork_Future_TaoLi
                     DL_LOAD = true
                 };
 
+                Thread.Sleep(1000);
                 DbEntity.DL_TAOLI_TABLE.Add(item);
 
                 DbEntity.SaveChanges();

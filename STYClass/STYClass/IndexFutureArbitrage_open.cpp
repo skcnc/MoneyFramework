@@ -229,12 +229,17 @@ namespace STYClass
 		itor = this->m_SyntheticIndex.m_positionlist.begin();
 		while (itor != this->m_SyntheticIndex.m_positionlist.end())
 		{
+			
+
 			if (itor->bstoped)
+			{
+				itor++;
 				continue;
+			}
 			/*******生成交易报单********/
 			strcpy(m_stockorders[stockordernum].cSecurity_code, itor->sSecurity.cSecurity_code);
 			m_stockorders[stockordernum].cSecuritytype = itor->sSecurity.cSecuritytype;
-			m_stockorders[stockordernum].nSecurity_amount = itor->ntradervolume;
+			m_stockorders[stockordernum].nSecurity_amount = 100;// itor->ntradervolume; //测试
 			m_stockorders[stockordernum].dOrderprice = itor->dlastprice*1.02;   //以2%的溢价限价买入
 			if (m_stockorders[stockordernum].dOrderprice > itor->duplimitprice)
 				m_stockorders[stockordernum].dOrderprice = itor->duplimitprice;  //涨停价
@@ -247,6 +252,8 @@ namespace STYClass
 			m_stockorders[stockordernum].cOrderPriceType = 0; //股票只有限价单  不需要
 			m_stockorders[stockordernum].cTraderdirection = '1'; //买入
 			/**********************/
+
+
 			itor++;
 			stockordernum++;
 		}

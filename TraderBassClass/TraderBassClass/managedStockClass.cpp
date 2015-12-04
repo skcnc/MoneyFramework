@@ -144,9 +144,8 @@ array<managedBargainreturnstruct^>^ managedStockClass::QueryTrader(QueryEntrustO
 	int count = 0;
 	char errmsg[255];
 
-	array<managedBargainreturnstruct^>^ managedRet = gcnew array<managedBargainreturnstruct^>(1);
-
 	bool b = m_cstockTrader->querytrader(*query, ret, count, errmsg);
+	array<managedBargainreturnstruct^>^ managedRet = gcnew array<managedBargainreturnstruct^>(count);
 
 	if (b == true)
 	{

@@ -217,7 +217,10 @@ namespace STYClass
 		while (itor != this->m_SyntheticIndex.m_positionlist.end())
 		{
 			if (itor->bstoped)
+			{
+				itor++;
 				continue;
+			}
 			/*******生成交易报单********/
 			strcpy(m_stockorders[stockordernum].cSecurity_code, itor->sSecurity.cSecurity_code);
 			m_stockorders[stockordernum].cSecuritytype = itor->sSecurity.cSecuritytype;
