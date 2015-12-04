@@ -49,7 +49,7 @@ namespace Stork_Future_TaoLi
 
 
             List<Task> TradeThreads = new List<Task>();
-            log.LogEvent("股票交易控制子线程启动： 初始化交易线程数 :" + futureNum.ToString());
+            log.LogEvent("期货交易控制子线程启动： 初始化交易线程数 :" + futureNum.ToString());
 
             //启动心跳和交易线程
             Task.Factory.StartNew(() => HeartBeatThreadProc((object)futureNum));
