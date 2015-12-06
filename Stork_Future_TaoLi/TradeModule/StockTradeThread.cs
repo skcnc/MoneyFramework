@@ -220,7 +220,7 @@ namespace Stork_Future_TaoLi.TradeModule
                     List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_stock_excuteThread.StockExcuteQueues[_threadNo].Dequeue();
 
 
-                    if (trades.Count == 0)
+                    if (trades == null || trades.Count == 0)
                     {
                         continue;
                     }

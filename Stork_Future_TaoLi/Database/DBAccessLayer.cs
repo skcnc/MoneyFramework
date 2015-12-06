@@ -572,13 +572,27 @@ namespace Stork_Future_TaoLi
         {
             lock(DBChangeLock)
             {
-                try
+                bool lockdb = false;
+                int count = 100;
+                while (lockdb == false)
                 {
-                    DbEntity.SaveChanges();
-                }
-                catch(Exception ex)
-                {
-                    GlobalErrorLog.LogInstance.LogEvent("type = " + type + "\r\n" + ex.InnerException.ToString());
+                    count--;
+                    try
+                    {
+                        DbEntity.SaveChanges();
+                        lockdb = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        GlobalErrorLog.LogInstance.LogEvent("type = " + type + "\r\n" + ex.InnerException.ToString());
+                        Thread.Sleep(10);
+
+                        if(count == 0)
+                        {
+                            GlobalErrorLog.LogInstance.LogEvent("数据库提交100次失败！");
+                            lockdb = true;
+                        }
+                    }
                 }
             }
         }
