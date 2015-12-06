@@ -247,15 +247,16 @@ namespace Stork_Future_TaoLi
                             CTP_CLI.CThostFtdcInputOrderField_M args = new CThostFtdcInputOrderField_M();
 
                             //填写委托参数
+
                             args.BrokerID = BROKER;
                             args.InvestorID = INVESTOR;
                             args.InstrumentID = order.cSecurityCode;
                             args.Direction = Convert.ToByte(order.cTradeDirection);
-                            args.CombOffsetFlag_0 = Convert.ToByte(order.cOffsetFlag);
+                            args.CombOffsetFlag_0 =  Convert.ToByte(order.cOffsetFlag);
                             args.VolumeTotalOriginal = Convert.ToInt16(order.nSecurityAmount);
                             args.LimitPrice = Convert.ToDouble(order.dOrderPrice);
                             args.OrderRef = order.OrderRef.ToString();
-                            args.OrderPriceType = Convert.ToByte(order.cOrderPriceType);
+                            args.OrderPriceType =Convert.ToByte(order.cOrderPriceType);
                             args.CombHedgeFlag_0 = Convert.ToByte('1');
                             args.MinVolume = 1;
                             args.ContingentCondition = Convert.ToByte('1');      

@@ -57,10 +57,11 @@ namespace Stork_Future_TaoLi
         {
             myEntrust = new QueryEntrustOrderStruct_M[nSize];
 
-            for (int i = 0; i < nSize; i++)
+            for (int i = 0; i < mytraderoder.Count(); i++)
             {
+                Thread.Sleep(1000);
+                if (mytraderoder[i] == null) break;
                 myEntrust[i] = new QueryEntrustOrderStruct_M();
-
                 myEntrust[i].Code = mytraderoder[i].SecurityCode;
                 myEntrust[i].Direction = mytraderoder[i].TradeDirection;
                 myEntrust[i].ExchangeID = mytraderoder[i].ExchangeID;
@@ -276,6 +277,28 @@ namespace Stork_Future_TaoLi
 
             DbEntity.DL_TAOLI_TABLE.Remove(_selecteditem6.ToList()[0]);
             DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+
+            CC_TAOLI_TABLE item7 = new CC_TAOLI_TABLE()
+            {
+                CC_CODE = "test",
+                CC_TYPE = "test",
+                CC_AMOUNT = 0,
+                CC_BUY_PRICE = 0,
+                CC_USER = "test"
+            };
+
+            DbEntity.CC_TAOLI_TABLE.Add(item7);
+            DbEntity.SaveChanges();
+
+            Thread.Sleep(10);
+            var _selecteditem7 = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == "test" select item);
+
+            DbEntity.CC_TAOLI_TABLE.Remove(_selecteditem7.ToList()[0]);
+            DbEntity.SaveChanges();
+
+            
         }
     }
     

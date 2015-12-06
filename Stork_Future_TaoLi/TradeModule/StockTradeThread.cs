@@ -220,7 +220,7 @@ namespace Stork_Future_TaoLi.TradeModule
                     List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_stock_excuteThread.StockExcuteQueues[_threadNo].Dequeue();
 
 
-                    if (trades.Count == 0)
+                    if (trades == null || trades.Count == 0)
                     {
                         continue;
                     }
@@ -276,11 +276,11 @@ namespace Stork_Future_TaoLi.TradeModule
                         if (DebugMark == true)
                         {
                             
-                            test.BatchTradeTest(tradesUnit, 15, out entrustUnit, out s);
+                            test.BatchTradeTest(tradesUnit, trades.Count, out entrustUnit, out s);
                         }
                         else
                         {
-                            _classTradeStock.BatchTrade(tradesUnit, 15, entrustUnit, s);
+                            _classTradeStock.BatchTrade(tradesUnit, trades.Count, entrustUnit, s);
                         }
 
                         if (entrustUnit != null && entrustUnit.ToList().Count() > 0)

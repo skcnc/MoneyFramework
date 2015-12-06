@@ -128,11 +128,11 @@
         <EntityContainer Name="MoneyEntityEntities1" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="CC_TAOLI_TABLE" EntityType="MoneyEntityModel.CC_TAOLI_TABLE" />
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="MoneyEntityModel.DL_TAOLI_TABLE" />
-          <EntitySet Name="ER_TAOLI_TABLE" EntityType="MoneyEntityModel.ER_TAOLI_TABLE" />
-          <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" />
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_OPEN_TABLE" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_STATUS_TABLE" />
           <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" />
+          <EntitySet Name="ER_TAOLI_TABLE" EntityType="MoneyEntityModel.ER_TAOLI_TABLE" />
+          <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" />
         </EntityContainer>
         <EntityType Name="CC_TAOLI_TABLE">
           <Key>
@@ -161,38 +161,6 @@
           <Property Name="DL_BARGAIN_TIME" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="DL_NO" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="DL_LOAD" Type="Boolean" />
-        </EntityType>
-        <EntityType Name="ER_TAOLI_TABLE">
-          <Key>
-            <PropertyRef Name="ER_GUID" />
-          </Key>
-          <Property Name="ER_GUID" Type="Guid" Nullable="false" />
-          <Property Name="ER_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ER_STRATEGY" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ER_CODE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ER_ORDER_EXCHANGE_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ER_ORDER_STATUS" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ER_ORDER_TYPE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ER_VOLUME_TOTAL_ORIGINAL" Type="Int32" />
-          <Property Name="ER_VOLUME_TRADED" Type="Int32" />
-          <Property Name="ER_VOLUME_REMAIN" Type="Int32" />
-          <Property Name="ER_WITHDRAW_AMOUNT" Type="Int32" />
-          <Property Name="ER_FROZEN_MONEY" Type="Double" />
-          <Property Name="ER_FROZEN_AMOUNT" Type="Double" />
-          <Property Name="ER_DATE" Type="DateTime" Precision="0" />
-          <Property Name="ER_ORDER_TIME" Type="DateTime" Precision="3" />
-          <Property Name="ER_CANCEL_TIME" Type="DateTime" Precision="3" />
-          <Property Name="ER_COMPLETED" Type="Boolean" />
-          <Property Name="ER_DIRECTION" Type="Int32" />
-        </EntityType>
-        <EntityType Name="OL_TAOLI_LIST_TABLE">
-          <Key>
-            <PropertyRef Name="OL_GUID" />
-          </Key>
-          <Property Name="OL_GUID" Type="Guid" Nullable="false" />
-          <Property Name="SG_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="OL_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="OL_TIME" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="SG_TAOLI_OPEN_TABLE">
           <Key>
@@ -241,6 +209,38 @@
           <Property Name="SG_CREATE_TIME" Type="DateTime" Precision="3" />
           <Property Name="SG_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="ER_TAOLI_TABLE">
+          <Key>
+            <PropertyRef Name="ER_GUID" />
+          </Key>
+          <Property Name="ER_GUID" Type="Guid" Nullable="false" />
+          <Property Name="ER_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_STRATEGY" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_CODE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_ORDER_EXCHANGE_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_ORDER_STATUS" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_ORDER_TYPE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_VOLUME_TOTAL_ORIGINAL" Type="Int32" />
+          <Property Name="ER_VOLUME_TRADED" Type="Int32" />
+          <Property Name="ER_VOLUME_REMAIN" Type="Int32" />
+          <Property Name="ER_WITHDRAW_AMOUNT" Type="Int32" />
+          <Property Name="ER_FROZEN_MONEY" Type="Double" />
+          <Property Name="ER_FROZEN_AMOUNT" Type="Double" />
+          <Property Name="ER_DATE" Type="DateTime" Precision="0" />
+          <Property Name="ER_ORDER_TIME" Type="DateTime" Precision="3" />
+          <Property Name="ER_CANCEL_TIME" Type="DateTime" Precision="3" />
+          <Property Name="ER_COMPLETED" Type="Boolean" />
+          <Property Name="ER_DIRECTION" Type="Int32" />
+        </EntityType>
+        <EntityType Name="OL_TAOLI_LIST_TABLE">
+          <Key>
+            <PropertyRef Name="OL_GUID" />
+          </Key>
+          <Property Name="OL_GUID" Type="Guid" Nullable="false" />
+          <Property Name="SG_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OL_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="OL_TIME" Type="DateTime" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -274,40 +274,6 @@
                 <ScalarProperty Name="DL_DIRECTION" ColumnName="DL_DIRECTION" />
                 <ScalarProperty Name="DL_STRATEGY" ColumnName="DL_STRATEGY" />
                 <ScalarProperty Name="DL_GUID" ColumnName="DL_GUID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ER_TAOLI_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.ER_TAOLI_TABLE">
-              <MappingFragment StoreEntitySet="ER_TAOLI_TABLE">
-                <ScalarProperty Name="ER_DIRECTION" ColumnName="ER_DIRECTION" />
-                <ScalarProperty Name="ER_COMPLETED" ColumnName="ER_COMPLETED" />
-                <ScalarProperty Name="ER_CANCEL_TIME" ColumnName="ER_CANCEL_TIME" />
-                <ScalarProperty Name="ER_ORDER_TIME" ColumnName="ER_ORDER_TIME" />
-                <ScalarProperty Name="ER_DATE" ColumnName="ER_DATE" />
-                <ScalarProperty Name="ER_FROZEN_AMOUNT" ColumnName="ER_FROZEN_AMOUNT" />
-                <ScalarProperty Name="ER_FROZEN_MONEY" ColumnName="ER_FROZEN_MONEY" />
-                <ScalarProperty Name="ER_WITHDRAW_AMOUNT" ColumnName="ER_WITHDRAW_AMOUNT" />
-                <ScalarProperty Name="ER_VOLUME_REMAIN" ColumnName="ER_VOLUME_REMAIN" />
-                <ScalarProperty Name="ER_VOLUME_TRADED" ColumnName="ER_VOLUME_TRADED" />
-                <ScalarProperty Name="ER_VOLUME_TOTAL_ORIGINAL" ColumnName="ER_VOLUME_TOTAL_ORIGINAL" />
-                <ScalarProperty Name="ER_ORDER_TYPE" ColumnName="ER_ORDER_TYPE" />
-                <ScalarProperty Name="ER_ORDER_STATUS" ColumnName="ER_ORDER_STATUS" />
-                <ScalarProperty Name="ER_ORDER_EXCHANGE_ID" ColumnName="ER_ORDER_EXCHANGE_ID" />
-                <ScalarProperty Name="ER_CODE" ColumnName="ER_CODE" />
-                <ScalarProperty Name="ER_STRATEGY" ColumnName="ER_STRATEGY" />
-                <ScalarProperty Name="ER_ID" ColumnName="ER_ID" />
-                <ScalarProperty Name="ER_GUID" ColumnName="ER_GUID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="OL_TAOLI_LIST_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.OL_TAOLI_LIST_TABLE">
-              <MappingFragment StoreEntitySet="OL_TAOLI_LIST_TABLE">
-                <ScalarProperty Name="OL_TIME" ColumnName="OL_TIME" />
-                <ScalarProperty Name="OL_LIST" ColumnName="OL_LIST" />
-                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
-                <ScalarProperty Name="OL_GUID" ColumnName="OL_GUID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -358,6 +324,40 @@
                 <ScalarProperty Name="SG_OPEN_ID" ColumnName="SG_OPEN_ID" />
                 <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
                 <ScalarProperty Name="SG_GUID" ColumnName="SG_GUID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ER_TAOLI_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.ER_TAOLI_TABLE">
+              <MappingFragment StoreEntitySet="ER_TAOLI_TABLE">
+                <ScalarProperty Name="ER_DIRECTION" ColumnName="ER_DIRECTION" />
+                <ScalarProperty Name="ER_COMPLETED" ColumnName="ER_COMPLETED" />
+                <ScalarProperty Name="ER_CANCEL_TIME" ColumnName="ER_CANCEL_TIME" />
+                <ScalarProperty Name="ER_ORDER_TIME" ColumnName="ER_ORDER_TIME" />
+                <ScalarProperty Name="ER_DATE" ColumnName="ER_DATE" />
+                <ScalarProperty Name="ER_FROZEN_AMOUNT" ColumnName="ER_FROZEN_AMOUNT" />
+                <ScalarProperty Name="ER_FROZEN_MONEY" ColumnName="ER_FROZEN_MONEY" />
+                <ScalarProperty Name="ER_WITHDRAW_AMOUNT" ColumnName="ER_WITHDRAW_AMOUNT" />
+                <ScalarProperty Name="ER_VOLUME_REMAIN" ColumnName="ER_VOLUME_REMAIN" />
+                <ScalarProperty Name="ER_VOLUME_TRADED" ColumnName="ER_VOLUME_TRADED" />
+                <ScalarProperty Name="ER_VOLUME_TOTAL_ORIGINAL" ColumnName="ER_VOLUME_TOTAL_ORIGINAL" />
+                <ScalarProperty Name="ER_ORDER_TYPE" ColumnName="ER_ORDER_TYPE" />
+                <ScalarProperty Name="ER_ORDER_STATUS" ColumnName="ER_ORDER_STATUS" />
+                <ScalarProperty Name="ER_ORDER_EXCHANGE_ID" ColumnName="ER_ORDER_EXCHANGE_ID" />
+                <ScalarProperty Name="ER_CODE" ColumnName="ER_CODE" />
+                <ScalarProperty Name="ER_STRATEGY" ColumnName="ER_STRATEGY" />
+                <ScalarProperty Name="ER_ID" ColumnName="ER_ID" />
+                <ScalarProperty Name="ER_GUID" ColumnName="ER_GUID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OL_TAOLI_LIST_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.OL_TAOLI_LIST_TABLE">
+              <MappingFragment StoreEntitySet="OL_TAOLI_LIST_TABLE">
+                <ScalarProperty Name="OL_TIME" ColumnName="OL_TIME" />
+                <ScalarProperty Name="OL_LIST" ColumnName="OL_LIST" />
+                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
+                <ScalarProperty Name="OL_GUID" ColumnName="OL_GUID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
