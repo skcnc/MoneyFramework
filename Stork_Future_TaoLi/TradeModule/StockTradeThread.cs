@@ -287,7 +287,10 @@ namespace Stork_Future_TaoLi.TradeModule
                         {
                             foreach (QueryEntrustOrderStruct_M unit in entrustUnit.ToList())
                             {
-                                if (unit.OrderSysID != null && unit.OrderSysID != String.Empty && unit.OrderSysID != "0")
+                                if (unit == null)
+                                    continue;
+
+                                if (unit.OrderSysID != null && unit.OrderSysID != String.Empty && unit.OrderSysID != "0" )
                                 {
                                     entrustorli.Add(unit);
                                 }
@@ -399,9 +402,9 @@ namespace Stork_Future_TaoLi.TradeModule
             _sorder.SecurityType = (unit.cSecurityType.Length != 0) ? (unit.cSecurityType == "S" ? (sbyte)115 : (sbyte)102) : (sbyte)115;
 
 
-            if (unit.cTradeDirection == "0") { _sorder.TradeDirection = (sbyte)Convert.ToChar("1"); }
-            else if (unit.cTradeDirection == "1") { _sorder.TradeDirection = (sbyte)Convert.ToChar("2"); }
-            else { _sorder.TradeDirection = (sbyte)(Convert.ToSByte("1")); }
+            if (unit.cTradeDirection == "0") { _sorder.TradeDirection = 49; }
+            else if (unit.cTradeDirection == "1") { _sorder.TradeDirection = 50; }
+            else { _sorder.TradeDirection = 49; }
 
 
 
