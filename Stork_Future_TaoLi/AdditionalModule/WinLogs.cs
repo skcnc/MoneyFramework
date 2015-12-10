@@ -91,6 +91,34 @@ namespace Stork_Future_TaoLi
 
     }
 
+
+    class MarketDelayLog
+    {
+        //private static LogWirter errLog = new LogWirter();
+
+        MarketDelayLog()
+        {
+            errLog.EventSourceName = "行情延时日志";
+            errLog.EventLogType = System.Diagnostics.EventLogEntryType.Information;
+            errLog.EventLogID = 60010;
+        }
+
+        private static LogWirter errLog = new LogWirter();
+
+        public static LogWirter LogInstance
+        {
+            get
+            {
+
+                if (errLog == null)
+                    errLog = new LogWirter();
+
+                return errLog;
+            }
+        }
+
+    }
+
     class GlobalHeartBeat
     {
         static DateTime lastHeartBeat = DateTime.Now;
@@ -119,6 +147,8 @@ namespace Stork_Future_TaoLi
 
 
     }
+
+
 
    
 }
