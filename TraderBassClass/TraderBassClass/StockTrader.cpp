@@ -225,7 +225,7 @@ bool CStockTrader::Batchstocktrader(const Traderorderstruct * mytraderoder, cons
 	{
 		pReqMsg->detail_buf[i].bs_type = mytraderoder[i].cTraderdirection;
 		strcpy(pReqMsg->detail_buf[i].security_code, mytraderoder[i].cSecurity_code);//股票代码
-		pReqMsg->detail_buf[i].price = (long)((mytraderoder[i].dOrderprice) * 1000);	// 			
+		pReqMsg->detail_buf[i].price = ((long)((mytraderoder[i].dOrderprice) * 100))*10;	// 			
 		pReqMsg->detail_buf[i].stock_amount = mytraderoder[i].nSecurity_amount;//交易数量		
 	}
 	pReqMsg->entrust_length = nSize;//报单条目数

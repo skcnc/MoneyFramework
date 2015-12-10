@@ -68,26 +68,28 @@ bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntr
 bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<QueryEntrustOrderStruct_M^>^ myEntrust, String^ Errormsg)
 {
 	bool rt_value = false;
-	Traderorderstruct** trades = new Traderorderstruct*[nSize];
-	QueryEntrustorderstruct* query = new QueryEntrustorderstruct[nSize];
+	Traderorderstruct* trades = new Traderorderstruct[nSize];
+	Traderorderstruct* trade_tmp = new Traderorderstruct();
+	QueryEntrustorderstruct* query = 0;
 
-	for (int i = 0; i < nSize; i++){
+	/*for (int i = 0; i < nSize; i++){
 		trades[i] = new Traderorderstruct();
-	}
+	}*/
 	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
 	int num = 0;
 	char err[255];
 	for (int i = 0; i < nSize; i++)
 	{
 		IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(mytraderoder[i]));
-		Marshal::StructureToPtr(mytraderoder, ptr, false);
-		trades[i] = (Traderorderstruct*)(ptr.ToPointer());
+		Marshal::StructureToPtr(mytraderoder[i], ptr, false);
+		trade_tmp = (Traderorderstruct*)(ptr.ToPointer());
 
-		strcpy_s(query[i].cExchangeID, 21, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(myEntrust[i]->ExchangeID));
+		/*strcpy_s(query[i].cExchangeID, 21, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(myEntrust[i]->ExchangeID));
 		strcpy_s(query[i].cOrderSysID, 21, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(myEntrust[i]->OrderSysID));
-		query[i].cSecuritytype = myEntrust[i]->SecurityType;
+		query[i].cSecuritytype = myEntrust[i]->SecurityType;*/
+		memcpy(trades + i, trade_tmp, sizeof(Traderorderstruct));
 	}
-	rt_value = m_cstockTrader->Batchstocktrader(*trades, nSize, &query, num, err);
+	rt_value = m_cstockTrader->Batchstocktrader(trades, nSize, &query, num, err);
 
 
 	return rt_value;
