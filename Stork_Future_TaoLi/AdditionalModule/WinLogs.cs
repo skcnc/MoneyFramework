@@ -103,7 +103,12 @@ namespace Stork_Future_TaoLi
             errLog.EventLogID = 60010;
         }
 
-        private static LogWirter errLog = new LogWirter();
+        private static LogWirter errLog = new LogWirter()
+        {
+            EventLogID = 60010,
+            EventLogType = System.Diagnostics.EventLogEntryType.Information,
+            EventSourceName = "行情延时日志"
+        };
 
         public static LogWirter LogInstance
         {
@@ -111,7 +116,11 @@ namespace Stork_Future_TaoLi
             {
 
                 if (errLog == null)
-                    errLog = new LogWirter();
+                    errLog = new LogWirter() {
+                        EventLogID = 60010,
+                        EventLogType = System.Diagnostics.EventLogEntryType.Information,
+                        EventSourceName = "行情延时日志"
+                    };
 
                 return errLog;
             }

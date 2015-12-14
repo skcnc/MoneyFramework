@@ -180,6 +180,8 @@ $('#category_panel_open').delegate('button.allow_strategy', 'click', function (e
         InputJson: JSONSTRING
     }, function (data, status) {
         alert("数据：" + data + "\n状态：" + status);
+
+        localStorage.setItem(_id + ":COMPLETE", "TRUE");
     })
 })
 
@@ -233,7 +235,10 @@ $('#category_panel_close').delegate('button.allow_strategy', 'click', function (
         InputJson: JSONSTRING
     }, function (data, status) {
         alert("数据：" + data + "\n状态：" + status);
+        localStorage[_id + ":COMPLETE"] = "TRUE";
     })
+
+
 })
 
 //删除开仓策略
@@ -256,8 +261,12 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
 
     var _allow =  localStorage[_id + ":ALLOW"];
     var _run = localStorage[_id + ":RUN"];
+    var _complete = localStorage[_id + ":COMPLETE"];
 
-    if(_allow + _run > 0)
+    if (_complete == "TRUE") {
+
+    }
+    else if(_allow + _run > 0)
     {
         alert("交易运行时无法删除！");
         return;
@@ -292,6 +301,7 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
         InputJson: JSONSTRING
     }, function (data, status) {
         alert("数据：" + data + "\n状态：" + status);
+
     })
 
     //删除对应的键值
@@ -306,6 +316,7 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
     localStorage.removeItem(_id + ":INDEX");
     localStorage.removeItem(_id + ":RUN");
     localStorage.removeItem(_id + ":ALLOW");
+    localStorage.removeItem(_id + ":COMPLETE");
 
     var chat = $.connection.proxyHub;
     chat.delete();
@@ -325,8 +336,10 @@ $('#category_panel_close').delegate('button.delete_strategy', 'click', function 
 
     var _allow = localStorage[_id + ":ALLOW"];
     var _run = localStorage[_id + ":RUN"];
+    var _complete = localStorage[_id + ":COMPLETE"];
 
-    if (_allow + _run > 0) {
+    if(_complete == "TRUE"){}
+    else if (_allow + _run > 0) {
         alert("交易运行时无法删除！");
         return;
     }
@@ -375,6 +388,7 @@ $('#category_panel_close').delegate('button.delete_strategy', 'click', function 
     localStorage.removeItem(_id + ":BASIS");
     localStorage.removeItem(_id + ":RUN");
     localStorage.removeItem(_id + ":ALLOW");
+    localStorage.removeItem(_id + ":COMPLETE");
 
     var chat = $.connection.proxyHub;
     chat.delete();
@@ -436,6 +450,7 @@ window.onload = function (e) {
         if (Modernizr.localstorage) {
             localStorage.setItem("IDCollection", "");
             UpdateOPENStrategies(false);
+            $('#userName').text(localStorage["USERNAME"]);
         }
         else {
             alert("您当前使用的浏览器版本过低，网站功能将被限制！");
@@ -673,6 +688,7 @@ function UpdateOPENStrategies(changeFlag)
                 exist += id + ";"
                 localStorage.setItem("IDCollection", exist);
                 localStorage.setItem(id + ":CHANGE", 0);
+                localStorage.setItem(id + ":COMPLETE", "FALSE");
                 var chat = $.connection.proxyHub;
                 chat.join(id);
             }
@@ -813,7 +829,7 @@ function UpdateOPENStrategies(changeFlag)
                 exist += id + ";"
                 localStorage.setItem("IDCollection", exist);
                 localStorage.setItem(id + ":CHANGE", 0);
-
+                localStorage.setItem(id + ":COMPLETE", "FALSE");
                 var chat = $.connection.proxyHub;
                 chat.join(id);
             }
