@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "SyntheticIndex.h"
-
+#include "TimeUtil.h"
 bool operator < (const securityindex & infor1,const securityindex &infor2) 
 	{
 		if (infor1.cSecuritytype == infor2.cSecuritytype)
@@ -90,13 +90,14 @@ double  CSyntheticIndex::getrealsellgain()
 
 bool    CSyntheticIndex::isupdated()
 {
-
+	
 	 map<securityindex ,CSecurity * >::iterator itor;
 	 itor=stockDb.begin();
 	 while(itor!=stockDb.end())
        { 
 		   if(!itor->second->isupdated())
 		       return  false;
+		   itor++;
        } 
  
     return true;

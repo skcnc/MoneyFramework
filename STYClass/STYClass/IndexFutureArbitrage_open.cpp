@@ -128,12 +128,15 @@ namespace STYClass
 
 	bool CIndexFutureArbitrage_open::calculateSimTradeStrikeAndDelta() //计算模拟指数，交易指数，调整基差
 	{
+		
 		m_SyntheticIndex.updatepositioninfor();   //更新position文件，便与生产traderlist文件
-
+		
 		dTotalStocksMarketValue = m_SyntheticIndex.getrealmarketvalue(stopmarketvalue);  //获取position的市值
+		
 		this->dSimIndex = m_SyntheticIndex.getSimIndex();
 		this->dSimerrorPre = (this->dSimIndex - m_index.getlastprice()) / m_index.getlastprice();
 		this->dSimtraderPre = dTotalStocksMarketValue / (nHands *m_index.getlastprice()*m_future.getfuturetime());
+	
 		dOrgDeltaPre = (m_future.getlastprice() - m_index.getlastprice()) / m_index.getlastprice();  //原始基差 
 
 		dTotalStockBuyStrike = m_SyntheticIndex.getrealbuycost() - dTotalStocksMarketValue;  //冲击
@@ -142,15 +145,19 @@ namespace STYClass
 		this->dPositiveDelta = m_future.getlastprice()   //调整后的基差
 			- this->dSimIndex
 			- (this->dTotalStockBuyStrike + this->dFutureSellStrike) / (nHands*m_future.getfuturetime());
+	
 		isOpenPointReached();
+
 		return  true;
 	}
 
 	bool CIndexFutureArbitrage_open::isOpenPointReached()
 	{
+		int nCurrentTime = CTimeUtil::getIntTime();
 		if (!this->m_SyntheticIndex.isupdated() || !this->m_future.isupdated()) //行情
 		{
 			strcpy(this->statusmsg, "行情有问题");
+			int nCurrentTime6 = CTimeUtil::getIntTime();
 			return false;
 		}
 		//if (abs(this->dSimerrorPre) > 0.002)  //模拟误差大于千分之2  

@@ -461,15 +461,28 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     //策略实例运算
                     List<managedMarketInforStruct> infos = new List<managedMarketInforStruct>();
+                    List<MarketData> dataList = new List<MarketData>();
+
+                    
                     while (_marketQueue.Count > 0)
                     {
-                        MarketData data = (MarketData)DeQueueInfo();
+                        MarketData d = (MarketData)DeQueueInfo();
 
-                        if (data == null)
+
+                        if (d == null)
                         {
                             Thread.Sleep(10);
                             continue;
                         }
+
+                        dataList.Add(d);
+                    }
+
+                    
+                    
+                    foreach(MarketData data in dataList)
+                    {
+                        
                         managedMarketInforStruct info = new managedMarketInforStruct();
 
                         info.dAskPrice = new double[10];
@@ -529,7 +542,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         }
                         info.LastUpdateTime = Int32.Parse(DateTime.Now.Hour.ToString().PadLeft(2, '0') + DateTime.Now.Minute.ToString().PadLeft(2, '0') + DateTime.Now.Second.ToString().PadLeft(2, '0'));
 
-
+                        //MarketDelayCalculation.cal(data.Time, 3);
                         if (data.Status == 68 || data.Status == 66)
                         {
                             info.bstoped = true;
@@ -543,13 +556,25 @@ namespace Stork_Future_TaoLi.StrategyModule
                         infos.Add(info);
                     }
 
+
+                    
+                    
+
                     if(infos.Count > 0)
                     {
                         if (Type == "OPEN")
                         {
+                            DateTime d1 = DateTime.Now;
+
                             m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
+
+                            GlobalErrorLog.LogInstance.LogEvent("Round1 : " + ((DateTime.Now.Minute - d1.Minute) * 60 + (DateTime.Now.Second - d1.Second)).ToString());
+                            d1 = DateTime.Now;
+
                             m_strategy_open.calculateSimTradeStrikeAndDelta();
-                           
+
+                            GlobalErrorLog.LogInstance.LogEvent("Round2 : " + ((DateTime.Now.Minute - d1.Minute) * 60 + (DateTime.Now.Second - d1.Second)).ToString());
+
                         }
                         else
                         {
@@ -558,8 +583,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         }
                     }
                     else { continue; }
-
-                   
+                    
                 }
 
                 

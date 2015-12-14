@@ -110,7 +110,7 @@ namespace Stork_Future_TaoLi
                     //发现行情有变动，更新本地股市
                     //注册hash键
 
-                    MarketDelayCalculation.cal(info.Time);
+                    //MarketDelayCalculation.cal(info.Time);
 
                     if (StockTable.ContainsKey(info.Code))
                     {
