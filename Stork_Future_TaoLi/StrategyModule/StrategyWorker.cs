@@ -444,6 +444,12 @@ namespace Stork_Future_TaoLi.StrategyModule
                 
                 Thread.Sleep(10); 
             }
+
+            if (DBAccessLayer.DBEnable)
+            {
+                DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 1);
+            }
+
             while (!breaklabel)
             { 
                 /****
@@ -453,6 +459,14 @@ namespace Stork_Future_TaoLi.StrategyModule
                  * 3. 判断运行条件
                  * 4. 生成交易列表
                  * ****/
+
+                if (Status == 1)
+                {
+                    if (DBAccessLayer.DBEnable)
+                    {
+                        DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 2);
+                    }
+                }
                 if(bRun)
                 {
                     //标记线程状态为正在运行
@@ -606,6 +620,8 @@ namespace Stork_Future_TaoLi.StrategyModule
                     // 生成交易列表
                     if (_reached)
                     {
+                        
+
                         List<managedTraderorderstruct> ol = (Type == "OPEN") ? m_strategy_open.getTradeList().ToList() : m_strategy_close.getTradeList().ToList();
 
 
@@ -645,6 +661,11 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                         //下单到交易预处理模块
                         queue_prd_trade.GetQueue().Enqueue((object)orderli);
+
+                        if (DBAccessLayer.DBEnable)
+                        {
+                            DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 3);
+                        }
 
                         // 列表只会生成一次
                         breaklabel = true;

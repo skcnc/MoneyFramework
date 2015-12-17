@@ -61,7 +61,7 @@
             this.tbip.Name = "tbip";
             this.tbip.Size = new System.Drawing.Size(118, 21);
             this.tbip.TabIndex = 1;
-            this.tbip.Text = "114.80.154.34";
+            this.tbip.Text = "202.96.155.225";
             // 
             // tbport
             // 
@@ -69,7 +69,7 @@
             this.tbport.Name = "tbport";
             this.tbport.Size = new System.Drawing.Size(100, 21);
             this.tbport.TabIndex = 3;
-            this.tbport.Text = "6231";
+            this.tbport.Text = "6221";
             // 
             // label2
             // 

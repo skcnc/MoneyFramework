@@ -332,7 +332,7 @@ namespace Stork_Future_TaoLi
         public static void UpdateStrategyStatusRecord(string str_id , int status)
         {
             if (DBAccessLayer.DBEnable == false) return;
-            if(status == 0)
+            if(status == 1)
             {
                 SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
                 {
@@ -360,6 +360,8 @@ namespace Stork_Future_TaoLi
 
                     _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
                 }
+
+                if (_rec.Count() == 0) return;
 
                 var _unit = _rec.ToList()[0];
 

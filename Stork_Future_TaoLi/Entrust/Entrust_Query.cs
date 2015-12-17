@@ -122,11 +122,6 @@ namespace Stork_Future_TaoLi.Entrust
                     TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
 
 
-                    //if ((ret.cOrderStatus.ToString() != ((int)(EntrustStatus.Dealed)).ToString()) && (!(ret.cOrderStatus.ToString() == ((int)EntrustStatus.Canceled).ToString() && ret.nVolumeTotal == 0)))
-                    //{
-                    //    queue_query_entrust.GetQueue().Enqueue((object)item);
-                    //    continue;
-                    //}
 
                     //目前仅考虑 1对1 返回的情况，不考虑出现1对多 ，类似基金交易的情况
                     //将委托变动返回更新数据库
