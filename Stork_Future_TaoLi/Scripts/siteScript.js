@@ -1,4 +1,6 @@
 ﻿
+
+
 //展开开仓策略细节
 $('#category_panel_open').delegate('button.displaystrategy', 'click', function (e) {
     var _list = $(this).parents("div.strategycategory_open").children('ul.list-group:eq(0)');
@@ -1001,72 +1003,7 @@ $('#btnSubmit_open').click(function (e) {
     alert('参数已写入，请刷新控制页面')
 })
 
-//平仓提交
-$('#btnSubmit_close').click(function (e) {
 
-    var ct = $.trim($('#ct_value')[0].value);
-    var hd = $.trim($('#hd_value')[0].value);
-    var sp = $.trim($('#sp_value')[0].value);
-    var coe = $('#coe_value')[0].value;
-    var sd = $('#sd_value')[0].value;
-    var sa = $('#sa_value')[0].value;
-    var pe = $('#pe_value')[0].value;
-    var basis = $('#basis_value')[0].value;
-
-    var buylist = $('#buylist')[0].value;
-    var id = $('#strategyID')[0].innerText;
-
-    var userName = $('#userName')[0].innerText;
-    var currentDate = new Date();
-
-    if (id == "NEW") {
-        id = userName + ":" + currentDate.getTime();
-    }
-
-
-    if (Modernizr.localstorage) {
-        //window.localStorage is available!
-        //0 : 开仓  1： 平仓 
-        localStorage.setItem(id + ":TYPE", 1);
-        //日期，只取天
-        localStorage.setItem(id + ":DT", currentDate.getDate());
-        //持仓列表
-        localStorage.setItem(id + ":BUYLIST", buylist);
-        //期货合约
-        localStorage.setItem(id + ":CT", ct);
-        //手数
-        localStorage.setItem(id + ":HD", hd);
-
-        //空头点位
-        localStorage.setItem(id + ":SP", sp);
-        //股票成本
-        localStorage.setItem(id + ":COE", coe);
-        //股票分红
-        localStorage.setItem(id + ":SD", sd);
-        //股票配股
-        localStorage.setItem(id + ":SA", sa);
-        //预期收益
-        localStorage.setItem(id + ":PE", pe);
-        //开仓基差
-        localStorage.setItem(id + ":BASIS", basis);
-
-        localStorage.setItem(id + ":CHANGE", 1);
-
-        if (localStorage[id + ":RUN"] == undefined) {
-            localStorage.setItem(id + ":RUN", 0);
-        }
-
-        if (localStorage[id + ":ALLOW"] == undefined) localStorage.setItem(id + ":ALLOW", 0);
-
-
-    } else {
-        // no native support for HTML5 storage :(
-        // maybe try dojox.storage or a third-party solution
-        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-        return;
-    }
-    alert('参数已写入，请刷新控制页面')
-})
 
 $('input[name="RadioType"]').change(function (e) {
     var type = $('input[name="RadioType"]:checked').val();
@@ -1159,6 +1096,79 @@ function GetHeader(headMark) {
     else if (headMark == "CLOSEALLOW") { return "B4"; }
     else if (headMark == "CLOSEDELETE") { return "B5";}
 }
+
+
+//平仓提交
+$('#btnSubmit_close').click(function (e) {
+
+
+
+    var ct = $.trim($('#ct_value')[0].value);
+    var hd = $.trim($('#hd_value')[0].value);
+    var sp = $.trim($('#sp_value')[0].value);
+    var coe = $('#coe_value')[0].value;
+    var sd = $('#sd_value')[0].value;
+    var sa = $('#sa_value')[0].value;
+    var pe = $('#pe_value')[0].value;
+    var basis = $('#basis_value')[0].value;
+
+    var buylist = $('#buylist')[0].value;
+    var id = $('#strategyID')[0].innerText;
+
+    var userName = $('#userName')[0].innerText;
+    var currentDate = new Date();
+
+    if (id == "NEW") {
+        id = userName + ":" + currentDate.getTime();
+    }
+
+
+    if (Modernizr.localstorage) {
+        //window.localStorage is available!
+        //0 : 开仓  1： 平仓 
+        localStorage.setItem(id + ":TYPE", 1);
+        //日期，只取天
+        localStorage.setItem(id + ":DT", currentDate.getDate());
+        //持仓列表
+        localStorage.setItem(id + ":BUYLIST", buylist);
+        //期货合约
+        localStorage.setItem(id + ":CT", ct);
+        //手数
+        localStorage.setItem(id + ":HD", hd);
+
+        //空头点位
+        localStorage.setItem(id + ":SP", sp);
+        //股票成本
+        localStorage.setItem(id + ":COE", coe);
+        //股票分红
+        localStorage.setItem(id + ":SD", sd);
+        //股票配股
+        localStorage.setItem(id + ":SA", sa);
+        //预期收益
+        localStorage.setItem(id + ":PE", pe);
+        //开仓基差
+        localStorage.setItem(id + ":BASIS", basis);
+
+        localStorage.setItem(id + ":CHANGE", 1);
+
+        if (localStorage[id + ":RUN"] == undefined) {
+            localStorage.setItem(id + ":RUN", 0);
+        }
+
+        if (localStorage[id + ":ALLOW"] == undefined) localStorage.setItem(id + ":ALLOW", 0);
+
+
+    } else {
+        // no native support for HTML5 storage :(
+        // maybe try dojox.storage or a third-party solution
+        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+        return;
+    }
+    alert('参数已写入，请刷新控制页面')
+})
+
+
+
 
 
 

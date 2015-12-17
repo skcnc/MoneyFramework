@@ -41,7 +41,6 @@ namespace Stork_Future_TaoLi
             FutureMonitor FM = new FutureMonitor();
             FM.Main();
 
-
             StrategyMonitorClass strategyMonitor = new StrategyMonitorClass();
             strategyMonitor.Run();
 

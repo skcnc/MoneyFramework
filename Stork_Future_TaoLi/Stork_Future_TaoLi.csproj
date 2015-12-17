@@ -257,6 +257,7 @@
     </Compile>
     <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
+    <Compile Include="Hubs\StrategyInfoHub.cs" />
     <Compile Include="Hubs\TradeMonitorHub.cs" />
     <Compile Include="Queues\queue_future_excuteThread.cs" />
     <Compile Include="TradeModule\FutureMonitor.cs" />
