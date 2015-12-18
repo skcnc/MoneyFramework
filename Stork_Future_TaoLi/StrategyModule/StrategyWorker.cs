@@ -665,6 +665,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         if (DBAccessLayer.DBEnable)
                         {
                             DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 3);
+                            DBAccessLayer.UpdateSGOPENStatus(StrategyInstanceID, 3);
                         }
 
                         // 列表只会生成一次
@@ -679,6 +680,19 @@ namespace Stork_Future_TaoLi.StrategyModule
                 if (Type == "OPEN")
                 {
                     string status = m_strategy_open.getshowstatus();
+
+                    List<String> statusLi = status.Split(' ').ToList();
+
+                    status = string.Empty;
+                    
+                    foreach (string i in statusLi)
+                    {
+                        if (i.Trim() != string.Empty)
+                        {
+                            status += (i + "&");
+                        }
+                    }
+
                     PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
                 }
                 else

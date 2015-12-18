@@ -17,7 +17,7 @@ namespace MCStockLib
 
 		bool Init(managedLogin^ mylogininfor,String^ Errormsg);
 		bool SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntrustOrderStruct_M^ myEntrust, String^ Errormsg);
-		bool BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<QueryEntrustOrderStruct_M^>^ myEntrust, String^ Errormsg);
+		array<QueryEntrustOrderStruct_M^>^ BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, String^ Errormsg);
 		bool getConnectStatus();
 		bool getWorkStatus();
 		void HeartBeat();

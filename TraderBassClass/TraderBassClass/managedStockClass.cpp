@@ -65,16 +65,13 @@ bool managedStockClass::SingleTrade(TradeOrderStruct_M^  mytraderoder, QueryEntr
 }
 
 //批量交易： 大于单支股票走该接口
-bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, array<QueryEntrustOrderStruct_M^>^ myEntrust, String^ Errormsg)
+array<QueryEntrustOrderStruct_M^>^ managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int nSize, String^ Errormsg)
 {
-	bool rt_value = false;
 	Traderorderstruct* trades = new Traderorderstruct[nSize];
 	Traderorderstruct* trade_tmp = new Traderorderstruct();
 	QueryEntrustorderstruct* query = 0;
 
-	/*for (int i = 0; i < nSize; i++){
-		trades[i] = new Traderorderstruct();
-	}*/
+
 	char* errmsg = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(Errormsg);
 	int num = 0;
 	char err[255];
@@ -89,10 +86,23 @@ bool managedStockClass::BatchTrade(array<TradeOrderStruct_M^>^ mytraderoder, int
 		query[i].cSecuritytype = myEntrust[i]->SecurityType;*/
 		memcpy(trades + i, trade_tmp, sizeof(Traderorderstruct));
 	}
-	rt_value = m_cstockTrader->Batchstocktrader(trades, nSize, &query, num, err);
+	m_cstockTrader->Batchstocktrader(trades, nSize, &query, num, err);
 
+	array<QueryEntrustOrderStruct_M^>^ myEntrust = gcnew array<QueryEntrustOrderStruct_M^>(num);
 
-	return rt_value;
+	for (int i = 0; i < num; i++)
+	{
+		myEntrust[i] = gcnew QueryEntrustOrderStruct_M();
+		myEntrust[i]->Code = gcnew String(query[i].cCode);
+		myEntrust[i]->Direction = query[i].Direction;
+		myEntrust[i]->ExchangeID = gcnew String(query[i].cExchangeID);
+		myEntrust[i]->OrderSysID = gcnew String(query[i].cOrderSysID);
+		myEntrust[i]->StrategyId = gcnew String(query[i].cStrategyId);
+
+	}
+	
+
+	return myEntrust;
 }
 
 //查询交易回报

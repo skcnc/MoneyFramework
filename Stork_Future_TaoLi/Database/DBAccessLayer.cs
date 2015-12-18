@@ -87,6 +87,26 @@ namespace Stork_Future_TaoLi
             else return true;
         }
 
+        /// <summary>
+        /// 修改开仓记录状态
+        /// </summary>
+        /// <param name="ID">策略ID</param>
+        /// <param name="status">状态</param>
+        public static void UpdateSGOPENStatus(string ID, int status)
+        {
+            if (DBAccessLayer.DBEnable)
+            {
+                var selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == ID select item);
+
+                if (selectedItem.Count() == 0) return;
+                else
+                {
+                    selectedItem.ToList()[0].SG_STATUS = status;
+                    Dbsavechage("UpdateSGOPENStatus");
+                }
+            }
+        }
+
         public static void InsertSGCLOSE(object v)
         {
             if (DBAccessLayer.DBEnable == false) { return; }
@@ -380,10 +400,8 @@ namespace Stork_Future_TaoLi
                         _unit.SG_STATUS = 0;
                         break;
                 }
-
-                Dbsavechage("UpdateStrategyStatusRecord");
-                
             }
+            Dbsavechage("UpdateStrategyStatusRecord");
         }
 
         /// <summary>
@@ -615,11 +633,11 @@ namespace Stork_Future_TaoLi
             int index = Convert.ToInt32(info.INDEX);
 
 
-            var _records = (from item in DbEntity.SG_TAOLI_OPEN_TABLE 
-                            where ((item.SG_STATUS == 3)&&
-                            (item.SG_OP_POINT == op )&&
+            var _records = (from item in DbEntity.SG_TAOLI_OPEN_TABLE
+                            where ((item.SG_STATUS == 3) &&
+                            (item.SG_OP_POINT == op) &&
                             (item.SG_Contract == contract) &&
-                            (item.SG_INDEX == index)&&
+                            (item.SG_INDEX == index) &&
                             (item.SG_USER == info.basic.USER))
                             select item);
 
