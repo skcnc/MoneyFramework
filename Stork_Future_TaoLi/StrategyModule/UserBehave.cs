@@ -336,4 +336,20 @@ namespace Stork_Future_TaoLi
         public int OrderRef { get; set; }
     }
 
+
+
+    /// <summary>
+    /// 平仓实例匹配
+    /// </summary>
+    public class SEARCHSTRATEGY
+    {
+        public Basic basic { get; set; }
+
+        public String CONTRACT { get; set; }
+
+        public String OPENPOINT { get; set; }
+
+        public String INDEX { get; set; }
+    }
+
 }

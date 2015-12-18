@@ -13,6 +13,12 @@ namespace Stork_Future_TaoLi.Hubs
         //    // Call the addNewMessageToPage method to update clients.
         //    Clients.All.updateMarket(name, value);
         //}
+
+        public void aa()
+        {
+            int a = 0;
+            a = 5;
+        }
     }
 
     public class MarketMonitor

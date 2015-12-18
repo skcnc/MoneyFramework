@@ -5,6 +5,7 @@ using System.Web;
 using Stork_Future_TaoLi.Database;
 using MCStockLib;
 using System.Threading;
+using Newtonsoft.Json;
 
 
 namespace Stork_Future_TaoLi
@@ -569,6 +570,79 @@ namespace Stork_Future_TaoLi
             
         }
 
+        public static List<String> GetDealList(string strId)
+        {
+            if (DBAccessLayer.DBEnable)
+            {
+                var _record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_STRATEGY == strId select item);
+
+                if(_record == null || _record.Count() == 0)
+                {
+                    return null;
+                }
+
+                List<String> _li = new List<string>();
+
+                foreach(DL_TAOLI_TABLE i in _record.ToList())
+                {
+                    _li.Add(i.DL_CODE + ";" + i.DL_TYPE + ";" + i.DL_STOCK_AMOUNT);
+                }
+
+
+                return _li;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取匹配策略ID
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public static string SearchStrategy(SEARCHSTRATEGY info)
+        {
+            if (DBAccessLayer.DBEnable == false) return string.Empty;
+
+
+            String SG_IDs = String.Empty;
+
+
+            double op = Convert.ToDouble(info.OPENPOINT);
+            string contract = info.CONTRACT.Trim();
+            int index = Convert.ToInt32(info.INDEX);
+
+
+            var _records = (from item in DbEntity.SG_TAOLI_OPEN_TABLE 
+                            where ((item.SG_STATUS == 3)&&
+                            (item.SG_OP_POINT == op )&&
+                            (item.SG_Contract == contract) &&
+                            (item.SG_INDEX == index)&&
+                            (item.SG_USER == info.basic.USER))
+                            select item);
+
+            if(_records != null && _records.Count() == 0)
+            {
+                return string.Empty;
+            }
+
+            if (_records.Count() > 0)
+            {
+                foreach(var item in _records.ToList())
+                {
+                    SG_IDs += (item.SG_ID + ";");
+                }
+            }
+            else
+            {
+                SG_IDs = _records.ToList()[0] + ";";
+            }
+
+            return SG_IDs;
+
+        }
 
         public static void Dbsavechage(string type)
         {
