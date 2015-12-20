@@ -319,6 +319,7 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
     localStorage.removeItem(_id + ":RUN");
     localStorage.removeItem(_id + ":ALLOW");
     localStorage.removeItem(_id + ":COMPLETE");
+    localStorage.removeItem(_id + ":OPENSTRID"); 
 
     var chat = $.connection.proxyHub;
     chat.delete();
@@ -391,6 +392,7 @@ $('#category_panel_close').delegate('button.delete_strategy', 'click', function 
     localStorage.removeItem(_id + ":RUN");
     localStorage.removeItem(_id + ":ALLOW");
     localStorage.removeItem(_id + ":COMPLETE");
+    localStorage.removeItem(_id + ":OPENSTRID");
 
     var chat = $.connection.proxyHub;
     chat.delete();
@@ -452,7 +454,7 @@ window.onload = function (e) {
         if (Modernizr.localstorage) {
             localStorage.setItem("IDCollection", "");
             UpdateOPENStrategies(false);
-            $('#userName').text(localStorage["USERNAME"]);
+            $('#userName')[0].innerText= localStorage["USERNAME"];
         }
         else {
             alert("您当前使用的浏览器版本过低，网站功能将被限制！");
@@ -743,6 +745,7 @@ function UpdateOPENStrategies(changeFlag)
             var sa = localStorage[id + ":SA"];
             var pe = localStorage[id + ":PE"];
             var basis = localStorage[id + ":BASIS"];
+            var openstrid = localStorage[id + ":OPENSTRID"];
 
             if (sp == "" || coe == "" || sd == "" || sa == "" || pe == "" || basis == "") continue;
 
@@ -810,7 +813,7 @@ function UpdateOPENStrategies(changeFlag)
             }
 
             var _ul = $('div.strategycategory_close[name=' + _name + ']');
-            var tt = _ul.find('li.list-group-item[sp_value=' + op + '][coe_value=' + hd + '][sd_value=' + sd + '][sa_value=' + sa + '][pe_value=' + pe + ']');
+            var tt = _ul.find('li.list-group-item[sp_value=' + sp + '][coe_value=' + coe + '][sd_value=' + sd + '][sa_value=' + sa + '][pe_value=' + pe + ']');
             if (tt.length != 0) {
                 continue;
             }
@@ -865,7 +868,8 @@ function UpdateOPENStrategies(changeFlag)
                 COSTOFEQUITY: coe,
                 STOCKDIVIDENDS: sd,
                 PROSPECTIVEARNINGS: pe,
-                OB: basis
+                OB: basis,
+                Open_STR_ID: openstrid
             }
             
 
@@ -947,7 +951,7 @@ $('#CloseStrategyCreate').click(function (e) {
 $('#btnSubmit_open').click(function (e) {
 
     var ct = $.trim($('#ct_value')[0].value);
-    var hd = $.trim($('#hd_value')[0].value);
+    var hd = $.trim($('#hd_value')[0].innerText);
     var op = $.trim($('#op_value')[0].value);
     var index = $('#index_input')[0].value;
 
@@ -1100,12 +1104,9 @@ function GetHeader(headMark) {
 
 //平仓提交
 $('#btnSubmit_close').click(function (e) {
-
-
-
-    var ct = $.trim($('#ct_value')[0].value);
-    var hd = $.trim($('#hd_value')[0].value);
-    var sp = $.trim($('#sp_value')[0].value);
+    var ct = $.trim($('#contract_value')[0].value);
+    var hd = $.trim($('#open_hd')[0].innerText);
+    var sp = $.trim($('#openpoint_value')[0].value);
     var coe = $('#coe_value')[0].value;
     var sd = $('#sd_value')[0].value;
     var sa = $('#sa_value')[0].value;
@@ -1117,6 +1118,7 @@ $('#btnSubmit_close').click(function (e) {
 
     var userName = $('#userName')[0].innerText;
     var currentDate = new Date();
+    var open_str_id = $('.open_strategy_id')[0].innerText;
 
     if (id == "NEW") {
         id = userName + ":" + currentDate.getTime();
@@ -1150,6 +1152,9 @@ $('#btnSubmit_close').click(function (e) {
         localStorage.setItem(id + ":BASIS", basis);
 
         localStorage.setItem(id + ":CHANGE", 1);
+
+        localStorage.setItem(id + ":OPENSTRID",open_str_id);
+
 
         if (localStorage[id + ":RUN"] == undefined) {
             localStorage.setItem(id + ":RUN", 0);

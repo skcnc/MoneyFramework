@@ -24,15 +24,15 @@ namespace Stork_Future_TaoLi.Hubs
                     if (obj == null) return;
 
                     if (obj == null || obj.CONTRACT == string.Empty || obj.INDEX == string.Empty || obj.OPENPOINT == string.Empty) return;
-
-                    String id = DBAccessLayer.SearchStrategy(obj);
-                    id = id.Split(';')[0];
+                    int hd = 0;
+                    String id = DBAccessLayer.SearchStrategy(obj,out hd);
+      
                     decimal stockcost = 0;
                     List<string> li = DBAccessLayer.GetDealList(id, out stockcost);
 
                     var connectId = Context.ConnectionId;
 
-                    Clients.Client(connectId).GetStrategyId(id);
+                    Clients.Client(connectId).GetStrategyId(id,hd);
 
                     
 

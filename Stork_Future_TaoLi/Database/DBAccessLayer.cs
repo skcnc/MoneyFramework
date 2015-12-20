@@ -124,7 +124,7 @@ namespace Stork_Future_TaoLi
             {
                 SG_GUID = Guid.NewGuid(),
                 SG_ID = close.basic.ID,
-                SG_OPEN_ID = close.Open_ID,
+                SG_OPEN_ID = close.Open_STR_ID,
                 SG_INIT_POSITION_LIST = close.POSITION,
                 SG_LATEST_POSITION_LIST = close.POSITION,
                 SG_FUTURE_CONTRACT = close.CT,
@@ -599,6 +599,7 @@ namespace Stork_Future_TaoLi
         public static List<String> GetDealList(string strId, out decimal totalStockMoney)
         {
             totalStockMoney = 0;
+            
 
             if (DBAccessLayer.DBEnable)
             {
@@ -631,8 +632,9 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        public static string SearchStrategy(SEARCHSTRATEGY info)
+        public static string SearchStrategy(SEARCHSTRATEGY info,out int hd)
         {
+            hd = 0;
             if (DBAccessLayer.DBEnable == false) return string.Empty;
 
 
@@ -657,17 +659,8 @@ namespace Stork_Future_TaoLi
                 return string.Empty;
             }
 
-            if (_records.Count() > 0)
-            {
-                foreach(var item in _records.ToList())
-                {
-                    SG_IDs += (item.SG_ID + ";");
-                }
-            }
-            else
-            {
-                SG_IDs = _records.ToList()[0] + ";";
-            }
+            SG_IDs = _records.ToList()[0].SG_ID;
+            hd = Convert.ToInt16(_records.ToList()[0].SG_HAND_NUM);
 
             return SG_IDs;
 

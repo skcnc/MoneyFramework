@@ -13,6 +13,8 @@
                 <input id="contract_value" type="text" placeholder="期货合约" style="margin:5px" />
                 <input id="openpoint_value" type="text" placeholder="开仓点位" style="margin:5px" />
                 <input id="index_value" type="text" placeholder="指数合约" style="margin:5px" />
+                <span class="sr-only open_strategy_id" ></span> 
+                <span id="open_hd" class="sr-only open_hd"></span> 
             </div>
             <div class="col-md-2">
                 <div class="col-md-12">
@@ -85,8 +87,9 @@
                 
             });
 
-            chat.client.GetStrategyId = function (ids) {
-      
+            chat.client.GetStrategyId = function (ids,hd) {
+                $('.open_strategy_id')[0].innerText = ids;
+                $('.open_hd')[0].innerText = hd;
             };
 
             chat.client.GetDealList = function (deals,stockcost) {

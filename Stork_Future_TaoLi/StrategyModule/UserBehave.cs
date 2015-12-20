@@ -213,7 +213,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 平仓对应的开仓ID
         /// </summary>
-        public string Open_ID { get; set; }
+        public string Open_STR_ID { get; set; }
     }
 
     public class CLOSEMODIFY
