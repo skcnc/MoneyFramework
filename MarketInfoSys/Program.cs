@@ -157,7 +157,7 @@ namespace MarketInfoSys
         private static string _indexCode = string.Empty;
         private static uint _indexPrice = 4000;
 
-        public static int SimMarketPerSecond = 100;
+        public static int SimMarketPerSecond = 60;
         public static string SimMarketCode = "600000;s;16.39|600010;s;3.94|600015;s;10.56|600016;s;8.60|600018;s;7.14|600028;s;5.03|600030;s;15.87|600036;s;17.93|600048;s;8.72|601998;s;6.40|601288;s;5.7";
        
 

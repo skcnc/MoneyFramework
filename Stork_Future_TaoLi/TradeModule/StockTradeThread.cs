@@ -388,7 +388,7 @@ namespace Stork_Future_TaoLi.TradeModule
         private static TradeOrderStruct_M CreateTradeUnit(TradeOrderStruct unit)
         {
 
-            
+
             TradeOrderStruct_M _sorder = new TradeOrderStruct_M();
 
             _sorder.ExchangeID = (unit.cExhcnageID.Length != 0) ? unit.cExhcnageID : "0";
@@ -399,7 +399,7 @@ namespace Stork_Future_TaoLi.TradeModule
             _sorder.OrderPriceType = (unit.cOrderPriceType.Length != 0) ? Convert.ToSByte(unit.cOrderPriceType) : Convert.ToSByte("0");
             _sorder.SecurityAmount = (int)(unit.nSecurityAmount);
             _sorder.SecurityCode = (unit.cSecurityCode.Length != 0) ? unit.cSecurityCode : "0";
-            _sorder.SecurityType = (unit.cSecurityType.Length != 0) ? (unit.cSecurityType == "S" ? (sbyte)115 : (sbyte)102) : (sbyte)115;
+            _sorder.SecurityType = (unit.cSecurityType.Length != 0) ? (unit.cSecurityType == "115" ? (sbyte)115 : (sbyte)102) : (sbyte)115;
 
 
             if (unit.cTradeDirection == "0") { _sorder.TradeDirection = 49; }
@@ -410,8 +410,6 @@ namespace Stork_Future_TaoLi.TradeModule
 
             return _sorder;
 
-            //return new managedTraderorderstruct(unit.cExhcnageID, unit.cSecurityCode, unit.SecurityName, (int)(unit.nSecurityAmount), unit.dOrderPrice
-            //    , Convert.ToSByte(unit.cTradeDirection), Convert.ToSByte(unit.cOffsetFlag), Convert.ToSByte(unit.cOrderPriceType), Convert.ToSByte(unit.cSecurityType), Convert.ToSByte(unit.cOrderLevel), Convert.ToSByte(unit.cOrderexecutedetail));
         }
 
     }

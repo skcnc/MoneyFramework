@@ -27,8 +27,8 @@ namespace Stork_Future_TaoLi.Hubs
 
                     String id = DBAccessLayer.SearchStrategy(obj);
                     id = id.Split(';')[0];
-
-                    List<string> li = DBAccessLayer.GetDealList(id);
+                    decimal stockcost = 0;
+                    List<string> li = DBAccessLayer.GetDealList(id, out stockcost);
 
                     var connectId = Context.ConnectionId;
 
@@ -43,7 +43,7 @@ namespace Stork_Future_TaoLi.Hubs
                         orderli += (deal + "\r\n");
                     }
 
-                    Clients.Client(connectId).GetDealList(orderli);
+                    Clients.Client(connectId).GetDealList(orderli, stockcost);
                 }
                 catch (Exception ex)
                 {

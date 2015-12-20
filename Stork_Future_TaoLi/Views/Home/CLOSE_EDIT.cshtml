@@ -89,9 +89,9 @@
       
             };
 
-            chat.client.GetDealList = function (deals) {
+            chat.client.GetDealList = function (deals,stockcost) {
                 $('#buylist')[0].value = deals;
-               
+                $('#coe_value')[0].value = stockcost;
             };
 
 

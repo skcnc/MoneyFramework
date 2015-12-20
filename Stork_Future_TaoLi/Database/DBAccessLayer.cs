@@ -319,10 +319,18 @@ namespace Stork_Future_TaoLi
 
             managedBargainreturnstruct record = (managedBargainreturnstruct)ret;
 
+
+
             if (record != null)
             {
                 lock (DLtableLock)
                 {
+                    string type = "s";
+                    if (record.OrderType == 115)
+                        type = "s";
+                    else if (record.OrderType == 102)
+                        type = "f";
+
                     DL_TAOLI_TABLE item = new DL_TAOLI_TABLE()
                     {
                         DL_GUID = Guid.NewGuid(),
@@ -331,7 +339,7 @@ namespace Stork_Future_TaoLi
                         DL_CODE = record.Security_code,
                         DL_NAME = record.Security_name,
                         DL_STATUS = record.OrderStatus.ToString(),
-                        DL_TYPE = record.OrderType.ToString(),
+                        DL_TYPE = type,
                         DL_STOCK_AMOUNT = record.stock_amount,
                         DL_BARGAIN_PRICE = record.bargain_price,
                         DL_BARGAIN_MONEY = record.bargain_money,
@@ -588,8 +596,10 @@ namespace Stork_Future_TaoLi
             
         }
 
-        public static List<String> GetDealList(string strId)
+        public static List<String> GetDealList(string strId, out decimal totalStockMoney)
         {
+            totalStockMoney = 0;
+
             if (DBAccessLayer.DBEnable)
             {
                 var _record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_STRATEGY == strId select item);
@@ -603,6 +613,7 @@ namespace Stork_Future_TaoLi
 
                 foreach(DL_TAOLI_TABLE i in _record.ToList())
                 {
+                    totalStockMoney += Convert.ToDecimal(i.DL_BARGAIN_MONEY);
                     _li.Add(i.DL_CODE + ";" + i.DL_TYPE + ";" + i.DL_STOCK_AMOUNT);
                 }
 

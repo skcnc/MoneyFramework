@@ -159,6 +159,7 @@ namespace Stork_Future_TaoLi.Entrust
 
                         bargin.strategyId = item.StrategyId;
                         bargin.direction = item.Direction;
+
                         ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateDLRecord), (object)bargin);
 
                         //更新持仓列表
