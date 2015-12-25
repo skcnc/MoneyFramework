@@ -11,7 +11,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 事件源名称
         /// </summary>
-        private string eventSourceName;
+        private string eventSourceName; 
         EventLogEntryType eventLogType;
         private int eventLogId;
         public LogWirter()
