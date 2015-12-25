@@ -5,6 +5,8 @@ using System.Web;
 using Stork_Future_TaoLi.Database;
 using MCStockLib;
 using System.Threading;
+using Newtonsoft.Json;
+
 
 namespace Stork_Future_TaoLi
 {
@@ -15,18 +17,22 @@ namespace Stork_Future_TaoLi
     public static class DBAccessLayer
     {
         static MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
-       
+        static object ERtableLock = new object();
+        static object DLtableLock = new object();
+        static object DBChangeLock = new object();
         //数据库测试标记
         public static bool DBEnable = true;
 
         public static void InsertSGOPEN(object v)
         {
+
+            
             if (DBAccessLayer.DBEnable == false) { return; }
             OPENCREATE open = (OPENCREATE)v;
             //若发现存在相同策略ID的实例未完成，将未完成实例标记为“删除”，替换以当前实例
             //这种情况在启动自检测时出现
 
-            DeleteSGOPEN(open.basic.ID);
+            if (!DetectSGOPEN(open.basic.ID)) return;
                 
             //等待上一步操作完成
             Thread.Sleep(10);
@@ -49,7 +55,7 @@ namespace Stork_Future_TaoLi
             };
 
             DbEntity.SG_TAOLI_OPEN_TABLE.Add(record);
-            DbEntity.SaveChanges();
+            Dbsavechage("InsertSGOPEN");
 
         }
 
@@ -61,9 +67,44 @@ namespace Stork_Future_TaoLi
             if (_selectedItem.Count() > 0)
             {
                 _selectedItem.ToList()[0].SG_STATUS = 1;
-                DbEntity.SaveChanges();
+                Dbsavechage("DeleteSGOPEN");
             }
 
+        }
+
+        /// <summary>
+        /// 判断数据是否已经在库中存在
+        /// </summary>
+        /// <param name="ID">策略的UUID值</param>
+        /// <returns>true: 库中已经存在 false: 库中不存在或者不可以写入</returns>
+        public static bool DetectSGOPEN(string ID)
+        {
+            if (DBAccessLayer.DBEnable == false) { return false; }
+
+            var _selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == ID select item);
+
+            if (_selectedItem.Count() > 0) return false;
+            else return true;
+        }
+
+        /// <summary>
+        /// 修改开仓记录状态
+        /// </summary>
+        /// <param name="ID">策略ID</param>
+        /// <param name="status">状态</param>
+        public static void UpdateSGOPENStatus(string ID, int status)
+        {
+            if (DBAccessLayer.DBEnable)
+            {
+                var selectedItem = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == ID select item);
+
+                if (selectedItem.Count() == 0) return;
+                else
+                {
+                    selectedItem.ToList()[0].SG_STATUS = status;
+                    Dbsavechage("UpdateSGOPENStatus");
+                }
+            }
         }
 
         public static void InsertSGCLOSE(object v)
@@ -74,6 +115,7 @@ namespace Stork_Future_TaoLi
             //若发现存在相同策略ID的实例未完成，将未完成实例标记为“删除”，替换以当前实例
             //这种情况在启动自检测时出现
             DeleteSGCLOSE(close.basic.ID);
+            if (!(DetectSGCLOSE(close.basic.ID))) return;
 
             //等待上一步操作完成
             Thread.Sleep(10);
@@ -82,7 +124,7 @@ namespace Stork_Future_TaoLi
             {
                 SG_GUID = Guid.NewGuid(),
                 SG_ID = close.basic.ID,
-                SG_OPEN_ID = close.Open_ID,
+                SG_OPEN_ID = close.Open_STR_ID,
                 SG_INIT_POSITION_LIST = close.POSITION,
                 SG_LATEST_POSITION_LIST = close.POSITION,
                 SG_FUTURE_CONTRACT = close.CT,
@@ -99,7 +141,7 @@ namespace Stork_Future_TaoLi
             };
 
             DbEntity.SG_TAOLI_CLOSE_TABLE.Add(item);
-            DbEntity.SaveChanges();
+            Dbsavechage("InsertSGCLOSE");
 
 
         }
@@ -113,10 +155,25 @@ namespace Stork_Future_TaoLi
             {
                 _selectedItem.ToList()[0].SG_STATUS = 1;
 
-                DbEntity.SaveChanges();
+                Dbsavechage("DeleteSGCLOSE");
             }
 
 
+        }
+
+
+        /// <summary>
+        /// 判断数据是否已经在库中存在
+        /// </summary>
+        /// <param name="ID">策略的UUID值</param>
+        /// <returns>true: 库中已经存在 false: 库中不存在或者不可以写入</returns>
+        public static bool DetectSGCLOSE(string ID)
+        {
+            if (DBAccessLayer.DBEnable == false) { return false; }
+            var _selectedItem = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == ID && item.SG_STATUS == 0 select item);
+
+            if (_selectedItem.Count() > 0) return false;
+            else return true;
         }
 
         public static void InsertSTATUS(string Id, int status)
@@ -130,7 +187,7 @@ namespace Stork_Future_TaoLi
             };
 
             DbEntity.SG_TAOLI_STATUS_TABLE.Add(item);
-            DbEntity.SaveChanges();
+            Dbsavechage("InsertSTATUS");
         }
 
         public static void InsertORDERLIST(string strategyId, string orderli)
@@ -145,7 +202,7 @@ namespace Stork_Future_TaoLi
             };
 
             DbEntity.OL_TAOLI_LIST_TABLE.Add(item);
-            DbEntity.SaveChanges();
+            Dbsavechage("InsertORDERLIST");
         }
 
         public static void DeleteORDERLIST(string strategyId)
@@ -157,7 +214,7 @@ namespace Stork_Future_TaoLi
             if(selected.Count() > 0)
             {
                 DbEntity.OL_TAOLI_LIST_TABLE.Remove(selected.ToList()[0]);
-                DbEntity.SaveChanges();
+                Dbsavechage("DeleteORDERLIST");
             }
         }
 
@@ -174,22 +231,42 @@ namespace Stork_Future_TaoLi
             if (DBAccessLayer.DBEnable == false) { return; }
             if (item == null) return;
 
+
             QueryEntrustOrderStruct_M entrust = (QueryEntrustOrderStruct_M)item;
 
-            ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
+            lock (ERtableLock)
             {
-                ER_GUID = Guid.NewGuid(),
-                //ER_ID = entrust.,
-                //ER_STRATEGY = entrust.StrategyId,
-                ER_ORDER_TYPE = entrust.SecurityType.ToString(),
-                ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
+                ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
+                {
+                    ER_GUID = Guid.NewGuid(),
+                    ER_ID = entrust.OrderSysID,
+                    ER_STRATEGY = entrust.StrategyId,
+                    ER_ORDER_TYPE = entrust.SecurityType.ToString(),
+                    ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
 
-                //ER_CODE = entrust.Code,
-                //ER_DIRECTION = entrust.Direction
-            };
+                    ER_CODE = entrust.Code,
+                    ER_DIRECTION = entrust.Direction,
+                    ER_CANCEL_TIME = new DateTime(1900, 1, 1),
+                    ER_COMPLETED = false,
+                    ER_DATE = new DateTime(1900, 1, 1),
+                    ER_FROZEN_AMOUNT = 0,
+                    ER_FROZEN_MONEY = 0,
+                    ER_ORDER_STATUS = string.Empty,
+                    ER_ORDER_TIME = DateTime.Now,
+                    ER_VOLUME_REMAIN = 0,
+                    ER_VOLUME_TOTAL_ORIGINAL = 0,
+                    ER_VOLUME_TRADED = 0,
+                    ER_WITHDRAW_AMOUNT = 0
+                };
 
-            DbEntity.ER_TAOLI_TABLE.Add(record);
-            DbEntity.SaveChanges();
+                DbEntity.ER_TAOLI_TABLE.Add(record);
+                Dbsavechage("CreateERRecord");
+            }
+        }
+
+        public static void CreateFutureERRecord(object item)
+        {
+
         }
 
         /// <summary>
@@ -206,33 +283,37 @@ namespace Stork_Future_TaoLi
         public static void UpdateERRecord(object ret)
         {
             managedEntrustreturnstruct record = (managedEntrustreturnstruct)ret;
-            var selected = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ID == record.cOrderSysID && item.ER_CODE == record.cSecurity_code select item);
-
-            if (selected.Count() > 0)
+            lock (ERtableLock)
             {
-                
-                var item = selected.ToList()[0];
-                item.ER_ORDER_STATUS = record.cOrderStatus.ToString();
-                item.ER_VOLUME_TOTAL_ORIGINAL = record.nVolumeTotalOriginal;
-                item.ER_VOLUME_TRADED = record.nVolumeTraded;
-                item.ER_VOLUME_REMAIN = record.nVolumeTotal;
-                item.ER_WITHDRAW_AMOUNT = record.withdraw_ammount;
-                item.ER_FROZEN_MONEY = record.frozen_money;
-                item.ER_FROZEN_AMOUNT = record.frozen_amount;
-                
-                //日期时间填写，待返回内容确认后完成
-                //item.ER_DATE = record.cInsertDate;
-                //item.ER_ORDER_TIME = record.cInsertTime;
-                //item.ER_CANCEL_TIME = record.cCancelTime;
 
-                DbEntity.SaveChanges();
+                var selected = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ID == record.cOrderSysID select item);
+
+                if (selected.Count() > 0)
+                {
+
+                    var item = selected.ToList()[0];
+                    item.ER_ORDER_STATUS = record.cOrderStatus.ToString();
+                    item.ER_VOLUME_TOTAL_ORIGINAL = record.nVolumeTotalOriginal;
+                    item.ER_VOLUME_TRADED = record.nVolumeTraded;
+                    item.ER_VOLUME_REMAIN = record.nVolumeTotal;
+                    item.ER_WITHDRAW_AMOUNT = record.withdraw_ammount;
+                    item.ER_FROZEN_MONEY = record.frozen_money;
+                    item.ER_FROZEN_AMOUNT = record.frozen_amount;
+
+                    //日期时间填写，待返回内容确认后完成
+                    //item.ER_DATE = record.cInsertDate;
+                    //item.ER_ORDER_TIME = record.cInsertTime;
+                    //item.ER_CANCEL_TIME = record.cCancelTime;
+
+                    Dbsavechage("UpdateERRecord");
+                }
             }
 
 
         }
 
         /// <summary>
-        /// 添加交易记录
+        /// 添加股票交易记录
         /// 成交记录只在委托完成后记录，如果委托未完成，就等它完成
         /// 因此这张表只会增加，不会删除或者修改
         /// --2015.08-07
@@ -246,25 +327,134 @@ namespace Stork_Future_TaoLi
 
             if (record != null)
             {
-                DL_TAOLI_TABLE item = new DL_TAOLI_TABLE() { 
-                    DL_GUID = Guid.NewGuid(),
-                    DL_STRATEGY = record.strategyId,
-                    DL_DIRECTION = record.direction,
-                    DL_CODE=record.Security_code,
-                    DL_NAME = record.Security_name,
-                    DL_STATUS = record.OrderStatus.ToString(),
-                    DL_TYPE = record.OrderType.ToString(),
-                    DL_STOCK_AMOUNT = record.stock_amount,
-                    DL_BARGAIN_PRICE = record.bargain_price,
-                    DL_BARGAIN_MONEY = record.bargain_money,
-                    DL_BARGAIN_TIME = record.bargain_time,
-                    DL_NO  = record.bargain_no.ToString(),
-                    DL_LOAD = true
+                lock (DLtableLock)
+                {
+                    string type = "s";
+                    if (record.OrderType == 115)
+                        type = "s";
+                    else if (record.OrderType == 102)
+                        type = "f";
+
+                    DL_TAOLI_TABLE item = new DL_TAOLI_TABLE()
+                    {
+                        DL_GUID = Guid.NewGuid(),
+                        DL_STRATEGY = record.strategyId,
+                        DL_DIRECTION = record.direction,
+                        DL_CODE = record.Security_code,
+                        DL_NAME = record.Security_name,
+                        DL_STATUS = record.OrderStatus.ToString(),
+                        DL_TYPE = type,
+                        DL_STOCK_AMOUNT = record.stock_amount,
+                        DL_BARGAIN_PRICE = record.bargain_price,
+                        DL_BARGAIN_MONEY = record.bargain_money,
+                        DL_BARGAIN_TIME = record.bargain_time,
+                        DL_NO = record.bargain_no.ToString(),
+                        DL_LOAD = true
+                    };
+
+                    DbEntity.DL_TAOLI_TABLE.Add(item);
+
+                    Dbsavechage("CreateDLRecord");
+
+                    Thread.Sleep(10);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 添加期货交易记录
+        /// 成交记录只在委托完成后记录，如果委托未完成，就等它完成
+        /// 因此这张表只会增加，不会删除或者修改
+        /// --2015.12.25
+        /// </summary>
+        /// <param name="ret"></param>
+        public static void CreateFutureDLRecord(object ret)
+        {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            RecordItem record = (RecordItem)ret;
+
+            if (record != null)
+            {
+                lock (DLtableLock)
+                {
+                    DL_TAOLI_TABLE item = new DL_TAOLI_TABLE()
+                    {
+                        DL_GUID = Guid.NewGuid(),
+                        DL_STRATEGY = record.StrategyId,
+                        DL_DIRECTION = Convert.ToInt16(record.Orientation),
+                        DL_CODE = record.Code,
+                        DL_NAME = record.Code,
+                        DL_STATUS = record.Status.ToString(),
+                        DL_TYPE = "f",
+                        DL_STOCK_AMOUNT = record.VolumeTraded,
+                        DL_BARGAIN_PRICE = Convert.ToDouble(record.Price),
+                        DL_BARGAIN_MONEY = Convert.ToDouble(record.Price) * record.VolumeTraded,
+                        DL_BARGAIN_TIME = record.OrderTime_Start.ToString(),
+                        DL_NO = record.OrderSysID.Trim()
+                    };
+
+                    DbEntity.DL_TAOLI_TABLE.Add(item);
+
+                    Dbsavechage("CreateFutureDLRecord");
+                    Thread.Sleep(10);
+                }
+            }
+        }
+
+        public static void UpdateStrategyStatusRecord(string str_id , int status)
+        {
+            if (DBAccessLayer.DBEnable == false) return;
+            if(status == 1)
+            {
+                SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
+                {
+                    SG_GUID = Guid.NewGuid(),
+                    SG_ID = str_id,
+                    SG_STATUS = status,
+                    SG_UPDATE_TIME = DateTime.Now
                 };
 
-                DbEntity.DL_TAOLI_TABLE.Add(item);
-                DbEntity.SaveChanges();
+                DbEntity.SG_TAOLI_STATUS_TABLE.Add(record);
             }
+            else
+            {
+                var _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
+
+                if (_rec.Count() == 0)
+                {
+                    SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
+                    {
+                        SG_GUID = Guid.NewGuid(),
+                        SG_ID = str_id,
+                        SG_STATUS = 0,
+                        SG_UPDATE_TIME = DateTime.Now
+                    };
+
+                    _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
+                }
+
+                if (_rec.Count() == 0) return;
+
+                var _unit = _rec.ToList()[0];
+
+                switch (status)
+                {
+                    case 1:
+                        _unit.SG_STATUS = 1;
+                        break;
+                    case 2:
+                        _unit.SG_STATUS = 2;
+                        break;
+                    case 3:
+                        _unit.SG_STATUS = 3;
+                        break;
+                    default:
+                        _unit.SG_STATUS = 0;
+                        break;
+                }
+            }
+            Dbsavechage("UpdateStrategyStatusRecord");
         }
 
         /// <summary>
@@ -400,7 +590,7 @@ namespace Stork_Future_TaoLi
                     };
 
                     DbEntity.CC_TAOLI_TABLE.Add(record);
-                    DbEntity.SaveChanges();
+                    Dbsavechage("UpdateCCRecords");
                     return;
                 }
                 else
@@ -426,7 +616,7 @@ namespace Stork_Future_TaoLi
                     record.CC_BUY_PRICE = (db_amount * db_price + amount * price) / (db_amount + amount);
                     record.CC_AMOUNT = db_amount + amount;
 
-                    DbEntity.SaveChanges();
+                    Dbsavechage("UpdateCCRecords");
                 }
                 else
                 {
@@ -441,7 +631,7 @@ namespace Stork_Future_TaoLi
                         record.CC_BUY_PRICE = (db_amount * db_price - amount * price) / (db_amount - amount);
                         record.CC_AMOUNT = db_amount - amount;
 
-                        DbEntity.SaveChanges();
+                        Dbsavechage("UpdateCCRecords");
                         return;
                     }
                 }
@@ -451,5 +641,103 @@ namespace Stork_Future_TaoLi
             
         }
 
+        public static List<String> GetDealList(string strId, out decimal totalStockMoney)
+        {
+            totalStockMoney = 0;
+            
+
+            if (DBAccessLayer.DBEnable)
+            {
+                var _record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_STRATEGY == strId select item);
+
+                if(_record == null || _record.Count() == 0)
+                {
+                    return null;
+                }
+
+                List<String> _li = new List<string>();
+
+                foreach(DL_TAOLI_TABLE i in _record.ToList())
+                {
+                    totalStockMoney += Convert.ToDecimal(i.DL_BARGAIN_MONEY);
+                    _li.Add(i.DL_CODE + ";" + i.DL_TYPE + ";" + i.DL_STOCK_AMOUNT);
+                }
+
+
+                return _li;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取匹配策略ID
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public static string SearchStrategy(SEARCHSTRATEGY info,out int hd)
+        {
+            hd = 0;
+            if (DBAccessLayer.DBEnable == false) return string.Empty;
+
+
+            String SG_IDs = String.Empty;
+
+
+            double op = Convert.ToDouble(info.BASIS);
+            string contract = info.CONTRACT.Trim();
+            int index = Convert.ToInt32(info.INDEX);
+
+
+            var _records = (from item in DbEntity.SG_TAOLI_OPEN_TABLE
+                            where ((item.SG_STATUS == 3) &&
+                            (item.SG_OP_POINT == op) &&
+                            (item.SG_Contract == contract) &&
+                            (item.SG_INDEX == index) &&
+                            (item.SG_USER == info.basic.USER))
+                            select item);
+
+            if(_records != null && _records.Count() == 0)
+            {
+                return string.Empty;
+            }
+
+            SG_IDs = _records.ToList()[0].SG_ID;
+            hd = Convert.ToInt16(_records.ToList()[0].SG_HAND_NUM);
+
+            return SG_IDs;
+
+        }
+
+        public static void Dbsavechage(string type)
+        {
+            lock(DBChangeLock)
+            {
+                bool lockdb = false;
+                int count = 100;
+                while (lockdb == false)
+                {
+                    count--;
+                    try
+                    {
+                        DbEntity.SaveChanges();
+                        lockdb = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        GlobalErrorLog.LogInstance.LogEvent("type = " + type + "\r\n" + ex.InnerException.ToString());
+                        Thread.Sleep(10);
+
+                        if(count == 0)
+                        {
+                            GlobalErrorLog.LogInstance.LogEvent("数据库提交100次失败！");
+                            lockdb = true;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

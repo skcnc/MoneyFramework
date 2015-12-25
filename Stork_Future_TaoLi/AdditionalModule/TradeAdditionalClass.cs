@@ -85,7 +85,6 @@ namespace Stork_Future_TaoLi
             );
 
 
-            //TODO ： 更新数据库
         }
 
         /// <summary>
@@ -250,6 +249,8 @@ namespace Stork_Future_TaoLi
         public void Update(int OrderRef, RecordItem Record)
         {
             this.AddOrUpdate(OrderRef, Record, (key, oldValue) => oldValue = Record);
+
+            DBAccessLayer.CreateFutureDLRecord((object)Record);
         }
 
         public void Delete(int OrderRef, RecordItem Record)

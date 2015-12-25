@@ -20,7 +20,13 @@ namespace Stork_Future_TaoLi
         private string BROKER = "8890";
         private string INVESTOR = "17730203";
         private string PASSWORD = "111111";
-        private string ADDRESS = "tcp://119.15.140.81:41205"; 
+        private string ADDRESS = "tcp://119.15.140.81:41205";
+
+        private string TEST_BROKER = "8890";
+        private string TEST_INVESTOR = "17730203";
+        private string TEST_PASSWORD = "111111";
+        private string TEST_ADDRESS = "tcp://119.15.140.81:41205";
+
 
         #region 委托参数
         /// <summary>
@@ -164,6 +170,15 @@ namespace Stork_Future_TaoLi
             //当前线程编号
             int _threadNo = _tpp._threadNo;
 
+            if(_threadNo == 0)
+            {
+                //默认0号期货交易线程即测试线程
+                BROKER = TEST_BROKER;
+                INVESTOR = TEST_INVESTOR;
+                ADDRESS = TEST_ADDRESS;
+                PASSWORD = TEST_PASSWORD;
+            }
+
             sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 开始执行");
 
             //用作发送心跳包的时间标记
@@ -232,20 +247,22 @@ namespace Stork_Future_TaoLi
                             CTP_CLI.CThostFtdcInputOrderField_M args = new CThostFtdcInputOrderField_M();
 
                             //填写委托参数
+
                             args.BrokerID = BROKER;
                             args.InvestorID = INVESTOR;
                             args.InstrumentID = order.cSecurityCode;
-                            args.Direction = Convert.ToByte(order.cTradeDirection[0]);
-                            args.CombOffsetFlag_0 = Convert.ToByte(order.cOffsetFlag[0]);
+                            args.Direction = Convert.ToByte(order.cTradeDirection);
+                            args.CombOffsetFlag_0 =  Convert.ToByte(order.cOffsetFlag);
                             args.VolumeTotalOriginal = Convert.ToInt16(order.nSecurityAmount);
                             args.LimitPrice = Convert.ToDouble(order.dOrderPrice);
                             args.OrderRef = order.OrderRef.ToString();
-                            args.OrderPriceType = Convert.ToByte('2');
+                            args.OrderPriceType =Convert.ToByte(order.cOrderPriceType);
                             args.CombHedgeFlag_0 = Convert.ToByte('1');
+                            args.MinVolume = 1;
+                            args.ContingentCondition = Convert.ToByte('1');      
                             args.TimeCondition = Convert.ToByte('3');
                             args.VolumeCondition = Convert.ToByte('1');
-                            args.MinVolume = 1;
-                            args.ContingentCondition = Convert.ToByte('1');
+
                             args.ForceCloseReason = Convert.ToByte('0');
                             args.IsAutoSuspend = 0;
                             args.UserForceClose = 0;

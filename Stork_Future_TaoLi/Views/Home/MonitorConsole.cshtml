@@ -21,7 +21,7 @@
 </div>
 
 <div id="TaoLiControlPanel"class="container-fluid">
-    <span class="sr-only" id="userName">Testor</span>
+    <span class="sr-only" id="userName"></span>
     <div class="row">
         <div class="col-lg-6">
             <div id="category_panel_open" class="col-md-12" style="margin-top:20px">
@@ -73,7 +73,7 @@
         <span class="sr-only liid"></span>
         <div class="row" style="padding-bottom:5px">
             <span class="sr-only strategy_id"></span>
-            <div>
+            <div class="col-md-12">
                 <div class="col-md-3">
                     <h4>OP&nbsp;=&nbsp;<a class="OPValue">30</a></h4>
                 </div>
@@ -96,26 +96,19 @@
                 </div>
             </div>
             <div class="col-md-10 para_panel">
-                <i>
-                    参数1：***
-                    参数2：***
-                    参数3：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数1：***
-                    参数2：***
-                    参数3：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                </i>
+                <div class="col-md-12 info">
+                    <p class="qihuojiage"></p>
+                    <p class="zhishujiage"></p>
+                    <p class="monizhishu"></p>
+                    <p class="yuanshijicha"></p>
+                    <p class="moniwucha"></p>
+                    <p class="tingpanshizhi"></p>
+                    <p class="mairuchongji"></p>
+                    <p class="qihuomaichuchongji"></p>
+                    <p class="tiaozhengjicha"></p>
+                    <p class="jiaoyiwucha"></p>
+                    <p class="zhuangtai"></p>
+                </div>
             </div>
         </div>
     </li>
@@ -160,27 +153,19 @@
                     </button>
                 </div>
             </div>
-            <div class="col-md-10  para_panel" style="margin-top:20px">
-                <i>
-                    参数1：***
-                    参数2：***
-                    参数3：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数1：***
-                    参数2：***
-                    参数3：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                </i>
+            <div class="col-md-10 para_panel">
+                <div class="col-md-12 info">
+                    <p class="zhenshiqihuoshouyi"></p>
+                    <p class="zhenshigupiaoshouyi"></p>
+                    <p class="zhenshigupiaomaichushouyi"></p>
+                    <p class="dietingshizhi"></p>
+                    <p class="qihuomairuchongji"></p>
+                    <p class="tingpanshizhi"></p>
+                    <p class="quanbushouyi"></p>
+                    <p class="gupiaoshizhi"></p>
+                    <p class="gupiaochongji"></p>
+                    <p class="zhuangtai"></p>
+                </div>
             </div>
         </div>
     </li>
@@ -201,6 +186,8 @@
 
         chat.client.updatePara = function (name, jsonString) {
 
+            
+
             var tt = $.find('span.liid');
             $.each(tt, function (index, obj) {
                 var n = obj.innerText;
@@ -208,9 +195,29 @@
                     return;
                 else
                 {
-                    var panel = $($(obj).parents('li.list-group-item')).find('i');
-                    $(panel).text(jsonString);
-                    
+                    var panel = $($(obj).parents('li.list-group-item')).find('.info');
+                    $(panel).find('.qihuojiage').text(jsonString.split("&")[0]);
+                    $(panel).find('.zhishujiage').text(jsonString.split("&")[1]);
+                    $(panel).find('.monizhishu').text(jsonString.split("&")[2]);
+                    $(panel).find('.yuanshijicha').text(jsonString.split("&")[3]);
+                    $(panel).find('.monishizhi').text(jsonString.split("&")[4]);
+                    $(panel).find('.tingpanshizhi').text(jsonString.split("&")[5]);
+                    $(panel).find('.tingpanshizhi').text(jsonString.split("&")[6]);
+                    $(panel).find('.mairuchongji').text(jsonString.split("&")[7]);
+                    $(panel).find('.qihuomaichuchongji').text(jsonString.split("&")[8]);
+                    $(panel).find('.tiaozhengjicha').text(jsonString.split("&")[9]);
+                    $(panel).find('.jiaoyiwucha').text(jsonString.split("&")[10]);
+                    $(panel).find('.zhuangtai').text(jsonString.split("&")[11]);
+                    $(panel).find('.zhenshiqihuoshouyi').text(jsonString.split("&")[0]);
+                    $(panel).find('.zhenshigupiaoshouyi').text(jsonString.split("&")[1]);
+                    $(panel).find('.zhenshigupiaomaichushouyi').text(jsonString.split("&")[2]);
+                    $(panel).find('.dietingshizhi').text(jsonString.split("&")[3]);
+                    $(panel).find('.qihuomairuchongji').text(jsonString.split("&")[4]);
+                    $(panel).find('.tingpanshizhi').text(jsonString.split("&")[5]);
+                    $(panel).find('.quanbushouyi').text(jsonString.split("&")[6]);
+                    $(panel).find('.gupiaoshizhi').text(jsonString.split("&")[7]);
+                    $(panel).find('.gupiaochongji').text(jsonString.split("&")[8]);
+                    $(panel).find('.zhuangtai').text(jsonString.split("&")[9]);
                 }
             });
 

@@ -148,14 +148,6 @@ namespace Stork_Future_TaoLi
                     }
                 }
 
-                //foreach (var item in value.WEIGHT.Split('\n'))
-                //{
-                //    if (item.Trim() == string.Empty) { continue; }
-                //    else
-                //    {
-                //        weili.Add(item.Split(';')[1] + item.Split(';')[0], Convert.ToDouble(item.Split(';')[2]));
-                //    }
-                //}
 
                 newWorker.LiStockOrder = oli;
                 newWorker.close_para.WeightList = weili;
@@ -180,15 +172,20 @@ namespace Stork_Future_TaoLi
             }
 
 
+            try
+            {
+                WorkersStratus.Add(newWorker.StrategyInstanceID, 0);
+                Workers.Add(newWorker.StrategyInstanceID, newWorker);
 
-            WorkersStratus.Add(newWorker.StrategyInstanceID, 0);
-            Workers.Add(newWorker.StrategyInstanceID, newWorker);
+                newWorker.RUN();
 
-            newWorker.RUN();
-
-            //向行情模块添加消息列表映射
-            MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(newWorker.StrategyInstanceID, newWorker.GetRefQueue()));
-
+                //向行情模块添加消息列表映射
+                MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(newWorker.StrategyInstanceID, newWorker.GetRefQueue()));
+            }
+            catch(Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(ex.ToString() + ":StrategyMonitorClass.cs" + ":" + newWorker.StrategyInstanceID);
+            }
         }
 
         /// <summary>
@@ -442,7 +439,7 @@ namespace Stork_Future_TaoLi
                 }
 
 
-                if (DateTime.Now.Second % 5 == 0)
+                if (DateTime.Now.Second == 0)
                 {
                     if (_logUpdateTime.Second != DateTime.Now.Second)
                     {
@@ -472,14 +469,7 @@ namespace Stork_Future_TaoLi
                 Thread.Sleep(10);
             }
         }
-
-
     }
-
-
-    
-
-   
 }
 
 

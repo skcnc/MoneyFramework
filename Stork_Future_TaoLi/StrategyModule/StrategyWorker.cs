@@ -174,6 +174,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// 标记当前状态
         /// </summary>
         public int Status { get; set; }
+
         #endregion
 
         #region private variables
@@ -441,8 +442,14 @@ namespace Stork_Future_TaoLi.StrategyModule
                 //标记线程状态为正在空转
                 Status = 1;
                 
-                Thread.Sleep(1000); 
+                Thread.Sleep(10); 
             }
+
+            if (DBAccessLayer.DBEnable)
+            {
+                DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 1);
+            }
+
             while (!breaklabel)
             { 
                 /****
@@ -452,6 +459,14 @@ namespace Stork_Future_TaoLi.StrategyModule
                  * 3. 判断运行条件
                  * 4. 生成交易列表
                  * ****/
+
+                if (Status == 1)
+                {
+                    if (DBAccessLayer.DBEnable)
+                    {
+                        DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 2);
+                    }
+                }
                 if(bRun)
                 {
                     //标记线程状态为正在运行
@@ -460,15 +475,28 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     //策略实例运算
                     List<managedMarketInforStruct> infos = new List<managedMarketInforStruct>();
+                    List<MarketData> dataList = new List<MarketData>();
+
+                    
                     while (_marketQueue.Count > 0)
                     {
-                        MarketData data = (MarketData)DeQueueInfo();
+                        MarketData d = (MarketData)DeQueueInfo();
 
-                        if (data == null)
+
+                        if (d == null)
                         {
                             Thread.Sleep(10);
                             continue;
                         }
+
+                        dataList.Add(d);
+                    }
+
+                    
+                    
+                    foreach(MarketData data in dataList)
+                    {
+                        
                         managedMarketInforStruct info = new managedMarketInforStruct();
 
                         info.dAskPrice = new double[10];
@@ -501,6 +529,11 @@ namespace Stork_Future_TaoLi.StrategyModule
                         info.dLowLimited = Convert.ToDouble(data.LowLimited) /10000;
                         info.exchangeID = data.WindCode.Split('.')[1];
 
+                        if (data.Status == 68)
+                        {
+                            info.bstoped = true;
+                        }
+
                         switch(data.IOPV)
                         {
                             case 0:
@@ -523,7 +556,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         }
                         info.LastUpdateTime = Int32.Parse(DateTime.Now.Hour.ToString().PadLeft(2, '0') + DateTime.Now.Minute.ToString().PadLeft(2, '0') + DateTime.Now.Second.ToString().PadLeft(2, '0'));
 
-
+                        //MarketDelayCalculation.cal(data.Time, 3);
                         if (data.Status == 68 || data.Status == 66)
                         {
                             info.bstoped = true;
@@ -537,12 +570,23 @@ namespace Stork_Future_TaoLi.StrategyModule
                         infos.Add(info);
                     }
 
+
+                    
+                    
+
                     if(infos.Count > 0)
                     {
                         if (Type == "OPEN")
                         {
+                            DateTime d1 = DateTime.Now;
+
                             m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
+
+                            d1 = DateTime.Now;
+
                             m_strategy_open.calculateSimTradeStrikeAndDelta();
+
+
                         }
                         else
                         {
@@ -551,8 +595,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         }
                     }
                     else { continue; }
-
-                   
+                    
                 }
 
                 
@@ -562,18 +605,21 @@ namespace Stork_Future_TaoLi.StrategyModule
                     bool _reached = false;
                     if (Type == "OPEN")
                     {
-                        m_strategy_open.isOpenPointReached(_reached);
+                        _reached = m_strategy_open.isOpenPointReached();
                     }
                     else
                     {
-                        m_strategy_close.isOpenPointReached(_reached);
+                        _reached = m_strategy_close.isOpenPointReached();
                     }
 
 
+                    _reached = true; //测试使用，注意删除
+
                     // 生成交易列表
                     if (_reached)
-                    //if(false)
                     {
+                        
+
                         List<managedTraderorderstruct> ol = (Type == "OPEN") ? m_strategy_open.getTradeList().ToList() : m_strategy_close.getTradeList().ToList();
 
 
@@ -598,6 +644,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                             order.cOrderexecutedetail = item.cOrderexecutedetail.ToString();
                             order.belongStrategy = StrategyInstanceID;
                             order.OrderRef = REQUEST_ID.ApplyNewID();
+                            order.cUser = User;
 
                             orderli.Add(order);
 
@@ -612,13 +659,58 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                         //下单到交易预处理模块
                         queue_prd_trade.GetQueue().Enqueue((object)orderli);
+
+                        if (DBAccessLayer.DBEnable)
+                        {
+                            DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 3);
+                            DBAccessLayer.UpdateSGOPENStatus(StrategyInstanceID, 3);
+                        }
+
+                        // 列表只会生成一次
+                        breaklabel = true;
                     }
-                    // 列表只会生成一次
-                    breaklabel = true;
+                   
                 }
 
                 //获取中间显示参数
                 //gettaderargs   getshowstatus
+
+                if (Type == "OPEN")
+                {
+                    string status = m_strategy_open.getshowstatus();
+
+                    List<String> statusLi = status.Split(' ').ToList();
+
+                    status = string.Empty;
+                    
+                    foreach (string i in statusLi)
+                    {
+                        if (i.Trim() != string.Empty)
+                        {
+                            status += (i + "&");
+                        }
+                    }
+
+                    PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
+                }
+                else
+                {
+                    string status = m_strategy_close.getshowstatus();
+
+                    List<string> statusLi = status.Split(' ').ToList();
+
+                    status = string.Empty;
+
+                    foreach (string i in statusLi)
+                    {
+                        if (i.Trim() != string.Empty)
+                        {
+                            status += (i + "&");
+                        }
+                    }
+
+                    PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
+                }
                 Thread.Sleep(1);
             }
         }

@@ -1,4 +1,6 @@
 ﻿
+
+
 //展开开仓策略细节
 $('#category_panel_open').delegate('button.displaystrategy', 'click', function (e) {
     var _list = $(this).parents("div.strategycategory_open").children('ul.list-group:eq(0)');
@@ -180,6 +182,8 @@ $('#category_panel_open').delegate('button.allow_strategy', 'click', function (e
         InputJson: JSONSTRING
     }, function (data, status) {
         alert("数据：" + data + "\n状态：" + status);
+
+        localStorage.setItem(_id + ":COMPLETE", "TRUE");
     })
 })
 
@@ -233,7 +237,10 @@ $('#category_panel_close').delegate('button.allow_strategy', 'click', function (
         InputJson: JSONSTRING
     }, function (data, status) {
         alert("数据：" + data + "\n状态：" + status);
+        localStorage[_id + ":COMPLETE"] = "TRUE";
     })
+
+
 })
 
 //删除开仓策略
@@ -256,8 +263,12 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
 
     var _allow =  localStorage[_id + ":ALLOW"];
     var _run = localStorage[_id + ":RUN"];
+    var _complete = localStorage[_id + ":COMPLETE"];
 
-    if(_allow + _run > 0)
+    if (_complete == "TRUE") {
+
+    }
+    else if(_allow + _run > 0)
     {
         alert("交易运行时无法删除！");
         return;
@@ -292,6 +303,7 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
         InputJson: JSONSTRING
     }, function (data, status) {
         alert("数据：" + data + "\n状态：" + status);
+
     })
 
     //删除对应的键值
@@ -306,6 +318,8 @@ $('#category_panel_open').delegate('button.delete_strategy', 'click', function (
     localStorage.removeItem(_id + ":INDEX");
     localStorage.removeItem(_id + ":RUN");
     localStorage.removeItem(_id + ":ALLOW");
+    localStorage.removeItem(_id + ":COMPLETE");
+    localStorage.removeItem(_id + ":OPENSTRID"); 
 
     var chat = $.connection.proxyHub;
     chat.delete();
@@ -325,8 +339,10 @@ $('#category_panel_close').delegate('button.delete_strategy', 'click', function 
 
     var _allow = localStorage[_id + ":ALLOW"];
     var _run = localStorage[_id + ":RUN"];
+    var _complete = localStorage[_id + ":COMPLETE"];
 
-    if (_allow + _run > 0) {
+    if(_complete == "TRUE"){}
+    else if (_allow + _run > 0) {
         alert("交易运行时无法删除！");
         return;
     }
@@ -375,6 +391,9 @@ $('#category_panel_close').delegate('button.delete_strategy', 'click', function 
     localStorage.removeItem(_id + ":BASIS");
     localStorage.removeItem(_id + ":RUN");
     localStorage.removeItem(_id + ":ALLOW");
+    localStorage.removeItem(_id + ":COMPLETE");
+    localStorage.removeItem(_id + ":OPENSTRID");
+    localStorage.removeItem(_id + ":INDEX");
 
     var chat = $.connection.proxyHub;
     chat.delete();
@@ -436,6 +455,7 @@ window.onload = function (e) {
         if (Modernizr.localstorage) {
             localStorage.setItem("IDCollection", "");
             UpdateOPENStrategies(false);
+            $('#userName')[0].innerText= localStorage["USERNAME"];
         }
         else {
             alert("您当前使用的浏览器版本过低，网站功能将被限制！");
@@ -673,6 +693,7 @@ function UpdateOPENStrategies(changeFlag)
                 exist += id + ";"
                 localStorage.setItem("IDCollection", exist);
                 localStorage.setItem(id + ":CHANGE", 0);
+                localStorage.setItem(id + ":COMPLETE", "FALSE");
                 var chat = $.connection.proxyHub;
                 chat.join(id);
             }
@@ -725,6 +746,7 @@ function UpdateOPENStrategies(changeFlag)
             var sa = localStorage[id + ":SA"];
             var pe = localStorage[id + ":PE"];
             var basis = localStorage[id + ":BASIS"];
+            var openstrid = localStorage[id + ":OPENSTRID"];
 
             if (sp == "" || coe == "" || sd == "" || sa == "" || pe == "" || basis == "") continue;
 
@@ -792,7 +814,7 @@ function UpdateOPENStrategies(changeFlag)
             }
 
             var _ul = $('div.strategycategory_close[name=' + _name + ']');
-            var tt = _ul.find('li.list-group-item[sp_value=' + op + '][coe_value=' + hd + '][sd_value=' + sd + '][sa_value=' + sa + '][pe_value=' + pe + ']');
+            var tt = _ul.find('li.list-group-item[sp_value=' + sp + '][sd_value=' + sd + '][sa_value=' + sa + '][pe_value=' + pe + ']');
             if (tt.length != 0) {
                 continue;
             }
@@ -813,7 +835,7 @@ function UpdateOPENStrategies(changeFlag)
                 exist += id + ";"
                 localStorage.setItem("IDCollection", exist);
                 localStorage.setItem(id + ":CHANGE", 0);
-
+                localStorage.setItem(id + ":COMPLETE", "FALSE");
                 var chat = $.connection.proxyHub;
                 chat.join(id);
             }
@@ -847,7 +869,8 @@ function UpdateOPENStrategies(changeFlag)
                 COSTOFEQUITY: coe,
                 STOCKDIVIDENDS: sd,
                 PROSPECTIVEARNINGS: pe,
-                OB: basis
+                OB: basis,
+                Open_STR_ID: openstrid
             }
             
 
@@ -864,7 +887,6 @@ function UpdateOPENStrategies(changeFlag)
 
     
 }
-
 
 //刷新界面
 $('#refresh').click(function (e) {
@@ -911,17 +933,17 @@ $('#btnViewList').click(function (e) {
 //创建新开仓实例对路径的修改
 $('#OpenStrategyCreate').click(function (e) {
     var user = $.trim($('#userName')[0].innerText);
-    var href = $(this).attr('href') + user;
-
-    $(this).attr('href', href);
+    var href = $(this).attr('href')
+    var url = href.split('?')[0] + '?' + href.split('?')[1].split('&')[0] + '&' + href.split('?')[1].split('&')[1].split('=')[0] + '=' + user;
+    $(this).attr('href', url);
 
 })
 
 $('#CloseStrategyCreate').click(function (e) {
     var user = $.trim($('#userName')[0].innerText);
-    var href = $(this).attr('href') + user;
-
-    $(this).attr('href', href);
+    var href = $(this).attr('href')
+    var url = href.split('?')[0] + '?' + href.split('?')[1].split('&')[0] + '&' + href.split('?')[1].split('&')[1].split('=')[0] + '=' + user;
+    $(this).attr('href', url);
 })
 
 //确认交易列表S
@@ -980,73 +1002,6 @@ $('#btnSubmit_open').click(function (e) {
     } else {
     // no native support for HTML5 storage :(
     // maybe try dojox.storage or a third-party solution
-        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-        return;
-    }
-    alert('参数已写入，请刷新控制页面')
-})
-
-//平仓提交
-$('#btnSubmit_close').click(function (e) {
-
-    var ct = $.trim($('#ct_value')[0].value);
-    var hd = $.trim($('#hd_value')[0].value);
-    var sp = $.trim($('#sp_value')[0].value);
-    var coe = $('#coe_value')[0].value;
-    var sd = $('#sd_value')[0].value;
-    var sa = $('#sa_value')[0].value;
-    var pe = $('#pe_value')[0].value;
-    var basis = $('#basis_value')[0].value;
-
-    var buylist = $('#buylist')[0].value;
-    var id = $('#strategyID')[0].innerText;
-
-    var userName = $('#userName')[0].innerText;
-    var currentDate = new Date();
-
-    if (id == "NEW") {
-        id = userName + ":" + currentDate.getTime();
-    }
-
-
-    if (Modernizr.localstorage) {
-        //window.localStorage is available!
-        //0 : 开仓  1： 平仓 
-        localStorage.setItem(id + ":TYPE", 1);
-        //日期，只取天
-        localStorage.setItem(id + ":DT", currentDate.getDate());
-        //持仓列表
-        localStorage.setItem(id + ":BUYLIST", buylist);
-        //期货合约
-        localStorage.setItem(id + ":CT", ct);
-        //手数
-        localStorage.setItem(id + ":HD", hd);
-
-        //空头点位
-        localStorage.setItem(id + ":SP", sp);
-        //股票成本
-        localStorage.setItem(id + ":COE", coe);
-        //股票分红
-        localStorage.setItem(id + ":SD", sd);
-        //股票配股
-        localStorage.setItem(id + ":SA", sa);
-        //预期收益
-        localStorage.setItem(id + ":PE", pe);
-        //开仓基差
-        localStorage.setItem(id + ":BASIS", basis);
-
-        localStorage.setItem(id + ":CHANGE", 1);
-
-        if (localStorage[id + ":RUN"] == undefined) {
-            localStorage.setItem(id + ":RUN", 0);
-        }
-
-        if (localStorage[id + ":ALLOW"] == undefined) localStorage.setItem(id + ":ALLOW", 0);
-
-
-    } else {
-        // no native support for HTML5 storage :(
-        // maybe try dojox.storage or a third-party solution
         alert("您当前使用的浏览器版本过低，网站功能将被限制！");
         return;
     }
@@ -1122,14 +1077,12 @@ $('#login_btnLogin').click(function (e) {
     window.location.href = '/home/MonitorConsole'
 })
 
-
 //辅助函数
 function GetIndexFullName(briefName)
 {
-    if(briefName == 500)
-    { return "中证500" }
+    if(briefName == 990905){ return "中证500" }
     else if(briefName == 300){ return "沪深300";}
-    else if (briefName == 50) { return "上证50" }
+    else if (briefName == 999987) { return "上证50" }
     else { return "未知";}
 }
 
@@ -1146,6 +1099,82 @@ function GetHeader(headMark) {
     else if (headMark == "CLOSEALLOW") { return "B4"; }
     else if (headMark == "CLOSEDELETE") { return "B5";}
 }
+
+//平仓提交
+$('#btnSubmit_close').click(function (e) {
+    var ct = $.trim($('#contract_value')[0].value);
+    var hd = $.trim($('#open_hd')[0].innerText);
+    var sp = $.trim($('#openpoint_value')[0].value);
+    var coe = $('#coe_value')[0].value;
+    var sd = $('#sd_value')[0].value;
+    var sa = $('#sa_value')[0].value;
+    var pe = $('#pe_value')[0].value;
+    var basis = $('#basis_value')[0].value;
+    var index = $('#index_value')[0].value;
+
+    var buylist = $('#buylist')[0].value;
+    var id = $('#strategyID')[0].innerText;
+
+    var userName = $('#userName')[0].innerText;
+    var currentDate = new Date();
+    var open_str_id = $('.open_strategy_id')[0].innerText;
+
+    if (id == "NEW") {
+        id = userName + ":" + currentDate.getTime();
+    }
+
+
+    if (Modernizr.localstorage) {
+        //window.localStorage is available!
+        //0 : 开仓  1： 平仓 
+        localStorage.setItem(id + ":TYPE", 1);
+        //日期，只取天
+        localStorage.setItem(id + ":DT", currentDate.getDate());
+        //持仓列表
+        localStorage.setItem(id + ":BUYLIST", buylist);
+        //期货合约
+        localStorage.setItem(id + ":CT", ct);
+        //手数
+        localStorage.setItem(id + ":HD", hd);
+
+        //空头点位
+        localStorage.setItem(id + ":SP", sp);
+        //股票成本
+        localStorage.setItem(id + ":COE", coe);
+        //股票分红
+        localStorage.setItem(id + ":SD", sd);
+        //股票配股
+        localStorage.setItem(id + ":SA", sa);
+        //预期收益
+        localStorage.setItem(id + ":PE", pe);
+        //开仓基差
+        localStorage.setItem(id + ":BASIS", basis);
+
+        localStorage.setItem(id + ":CHANGE", 1);
+
+        localStorage.setItem(id + ":OPENSTRID", open_str_id);
+
+        localStorage.setItem(id + ":INDEX", index);
+
+
+        if (localStorage[id + ":RUN"] == undefined) {
+            localStorage.setItem(id + ":RUN", 0);
+        }
+
+        if (localStorage[id + ":ALLOW"] == undefined) localStorage.setItem(id + ":ALLOW", 0);
+
+
+    } else {
+        // no native support for HTML5 storage :(
+        // maybe try dojox.storage or a third-party solution
+        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+        return;
+    }
+    alert('参数已写入，请刷新控制页面')
+})
+
+
+
 
 
 

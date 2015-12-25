@@ -23,7 +23,7 @@ typedef struct securityindex
   securityindex & operator=(const securityindex & infor1)
   {
 	  this->cSecuritytype = infor1.cSecuritytype;
-	  strcpy(this->cSecurity_code, infor1.cSecurity_code);
+	  strcpy_s(this->cSecurity_code, infor1.cSecurity_code);
 	  return *this;
   }
 

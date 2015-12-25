@@ -128,12 +128,15 @@ namespace STYClass
 
 	bool CIndexFutureArbitrage_open::calculateSimTradeStrikeAndDelta() //计算模拟指数，交易指数，调整基差
 	{
+		
 		m_SyntheticIndex.updatepositioninfor();   //更新position文件，便与生产traderlist文件
-
+		
 		dTotalStocksMarketValue = m_SyntheticIndex.getrealmarketvalue(stopmarketvalue);  //获取position的市值
+		
 		this->dSimIndex = m_SyntheticIndex.getSimIndex();
 		this->dSimerrorPre = (this->dSimIndex - m_index.getlastprice()) / m_index.getlastprice();
 		this->dSimtraderPre = dTotalStocksMarketValue / (nHands *m_index.getlastprice()*m_future.getfuturetime());
+	
 		dOrgDeltaPre = (m_future.getlastprice() - m_index.getlastprice()) / m_index.getlastprice();  //原始基差 
 
 		dTotalStockBuyStrike = m_SyntheticIndex.getrealbuycost() - dTotalStocksMarketValue;  //冲击
@@ -142,29 +145,41 @@ namespace STYClass
 		this->dPositiveDelta = m_future.getlastprice()   //调整后的基差
 			- this->dSimIndex
 			- (this->dTotalStockBuyStrike + this->dFutureSellStrike) / (nHands*m_future.getfuturetime());
+	
+		isOpenPointReached();
+
 		return  true;
 	}
 
 	bool CIndexFutureArbitrage_open::isOpenPointReached()
 	{
+		int nCurrentTime = CTimeUtil::getIntTime();
 		if (!this->m_SyntheticIndex.isupdated() || !this->m_future.isupdated()) //行情
 		{
+			strcpy(this->statusmsg, "行情有问题");
+			int nCurrentTime6 = CTimeUtil::getIntTime();
 			return false;
 		}
-		if (abs(this->dSimerrorPre) > 0.002)  //模拟误差大于千分之2  
-		{
-			return false;
-		}
+		//if (abs(this->dSimerrorPre) > 0.002)  //模拟误差大于千分之2  
+		//{
+			//return false;
+		//}
 		if (!CTimeUtil::isAutoTradingTime())  //交易时间
 		{
+			strcpy(this->statusmsg, "非交易时间");
 			return false;
 		}
 		if (this->dPositiveDelta > this->dExpectOpenDelta) // 大于预设值，则允许开仓
 		{
+			strcpy(this->statusmsg, "等待交易");
 			return true;
+
 		}
 		else
+		{
+			strcpy(this->statusmsg, "正常运行");
 			return false;
+		}
 
 	}
 
@@ -193,20 +208,20 @@ namespace STYClass
 	}
 	bool   CIndexFutureArbitrage_open::getshowstatus(IndexFutureArbitrageopenshowargs & msg)
 	{
-		msg.futureprice = this->m_future.getlastprice();
-		msg.indexprice = this->m_index.getlastprice();
-		msg.SimIndex = this->dSimIndex;
-		msg.OrgDeltaPre = this->dOrgDeltaPre;
-		msg.SimerrorPre = this->dSimerrorPre;
+		msg.futureprice = this->m_future.getlastprice(); //期货价格
+		msg.indexprice = this->m_index.getlastprice(); //指数价格
+		msg.SimIndex = this->dSimIndex; //模拟指数
+		msg.OrgDeltaPre = this->dOrgDeltaPre;//原始基差
+		msg.SimerrorPre = this->dSimerrorPre;//模拟误差
 
-		msg.TotalStocksMarketValue = this->dTotalStocksMarketValue;
-		msg.stopmarketvalue = this->stopmarketvalue;
-		msg.uplimitmarketvalue = 0;
-		msg.TotalStockBuyStrike = this->dTotalStockBuyStrike;
-		msg.dFutureSellStrike = this->dFutureSellStrike;
-		msg.dPositiveDelta = this->dPositiveDelta;
-		msg.SimtraderPre = this->dSimtraderPre;
-		strcpy(msg.statusmsg, this->statusmsg);
+		msg.TotalStocksMarketValue = this->dTotalStocksMarketValue; //模拟市值
+		msg.stopmarketvalue = this->stopmarketvalue;//停盘市值
+		msg.uplimitmarketvalue = 0;//
+		msg.TotalStockBuyStrike = this->dTotalStockBuyStrike;//买入冲击
+		msg.dFutureSellStrike = this->dFutureSellStrike;//期货卖出冲击
+		msg.dPositiveDelta = this->dPositiveDelta;//调整基差
+		msg.SimtraderPre = this->dSimtraderPre;//交易误差
+		strcpy(msg.statusmsg, this->statusmsg);//显示状态 
 		return true;
 	}
 	/**********获取交易*******/
@@ -221,12 +236,17 @@ namespace STYClass
 		itor = this->m_SyntheticIndex.m_positionlist.begin();
 		while (itor != this->m_SyntheticIndex.m_positionlist.end())
 		{
+			
+
 			if (itor->bstoped)
+			{
+				itor++;
 				continue;
+			}
 			/*******生成交易报单********/
 			strcpy(m_stockorders[stockordernum].cSecurity_code, itor->sSecurity.cSecurity_code);
 			m_stockorders[stockordernum].cSecuritytype = itor->sSecurity.cSecuritytype;
-			m_stockorders[stockordernum].nSecurity_amount = itor->ntradervolume;
+			m_stockorders[stockordernum].nSecurity_amount = 100;// itor->ntradervolume; //测试
 			m_stockorders[stockordernum].dOrderprice = itor->dlastprice*1.02;   //以2%的溢价限价买入
 			if (m_stockorders[stockordernum].dOrderprice > itor->duplimitprice)
 				m_stockorders[stockordernum].dOrderprice = itor->duplimitprice;  //涨停价
@@ -239,6 +259,8 @@ namespace STYClass
 			m_stockorders[stockordernum].cOrderPriceType = 0; //股票只有限价单  不需要
 			m_stockorders[stockordernum].cTraderdirection = '1'; //买入
 			/**********************/
+
+
 			itor++;
 			stockordernum++;
 		}

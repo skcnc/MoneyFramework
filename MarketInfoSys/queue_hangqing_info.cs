@@ -19,6 +19,12 @@ namespace MarketInfoSys
             set;
         }
 
+        public static bool Suspend
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// 获取队列的实例
         /// </summary>
@@ -31,6 +37,13 @@ namespace MarketInfoSys
             }
 
             return instance;
+        }
+
+        public void EnQueue(object obj)
+        {
+            if (Suspend == true)
+                instance.Enqueue(obj);
+            else return;
         }
 
         /// <summary>
@@ -51,5 +64,18 @@ namespace MarketInfoSys
                 return -1;
             }
         }
+    }
+
+    /// <summary>
+    /// 模拟行情数据结构
+    /// </summary>
+    public class Sim_HQ_Struct
+    {
+        //代码
+        public string CODE { get; set; }
+        //类型
+        public string TYPE { get; set; }
+        //价格
+        public decimal PRICE { get; set; }
     }
 }

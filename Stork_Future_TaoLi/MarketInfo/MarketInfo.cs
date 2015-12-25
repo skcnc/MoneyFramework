@@ -102,12 +102,16 @@ namespace Stork_Future_TaoLi
                     log.LogEvent("未能成功返回； "+ ex.ToString());
                     continue;
                 }
+
                 if (info == null)
                     continue;
                 else
                 {
                     //发现行情有变动，更新本地股市
                     //注册hash键
+
+                    //MarketDelayCalculation.cal(info.Time);
+
                     if (StockTable.ContainsKey(info.Code))
                     {
                         StockTable.Remove(info.Code);

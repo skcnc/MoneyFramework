@@ -43,6 +43,7 @@
             this.QueueLength = new System.Windows.Forms.Label();
             this.updateCount = new System.Windows.Forms.Timer(this.components);
             this.login = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -60,7 +61,7 @@
             this.tbip.Name = "tbip";
             this.tbip.Size = new System.Drawing.Size(118, 21);
             this.tbip.TabIndex = 1;
-            this.tbip.Text = "114.80.154.34";
+            this.tbip.Text = "202.96.155.225";
             // 
             // tbport
             // 
@@ -68,7 +69,7 @@
             this.tbport.Name = "tbport";
             this.tbport.Size = new System.Drawing.Size(100, 21);
             this.tbport.TabIndex = 3;
-            this.tbport.Text = "6231";
+            this.tbport.Text = "6221";
             // 
             // label2
             // 
@@ -94,7 +95,7 @@
             this.tbuserName.Name = "tbuserName";
             this.tbuserName.Size = new System.Drawing.Size(118, 21);
             this.tbuserName.TabIndex = 3;
-            this.tbuserName.Text = "TD1033422002";
+            this.tbuserName.Text = "TD1379799005";
             // 
             // label6
             // 
@@ -112,7 +113,7 @@
             this.tbpassword.PasswordChar = '*';
             this.tbpassword.Size = new System.Drawing.Size(100, 21);
             this.tbpassword.TabIndex = 3;
-            this.tbpassword.Text = "27692616";
+            this.tbpassword.Text = "73166101";
             // 
             // rtbSubscribe
             // 
@@ -121,7 +122,7 @@
             this.rtbSubscribe.Name = "rtbSubscribe";
             this.rtbSubscribe.Size = new System.Drawing.Size(347, 432);
             this.rtbSubscribe.TabIndex = 4;
-            this.rtbSubscribe.Text = "600030.sh";
+            this.rtbSubscribe.Text = "";
             // 
             // btnSubmit
             // 
@@ -154,11 +155,23 @@
             this.login.TabIndex = 7;
             this.login.Text = "未登陆";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(231, 93);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(72, 16);
+            this.checkBox1.TabIndex = 8;
+            this.checkBox1.Text = "模拟开关";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // ControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(397, 590);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.login);
             this.Controls.Add(this.QueueLength);
             this.Controls.Add(this.btnSubmit);
@@ -196,5 +209,6 @@
         private System.Windows.Forms.Label QueueLength;
         private System.Windows.Forms.Timer updateCount;
         private System.Windows.Forms.Label login;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
