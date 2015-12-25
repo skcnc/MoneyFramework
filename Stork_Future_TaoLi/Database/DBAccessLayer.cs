@@ -264,6 +264,11 @@ namespace Stork_Future_TaoLi
             }
         }
 
+        public static void CreateFutureERRecord(object item)
+        {
+
+        }
+
         /// <summary>
         /// 修改委托记录
         /// </summary>
@@ -278,13 +283,14 @@ namespace Stork_Future_TaoLi
         public static void UpdateERRecord(object ret)
         {
             managedEntrustreturnstruct record = (managedEntrustreturnstruct)ret;
-            var selected = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ID == record.cOrderSysID select item);
-
-            if (selected.Count() > 0)
+            lock (ERtableLock)
             {
 
-                lock (ERtableLock)
+                var selected = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ID == record.cOrderSysID select item);
+
+                if (selected.Count() > 0)
                 {
+
                     var item = selected.ToList()[0];
                     item.ER_ORDER_STATUS = record.cOrderStatus.ToString();
                     item.ER_VOLUME_TOTAL_ORIGINAL = record.nVolumeTotalOriginal;
@@ -307,7 +313,7 @@ namespace Stork_Future_TaoLi
         }
 
         /// <summary>
-        /// 添加交易记录
+        /// 添加股票交易记录
         /// 成交记录只在委托完成后记录，如果委托未完成，就等它完成
         /// 因此这张表只会增加，不会删除或者修改
         /// --2015.08-07
@@ -318,8 +324,6 @@ namespace Stork_Future_TaoLi
             if (DBAccessLayer.DBEnable == false) { return; }
 
             managedBargainreturnstruct record = (managedBargainreturnstruct)ret;
-
-
 
             if (record != null)
             {
@@ -352,6 +356,47 @@ namespace Stork_Future_TaoLi
 
                     Dbsavechage("CreateDLRecord");
 
+                    Thread.Sleep(10);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 添加期货交易记录
+        /// 成交记录只在委托完成后记录，如果委托未完成，就等它完成
+        /// 因此这张表只会增加，不会删除或者修改
+        /// --2015.12.25
+        /// </summary>
+        /// <param name="ret"></param>
+        public static void CreateFutureDLRecord(object ret)
+        {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            RecordItem record = (RecordItem)ret;
+
+            if (record != null)
+            {
+                lock (DLtableLock)
+                {
+                    DL_TAOLI_TABLE item = new DL_TAOLI_TABLE()
+                    {
+                        DL_GUID = Guid.NewGuid(),
+                        DL_STRATEGY = record.StrategyId,
+                        DL_DIRECTION = Convert.ToInt16(record.Orientation),
+                        DL_CODE = record.Code,
+                        DL_NAME = record.Code,
+                        DL_STATUS = record.Status.ToString(),
+                        DL_TYPE = "f",
+                        DL_STOCK_AMOUNT = record.VolumeTraded,
+                        DL_BARGAIN_PRICE = Convert.ToDouble(record.Price),
+                        DL_BARGAIN_MONEY = Convert.ToDouble(record.Price) * record.VolumeTraded,
+                        DL_BARGAIN_TIME = record.OrderTime_Start.ToString(),
+                        DL_NO = record.OrderSysID.Trim()
+                    };
+
+                    DbEntity.DL_TAOLI_TABLE.Add(item);
+
+                    Dbsavechage("CreateFutureDLRecord");
                     Thread.Sleep(10);
                 }
             }
@@ -641,7 +686,7 @@ namespace Stork_Future_TaoLi
             String SG_IDs = String.Empty;
 
 
-            double op = Convert.ToDouble(info.OPENPOINT);
+            double op = Convert.ToDouble(info.BASIS);
             string contract = info.CONTRACT.Trim();
             int index = Convert.ToInt32(info.INDEX);
 

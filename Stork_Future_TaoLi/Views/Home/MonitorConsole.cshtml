@@ -153,27 +153,19 @@
                     </button>
                 </div>
             </div>
-            <div class="col-md-10  para_panel" style="margin-top:20px">
-                <i>
-                    参数1：***
-                    参数2：***
-                    参数3：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数1：***
-                    参数2：***
-                    参数3：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                    参数4：***
-                    参数5：***
-                    参数6：***
-                </i>
+            <div class="col-md-10 para_panel">
+                <div class="col-md-12 info">
+                    <p class="zhenshiqihuoshouyi"></p>
+                    <p class="zhenshigupiaoshouyi"></p>
+                    <p class="zhenshigupiaomaichushouyi"></p>
+                    <p class="dietingshizhi"></p>
+                    <p class="qihuomairuchongji"></p>
+                    <p class="tingpanshizhi"></p>
+                    <p class="quanbushouyi"></p>
+                    <p class="gupiaoshizhi"></p>
+                    <p class="gupiaochongji"></p>
+                    <p class="zhuangtai"></p>
+                </div>
             </div>
         </div>
     </li>
@@ -216,6 +208,16 @@
                     $(panel).find('.tiaozhengjicha').text(jsonString.split("&")[9]);
                     $(panel).find('.jiaoyiwucha').text(jsonString.split("&")[10]);
                     $(panel).find('.zhuangtai').text(jsonString.split("&")[11]);
+                    $(panel).find('.zhenshiqihuoshouyi').text(jsonString.split("&")[0]);
+                    $(panel).find('.zhenshigupiaoshouyi').text(jsonString.split("&")[1]);
+                    $(panel).find('.zhenshigupiaomaichushouyi').text(jsonString.split("&")[2]);
+                    $(panel).find('.dietingshizhi').text(jsonString.split("&")[3]);
+                    $(panel).find('.qihuomairuchongji').text(jsonString.split("&")[4]);
+                    $(panel).find('.tingpanshizhi').text(jsonString.split("&")[5]);
+                    $(panel).find('.quanbushouyi').text(jsonString.split("&")[6]);
+                    $(panel).find('.gupiaoshizhi').text(jsonString.split("&")[7]);
+                    $(panel).find('.gupiaochongji').text(jsonString.split("&")[8]);
+                    $(panel).find('.zhuangtai').text(jsonString.split("&")[9]);
                 }
             });
 

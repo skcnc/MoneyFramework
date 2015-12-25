@@ -582,12 +582,10 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                             m_strategy_open.updateSecurityInfo(infos.ToArray(), infos.Count);
 
-                            GlobalErrorLog.LogInstance.LogEvent("Round1 : " + ((DateTime.Now.Minute - d1.Minute) * 60 + (DateTime.Now.Second - d1.Second)).ToString());
                             d1 = DateTime.Now;
 
                             m_strategy_open.calculateSimTradeStrikeAndDelta();
 
-                            GlobalErrorLog.LogInstance.LogEvent("Round2 : " + ((DateTime.Now.Minute - d1.Minute) * 60 + (DateTime.Now.Second - d1.Second)).ToString());
 
                         }
                         else
@@ -697,7 +695,21 @@ namespace Stork_Future_TaoLi.StrategyModule
                 }
                 else
                 {
+                    string status = m_strategy_close.getshowstatus();
 
+                    List<string> statusLi = status.Split(' ').ToList();
+
+                    status = string.Empty;
+
+                    foreach (string i in statusLi)
+                    {
+                        if (i.Trim() != string.Empty)
+                        {
+                            status += (i + "&");
+                        }
+                    }
+
+                    PushStrategyInfo.Instance.UpdateStrategyInfo(StrategyInstanceID, status);
                 }
                 Thread.Sleep(1);
             }

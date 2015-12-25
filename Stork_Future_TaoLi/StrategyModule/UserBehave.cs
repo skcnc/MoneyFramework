@@ -347,7 +347,7 @@ namespace Stork_Future_TaoLi
 
         public String CONTRACT { get; set; }
 
-        public String OPENPOINT { get; set; }
+        public String BASIS { get; set; }
 
         public String INDEX { get; set; }
     }

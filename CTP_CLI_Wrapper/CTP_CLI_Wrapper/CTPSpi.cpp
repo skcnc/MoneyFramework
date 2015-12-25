@@ -112,7 +112,7 @@ void CCTPSpi::OnRtnTrade( CThostFtdcTradeField *pTrade )
 			this->rtnTradeCallback(&req);
 		}
 		else{
-			//this->rtnTradeCallback(pTrade);
+			this->rtnTradeCallback(pTrade);
 		}
 	}
 	catch (int e){}

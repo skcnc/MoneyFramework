@@ -393,6 +393,7 @@ $('#category_panel_close').delegate('button.delete_strategy', 'click', function 
     localStorage.removeItem(_id + ":ALLOW");
     localStorage.removeItem(_id + ":COMPLETE");
     localStorage.removeItem(_id + ":OPENSTRID");
+    localStorage.removeItem(_id + ":INDEX");
 
     var chat = $.connection.proxyHub;
     chat.delete();
@@ -813,7 +814,7 @@ function UpdateOPENStrategies(changeFlag)
             }
 
             var _ul = $('div.strategycategory_close[name=' + _name + ']');
-            var tt = _ul.find('li.list-group-item[sp_value=' + sp + '][coe_value=' + coe + '][sd_value=' + sd + '][sa_value=' + sa + '][pe_value=' + pe + ']');
+            var tt = _ul.find('li.list-group-item[sp_value=' + sp + '][sd_value=' + sd + '][sa_value=' + sa + '][pe_value=' + pe + ']');
             if (tt.length != 0) {
                 continue;
             }
@@ -951,7 +952,7 @@ $('#CloseStrategyCreate').click(function (e) {
 $('#btnSubmit_open').click(function (e) {
 
     var ct = $.trim($('#ct_value')[0].value);
-    var hd = $.trim($('#hd_value')[0].innerText);
+    var hd = $.trim($('#hd_value')[0].value);
     var op = $.trim($('#op_value')[0].value);
     var index = $('#index_input')[0].value;
 
@@ -1006,8 +1007,6 @@ $('#btnSubmit_open').click(function (e) {
     }
     alert('参数已写入，请刷新控制页面')
 })
-
-
 
 $('input[name="RadioType"]').change(function (e) {
     var type = $('input[name="RadioType"]:checked').val();
@@ -1101,7 +1100,6 @@ function GetHeader(headMark) {
     else if (headMark == "CLOSEDELETE") { return "B5";}
 }
 
-
 //平仓提交
 $('#btnSubmit_close').click(function (e) {
     var ct = $.trim($('#contract_value')[0].value);
@@ -1112,6 +1110,7 @@ $('#btnSubmit_close').click(function (e) {
     var sa = $('#sa_value')[0].value;
     var pe = $('#pe_value')[0].value;
     var basis = $('#basis_value')[0].value;
+    var index = $('#index_value')[0].value;
 
     var buylist = $('#buylist')[0].value;
     var id = $('#strategyID')[0].innerText;
@@ -1153,7 +1152,9 @@ $('#btnSubmit_close').click(function (e) {
 
         localStorage.setItem(id + ":CHANGE", 1);
 
-        localStorage.setItem(id + ":OPENSTRID",open_str_id);
+        localStorage.setItem(id + ":OPENSTRID", open_str_id);
+
+        localStorage.setItem(id + ":INDEX", index);
 
 
         if (localStorage[id + ":RUN"] == undefined) {

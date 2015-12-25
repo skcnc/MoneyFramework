@@ -23,7 +23,7 @@ namespace Stork_Future_TaoLi.Hubs
 
                     if (obj == null) return;
 
-                    if (obj == null || obj.CONTRACT == string.Empty || obj.INDEX == string.Empty || obj.OPENPOINT == string.Empty) return;
+                    if (obj == null || obj.CONTRACT == string.Empty || obj.INDEX == string.Empty || obj.BASIS == string.Empty) return;
                     int hd = 0;
                     String id = DBAccessLayer.SearchStrategy(obj,out hd);
       

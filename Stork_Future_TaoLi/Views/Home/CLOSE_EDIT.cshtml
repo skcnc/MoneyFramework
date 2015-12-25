@@ -11,7 +11,7 @@
         <div class="col-md-12">
             <div class="col-md-10">
                 <input id="contract_value" type="text" placeholder="期货合约" style="margin:5px" />
-                <input id="openpoint_value" type="text" placeholder="开仓点位" style="margin:5px" />
+                <input id="basis_value" type="text" placeholder="开仓基差" style="margin:5px" />
                 <input id="index_value" type="text" placeholder="指数合约" style="margin:5px" />
                 <span class="sr-only open_strategy_id" ></span> 
                 <span id="open_hd" class="sr-only open_hd"></span> 
@@ -28,7 +28,7 @@
                 <input id="sd_value" type="text" placeholder="股票分红" style="margin:5px" />
                 <input id="sa_value" type="text" placeholder="股票配股" style="margin:5px" />
                 <input id="pe_value" type="text" placeholder="预期收益" style="margin:5px" />
-                <input id="basis_value" type="text" placeholder="开仓基差" style="margin:5px" />
+                <input id="openpoint_value" type="text" placeholder="开仓点位" style="margin:5px" />
             </div>
             <div class="col-md-2">
                 <div class="col-md-12">
@@ -62,7 +62,7 @@
             $('#btnGetStrategyInfo').click(function () {
                 var index = $.trim($('#index_value')[0].value);
                 var contract = $.trim($('#contract_value')[0].value);
-                var op = $.trim($('#openpoint_value')[0].value);
+                var basis = $.trim($('#basis_value')[0].value);
                 var userName = $.trim($('#userName')[0].innerText);
 
                 //发送至服务器
@@ -76,7 +76,7 @@
                 var strategy = {
                     basic: _basic,
                     CONTRACT: contract,
-                    OPENPOINT: op,
+                    BASIS: basis,
                     INDEX: index
                 }
                 var chat = $.connection.strategyInfoHub;

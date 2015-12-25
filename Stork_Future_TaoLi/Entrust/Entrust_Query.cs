@@ -163,7 +163,7 @@ namespace Stork_Future_TaoLi.Entrust
                         ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateDLRecord), (object)bargin);
 
                         //更新持仓列表
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
+                        //ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
 
                     }
                 }

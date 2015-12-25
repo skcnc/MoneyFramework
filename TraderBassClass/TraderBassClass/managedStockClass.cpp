@@ -153,6 +153,10 @@ array<managedBargainreturnstruct^>^ managedStockClass::QueryTrader(QueryEntrustO
 	QueryEntrustorderstruct* query = new QueryEntrustorderstruct();
 	Bargainreturnstruct* ret = new Bargainreturnstruct[1];
 
+	IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(queryEntrust));
+	Marshal::StructureToPtr(queryEntrust, ptr, false);
+	query = (QueryEntrustorderstruct*)(ptr.ToPointer());
+
 	int count = 0;
 	char errmsg[255];
 
