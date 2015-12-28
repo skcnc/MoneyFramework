@@ -110,17 +110,17 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 行情系统状态
         /// </summary>
-        public DateTime MarketSystemStatus { get; set; }
+        public bool MarketSystemStatus { get; set; }
 
         /// <summary>
         /// 心跳发生系统状态
         /// </summary>
-        public DateTime HeartBeatSystemStatus { get; set; }
+        public bool HeartBeatSystemStatus { get; set; }
 
         /// <summary>
         /// 策略管理系统状态
         /// </summary>
-        public DateTime StrategyManagementSystemStatus { get; set; }
+        public bool StrategyManagementSystemStatus { get; set; }
 
         /// <summary>
         /// 策略工作系统状态
@@ -130,32 +130,32 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 交易预处理系统状态
         /// </summary>
-        public DateTime Pre_TradeControlSystemStatus { get; set; }
+        public bool Pre_TradeControlSystemStatus { get; set; }
 
         /// <summary>
         /// 期货交易管理系统状态
         /// </summary>
-        public DateTime FutureTradeManagementSystemStatus { get; set; }
+        public bool FutureTradeManagementSystemStatus { get; set; }
 
         /// <summary>
         /// 期货交易工作系统状态
         /// </summary>
-        public List<DateTime> FutureTradeWorkerSystemStatus { get; set; }
+        public List<bool> FutureTradeWorkerSystemStatus { get; set; }
         
         /// <summary>
         /// 股票交易管理系统状态
         /// </summary>
-        public DateTime StockTradeManagementSystemStatus { get; set; }
+        public bool StockTradeManagementSystemStatus { get; set; }
 
         /// <summary>
         /// 股票交易工作系统状态
         /// </summary>
-        public List<DateTime> StockTradeWorkerSystemStatus { get; set; }
+        public List<bool> StockTradeWorkerSystemStatus { get; set; }
 
         /// <summary>
         /// 委托查询系统状态
         /// </summary>
-        public DateTime StockEntrustManagementSystemStatus { get; set; }
+        public bool StockEntrustManagementSystemStatus { get; set; }
         #endregion 
 
     }
@@ -223,6 +223,20 @@ namespace Stork_Future_TaoLi
     }
 
 
+    class ThreadLatestMessage
+    {
+        public DateTime MarketSystemStatus { get; set; }
+        public DateTime HeartBeatSystemStatus { get; set; }
+        public DateTime StrategyManagementSystemStatus { get; set; }
+        public Dictionary<string, DateTime> StrategyWorkerSystemStatus { get; set; }
+        public DateTime Pre_TradeControlSystemStatus { get; set; }
+        public DateTime FutureTradeManagementSystemStatus { get; set; }
+        public List<DateTime> FutureTradeWorkerSystemStatus { get; set; }
+        public DateTime StockTradeManagementSystemStatus { get; set; }
+        public List<DateTime> StockTradeWorkerSystemStatus { get; set; }
+        public DateTime StockEntrustManagementSystemStatus { get; set; }
+    }
+
     class SystemMonitorClass
     {
         /// <summary>
@@ -233,6 +247,9 @@ namespace Stork_Future_TaoLi
         private static SystemMonitorClass instance;
 
         private static SystemStatusClass status = new SystemStatusClass();
+
+        private static ThreadLatestMessage messageData = new ThreadLatestMessage();
+
         /// <summary>
         /// 外部执行函数
         /// </summary>
@@ -258,8 +275,14 @@ namespace Stork_Future_TaoLi
         private static void ThreadProc()
         {
             DateTime lastmessage = DateTime.Now;
-            status.FutureTradeWorkerSystemStatus = new List<DateTime>(CONFIG.FUTURE_TRADE_THREAD_NUM);
-            status.StockTradeWorkerSystemStatus = new List<DateTime>(CONFIG.STOCK_TRADE_THREAD_NUM);
+
+            status.FutureTradeWorkerSystemStatus = new List<bool>(CONFIG.FUTURE_TRADE_THREAD_NUM);
+            status.StockTradeWorkerSystemStatus = new List<bool>(CONFIG.STOCK_TRADE_THREAD_NUM);
+
+
+            messageData.FutureTradeWorkerSystemStatus = new List<DateTime>(CONFIG.FUTURE_TRADE_THREAD_NUM);
+            messageData.StockTradeWorkerSystemStatus = new List<DateTime>(CONFIG.STOCK_TRADE_THREAD_NUM);
+
             status.StopStockList = new List<int>();
             status.StrategyInfomation = new Dictionary<string, StrategyInfo>();
             status.StrategyWorkerSystemStatus = new Dictionary<string, int>();
@@ -392,30 +415,28 @@ namespace Stork_Future_TaoLi
             switch (head)
             {
                 case "THREAD_MARKET":
-                    status.MarketSystemStatus = DateTime.Now;
+                    messageData.MarketSystemStatus = DateTime.Now;
                     break;
                 case "THREAD_HEARTBEAT":
-                    status.HeartBeatSystemStatus =  DateTime.Now;
+                    messageData.HeartBeatSystemStatus = DateTime.Now;
                     break;
                 case "THREAD_STRATEGY_MANAGEMENT":
-                    status.StrategyManagementSystemStatus = DateTime.Now;
+                    messageData.StrategyManagementSystemStatus = DateTime.Now;
                     break;
                 case "THREAD_STRATEGY_WORKER":
                     {
-                        status.StrategyWorkerSystemStatus.Clear();
-
+                        messageData.StrategyWorkerSystemStatus.Clear();
                         foreach(KeyValuePair<string,int> value in (Dictionary<string,int>)obj)
                         {
-
-                            status.StrategyWorkerSystemStatus.Add(value.Key, value.Value);
+                            messageData.StrategyWorkerSystemStatus.Add(value.Key, DateTime.Now);
                         }
                     }
                     break;
                 case "THREAD_PRE_TRADE":
-                    status.Pre_TradeControlSystemStatus = DateTime.Now;
+                    messageData.Pre_TradeControlSystemStatus = DateTime.Now;
                     break;
                 case "THREAD_FUTURE_TRADE_MONITOR":
-                    status.FutureTradeManagementSystemStatus = DateTime.Now;
+                    messageData.FutureTradeManagementSystemStatus = DateTime.Now;
                     break;
                 case "THREAD_FUTURE_TRADE_WORKER":
                     {
@@ -424,7 +445,7 @@ namespace Stork_Future_TaoLi
                     }
                     break;
                 case "THREAD_STOCK_TRADE_MONITOR":
-                    status.StockTradeManagementSystemStatus = DateTime.Now;
+                    messageData.StockTradeManagementSystemStatus = DateTime.Now;
                     break;
                 case "THREAD_STOCK_TRADE_WORKER":
                     {
