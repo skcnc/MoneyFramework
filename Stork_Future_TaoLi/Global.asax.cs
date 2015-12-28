@@ -10,6 +10,7 @@ using Stork_Future_TaoLi;
 using Stork_Future_TaoLi.TradeModule;
 using System.Threading;
 using Stork_Future_TaoLi.Entrust;
+using Stork_Future_TaoLi.Queues;
 
 
 namespace Stork_Future_TaoLi
@@ -57,6 +58,8 @@ namespace Stork_Future_TaoLi
 
             ThreadHeartBeatControl.Run();
 
+            SystemMonitorClass.getInstance().Run();
+
             Thread.Sleep(3000);
         }
     }
@@ -76,12 +79,22 @@ namespace Stork_Future_TaoLi
 
         private static void threadProc()
         {
+            DateTime lastmessage = DateTime.Now;
+
+
             while(true)
             {
                 Thread.Sleep(1000);
                 if (DateTime.Now.Minute % 2 == 0)
                 {
                     GlobalHeartBeat.SetGlobalTime();
+                }
+
+                if (lastmessage.Minute != DateTime.Now.Minute)
+                {
+                    KeyValuePair<string, object> message = new KeyValuePair<string, object>("THREAD_HEARTBEAT", (object)true);
+                    queue_system_status.GetQueue().Enqueue((object)message);
+                    lastmessage = DateTime.Now;
                 }
             }
         }

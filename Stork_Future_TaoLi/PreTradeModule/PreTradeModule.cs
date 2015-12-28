@@ -6,6 +6,7 @@ using Stork_Future_TaoLi.Variables_Type;
 using Stork_Future_TaoLi.Modulars;
 using System.Threading;
 using Stork_Future_TaoLi;
+using Stork_Future_TaoLi.Queues;
 
 namespace Stork_Future_TaoLi
 {
@@ -355,10 +356,19 @@ namespace Stork_Future_TaoLi
                 
                 #endregion
 
+                if (DateTime.Now.Minute != PreTradeModule.isRunning.Minute)
+                {
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_PRE_TRADE", (object)true);
+                    queue_system_status.GetQueue().Enqueue((object)message1);
+
+                }
+
                 if (DateTime.Now.Second != PreTradeModule.isRunning.Second)
                 {
                     PreTradeModule.isRunning = DateTime.Now;
                 }
+
+                
 
             }
         }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections;
 using marketinfosys;
+using Stork_Future_TaoLi.Queues;
 
 
 
@@ -76,20 +77,35 @@ namespace Stork_Future_TaoLi
         private void ThreadProc()
         {
             //本地股市信息存入stockTable 中
-            
-            
             StockInfoClient client = new StockInfoClient();
+
+            KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_MARKET", (object)true);
+            queue_system_status.GetQueue().Enqueue((object)message1);
+            DateTime lastmessage = DateTime.Now;
+
             while (true)
             {
+
                 //更新本地行情列表
                 updateNewSubscribeList();
 
                 //从行情应用获取新行情
                 Thread.Sleep(1); //线程的喘息时间
 
+                if (DateTime.Now.Minute != lastmessage.Minute)
+                {
+                    KeyValuePair<string, object> message3 = new KeyValuePair<string, object>("THREAD_MARKET", (object)false);
+                    queue_system_status.GetQueue().Enqueue((object)message3);
+                    lastmessage = DateTime.Now;
+                }
+
                 if((DateTime.Now-GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 15)
                 {
                     log.LogEvent("行情获取线程即将停止！");
+
+                    KeyValuePair<string, object> message2 = new KeyValuePair<string, object>("THREAD_MARKET", (object)false);
+                    queue_system_status.GetQueue().Enqueue((object)message2);
+
                     break;
                 }
                 MarketData info = new MarketData();

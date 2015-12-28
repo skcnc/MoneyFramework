@@ -28,6 +28,7 @@ namespace Stork_Future_TaoLi
         private string TEST_ADDRESS = "tcp://119.15.140.81:41205";
 
 
+
         #region 委托参数
         /// <summary>
         /// 经纪公司代码
@@ -210,6 +211,7 @@ namespace Stork_Future_TaoLi
 
                 while (true)
                 {
+
                     Thread.Sleep(10);
 
                     if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
@@ -218,8 +220,6 @@ namespace Stork_Future_TaoLi
                         _threadRunControl = false;
                         break;
                     }
-
-
 
 
                     if (queue_future_excuteThread.GetQueue(_threadNo).Count < 2)

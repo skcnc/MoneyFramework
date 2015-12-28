@@ -1,4 +1,5 @@
-﻿using Stork_Future_TaoLi.StrategyModule;
+﻿using Stork_Future_TaoLi.Queues;
+using Stork_Future_TaoLi.StrategyModule;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -376,15 +377,19 @@ namespace Stork_Future_TaoLi
         /// </summary>
         private void ThreadProc()
         {
+
+
             while(true)
             {
                 if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 15)
                 {
                     log.LogEvent("系统供血模块无响应，策略管理线程即将停止！");
-                    
+                    KeyValuePair<string, object> message2 = new KeyValuePair<string, object>("THREAD_STRATEGY_MANAGEMENT", (object)false);
+                    queue_system_status.GetQueue().Enqueue((object)message2);
                     //管理策略线程退出前，对正在运行的工作策略执行“绞杀”，并维护数据库记录，这个过程称为 grace broken 
                     break;
                 }
+
 
                 while(QCommands.Count > 0)
                 {
@@ -444,7 +449,9 @@ namespace Stork_Future_TaoLi
                     if (_logUpdateTime.Second != DateTime.Now.Second)
                     {
                         _logUpdateTime = DateTime.Now;
-                        
+
+                        KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STRATEGY_MANAGEMENT", (object)true);
+                        queue_system_status.GetQueue().Enqueue((object)message1);
 
                         int count_0 = (from item in WorkersStratus where item.Value == 0 select item).Count();
                         int count_12 = (from item in WorkersStratus where item.Value == 1 || item.Value == 2 select item).Count();
@@ -456,6 +463,9 @@ namespace Stork_Future_TaoLi
                             WorkersStratus[item.Key] = item.Value.Status;
                             item.Value.Status = 0;
                         }
+
+                        KeyValuePair<string, object> message3 = new KeyValuePair<string, object>("THREAD_STRATEGY_WORKER", (object)WorkersStratus);
+                        queue_system_status.GetQueue().Enqueue((object)message3);
                     }
                 }
 

@@ -175,6 +175,11 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         public int Status { get; set; }
 
+        /// <summary>
+        /// 线程内更新时间变量，上级系统抓取该变量判断系统运行状态
+        /// </summary>
+        public DateTime RunningMark { get; set; }
+
         #endregion
 
         #region private variables
@@ -432,7 +437,9 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         private void _threadProc()
         {
-            while (!bRun) { 
+            while (!bRun) {
+                //标记最后扫描时间，交付上级判断
+                RunningMark = DateTime.Now;
 
                 //尚未运行的策略，直接丢弃队列中新的行情
                 while (_marketQueue.Count > 0)
@@ -443,6 +450,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                 Status = 1;
                 
                 Thread.Sleep(10); 
+
             }
 
             if (DBAccessLayer.DBEnable)
@@ -452,6 +460,8 @@ namespace Stork_Future_TaoLi.StrategyModule
 
             while (!breaklabel)
             { 
+
+
                 /****
                  * 循环工作：
                  * 1. 更新行情信息
@@ -459,6 +469,9 @@ namespace Stork_Future_TaoLi.StrategyModule
                  * 3. 判断运行条件
                  * 4. 生成交易列表
                  * ****/
+
+                //标记最后扫描时间，交付上级判断
+                RunningMark = DateTime.Now;
 
                 if (Status == 1)
                 {

@@ -260,6 +260,7 @@
     <Compile Include="Hubs\StrategyInfoHub.cs" />
     <Compile Include="Hubs\TradeMonitorHub.cs" />
     <Compile Include="Queues\queue_future_excuteThread.cs" />
+    <Compile Include="Queues\queue_system_status.cs" />
     <Compile Include="TradeModule\FutureMonitor.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -401,6 +402,7 @@
     <Content Include="Views\Home\MarketView.cshtml" />
     <Content Include="Views\Home\TradeMonitor.cshtml" />
     <Content Include="Views\Home\SysLogin.cshtml" />
+    <Content Include="Views\Home\SysMonitor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

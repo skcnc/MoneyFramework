@@ -46,7 +46,7 @@ namespace Stork_Future_TaoLi
             //初始化子线程
             int futureNum = CONFIG.FUTURE_TRADE_THREAD_NUM;
 
-
+            DateTime lastmessage = DateTime.Now;
 
             List<Task> TradeThreads = new List<Task>();
             log.LogEvent("期货交易控制子线程启动： 初始化交易线程数 :" + futureNum.ToString());
@@ -87,7 +87,12 @@ namespace Stork_Future_TaoLi
                 //获取下一笔交易
                 List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
 
-
+                if (lastmessage.Minute != DateTime.Now.Minute)
+                {
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_FUTURE_TRADE_MONITOR", (object)true);
+                    queue_system_status.GetQueue().Enqueue((object)message1);
+                    lastmessage = DateTime.Now;
+                }
 
                 if (QUEUE_FUTURE_TRADE.GetQueueNumber() > 0)
                 {
@@ -133,12 +138,8 @@ namespace Stork_Future_TaoLi
                 //************************************
                 //将交易发送到相应执行线程后需要做的事情
                 //************************************
-                //if (DateTime.Now.Second % 3 == 0)
-                //{
-                //    //每3秒更新一次线程使用状况
-                //    Console.WriteLine(DateTime.Now.ToString());
-                //    Console.WriteLine("Thread Busy Rate : " + queue_stock_excuteThread.GetBusyNum().ToString() + "/" + stockNum.ToString());
-                //}
+
+
             }
             Thread.CurrentThread.Abort();
         }

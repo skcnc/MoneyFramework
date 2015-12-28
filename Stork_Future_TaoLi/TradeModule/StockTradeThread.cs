@@ -47,6 +47,8 @@ namespace Stork_Future_TaoLi.TradeModule
             //初始化子线程
             int stockNum = CONFIG.STOCK_TRADE_THREAD_NUM;
 
+            DateTime lastmessage = DateTime.Now;
+
             List<Task> TradeThreads = new List<Task>();
             log.LogEvent("股票交易控制子线程启动： 初始化交易线程数 :" + stockNum.ToString());
 
@@ -77,14 +79,17 @@ namespace Stork_Future_TaoLi.TradeModule
                 if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
                 {
                     log.LogEvent("本模块供血不足，线程即将死亡");
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_MONITOR", (object)false);
+                    queue_system_status.GetQueue().Enqueue((object)message1);
                     break;
                 }
 
-                //向心跳发起线程发送心跳
-                //if (DateTime.Now.Second % 2 == 0 && Queue_Trade_Heart_Beat.GetQueueNumber() < 2)
-                //{
-                //    Queue_Trade_Heart_Beat.GetQueue().Enqueue(new object());
-                //}
+                if (lastmessage.Minute != DateTime.Now.Minute)
+                {
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_MONITOR", (object)true);
+                    queue_system_status.GetQueue().Enqueue((object)message1);
+                    lastmessage = DateTime.Now;
+                }
 
                 //获取下一笔交易
                 List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
