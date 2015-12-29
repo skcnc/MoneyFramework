@@ -87,7 +87,7 @@ namespace Stork_Future_TaoLi
                 //获取下一笔交易
                 List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
 
-                if (lastmessage.Minute != DateTime.Now.Minute)
+                if (lastmessage.Second != DateTime.Now.Second)
                 {
                     KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_FUTURE_TRADE_MONITOR", (object)true);
                     queue_system_status.GetQueue().Enqueue((object)message1);

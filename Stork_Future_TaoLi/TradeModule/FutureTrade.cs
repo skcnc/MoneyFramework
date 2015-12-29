@@ -166,6 +166,8 @@ namespace Stork_Future_TaoLi
             //令该线程为前台线程
             Thread.CurrentThread.IsBackground = true;
 
+            DateTime lastmessagetime = DateTime.Now;
+
             TradeParaPackage _tpp = (TradeParaPackage)para;
 
             //当前线程编号
@@ -221,6 +223,11 @@ namespace Stork_Future_TaoLi
                         break;
                     }
 
+                    if (lastmessagetime.Second != DateTime.Now.Second)
+                    {
+                        KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_FUTURE_TRADE_WORKER", (object)_threadNo);
+                        queue_system_status.GetQueue().Enqueue((object)message1);
+                    }
 
                     if (queue_future_excuteThread.GetQueue(_threadNo).Count < 2)
                     {

@@ -84,7 +84,7 @@ namespace Stork_Future_TaoLi.TradeModule
                     break;
                 }
 
-                if (lastmessage.Minute != DateTime.Now.Minute)
+                if (lastmessage.Second != DateTime.Now.Second)
                 {
                     KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_MONITOR", (object)true);
                     queue_system_status.GetQueue().Enqueue((object)message1);
@@ -185,6 +185,7 @@ namespace Stork_Future_TaoLi.TradeModule
             sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 开始执行");
             //用作发送心跳包的时间标记
             DateTime _markedTime = DateTime.Now;
+            DateTime lastmessagetime = DateTime.Now;
 
             //初始化通信
             //功能1
@@ -207,6 +208,13 @@ namespace Stork_Future_TaoLi.TradeModule
                     //_stockTradeAPI.heartBeat();
                     _classTradeStock.HeartBeat();
                     _markedTime = DateTime.Now;
+                }
+
+                if(lastmessagetime.Second != DateTime.Now.Second)
+                {
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("StockTradeWorkerSystemStatus", (object)_threadNo);
+                    queue_system_status.GetQueue().Enqueue((object)message1);
+                    lastmessagetime = DateTime.Now;
                 }
 
 

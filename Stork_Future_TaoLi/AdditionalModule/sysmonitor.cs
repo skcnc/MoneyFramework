@@ -294,6 +294,42 @@ namespace Stork_Future_TaoLi
                     lastmessage = DateTime.Now;
 
                     //此处需要把信息发出去
+                    SystemStatusClass message = new SystemStatusClass();
+                    DateTime current = DateTime.Now;
+
+                    message.StrategyWorkerSystemStatus = new Dictionary<string, int>();
+                    message.FutureTradeWorkerSystemStatus = new List<bool>();
+                    message.StockTradeWorkerSystemStatus = new List<bool>();
+
+                    if ((current - messageData.MarketSystemStatus).TotalSeconds > 5) { message.MarketSystemStatus = false; } else { message.MarketSystemStatus = true; }
+                    if ((current - messageData.HeartBeatSystemStatus).TotalSeconds > 5) { message.HeartBeatSystemStatus = false; } else { message.HeartBeatSystemStatus = true; }
+                    if ((current - messageData.StrategyManagementSystemStatus).TotalSeconds > 5) { message.StrategyManagementSystemStatus = false; } else { message.StrategyManagementSystemStatus = true; }
+                    
+                    foreach(KeyValuePair<string,DateTime> value in messageData.StrategyWorkerSystemStatus)
+                    {
+                        if ((current - value.Value).TotalSeconds > 5) { message.StrategyWorkerSystemStatus.Add(value.Key.Substring(0, value.Key.Length - 1), 0); } else { message.StrategyWorkerSystemStatus.Add(value.Key.Substring(0, value.Key.Length - 1), Convert.ToInt16(value.Key.Substring(value.Key.Length - 1, 1))); }
+                    }
+
+                    if ((current - messageData.Pre_TradeControlSystemStatus).TotalSeconds > 5) { message.Pre_TradeControlSystemStatus = false; } else { message.Pre_TradeControlSystemStatus = true; }
+
+                    if ((current - messageData.FutureTradeManagementSystemStatus).TotalSeconds > 5) { message.FutureTradeManagementSystemStatus = false; } else { message.FutureTradeManagementSystemStatus = true; }
+
+                    int count = 0;
+                    foreach(DateTime time in messageData.FutureTradeWorkerSystemStatus)
+                    {
+                        if ((current - messageData.FutureTradeWorkerSystemStatus[count]).TotalSeconds > 5) { message.FutureTradeWorkerSystemStatus[count] = false; } else { message.FutureTradeWorkerSystemStatus[count] = true; }
+                        count++;
+                    }
+
+
+                    if ((current - messageData.StockTradeManagementSystemStatus).TotalSeconds > 5) { message.StockTradeManagementSystemStatus = false; } else { message.StockTradeManagementSystemStatus = true; }
+
+                    count = 0;
+                    foreach (DateTime time in messageData.FutureTradeWorkerSystemStatus)
+                    {
+                        if ((current - messageData.StockTradeWorkerSystemStatus[count]).TotalSeconds > 5) { message.StockTradeWorkerSystemStatus[count] = false; } else { message.StockTradeWorkerSystemStatus[count] = true; }
+                        count++;
+                    }
                 }
                 
 
@@ -428,7 +464,7 @@ namespace Stork_Future_TaoLi
                         messageData.StrategyWorkerSystemStatus.Clear();
                         foreach(KeyValuePair<string,int> value in (Dictionary<string,int>)obj)
                         {
-                            messageData.StrategyWorkerSystemStatus.Add(value.Key, DateTime.Now);
+                            messageData.StrategyWorkerSystemStatus.Add(value.Key+value.Value.ToString(), DateTime.Now);
                         }
                     }
                     break;
@@ -440,8 +476,8 @@ namespace Stork_Future_TaoLi
                     break;
                 case "THREAD_FUTURE_TRADE_WORKER":
                     {
-                        //int No = (int)obj;
-                        //status.FutureTradeWorkerSystemStatus[No] = DateTime.Now;
+                        int No = (int)obj;
+                        messageData.FutureTradeWorkerSystemStatus[No] = DateTime.Now;
                     }
                     break;
                 case "THREAD_STOCK_TRADE_MONITOR":
@@ -449,10 +485,8 @@ namespace Stork_Future_TaoLi
                     break;
                 case "THREAD_STOCK_TRADE_WORKER":
                     {
-                        //for(int i =0;i<((List<bool>)obj).Count;i++)
-                        //{
-                        //    status.StockTradeWorkerSystemStatus[i] = ((List<bool>)obj)[i];
-                        //}
+                        int No = (int)obj;
+                        messageData.StockTradeWorkerSystemStatus[No] = DateTime.Now;
                     }
                     break;
                 default: break;

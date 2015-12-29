@@ -92,7 +92,7 @@ namespace Stork_Future_TaoLi
                 //从行情应用获取新行情
                 Thread.Sleep(1); //线程的喘息时间
 
-                if (DateTime.Now.Minute != lastmessage.Minute)
+                if (DateTime.Now.Second != lastmessage.Second)
                 {
                     KeyValuePair<string, object> message3 = new KeyValuePair<string, object>("THREAD_MARKET", (object)false);
                     queue_system_status.GetQueue().Enqueue((object)message3);

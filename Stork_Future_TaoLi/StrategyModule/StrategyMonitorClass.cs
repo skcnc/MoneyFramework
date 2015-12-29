@@ -444,7 +444,7 @@ namespace Stork_Future_TaoLi
                 }
 
 
-                if (DateTime.Now.Second == 0)
+                if (DateTime.Now.Second % 2 == 0)
                 {
                     if (_logUpdateTime.Second != DateTime.Now.Second)
                     {

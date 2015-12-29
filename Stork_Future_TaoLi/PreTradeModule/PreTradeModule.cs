@@ -356,15 +356,10 @@ namespace Stork_Future_TaoLi
                 
                 #endregion
 
-                if (DateTime.Now.Minute != PreTradeModule.isRunning.Minute)
+                if (DateTime.Now.Second != PreTradeModule.isRunning.Second)
                 {
                     KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_PRE_TRADE", (object)true);
                     queue_system_status.GetQueue().Enqueue((object)message1);
-
-                }
-
-                if (DateTime.Now.Second != PreTradeModule.isRunning.Second)
-                {
                     PreTradeModule.isRunning = DateTime.Now;
                 }
 

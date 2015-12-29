@@ -90,7 +90,7 @@ namespace Stork_Future_TaoLi
                     GlobalHeartBeat.SetGlobalTime();
                 }
 
-                if (lastmessage.Minute != DateTime.Now.Minute)
+                if (lastmessage.Second != DateTime.Now.Second)
                 {
                     KeyValuePair<string, object> message = new KeyValuePair<string, object>("THREAD_HEARTBEAT", (object)true);
                     queue_system_status.GetQueue().Enqueue((object)message);
