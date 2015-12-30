@@ -458,14 +458,38 @@ namespace Stork_Future_TaoLi
 
                         log.LogEvent("运行策略： " + (count_0 + count_12).ToString() + "\n问题或结束策略： " + count_0.ToString());
 
+                        Dictionary<String, StrategyInfo> strategyInfo = new Dictionary<string, StrategyInfo>();
                         foreach (var item in Workers)
                         {
                             WorkersStratus[item.Key] = item.Value.Status;
                             item.Value.Status = 0;
+
+                            StrategyInfo info = new StrategyInfo()
+                            {
+                                BelongUser = item.Value.User,
+                                StrType = item.Value.Type,
+                                Contract = item.Value.CT,
+                                Status = item.Value.Status,
+                                StrategyInstanceID = item.Value.StrategyInstanceID,
+                                HandNum = item.Value.HD,
+                                SubscribeList = new List<string>(item.Value.SubscribeList.Count)
+                            };
+
+                            foreach(string s in item.Value.SubscribeList)
+                            {
+                                info.SubscribeList.Add(s);
+                            }
                         }
 
-                        KeyValuePair<string, object> message3 = new KeyValuePair<string, object>("THREAD_STRATEGY_WORKER", (object)WorkersStratus);
+                        int count = Workers.Count;
+                        KeyValuePair<string, object> message2 = new KeyValuePair<string, object>("STRATEGY_N", (object)count);
+                        queue_system_status.GetQueue().Enqueue((object)message2);
+
+                        KeyValuePair<string, object> message3 = new KeyValuePair<string, object>("STRATEGY_P", (object)count);
                         queue_system_status.GetQueue().Enqueue((object)message3);
+
+                        KeyValuePair<string, object> message4 = new KeyValuePair<string, object>("THREAD_STRATEGY_WORKER", (object)WorkersStratus);
+                        queue_system_status.GetQueue().Enqueue((object)message4);
                     }
                 }
 

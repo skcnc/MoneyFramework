@@ -14,24 +14,16 @@ namespace Stork_Future_TaoLi
         public static int TotalDelaySecond = 0;
         public static int TotalMarketCount = 0;
 
-        private static bool minute_door = false;
-        private static int second_door = 0;
+        
+        private static DateTime updatetime = DateTime.Now;
 
-        public static void cal(int time,int i)
+        public static void cal(int time)
         {
             if(time == 80006000)
             {
                 return;
             }
 
-
-
-            if (DateTime.Now.Second != second_door) { 
-                //MarketDelayLog.LogInstance.LogEvent(DateTime.Now.ToString());
-                second_door = DateTime.Now.Second;
-
-                MarketDelayLog.LogInstance.LogEvent(i.ToString());
-            }
 
             if (time == 0) return;
 
@@ -199,12 +191,12 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 指数类型
         /// </summary>
-        public string Index { get; set; }
+        //public string Index { get; set; }
 
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreateTime { get; set; }
+        //public DateTime CreateTime { get; set; }
 
         /// <summary>
         /// 策略状态
@@ -214,12 +206,17 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 线程号
         /// </summary>
-        public int ThreadNo { get; set; }
+        public string StrategyInstanceID { get; set; }
 
         /// <summary>
         /// 订阅列表
         /// </summary>
-        public List<int> SubscribeList { get; set; }
+        public List<string> SubscribeList { get; set; }
+
+        /// <summary>
+        /// 手数
+        /// </summary>
+        public int HandNum { get; set; }
     }
 
 
