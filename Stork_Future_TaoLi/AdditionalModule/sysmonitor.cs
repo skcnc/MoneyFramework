@@ -39,21 +39,22 @@ namespace Stork_Future_TaoLi
             TotalDelaySecond += delay;
             TotalMarketCount += 1;
 
-            if (_now.Second == 0)
+            if (_now.Minute != updatetime.Minute    )
             {
-                if (minute_door == false)
-                {
-                    minute_door = true;
-                    MarketDelayLog.LogInstance.LogEvent(
-                        "时间： " + _now.ToString() + "\r\n" +
-                        "平均延时： " + (TotalDelaySecond / TotalMarketCount) + "\r\n" +
-                        "行情数量： " + TotalMarketCount
-                        );
-                }
-            }
-            else
-            {
-                minute_door = false;
+                updatetime = _now;
+
+                MarketDelayLog.LogInstance.LogEvent(
+                    "时间： " + _now.ToString() + "\r\n" +
+                    "平均延时： " + (TotalDelaySecond / TotalMarketCount) + "\r\n" +
+                    "行情数量： " + TotalMarketCount
+                    );
+
+                KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("MARKET_F", (object)TotalMarketCount);
+                queue_system_status.GetQueue().Enqueue((object)message1);
+
+                KeyValuePair<string, object> message2 = new KeyValuePair<string, object>("MARKET_D", (object)(TotalDelaySecond / TotalMarketCount));
+                queue_system_status.GetQueue().Enqueue((object)message2);
+
             }
 
         }
@@ -64,7 +65,7 @@ namespace Stork_Future_TaoLi
     class SystemStatusClass
     {
         #region WEB 端用户状态
-        public List<WebUserInfo> WebLogInfo { get; set; }
+        //public List<WebUserInfo> WebLogInfo { get; set; }
         #endregion
 
         #region 行情信息
