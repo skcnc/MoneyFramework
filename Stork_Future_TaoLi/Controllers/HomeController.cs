@@ -52,6 +52,11 @@ namespace Stork_Future_TaoLi.Controllers
             return View();
         }
 
+        public ActionResult SysMonitor()
+        {
+            return View();
+        }
+
         public string ImportHarbor(String InputJson)
         {
             try

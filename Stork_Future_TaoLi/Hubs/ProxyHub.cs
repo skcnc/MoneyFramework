@@ -57,7 +57,6 @@ namespace Stork_Future_TaoLi
             PushStrategyInfo.Instance.join(name, Context.ConnectionId);
         }
 
-
         public void leave()
         {
             PushStrategyInfo.Instance.leave(Context.ConnectionId);
@@ -166,4 +165,6 @@ namespace Stork_Future_TaoLi
             return RegisterRelation.Count;
         }
     }
+
+
 }

@@ -1,4 +1,5 @@
-﻿using Stork_Future_TaoLi.Queues;
+﻿using Stork_Future_TaoLi.Hubs;
+using Stork_Future_TaoLi.Queues;
 using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections.Generic;
@@ -27,34 +28,42 @@ namespace Stork_Future_TaoLi
 
             if (time == 0) return;
 
-            string _time = (time / 1000).ToString();
-            int hour = Convert.ToInt16(_time.Substring(0, 2));
-            int minute = Convert.ToInt16(_time.Substring(2, 2));
-            int second = Convert.ToInt16(_time.Substring(4, 2));
-
-            DateTime _now = DateTime.Now;
-
-            int delay = (_now.Hour - hour) * 3600 + (_now.Minute - minute) * 60 + (_now.Second - second);
-
-            TotalDelaySecond += delay;
-            TotalMarketCount += 1;
-
-            if (_now.Minute != updatetime.Minute    )
+            try
             {
-                updatetime = _now;
+                string _time = (time / 1000).ToString();
+                int hour = Convert.ToInt16(_time.Substring(0, 2));
+                int minute = Convert.ToInt16(_time.Substring(2, 2));
+                int second = Convert.ToInt16(_time.Substring(4, 2));
 
-                MarketDelayLog.LogInstance.LogEvent(
-                    "时间： " + _now.ToString() + "\r\n" +
-                    "平均延时： " + (TotalDelaySecond / TotalMarketCount) + "\r\n" +
-                    "行情数量： " + TotalMarketCount
-                    );
+                DateTime _now = DateTime.Now;
 
-                KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("MARKET_F", (object)TotalMarketCount);
-                queue_system_status.GetQueue().Enqueue((object)message1);
+                int delay = (_now.Hour - hour) * 3600 + (_now.Minute - minute) * 60 + (_now.Second - second);
 
-                KeyValuePair<string, object> message2 = new KeyValuePair<string, object>("MARKET_D", (object)(TotalDelaySecond / TotalMarketCount));
-                queue_system_status.GetQueue().Enqueue((object)message2);
+                TotalDelaySecond += delay;
+                TotalMarketCount += 1;
 
+                if (_now.Minute != updatetime.Minute)
+                {
+                    updatetime = _now;
+
+                    MarketDelayLog.LogInstance.LogEvent(
+                        "时间： " + _now.ToString() + "\r\n" +
+                        "平均延时： " + (TotalDelaySecond / TotalMarketCount) + "\r\n" +
+                        "行情数量： " + TotalMarketCount
+                        );
+
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("MARKET_F", (object)TotalMarketCount);
+                    queue_system_status.GetQueue().Enqueue((object)message1);
+
+                    KeyValuePair<string, object> message2 = new KeyValuePair<string, object>("MARKET_D", (object)(TotalDelaySecond / TotalMarketCount));
+                    queue_system_status.GetQueue().Enqueue((object)message2);
+
+                }
+
+            }
+            catch
+            {
+                return;
             }
 
         }
@@ -62,7 +71,7 @@ namespace Stork_Future_TaoLi
 
 
 
-    class SystemStatusClass
+    public class SystemStatusClass
     {
         #region WEB 端用户状态
         //public List<WebUserInfo> WebLogInfo { get; set; }
@@ -172,7 +181,7 @@ namespace Stork_Future_TaoLi
     /// <summary>
     /// 行情信息
     /// </summary>
-    class StrategyInfo
+    public class StrategyInfo
     {
         /// <summary>
         /// 策略创建者
@@ -253,7 +262,41 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public void Run()
         {
+            messageData.FutureTradeWorkerSystemStatus = new List<DateTime>(CONFIG.FUTURE_TRADE_THREAD_NUM);
+            for (int i = 0; i < CONFIG.FUTURE_TRADE_THREAD_NUM; i++)
+            {
+                messageData.FutureTradeWorkerSystemStatus.Add(DateTime.Now);
+            }
+            messageData.StockTradeWorkerSystemStatus = new List<DateTime>(CONFIG.STOCK_TRADE_THREAD_NUM);
+
+            for (int i = 0; i < CONFIG.STOCK_TRADE_THREAD_NUM; i++)
+            {
+                messageData.StockTradeWorkerSystemStatus.Add(DateTime.Now);
+            }
+
+            messageData.StrategyWorkerSystemStatus = new Dictionary<string, DateTime>();
+
+            status.FutureTradeWorkerSystemStatus = new List<bool>(CONFIG.FUTURE_TRADE_THREAD_NUM);
+
+            for (int i = 0; i < CONFIG.FUTURE_TRADE_THREAD_NUM; i++)
+            {
+                status.FutureTradeWorkerSystemStatus.Add(false);
+            }
+
+            status.StockTradeWorkerSystemStatus = new List<bool>(CONFIG.STOCK_TRADE_THREAD_NUM);
+
+            for (int i = 0; i < CONFIG.STOCK_TRADE_THREAD_NUM; i++)
+            {
+                status.StockTradeWorkerSystemStatus.Add(false);
+            }
+
+            status.StopStockList = new List<int>();
+            status.StrategyInfomation = new Dictionary<string, StrategyInfo>();
+            status.StrategyWorkerSystemStatus = new Dictionary<string, int>();
+
             excuteThread.Start();
+
+
             Thread.Sleep(10);
         }
 
@@ -274,17 +317,8 @@ namespace Stork_Future_TaoLi
         {
             DateTime lastmessage = DateTime.Now;
 
-            status.FutureTradeWorkerSystemStatus = new List<bool>(CONFIG.FUTURE_TRADE_THREAD_NUM);
-            status.StockTradeWorkerSystemStatus = new List<bool>(CONFIG.STOCK_TRADE_THREAD_NUM);
-
-
-            messageData.FutureTradeWorkerSystemStatus = new List<DateTime>(CONFIG.FUTURE_TRADE_THREAD_NUM);
-            messageData.StockTradeWorkerSystemStatus = new List<DateTime>(CONFIG.STOCK_TRADE_THREAD_NUM);
-
-            status.StopStockList = new List<int>();
-            status.StrategyInfomation = new Dictionary<string, StrategyInfo>();
-            status.StrategyWorkerSystemStatus = new Dictionary<string, int>();
-            status.WebLogInfo = new List<WebUserInfo>();
+            
+            //status.WebLogInfo = new List<WebUserInfo>();
 
             while (true)
             {
@@ -296,10 +330,20 @@ namespace Stork_Future_TaoLi
                     DateTime current = DateTime.Now;
 
                     message.StrategyWorkerSystemStatus = new Dictionary<string, int>();
-                    message.FutureTradeWorkerSystemStatus = new List<bool>();
-                    message.StockTradeWorkerSystemStatus = new List<bool>();
+                    message.FutureTradeWorkerSystemStatus = new List<bool>(CONFIG.FUTURE_TRADE_THREAD_NUM);
+                    message.StockTradeWorkerSystemStatus = new List<bool>(CONFIG.STOCK_TRADE_THREAD_NUM);
 
-                    if ((current - messageData.MarketSystemStatus).TotalSeconds > 5) { message.MarketSystemStatus = false; } else { message.MarketSystemStatus = true; }
+                    for (int i = 0; i < CONFIG.FUTURE_TRADE_THREAD_NUM; i++)
+                    {
+                        message.FutureTradeWorkerSystemStatus.Add(false);
+                    }
+
+                    for (int i = 0; i < CONFIG.STOCK_TRADE_THREAD_NUM; i++)
+                    {
+                        message.StockTradeWorkerSystemStatus.Add(false);
+                    }
+
+                        if ((current - messageData.MarketSystemStatus).TotalSeconds > 5) { message.MarketSystemStatus = false; } else { message.MarketSystemStatus = true; }
                     if ((current - messageData.HeartBeatSystemStatus).TotalSeconds > 5) { message.HeartBeatSystemStatus = false; } else { message.HeartBeatSystemStatus = true; }
                     if ((current - messageData.StrategyManagementSystemStatus).TotalSeconds > 5) { message.StrategyManagementSystemStatus = false; } else { message.StrategyManagementSystemStatus = true; }
                     
@@ -328,6 +372,8 @@ namespace Stork_Future_TaoLi
                         if ((current - messageData.StockTradeWorkerSystemStatus[count]).TotalSeconds > 5) { message.StockTradeWorkerSystemStatus[count] = false; } else { message.StockTradeWorkerSystemStatus[count] = true; }
                         count++;
                     }
+
+                    SysMonitor.Instance.updateSysStatus(message);
                 }
                 
 
@@ -339,6 +385,8 @@ namespace Stork_Future_TaoLi
 
 
                 object obj = queue_system_status.GetQueue().Dequeue();
+
+                if (obj == null) continue;
 
                 KeyValuePair<string, object> news = (KeyValuePair<string, object>)obj;
 

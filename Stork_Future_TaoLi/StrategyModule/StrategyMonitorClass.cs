@@ -475,6 +475,8 @@ namespace Stork_Future_TaoLi
                                 SubscribeList = new List<string>(item.Value.SubscribeList.Count)
                             };
 
+                            strategyInfo.Add(item.Value.StrategyInstanceID, info);
+
                             foreach(string s in item.Value.SubscribeList)
                             {
                                 info.SubscribeList.Add(s);
