@@ -200,6 +200,7 @@ void Strategy_CLOSE::init(close_args^ m){
 	memset(m_close_strategy->m_args->positionliststr, 0, sizeof(m_close_strategy->m_args->positionliststr));
 	strcpy_s(m_close_strategy->m_args->positionliststr, strlen(position)+1, position);
 
+
 	m_close_strategy->m_args->nHands = m->nHands;
 	strcpy_s(m_close_strategy->m_args->indexCode, 32, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->indexCode));
 	strcpy_s(m_close_strategy->m_args->contractCode, 32, (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(m->contractCode));
@@ -210,8 +211,8 @@ void Strategy_CLOSE::init(close_args^ m){
 	m_close_strategy->m_args->dFutureSellPoint = m->dFutureSellPoint;
 	m_close_strategy->m_args->dOpenedPoint = m->dOpenedPoint;
 	m_close_strategy->m_args->dExpectedGain = m->dExpectedGain;
+	m_close_strategy->m_args->positionlistnum = m->positionNum;
 	m_close_strategy->m_args->dShortCharge = m->dShortCharge;
-
 	m_close_strategy->m_args->bTradingAllowed = m->bTradingAllowed;
 
 	m_close_strategy->init();
@@ -251,16 +252,14 @@ String^ Strategy_CLOSE::getshowstatus()
 
 array<managedTraderorderstruct^>^ Strategy_CLOSE::getTradeList(){
 	array<managedTraderorderstruct^>^ orderlist;
-	Traderorderstruct *m_list;
-
-	memset(m_list->cExchangeID, 0, 21);
-	memset(m_list->cSecurity_code, 0, 31);
-	memset(m_list->security_name, 0, 55);
+	Traderorderstruct *m_list = 0;
 
 	int m_num;
 
 	bool b = m_close_strategy->gettaderlist(&m_list, m_num);
 
+
+	orderlist = gcnew array<managedTraderorderstruct^>(m_num);
 	if (b == true){
 		for (int i = 0; i < m_num; i++){
 			orderlist[i] = gcnew managedTraderorderstruct();
