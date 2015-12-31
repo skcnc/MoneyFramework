@@ -6,6 +6,26 @@
 
 <div class="container-fluid">
     <div class="col-md-12">
+        <h3> 行情信息 </h3>
+        行情延时：<p class="MarketDelay"></p>
+        行情频率：<p class="MarketFrequence"></p>
+
+        <h3> 策略状态 </h3>
+        策略数量：<p class="StrategyNum"></p>
+        策略信息：<p class="StrategyWorkerSystemStatus"></p>
+
+        <h3> 系统状态 </h3>
+        行情线程状态：<p class="MarketSystemStatus"></p>
+        心跳线程状态：<p class="HeartBeatSystemStatus"></p>
+        策略控制线程：<p class="StrategyManagementSystemStatus"></p>
+        策略工作线程：<p class="StrategyWorkerSystemStatus"></p>
+        交易预处理线程：<p class="Pre_TradeControlSystemStatus"></p>
+        期货交易管理：<p class="FutureTradeManagementSystemStatus"></p>
+        期货工作状态：<p class="FutureTradeWorkerSystemStatus"></p>
+        股票交易管理：<p class="StockTradeManagementSystemStatus"></p>
+        股票工作状态：<p class="StockTradeWorkerSystemStatus"></p>
+        委托查询系统状态：<p class="StockEntrustManagementSystemStatus"></p>
+
 
     </div>
 </div>
@@ -21,13 +41,26 @@
     <script>
         $(function () {
             // Reference the auto-generated proxy for the hub.
-            var chat = $.connection.sysMonitorHub;
+            var chat = $.connection.monitorHub;
 
             chat.client.updateStatus = function (jsonString) {
 
                 var obj = eval('(' + jsonString + ')');
 
-                obj = obj;
+                $('.MarketDelay').text(obj.MarketDelay);
+                $('.MarketFrequence').text(obj.MarketFrequence);
+                $('.StrategyNum').text(obj.StrategyNum);
+                $('.StrategyWorkerSystemStatus').text(obj.StrategyWorkerSystemStatus);
+                $('.MarketSystemStatus').text(obj.MarketSystemStatus);
+                $('.HeartBeatSystemStatus').text(obj.HeartBeatSystemStatus);
+                $('.StrategyManagementSystemStatus').text(obj.StrategyManagementSystemStatus);
+                $('.StrategyWorkerSystemStatus').text(obj.StrategyWorkerSystemStatus);
+                $('.Pre_TradeControlSystemStatus').text(obj.Pre_TradeControlSystemStatus);
+                $('.FutureTradeManagementSystemStatus').text(obj.FutureTradeManagementSystemStatus);
+                $('.FutureTradeWorkerSystemStatus').text(obj.FutureTradeWorkerSystemStatus);
+                $('.StockTradeManagementSystemStatus').text(obj.StockTradeManagementSystemStatus);
+                $('.StockTradeWorkerSystemStatus').text(obj.StockTradeWorkerSystemStatus);
+                $('.StockEntrustManagementSystemStatus').text(obj.StockEntrustManagementSystemStatus);
 
             };
 

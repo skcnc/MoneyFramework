@@ -823,14 +823,13 @@ namespace Stork_Future_TaoLi.StrategyModule
                 managedstockposition s = new managedstockposition();
                 managedsecurityindex si = new managedsecurityindex();
 
-                si.cSecurity_code = item.Key.Substring(1);
-                si.cSecuritytype = Convert.ToSByte(item.Key.Substring(0, 1)[0]);
-
-                s.sSecurity = si;
+                string code = item.Key.Substring(1);
+                string type = item.Key.Substring(0, 1);
+                string count = item.Value.ToString();
 
                 s.tradevolume = item.Value;
 
-                POSITIONLIST += (si.cSecurity_code + ";" + si.cSecuritytype + ";" + s.tradevolume + "|");
+                POSITIONLIST += (code + ";" + type + ";" + count + "|");
                 positionNum++;
             }
 

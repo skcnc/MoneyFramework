@@ -212,7 +212,7 @@ namespace Stork_Future_TaoLi.TradeModule
 
                 if(lastmessagetime.Second != DateTime.Now.Second)
                 {
-                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("StockTradeWorkerSystemStatus", (object)_threadNo);
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_WORKER", (object)_threadNo);
                     queue_system_status.GetQueue().Enqueue((object)message1);
                     lastmessagetime = DateTime.Now;
                 }

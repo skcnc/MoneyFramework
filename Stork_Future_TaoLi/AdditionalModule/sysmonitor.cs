@@ -322,7 +322,8 @@ namespace Stork_Future_TaoLi
 
             while (true)
             {
-                if(lastmessage.Minute != DateTime.Now.Minute   ){
+                if ((lastmessage.Second != DateTime.Now.Second) && (DateTime.Now.Second % 2 == 0))
+                {
                     lastmessage = DateTime.Now;
 
                     //此处需要把信息发出去
@@ -343,7 +344,7 @@ namespace Stork_Future_TaoLi
                         message.StockTradeWorkerSystemStatus.Add(false);
                     }
 
-                        if ((current - messageData.MarketSystemStatus).TotalSeconds > 5) { message.MarketSystemStatus = false; } else { message.MarketSystemStatus = true; }
+                    if ((current - messageData.MarketSystemStatus).TotalSeconds > 5) { message.MarketSystemStatus = false; } else { message.MarketSystemStatus = true; }
                     if ((current - messageData.HeartBeatSystemStatus).TotalSeconds > 5) { message.HeartBeatSystemStatus = false; } else { message.HeartBeatSystemStatus = true; }
                     if ((current - messageData.StrategyManagementSystemStatus).TotalSeconds > 5) { message.StrategyManagementSystemStatus = false; } else { message.StrategyManagementSystemStatus = true; }
                     
@@ -367,13 +368,16 @@ namespace Stork_Future_TaoLi
                     if ((current - messageData.StockTradeManagementSystemStatus).TotalSeconds > 5) { message.StockTradeManagementSystemStatus = false; } else { message.StockTradeManagementSystemStatus = true; }
 
                     count = 0;
-                    foreach (DateTime time in messageData.FutureTradeWorkerSystemStatus)
+                    foreach (DateTime time in messageData.StockTradeWorkerSystemStatus)
                     {
                         if ((current - messageData.StockTradeWorkerSystemStatus[count]).TotalSeconds > 5) { message.StockTradeWorkerSystemStatus[count] = false; } else { message.StockTradeWorkerSystemStatus[count] = true; }
                         count++;
                     }
 
-                    SysMonitor.Instance.updateSysStatus(message);
+
+                    if ((current - messageData.StockEntrustManagementSystemStatus).TotalSeconds > 5) { message.StockEntrustManagementSystemStatus = false; } else { message.StockEntrustManagementSystemStatus = true; }
+
+                    MonitorSys.Instance.updateSysStatus(message);
                 }
                 
 
@@ -435,6 +439,9 @@ namespace Stork_Future_TaoLi
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     case "THREAD_STOCK_TRADE_WORKER":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "THREAD_ENTRUST_WORKER":
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     default:
@@ -533,6 +540,11 @@ namespace Stork_Future_TaoLi
                     {
                         int No = (int)obj;
                         messageData.StockTradeWorkerSystemStatus[No] = DateTime.Now;
+                    }
+                    break;
+                case "THREAD_ENTRUST_WORKER":
+                    {
+                        messageData.StockEntrustManagementSystemStatus = DateTime.Now;
                     }
                     break;
                 default: break;

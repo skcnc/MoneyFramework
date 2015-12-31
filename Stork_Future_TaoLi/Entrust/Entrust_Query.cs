@@ -21,6 +21,7 @@ namespace Stork_Future_TaoLi.Entrust
         MCStockLib.managedLogin login = new managedLogin(CommConfig.Stock_ServerAddr, CommConfig.Stock_Port, CommConfig.Stock_Account, CommConfig.Stock_BrokerID, CommConfig.Stock_Password, CommConfig.Stock_InvestorID);
         string ErrorMsg = string.Empty;
         StockTradeTest test = new StockTradeTest();
+        private static DateTime lastmessagetime = DateTime.Now;
         #endregion
 
         #region 单例模式
@@ -68,6 +69,13 @@ namespace Stork_Future_TaoLi.Entrust
                 if (!_classTradeStock.getConnectStatus())
                 {
                     _classTradeStock.Init(login, ErrorMsg);
+                }
+
+                if (lastmessagetime.Second != DateTime.Now.Second)
+                {
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_ENTRUST_WORKER", (object)(DateTime.Now));
+                    queue_system_status.GetQueue().Enqueue((object)message1);
+                    lastmessagetime = DateTime.Now;
                 }
 
 

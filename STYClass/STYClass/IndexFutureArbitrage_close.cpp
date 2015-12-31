@@ -103,8 +103,8 @@ namespace STYClass
 		if (indexfuturearbitragecloseargs.positionlist != 0)
 			delete indexfuturearbitragecloseargs.positionlist;
 
-		if (indexfuturearbitragecloseargs.positionlistnum <= 0)
-			return false;
+		//if (indexfuturearbitragecloseargs.positionlistnum <= 0)
+			//return false;
 
 		indexfuturearbitragecloseargs.positionlist= new  stockpotionstruct[indexfuturearbitragecloseargs.positionlistnum];
 		//stringtoweightlist(indexfuturearbitragecloseargs.weightliststr, indexfuturearbitragecloseargs.weightlist, indexfuturearbitragecloseargs.weightlistnum);
