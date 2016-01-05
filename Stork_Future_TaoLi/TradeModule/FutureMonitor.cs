@@ -24,11 +24,15 @@ namespace Stork_Future_TaoLi
             //初始化消息队列
             queue_future_excuteThread.Init();
 
+            FutureTrade.InitRespFunc();
+
             //创建线程任务
             Thread FutureTradeControl = new Thread(new ThreadStart(ThreadProc));
 
             //启动主线程
             FutureTradeControl.Start();
+
+
 
 
             //日志初始化

@@ -378,6 +378,16 @@ namespace Stork_Future_TaoLi
             {
                 lock (DLtableLock)
                 {
+                    var selected = (from row in DbEntity.DL_TAOLI_TABLE where (row.DL_STRATEGY == record.StrategyId && row.DL_CODE == record.Code && row.DL_TYPE == "f") select row);
+
+                    if (selected.Count() > 0)
+                    {
+                        foreach (var i in selected.ToList())
+                        {
+                            DbEntity.DL_TAOLI_TABLE.Remove(i);
+                        }
+                    }
+
                     DL_TAOLI_TABLE item = new DL_TAOLI_TABLE()
                     {
                         DL_GUID = Guid.NewGuid(),

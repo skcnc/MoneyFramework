@@ -487,7 +487,23 @@ namespace Stork_Future_TaoLi
                         KeyValuePair<string, object> message2 = new KeyValuePair<string, object>("STRATEGY_N", (object)count);
                         queue_system_status.GetQueue().Enqueue((object)message2);
 
-                        KeyValuePair<string, object> message3 = new KeyValuePair<string, object>("STRATEGY_P", (object)count);
+                        Dictionary<string, StrategyInfo> value = new Dictionary<string, StrategyInfo>();
+                        foreach(KeyValuePair<string,StrategyWorker> pair in Workers)
+                        {
+                            StrategyInfo info = new StrategyInfo()
+                            {
+                                BelongUser = pair.Value.User,
+                                Contract = pair.Value.CT,
+                                HandNum = pair.Value.HD,
+                                Status = pair.Value.Status,
+                                StrategyInstanceID = pair.Value.StrategyInstanceID,
+                                StrType = pair.Value.Type,
+                                SubscribeList = pair.Value.SubscribeList
+                            };
+                            value.Add(pair.Value.StrategyInstanceID, info);
+                            
+                        }
+                        KeyValuePair<string, object> message3 = new KeyValuePair<string, object>("STRATEGY_P", (object)value);
                         queue_system_status.GetQueue().Enqueue((object)message3);
 
                         KeyValuePair<string, object> message4 = new KeyValuePair<string, object>("THREAD_STRATEGY_WORKER", (object)WorkersStratus);

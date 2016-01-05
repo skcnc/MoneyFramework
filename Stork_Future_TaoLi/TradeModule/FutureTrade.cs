@@ -13,19 +13,19 @@ namespace Stork_Future_TaoLi
 {
     public class FutureTrade
     {
-        private LogWirter sublog = new LogWirter();//子线程日志记录
-        private CTP_CLI.CCTPClient _client;
-        private FutureTradeThreadStatus status = FutureTradeThreadStatus.DISCONNECTED;
+        private  static LogWirter sublog = new LogWirter();//子线程日志记录
+        private static CTP_CLI.CCTPClient _client;
+        private static FutureTradeThreadStatus status = FutureTradeThreadStatus.DISCONNECTED;
 
-        private string BROKER = "8890";
-        private string INVESTOR = "17730203";
-        private string PASSWORD = "111111";
-        private string ADDRESS = "tcp://119.15.140.81:41205";
+        private static  string BROKER = "8890";
+        private static string INVESTOR = "17730203";
+        private static string PASSWORD = "111111";
+        private static string ADDRESS = "tcp://119.15.140.81:41205";
 
-        private string TEST_BROKER = "8890";
-        private string TEST_INVESTOR = "17730203";
-        private string TEST_PASSWORD = "111111";
-        private string TEST_ADDRESS = "tcp://119.15.140.81:41205";
+        private static string TEST_BROKER = "8890";
+        private static string TEST_INVESTOR = "17730203";
+        private static string TEST_PASSWORD = "111111";
+        private static string TEST_ADDRESS = "tcp://119.15.140.81:41205";
 
 
 
@@ -155,6 +155,29 @@ namespace Stork_Future_TaoLi
 
         #endregion
 
+
+        public static void InitRespFunc()
+        {
+            _client = new CTP_CLI.CCTPClient(INVESTOR, PASSWORD, BROKER, ADDRESS);
+
+            //CTP后台成功建立连接的回调函数
+            _client.FrontConnected += _client_FrontConnected;
+            //CTP后台连接丢失回调函数
+            _client.FrontDisconnected += _client_FrontDisconnected;
+            //登陆成功回调函数
+            _client.RspUserLogin += _client_RspUserLogin;
+            //报单变化回调函数
+            _client.RtnOrder += _client_RtnOrder;
+            //成交变化回调函数
+            _client.RtnTrade += _client_RtnTrade;
+            //报单修改操作回调函数（暂时不用）
+            _client.RspOrderAction += _client_RspOrderAction;
+            //报单失败回调函数
+            _client.RspOrderInsert += _client_RspOrderInsert;
+            //报单问题回调函数
+            _client.ErrRtnOrderInsert += _client_ErrRtnOrderInsert;
+        }
+
         /// <summary>
         /// 期货交易工作线程
         /// </summary>
@@ -198,7 +221,7 @@ namespace Stork_Future_TaoLi
                 _client.Connect();
 
                 //状态 DISCONNECTED -> CONNECTED
-                while (this.status != FutureTradeThreadStatus.CONNECTED)
+                while (status != FutureTradeThreadStatus.CONNECTED)
                 {
                     Thread.Sleep(10);
                 }
@@ -206,7 +229,7 @@ namespace Stork_Future_TaoLi
                 _client.ReqUserLogin();
 
                 //状态 CONNECTED -> LOGIN
-                while (this.status != FutureTradeThreadStatus.LOGIN)
+                while (status != FutureTradeThreadStatus.LOGIN)
                 {
                     Thread.Sleep(10);
                 }
@@ -280,7 +303,22 @@ namespace Stork_Future_TaoLi
                             _client.OrderInsert(args);
 
                             //创建记录
-                            TradeRecord.GetInstance().CreateOrder(order.OrderRef, order.belongStrategy);
+                            RecordItem item = new RecordItem();
+                            item.AveragePrice = 0;
+                            item.Code = order.cSecurityCode;
+                            item.CombOffsetFlag = Convert.ToInt16(order.cOffsetFlag);
+                            item.OrderRef = order.OrderRef;
+                            item.OrderStatus = 0;
+                            item.OrderSysID = "0";
+                            item.Orientation = order.cTradeDirection;
+                            item.Price = Convert.ToDecimal(order.dOrderPrice);
+                            item.Status = TradeDealStatus.ORDERING;
+                            item.StrategyId = order.belongStrategy;
+                            item.Type = "1";
+                            item.VolumeTotalOriginal = item.VolumeTotal = Convert.ToInt32(order.nSecurityAmount);
+                            item.VolumeTraded = 0;
+                            
+                            TradeRecord.GetInstance().CreateOrder(order.OrderRef, item);
                         }
 
                     }
@@ -292,29 +330,12 @@ namespace Stork_Future_TaoLi
         /// 设置日志
         /// </summary>
         /// <param name="log"></param>
-        public void SetLog(LogWirter log) { this.sublog = log; }
+        public void SetLog(LogWirter log) { sublog = log; }
 
 
         public FutureTrade()
         {
-            _client = new CTP_CLI.CCTPClient(INVESTOR, PASSWORD, BROKER, ADDRESS);
-
-            //CTP后台成功建立连接的回调函数
-            _client.FrontConnected += _client_FrontConnected;
-            //CTP后台连接丢失回调函数
-            _client.FrontDisconnected += _client_FrontDisconnected;
-            //登陆成功回调函数
-            _client.RspUserLogin += _client_RspUserLogin;
-            //报单变化回调函数
-            _client.RtnOrder += _client_RtnOrder;
-            //成交变化回调函数
-            _client.RtnTrade += _client_RtnTrade;
-            //报单修改操作回调函数（暂时不用）
-            _client.RspOrderAction += _client_RspOrderAction;
-            //报单失败回调函数
-            _client.RspOrderInsert += _client_RspOrderInsert;
-            //报单问题回调函数
-            _client.ErrRtnOrderInsert += _client_ErrRtnOrderInsert;
+            
           
         }
 
@@ -323,7 +344,7 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="pInputOrder"></param>
         /// <param name="pRspInfo"></param>
-        void _client_ErrRtnOrderInsert(CThostFtdcInputOrderField_M pInputOrder, CThostFtdcRspInfoField_M pRspInfo)
+        static void _client_ErrRtnOrderInsert(CThostFtdcInputOrderField_M pInputOrder, CThostFtdcRspInfoField_M pRspInfo)
         {
             //throw new NotImplementedException();
             TradeRecord.GetInstance().MarkFailure(Convert.ToInt16(pInputOrder.OrderRef), pRspInfo.ErrorMsg);
@@ -333,16 +354,16 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 连接成功
         /// </summary>
-        void _client_FrontConnected()
+        static void _client_FrontConnected()
         {
-            this.status = FutureTradeThreadStatus.CONNECTED;
+            status = FutureTradeThreadStatus.CONNECTED;
         }
 
         /// <summary>
         /// 链接失败，记入日志
         /// </summary>
         /// <param name="nReason"></param>
-        void _client_FrontDisconnected(int nReason)
+        static void _client_FrontDisconnected(int nReason)
         {
             sublog.LogEvent("期货交易所链接失败，失败码：" + nReason.ToString());
         }
@@ -354,7 +375,7 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo"></param>
         /// <param name="nRequestID"></param>
         /// <param name="bIsLast"></param>
-        void _client_RspOrderInsert(CTP_CLI.CThostFtdcInputOrderField_M pInputOrder, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        static void _client_RspOrderInsert(CTP_CLI.CThostFtdcInputOrderField_M pInputOrder, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             TradeRecord.GetInstance().MarkFailure(Convert.ToInt16(pInputOrder.OrderRef), pRspInfo.ErrorMsg);
         }
@@ -366,7 +387,7 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo">返回信息</param>
         /// <param name="nRequestID"></param>
         /// <param name="bIsLast"></param>
-        void _client_RspOrderAction(CTP_CLI.CThostFtdcInputOrderActionField_M pInputOrderAction, 
+        static void _client_RspOrderAction(CTP_CLI.CThostFtdcInputOrderActionField_M pInputOrderAction, 
             CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             //throw new NotImplementedException();
@@ -439,7 +460,7 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo">返回用户响应信息</param>
         /// <param name="nRequestID">返回用户登录请求的ID，该ID 由用户在登录时指定。</param>
         /// <param name="bIsLast">指示该次返回是否为针对nRequestID的最后一次返回。</param>
-        void _client_RspUserLogin(CTP_CLI.CThostFtdcRspUserLoginField_M pRspUserLogin, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        static void _client_RspUserLogin(CTP_CLI.CThostFtdcRspUserLoginField_M pRspUserLogin, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             if (pRspInfo.ErrorID == 0 && bIsLast == true)
             {
@@ -448,7 +469,7 @@ namespace Stork_Future_TaoLi
             //throw new NotImplementedException();
         }
 
-        void _client_RspError(CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        static void _client_RspError(CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             throw new NotImplementedException();
         }

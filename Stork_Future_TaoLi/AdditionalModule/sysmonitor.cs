@@ -31,6 +31,9 @@ namespace Stork_Future_TaoLi
             try
             {
                 string _time = (time / 1000).ToString();
+
+                if (_time.Length == 5) _time = "0" + _time;
+
                 int hour = Convert.ToInt16(_time.Substring(0, 2));
                 int minute = Convert.ToInt16(_time.Substring(2, 2));
                 int second = Convert.ToInt16(_time.Substring(4, 2));
@@ -38,6 +41,12 @@ namespace Stork_Future_TaoLi
                 DateTime _now = DateTime.Now;
 
                 int delay = (_now.Hour - hour) * 3600 + (_now.Minute - minute) * 60 + (_now.Second - second);
+
+                if (delay > 100) 
+                {
+                    return; 
+                }
+
 
                 TotalDelaySecond += delay;
                 TotalMarketCount += 1;
@@ -86,7 +95,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 行情分钟平均延时
         /// </summary>
-        public float MarketDelay { get; set; }
+        public double MarketDelay { get; set; }
 
         /// <summary>
         /// 停盘列表
@@ -104,7 +113,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 策略信息
         /// </summary>
-        public Dictionary<string,StrategyInfo> StrategyInfomation { get; set; }
+        public List<StrategyInfo> StrategyInformation { get; set; }
 
         #endregion
 
@@ -242,6 +251,10 @@ namespace Stork_Future_TaoLi
         public DateTime StockTradeManagementSystemStatus { get; set; }
         public List<DateTime> StockTradeWorkerSystemStatus { get; set; }
         public DateTime StockEntrustManagementSystemStatus { get; set; }
+        public double MarketDelay { get; set; }
+        public int MarketFrequence { get; set; }
+        public Dictionary<string, StrategyInfo> StrategyInfomation { get; set; }
+        public int StrategyNum { get; set; }
     }
 
     class SystemMonitorClass
@@ -291,7 +304,7 @@ namespace Stork_Future_TaoLi
             }
 
             status.StopStockList = new List<int>();
-            status.StrategyInfomation = new Dictionary<string, StrategyInfo>();
+            status.StrategyInformation = new List<StrategyInfo>(); 
             status.StrategyWorkerSystemStatus = new Dictionary<string, int>();
 
             excuteThread.Start();
@@ -329,6 +342,18 @@ namespace Stork_Future_TaoLi
                     //此处需要把信息发出去
                     SystemStatusClass message = new SystemStatusClass();
                     DateTime current = DateTime.Now;
+
+                    message.MarketDelay = messageData.MarketDelay;
+                    message.MarketFrequence = messageData.MarketFrequence;
+
+                    message.StrategyNum = messageData.StrategyNum;
+                    message.StrategyInformation = new List<StrategyInfo>();
+
+                    foreach(KeyValuePair<String,StrategyInfo> info in messageData.StrategyInfomation)
+                    {
+                        message.StrategyInformation.Add(info.Value);
+                    }
+                    
 
                     message.StrategyWorkerSystemStatus = new Dictionary<string, int>();
                     message.FutureTradeWorkerSystemStatus = new List<bool>(CONFIG.FUTURE_TRADE_THREAD_NUM);
@@ -467,13 +492,20 @@ namespace Stork_Future_TaoLi
         /// 行情分钟频率消息处理
         /// </summary>
         /// <param name="obj">行情频率</param>
-        private static void arrive_market_frequence(object obj) { }
+        private static void arrive_market_frequence(object obj) {
+
+            messageData.MarketFrequence = Convert.ToInt32(obj);
+               
+        }
 
         /// <summary>
         /// 行情分钟延迟消息处理
         /// </summary>
         /// <param name="obj"></param>
-        private static void arrive_market_delay(object obj) { }
+        private static void arrive_market_delay(object obj) {
+
+            messageData.MarketDelay = Convert.ToDouble(obj) * 1.0;
+        }
 
         /// <summary>
         /// 停盘行情消息处理
@@ -485,13 +517,18 @@ namespace Stork_Future_TaoLi
         /// 策略数量消息处理
         /// </summary>
         /// <param name="obj"></param>
-        private static void arrive_strategy_num(object obj) { }
+        private static void arrive_strategy_num(object obj) {
+            messageData.StrategyNum = (int)obj;
+        }
 
         /// <summary>
         /// 策略信息消息处理
         /// </summary>
         /// <param name="obj"></param>
-        private static void arrive_strategy_info(object obj) { }
+        private static void arrive_strategy_info(object obj) {
+
+            messageData.StrategyInfomation = (Dictionary<string, StrategyInfo>)(obj);
+        }
 
         /// <summary>
         /// 线程状态消息处理
@@ -515,7 +552,8 @@ namespace Stork_Future_TaoLi
                 case "THREAD_STRATEGY_WORKER":
                     {
                         messageData.StrategyWorkerSystemStatus.Clear();
-                        foreach(KeyValuePair<string,int> value in (Dictionary<string,int>)obj)
+                        Dictionary<string,int> workers = (Dictionary<string,int>)obj;
+                        foreach (KeyValuePair<string, int> value in workers)
                         {
                             messageData.StrategyWorkerSystemStatus.Add(value.Key+value.Value.ToString(), DateTime.Now);
                         }

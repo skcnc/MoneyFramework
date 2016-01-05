@@ -32,18 +32,11 @@ namespace Stork_Future_TaoLi
             return Instance;
         }
 
-        public void CreateOrder(int OrderRef, String StrategyId)
+        public void CreateOrder(int OrderRef, RecordItem item)
         {
 
-
-            RecordItem _record = new RecordItem()
-            {
-                OrderRef = OrderRef,
-                StrategyId = StrategyId
-            };
-
-            this.AddOrUpdate(OrderRef, _record, (key, oldValue) =>
-                oldValue = _record
+            this.AddOrUpdate(OrderRef, item, (key, oldValue) =>
+                oldValue = item
             );
 
         }
@@ -217,6 +210,8 @@ namespace Stork_Future_TaoLi
         public void MarkFailure(int OrderRef, String Err)
         {
             RecordItem _record = new RecordItem();
+
+           
             _record = this.GetOrAdd(OrderRef, _record);
             _record.ErrMsg = Err;
             _record.Status = TradeDealStatus.ORDERFAILURE;

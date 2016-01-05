@@ -7,24 +7,50 @@
 <div class="container-fluid">
     <div class="col-md-12">
         <h3> 行情信息 </h3>
-        行情延时：<p class="MarketDelay"></p>
-        行情频率：<p class="MarketFrequence"></p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>行情信息</th>
+                    <th>指标</th>
+                </tr>
+            </thead>
+            <tbody class="market_status"></tbody>
+        </table>
+
 
         <h3> 策略状态 </h3>
         策略数量：<p class="StrategyNum"></p>
-        策略信息：<p class="StrategyWorkerSystemStatus"></p>
+
+        <h3>策略信息 </h3>
+        <table class="table" >
+            <thead>
+                <tr>
+                    <th>策略ID</th>
+                    <th>期货</th>
+                    <th>用户</th>
+                    <th>手数</th>
+                    <th>状态</th>
+                    <th>类型</th>
+                    <th>订阅列表</th>
+                </tr>
+            </thead>
+            <tbody class="strategy_infomation">
+            </tbody>
+        </table>
 
         <h3> 系统状态 </h3>
-        行情线程状态：<p class="MarketSystemStatus"></p>
-        心跳线程状态：<p class="HeartBeatSystemStatus"></p>
-        策略控制线程：<p class="StrategyManagementSystemStatus"></p>
-        策略工作线程：<p class="StrategyWorkerSystemStatus"></p>
-        交易预处理线程：<p class="Pre_TradeControlSystemStatus"></p>
-        期货交易管理：<p class="FutureTradeManagementSystemStatus"></p>
-        期货工作状态：<p class="FutureTradeWorkerSystemStatus"></p>
-        股票交易管理：<p class="StockTradeManagementSystemStatus"></p>
-        股票工作状态：<p class="StockTradeWorkerSystemStatus"></p>
-        委托查询系统状态：<p class="StockEntrustManagementSystemStatus"></p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>线程名称</th>
+                    <th>线程状态</th>
+                </tr>
+            </thead>
+            <tbody class="thread_status"></tbody>
+        </table>
+
+     
 
 
     </div>
@@ -47,20 +73,107 @@
 
                 var obj = eval('(' + jsonString + ')');
 
-                $('.MarketDelay').text(obj.MarketDelay);
-                $('.MarketFrequence').text(obj.MarketFrequence);
+
                 $('.StrategyNum').text(obj.StrategyNum);
                 $('.StrategyWorkerSystemStatus').text(obj.StrategyWorkerSystemStatus);
-                $('.MarketSystemStatus').text(obj.MarketSystemStatus);
-                $('.HeartBeatSystemStatus').text(obj.HeartBeatSystemStatus);
-                $('.StrategyManagementSystemStatus').text(obj.StrategyManagementSystemStatus);
-                $('.StrategyWorkerSystemStatus').text(obj.StrategyWorkerSystemStatus);
-                $('.Pre_TradeControlSystemStatus').text(obj.Pre_TradeControlSystemStatus);
-                $('.FutureTradeManagementSystemStatus').text(obj.FutureTradeManagementSystemStatus);
-                $('.FutureTradeWorkerSystemStatus').text(obj.FutureTradeWorkerSystemStatus);
-                $('.StockTradeManagementSystemStatus').text(obj.StockTradeManagementSystemStatus);
-                $('.StockTradeWorkerSystemStatus').text(obj.StockTradeWorkerSystemStatus);
-                $('.StockEntrustManagementSystemStatus').text(obj.StockEntrustManagementSystemStatus);
+
+
+                $('tbody.strategy_infomation tr').each(function () { $(this).remove();})
+                $('tbody.thread_status tr').each(function () { $(this).remove(); })
+                $('tbody.market_status tr').each(function () { $(this).remove(); })
+
+                var str = "<tr><td>$name</td><td>$result</td></tr>"
+                var result = undefined;
+
+                $('.market_status').append(str.replace('$name', "行情平均延时").replace('$result', obj.MarketDelay));
+                $('.market_status').append(str.replace('$name', "行情发送频率").replace('$result', obj.MarketFrequence));
+
+                if (obj.MarketSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "行情线程").replace('$result', result));
+
+                if (obj.HeartBeatSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "心跳线程").replace('$result', result));
+
+                if (obj.StrategyManagementSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "策略控制").replace('$result', result));
+
+                if (obj.Pre_TradeControlSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "交易预处理").replace('$result', result));
+
+                
+                if (obj.FutureTradeManagementSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "期货管理").replace('$result', result));
+
+                for (var m = 0 ; m < obj.FutureTradeWorkerSystemStatus.length; m++) {
+                    if (obj.FutureTradeWorkerSystemStatus[m] == true) {
+                        result = "正常";
+                    }
+                    else result = "异常";
+                    $('.thread_status').append(str.replace('$name', "期货交易"+m).replace('$result', result));
+                }
+
+                if (obj.StockTradeManagementSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "股票管理").replace('$result', result));
+
+
+                for (var m = 0 ; m < obj.StockTradeWorkerSystemStatus.length; m++) {
+                    if (obj.StockTradeWorkerSystemStatus[m] == true) {
+                        result = "正常";
+                    }
+                    else result = "异常";
+                    $('.thread_status').append(str.replace('$name', "股票交易" + m).replace('$result', result));
+                }
+
+                if (obj.StockEntrustManagementSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "股票委托查询").replace('$result', result));
+
+
+                for (var i = 0; i < obj.StrategyNum; i++) {
+
+
+                    str = "<tr><td>$ID</td><td>$CT</td><td>$USER</td><td>$HAND</td><td>$STATUS</td><td>$TYPE</td><td>$SUBLIST</td></tr>"
+
+                    var status = "未知状态";
+                    if (obj.StrategyInformation[i].Status == 0)
+                    {
+                        status = "退出或故障";
+
+                    }
+                    else if (obj.StrategyInformation[i].Status == 1)
+                    {
+                        status = "空转状态";
+                    }
+                    else if (obj.StrategyInformation[i].Status == 2)
+                    {
+                        status = "正常运行";
+                    }
+
+                    str = str.replace('$ID', obj.StrategyInformation[i].StrategyInstanceID).replace('$CT', obj.StrategyInformation[i].Contract).replace('$USER', obj.StrategyInformation[i].BelongUser).replace('$HAND', obj.StrategyInformation[i].HandNum).replace('$STATUS', status).replace('$TYPE', obj.StrategyInformation[i].StrType).replace('$SUBLIST', obj.StrategyInformation[i].SubscribeList);
+ 
+
+                    $('.strategy_infomation').append(str);
+                }
 
             };
 
