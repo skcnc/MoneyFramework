@@ -335,6 +335,9 @@ namespace Stork_Future_TaoLi
                     else if (record.OrderType == 102)
                         type = "f";
 
+
+                    string bargin_time = DateTime.Now.ToString();
+
                     DL_TAOLI_TABLE item = new DL_TAOLI_TABLE()
                     {
                         DL_GUID = Guid.NewGuid(),
@@ -345,10 +348,10 @@ namespace Stork_Future_TaoLi
                         DL_STATUS = record.OrderStatus.ToString(),
                         DL_TYPE = type,
                         DL_STOCK_AMOUNT = record.stock_amount,
-                        DL_BARGAIN_PRICE = record.bargain_price,
+                        DL_BARGAIN_PRICE = record.bargain_price / 1000,
                         DL_BARGAIN_MONEY = record.bargain_money,
-                        DL_BARGAIN_TIME = record.bargain_time,
-                        DL_NO = record.bargain_no.ToString(),
+                        DL_BARGAIN_TIME =bargin_time,
+                        DL_NO = record.OrderSysID.ToString(),
                         DL_LOAD = true
                     };
 
@@ -651,10 +654,10 @@ namespace Stork_Future_TaoLi
             
         }
 
-        public static List<String> GetDealList(string strId, out decimal totalStockMoney)
+        public static List<String> GetDealList(string strId, out decimal totalStockMoney, out decimal futureIndex)
         {
             totalStockMoney = 0;
-            
+            futureIndex = 0;
 
             if (DBAccessLayer.DBEnable)
             {
@@ -665,14 +668,21 @@ namespace Stork_Future_TaoLi
                     return null;
                 }
 
+
                 List<String> _li = new List<string>();
 
                 foreach(DL_TAOLI_TABLE i in _record.ToList())
                 {
-                    totalStockMoney += Convert.ToDecimal(i.DL_BARGAIN_MONEY);
-                    _li.Add(i.DL_CODE + ";" + i.DL_TYPE + ";" + i.DL_STOCK_AMOUNT);
+                    if (i.DL_TYPE == "f")
+                    {
+                        futureIndex = Convert.ToDecimal(i.DL_BARGAIN_PRICE);
+                    }
+                    else
+                    {
+                        totalStockMoney += Convert.ToDecimal(i.DL_BARGAIN_MONEY);
+                        _li.Add(i.DL_CODE + ";" + i.DL_TYPE + ";" + i.DL_STOCK_AMOUNT);
+                    }
                 }
-
 
                 return _li;
             }

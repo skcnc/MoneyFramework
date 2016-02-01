@@ -92,9 +92,10 @@
                 $('.open_hd')[0].innerText = hd;
             };
 
-            chat.client.GetDealList = function (deals,stockcost) {
+            chat.client.GetDealList = function (deals, stockcost, futureIndex) {
                 $('#buylist')[0].value = deals;
                 $('#coe_value')[0].value = stockcost;
+                $('#openpoint_value')[0].value = futureIndex;
             };
 
 

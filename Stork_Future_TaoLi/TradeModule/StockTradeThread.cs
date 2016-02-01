@@ -415,7 +415,7 @@ namespace Stork_Future_TaoLi.TradeModule
             _sorder.SecurityType = (unit.cSecurityType.Length != 0) ? (unit.cSecurityType == "115" ? (sbyte)115 : (sbyte)102) : (sbyte)115;
 
 
-            _sorder.TradeDirection = Convert.ToSByte(Convert.ToInt16(unit.cTradeDirection[0]));
+            _sorder.TradeDirection = Convert.ToSByte(Convert.ToInt16(unit.cTradeDirection));
             
             //if (unit.cTradeDirection == "0") { _sorder.TradeDirection = 49; }
             //else if (unit.cTradeDirection == "1") { _sorder.TradeDirection = 50; }

@@ -168,6 +168,7 @@ namespace Stork_Future_TaoLi
                 if (DBAccessLayer.DBEnable)
                 {
                     DBAccessLayer.InsertSGCLOSE((object)value);
+                    DBAccessLayer.UpdateSGOPENStatus(value.Open_STR_ID, 4);
                 }
                 
             }
