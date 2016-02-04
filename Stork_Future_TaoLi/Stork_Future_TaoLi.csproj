@@ -241,6 +241,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalModule\EntrustRecord.cs" />
     <Compile Include="AdditionalModule\sysmonitor.cs" />
     <Compile Include="AdditionalModule\TradeAdditionalClass.cs" />
     <Compile Include="App_Start\AuthConfig.cs" />
@@ -947,6 +948,9 @@
     <Content Include="Views\Home\TradeMonitor.cshtml" />
     <Content Include="Views\Home\SysLogin.cshtml" />
     <Content Include="Views\Home\SysMonitor.cshtml" />
+    <Content Include="Views\Home\RegisterUser.cshtml" />
+    <Content Include="Views\Home\SysRegister.cshtml" />
+    <Content Include="Views\Home\ChangePassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

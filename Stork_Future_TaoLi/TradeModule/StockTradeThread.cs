@@ -355,6 +355,17 @@ namespace Stork_Future_TaoLi.TradeModule
                             entrustorli[i].OrderPrice = trades[i].dOrderPrice;
                             ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateERRecord), (object)(entrustorli[i]));
                             queue_query_entrust.GetQueue().Enqueue((object)entrustorli[i]);
+                            ERecord record = new ERecord()
+                            {
+                                UserName = trades[i].cUser,
+                                Amount = trades[i].nSecurityAmount,
+                                Code = trades[i].cSecurityCode,
+                                ExchangeId = trades[i].cExhcnageID,
+                                OrderPrice = trades[i].dOrderPrice,
+                                OrderRef = trades[i].OrderRef,
+                                StrategyNo = trades[i].belongStrategy,
+                                SysOrderRef = entrustorli[i].OrderSysID
+                            };
                         }
                     }
                 }

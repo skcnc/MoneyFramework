@@ -150,5 +150,15 @@ namespace Stork_Future_TaoLi.Controllers
         {
             return View();
         }
+
+        public ActionResult SysRegister()
+        {
+            return View();
+        }
+
+        public ActionResult ChangePassword()
+        {
+            return View();
+        }
     }
 }
