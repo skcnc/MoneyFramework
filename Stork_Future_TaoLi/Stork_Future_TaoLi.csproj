@@ -951,6 +951,7 @@
     <Content Include="Views\Home\RegisterUser.cshtml" />
     <Content Include="Views\Home\SysRegister.cshtml" />
     <Content Include="Views\Home\ChangePassword.cshtml" />
+    <Content Include="Views\Home\AccountOverVIew.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

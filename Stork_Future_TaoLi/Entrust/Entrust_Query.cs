@@ -137,6 +137,9 @@ namespace Stork_Future_TaoLi.Entrust
                         //更新数据，记录入数据库
                         ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateERRecord), (object)(ret));
 
+                        //修改委托缓存数据
+                        EntrustRecord.ModifyEntrustPosition(item.OrderRef, Convert.ToInt32(ret.frozen_amount), Convert.ToDouble(ret.frozen_money));
+
                         //此处判断，相应代码的委托是否完成
                         //此处逻辑需要待返回报文内容确认后修改
                         //测试使用
@@ -169,8 +172,12 @@ namespace Stork_Future_TaoLi.Entrust
 
                         ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateDLRecord), (object)bargin);
 
+                        EntrustRecord.DeleteEntrustRecord(item.OrderRef);
+
                         //更新持仓列表
-                        //ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
+
+
 
                     }
                 }

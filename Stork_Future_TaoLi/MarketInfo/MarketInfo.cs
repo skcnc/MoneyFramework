@@ -126,6 +126,20 @@ namespace Stork_Future_TaoLi
                     //发现行情有变动，更新本地股市
                     //注册hash键
 
+                    string key = info.Code;
+                    if(key.Contains("."))
+                    {
+                        key = key.Split('.')[0]; 
+                    }
+                    if(MarketPrice.market.ContainsKey(info.Code))
+                    {
+                        MarketPrice.market[info.Code] = info.Match;
+                    }
+                    else
+                    {
+                        MarketPrice.market.Add(info.Code, info.Match);
+                    }
+
                     MarketDelayCalculation.cal(info.Time);
 
                     if (StockTable.ContainsKey(info.Code))

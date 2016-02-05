@@ -366,6 +366,9 @@ namespace Stork_Future_TaoLi.TradeModule
                                 StrategyNo = trades[i].belongStrategy,
                                 SysOrderRef = entrustorli[i].OrderSysID
                             };
+
+                            EntrustRecord.AddEntrustRecord(record);
+                           
                         }
                     }
                 }

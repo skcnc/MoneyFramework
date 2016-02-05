@@ -568,23 +568,23 @@ namespace Stork_Future_TaoLi
             string strategy = bargin.strategyId;
 
 
-            var sg_open_li = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == bargin.strategyId && item.SG_STATUS == 0 select item);
-            var sg_close_li = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == bargin.strategyId && item.SG_STATUS == 0 select item);
+            //var sg_open_li = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == bargin.strategyId && item.SG_STATUS == 0 select item);
+            //var sg_close_li = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == bargin.strategyId && item.SG_STATUS == 0 select item);
 
-            if(sg_open_li.Count() == 0 && sg_close_li.Count() == 0)
-            {
-                GlobalErrorLog.LogInstance.LogEvent("策略不存在--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
-                return;
-            }
+            //if(sg_open_li.Count() == 0 && sg_close_li.Count() == 0)
+            //{
+            //    GlobalErrorLog.LogInstance.LogEvent("策略不存在--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
+            //    return;
+            //}
 
-            if(sg_close_li.Count()!=0)
-            {
-                user = sg_close_li.ToList()[0].SG_USER;
-            }
-            else
-            {
-                user = sg_open_li.ToList()[0].SG_USER;
-            }
+            //if(sg_close_li.Count()!=0)
+            //{
+            //    user = sg_close_li.ToList()[0].SG_USER;
+            //}
+            //else
+            //{
+            //    user = sg_open_li.ToList()[0].SG_USER;
+            //}
 
             var selectedrecord = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_TYPE == type && item.CC_USER == user select item);
 
@@ -603,6 +603,16 @@ namespace Stork_Future_TaoLi
                     };
 
                     DbEntity.CC_TAOLI_TABLE.Add(record);
+
+                    CCRecord ccRecord = new CCRecord()
+                    {
+                        code = code,
+                        type = type,
+                        price = price,
+                        amount = amount,
+                        user = user
+                    };
+                    PositionRecord.UpdateCCRecord(ccRecord);
                     Dbsavechage("UpdateCCRecords");
                     return;
                 }
@@ -629,6 +639,18 @@ namespace Stork_Future_TaoLi
                     record.CC_BUY_PRICE = (db_amount * db_price + amount * price) / (db_amount + amount);
                     record.CC_AMOUNT = db_amount + amount;
 
+
+                    CCRecord ccRecord = new CCRecord()
+                    {
+                        amount = Convert.ToInt16(record.CC_AMOUNT),
+                        code = record.CC_CODE,
+                        price = Convert.ToDouble(record.CC_BUY_PRICE),
+                        type = record.CC_TYPE,
+                        user = record.CC_USER
+                    };
+
+                    PositionRecord.UpdateCCRecord(ccRecord);
+
                     Dbsavechage("UpdateCCRecords");
                 }
                 else
@@ -643,7 +665,16 @@ namespace Stork_Future_TaoLi
                     {
                         record.CC_BUY_PRICE = (db_amount * db_price - amount * price) / (db_amount - amount);
                         record.CC_AMOUNT = db_amount - amount;
+                        DbEntity.CC_TAOLI_TABLE.Remove(record);
 
+                        CCRecord ccrecord = new CCRecord()
+                        {
+                            code = record.CC_CODE,
+                            type = record.CC_TYPE,
+                            user = record.CC_USER
+                        };
+
+                        PositionRecord.DeleteCCRecord(ccrecord);
                         Dbsavechage("UpdateCCRecords");
                         return;
                     }
@@ -652,6 +683,35 @@ namespace Stork_Future_TaoLi
             }
             
             
+        }
+
+        /// <summary>
+        /// 更新持仓列表
+        /// </summary>
+        /// <param name="v"></param>
+        public static void UpdatePositionList(object v)
+        {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            managedBargainreturnstruct bargin = (managedBargainreturnstruct)v;
+
+            if (bargin == null)
+            {
+                return;
+            }
+
+            string code = bargin.Security_code;
+            string type = bargin.OrderType.ToString();
+            int amount = bargin.stock_amount;
+            double price = bargin.bargain_price;
+            int direction = bargin.direction;
+            string user = string.Empty;
+            string strategy = bargin.strategyId;
+
+            var position = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user && item.CC_CODE == code select item);
+
+            
+
         }
 
         public static List<String> GetDealList(string strId, out decimal totalStockMoney, out decimal futureIndex)

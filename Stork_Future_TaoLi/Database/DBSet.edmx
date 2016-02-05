@@ -56,6 +56,40 @@
           <Property Name="ER_COMPLETED" Type="bit" />
           <Property Name="ER_DIRECTION" Type="int" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'MoneyEntity.dbo.MarketData' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="MarketData">
+          <Property Name="ActionDay" Type="nvarchar" MaxLength="50" />
+          <Property Name="Time" Type="nvarchar" MaxLength="50" />
+          <Property Name="AskPrice" Type="nvarchar" MaxLength="50" />
+          <Property Name="AskVol" Type="nvarchar" MaxLength="50" />
+          <Property Name="BidPrice" Type="nvarchar" MaxLength="50" />
+          <Property Name="BidVol" Type="nvarchar" MaxLength="50" />
+          <Property Name="Code" Type="nvarchar" MaxLength="50" />
+          <Property Name="High" Type="nvarchar" MaxLength="50" />
+          <Property Name="HighLimited" Type="nvarchar" MaxLength="50" />
+          <Property Name="IOPV" Type="nvarchar" MaxLength="50" />
+          <Property Name="Low" Type="nvarchar" MaxLength="50" />
+          <Property Name="LowLimited" Type="nvarchar" MaxLength="50" />
+          <Property Name="Match" Type="nvarchar" MaxLength="50" />
+          <Property Name="NumTrades" Type="nvarchar" MaxLength="50" />
+          <Property Name="dOpen" Type="nvarchar" MaxLength="50" />
+          <Property Name="PreClose" Type="nvarchar" MaxLength="50" />
+          <Property Name="Prefix" Type="nvarchar" MaxLength="50" />
+          <Property Name="SD2" Type="int" />
+          <Property Name="Status" Type="int" />
+          <Property Name="Sy11" Type="int" />
+          <Property Name="Sy12" Type="int" />
+          <Property Name="TotalAskVol" Type="int" />
+          <Property Name="TotalBidVol" Type="int" />
+          <Property Name="TradingDay" Type="int" />
+          <Property Name="Turnover" Type="int" />
+          <Property Name="Volume" Type="int" />
+          <Property Name="WeightedAvgAskPrice" Type="nvarchar" MaxLength="50" />
+          <Property Name="WeightedAvgBidPrice" Type="nvarchar" MaxLength="50" />
+          <Property Name="WindCode" Type="nvarchar" MaxLength="50" />
+          <Property Name="YieldToMaturity" Type="int" />
+        </EntityType>-->
         <EntityType Name="OL_TAOLI_LIST_TABLE">
           <Key>
             <PropertyRef Name="OL_GUID" />

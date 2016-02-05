@@ -57,7 +57,7 @@ namespace Stork_Future_TaoLi
         /// 2：委托量小于成交量
         /// 3：其他失败原因
         /// </returns>
-        public static int ReduceEntrustPosition(int OrderRef, int count)
+        public static int ModifyEntrustPosition(int OrderRef, int dealAmount, double FrozenMoney)
         {
             var tmp = (from item in EntrustRecordList where item.OrderRef == OrderRef select item);
 
@@ -67,26 +67,72 @@ namespace Stork_Future_TaoLi
                 return 1;
             }
 
+            tmp.ToList()[0].DealAmount = dealAmount;
+            tmp.ToList()[0].DealFrezonMoney = FrozenMoney;
+            
+            return 0;
+        }
 
+        /// <summary>
+        /// 删除委托缓存
+        /// </summary>
+        /// <param name="OrderRef"></param>
+        /// <returns>
+        /// 0： 删除成功
+        /// 1： 删除失败
+        /// </returns>
+        public static int DeleteEntrustRecord(int OrderRef)
+        {
+            var tmp = (from item in EntrustRecordList where item.OrderRef == OrderRef select item);
 
-            if (tmp.ToList()[0].Amount < count)
+            if (tmp.Count() == 0)
             {
-                GlobalErrorLog.LogInstance.LogEvent("委托缓存减持失败，原因是委托剩余量小于成交量。");
-                EntrustRecordList.Remove(tmp.ToList()[0]);
-                return 2;
+                GlobalErrorLog.LogInstance.LogEvent("删除委托失败，原因是原委托不存在，委托号： " + OrderRef );
+                return 1;
             }
 
-            try
+            if (tmp.ToList()[0].DealAmount != tmp.ToList()[0].Amount)
             {
-                tmp.ToList()[0].Amount -= count;
+                GlobalErrorLog.LogInstance.LogEvent("删除委托报警，原因是成交量和申报量不符，委托号： " + OrderRef + "   股票代码： " + tmp.ToList()[0].Code + "   申报量：" + tmp.ToList()[0].Amount + "   成交量：" + tmp.ToList()[0].DealAmount);
             }
-            catch (Exception ex)
-            {
-                GlobalErrorLog.LogInstance.LogEvent("委托缓存减持失败，原因是：" + ex.ToString());
-                return 3;
-            }
+
+            EntrustRecordList.Remove(tmp.ToList()[0]);
 
             return 0;
+        }
+
+        /// <summary>
+        /// 获取委托中冻结资金量
+        /// </summary>
+        /// <param name="user">用户名</param>
+        /// <param name="frozenMoney">冻结资金量</param>
+        public static void GetUserAccountInfo(string user, out double frozenMoney)
+        {
+            frozenMoney = 0;
+
+            List<ERecord> record = new List<ERecord>();
+
+
+            if (user == "*")
+            {
+                var tmp = (from item in EntrustRecordList select item);
+                record = tmp.ToList();
+            }
+            else
+            {
+                var tmp = (from item in EntrustRecordList where item.UserName == user select item);
+                record = tmp.ToList();
+            }
+
+           
+
+            if (record.Count() > 0)
+            {
+                foreach (var i in record.ToList())
+                {
+                    frozenMoney += i.DealFrezonMoney;
+                }
+            }
         }
     }
 
@@ -134,5 +180,151 @@ namespace Stork_Future_TaoLi
         /// 交易所返回委托编号
         /// </summary>
         public string SysOrderRef { get; set; }
+
+        /// <summary>
+        /// 已成交数量
+        /// </summary>
+        public int DealAmount { get; set; }
+
+        /// <summary>
+        /// 冻结金额
+        /// </summary>
+        public double DealFrezonMoney { get; set; }
+    }
+
+    /// <summary>
+    /// 持仓记录
+    /// </summary>
+    public class PositionRecord
+    {
+        /// <summary>
+        /// 持仓列表记录
+        /// </summary>
+        public static List<CCRecord> CCRecordList = new List<CCRecord>();
+
+        /// <summary>
+        /// 更新持仓列表
+        /// </summary>
+        /// <param name="record">新持仓记录</param>
+        public static void UpdateCCRecord(CCRecord record)
+        {
+            var tmp = (from item in CCRecordList where item.code == record.code && item.type == record.type && item.user == record.user select item);
+
+            if (tmp.Count() == 0)
+            {
+                CCRecordList.Add(record);
+            }
+            else
+            {
+                tmp.ToList()[0].amount = record.amount;
+                tmp.ToList()[0].price = record.price;
+            }
+
+        }
+
+        public static void DeleteCCRecord(CCRecord record)
+        {
+            var tmp = (from item in CCRecordList where item.user == record.user && item.code == record.code && item.type == record.type select item);
+
+            if (tmp.Count() > 0)
+            {
+                CCRecordList.Remove(tmp.ToList()[0]);
+            }
+        }
+
+        /// <summary>
+        /// 获取用户股票持仓
+        /// </summary>
+        /// <param name="userName">用户名,如果为'*'则查看所有</param>
+        /// <param name="records">持仓记录</param>
+        /// <param name="stockcost">股票成本</param>
+        public static void LoadCCList(string userName, out List<CCRecord> records , out double stockcost)
+        {
+            records = new List<CCRecord>();
+            stockcost = 0;
+
+
+         
+            if (userName != "*")
+            {
+                var tmp = (from item in CCRecordList where item.user == userName select item);
+                records = tmp.ToList();
+            }
+            else
+            {
+                var tmp = (from item in CCRecordList select item);
+                records = tmp.ToList();
+            }
+
+
+
+            if (records.Count() > 0)
+            {
+
+                foreach (var i in records)
+                {
+                    records.Add(i);
+                    stockcost += (i.amount * i.price);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 持仓记录类型
+    /// </summary>
+    public class CCRecord
+    {
+        /// <summary>
+        /// 股票代码
+        /// </summary>
+        public string code { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public string type { get; set; }
+
+        /// <summary>
+        /// 持仓数量
+        /// </summary>
+        public int amount { get; set; }
+
+        /// <summary>
+        /// 持仓单价
+        /// </summary>
+        public double price { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string user { get; set; }
+    }
+
+    /// <summary>
+    /// 最新行情记录
+    /// </summary>
+    public class MarketPrice
+    {
+        /// <summary>
+        /// 行情列表
+        /// </summary>
+        public static Dictionary<string, double> market = new Dictionary<string, double>();
+
+        /// <summary>
+        /// 计算当前股票市值
+        /// </summary>
+        /// <param name="records"></param>
+        /// <returns></returns>
+        public static double CalculateCurrentValue(List<CCRecord> records)
+        {
+            double value = 0;
+            foreach (CCRecord i in records)
+            {
+                value += market[i.code] * i.amount;
+            }
+
+            return value;
+        }
     }
 }
