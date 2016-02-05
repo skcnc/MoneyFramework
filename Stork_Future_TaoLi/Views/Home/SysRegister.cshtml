@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "SysRegister";
+}
+
+<h2><span class="label label-primary">新用户注册</span></h2>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="input-group col-sm-12">
+                <h3><span class="label label-info">用户名</span></h3>
+                <input type="text" class="form-control" id="Username" />
+            </div>
+            <div class="input-group col-sm-12">
+                <h3><span class="label label-info">密码</span></h3>
+                <input type="text" class="form-control" id="Password" />
+            </div>
+            <div class="input-group col-sm-12">
+                <h3><span class="label label-info">真实姓名</span></h3>
+                <input type="text" class="form-control" id="Realname" />
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="input-group col-sm-12">
+                <h3><span class="label label-info">股票可用资金</span></h3>
+                <input type="text" class="form-control" id="StockAccount" />
+            </div>
+            <div class="input-group col-sm-12">
+                <h3><span class="label label-info">期货可用资金</span></h3>
+                <input type="text" class="form-control" id="FutureAccount" />
+            </div>
+            <div class="input-group col-sm-12">
+                <h3><span class="label label-info">可用策略</span></h3>
+                <br />
+                <input type="checkbox" id="StrTaoli" style="margin-left:20px" /><span class="label label-success">套利策略</span>
+                <input type="checkbox" id="StrGupiao" style="margin-left:20px" /><span class="label label-success">股票策略</span>
+                <input type="checkbox" id="StrTrade" style="margin-left:20px" /><span class="label label-success">交易策略</span>
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="col-ms-12">
+        <button class="btn btn-primary" id="btnRegist">确认添加</button>
+    </div>
+</div> 
