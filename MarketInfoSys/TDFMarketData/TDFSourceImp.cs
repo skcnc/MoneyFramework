@@ -121,10 +121,18 @@ namespace MarketInfoSys
                     EnQueueType obj = new EnQueueType() { Type = "S", value = (object)data };
                     if (Queue_Data.Suspend == false)
                     {
-                        Queue_Data.GetQueue().Enqueue((object)obj);
+                        if (!simulate_trade.MarketRecorder)
+                        {
+                            Queue_Data.GetQueue().Enqueue((object)obj);
+                        }
                         if (data.Status == 68)
                         {
                             stop_plate_stocks.GetInstance().updateStopList(data);
+                        }
+
+                        if (simulate_trade.MarketRecorder)
+                        {
+                            MarketInfoQueue.EnQueueNew(data);
                         }
                     }
                 }

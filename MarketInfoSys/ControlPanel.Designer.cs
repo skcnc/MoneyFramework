@@ -44,6 +44,7 @@
             this.updateCount = new System.Windows.Forms.Timer(this.components);
             this.login = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -166,11 +167,23 @@
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(132, 93);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(72, 16);
+            this.checkBox2.TabIndex = 8;
+            this.checkBox2.Text = "行情记录";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
             // ControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(397, 590);
+            this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.login);
             this.Controls.Add(this.QueueLength);
@@ -210,5 +223,6 @@
         private System.Windows.Forms.Timer updateCount;
         private System.Windows.Forms.Label login;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox checkBox2;
     }
 }

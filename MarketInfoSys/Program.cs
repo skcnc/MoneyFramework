@@ -31,8 +31,13 @@ namespace MarketInfoSys
             
             ControlPanel panel = new ControlPanel();
 
+            LoadMarketClass loadMarketThread = new LoadMarketClass();
+            loadMarketThread.Run();
             Application.Run(panel);
         }
+
+  
+
     }
 
     class webservice
@@ -163,6 +168,8 @@ namespace MarketInfoSys
 
         //模拟行情开关
         public static bool SimSwitch { get; set; }
+
+        public static bool MarketRecorder { get; set; }
 
         /// <summary>
         /// 初始化模拟行情列表

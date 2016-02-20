@@ -23,6 +23,16 @@ namespace Stork_Future_TaoLi
         //数据库测试标记
         public static bool DBEnable = true;
 
+        public static List<UserInfo> GetUser()
+        {
+            if (DBAccessLayer.DBEnable == false) { return null; }
+
+            var tmp = (from item in DbEntity.UserInfo select item);
+
+            if (tmp.Count() == 0) return null;
+            else return tmp.ToList();
+        }
+
         public static void InsertSGOPEN(object v)
         {
 

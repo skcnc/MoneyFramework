@@ -241,6 +241,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Account\accountMonitor.cs" />
     <Compile Include="AdditionalModule\EntrustRecord.cs" />
     <Compile Include="AdditionalModule\sysmonitor.cs" />
     <Compile Include="AdditionalModule\TradeAdditionalClass.cs" />
@@ -288,8 +289,12 @@
     <Compile Include="Database\SG_TAOLI_STATUS_TABLE.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\UserInfo.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
+    <Compile Include="Hubs\AccountHub.cs" />
     <Compile Include="Hubs\monitorHub.cs" />
     <Compile Include="Hubs\StrategyInfoHub.cs" />
     <Compile Include="Hubs\TradeMonitorHub.cs" />

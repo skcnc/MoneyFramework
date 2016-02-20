@@ -109,11 +109,24 @@ namespace MarketInfoSys
                         foreach (TDFMarketData data in stop_plate_stocks.GetInstance().GetStopList())
                         {
                             EnQueueType obj = new EnQueueType() { Type = "S", value = (object)data };
-                            Queue_Data.GetQueue().Enqueue((object)obj);
+
+                            
+
+                            if (simulate_trade.MarketRecorder)
+                            {
+                                MarketInfoQueue.EnQueueNew(data);
+                            }
+                            else
+                            {
+                                Queue_Data.GetQueue().Enqueue((object)obj);
+                            }
+
                         }
                         RunningTime.CurrentTime = DateTime.Now;
 
                     }
+
+
 
                     if ((simulate_trade.SimSwitch)&&(Queue_Data.Suspend == false))
                     {

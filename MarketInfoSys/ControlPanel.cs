@@ -94,5 +94,11 @@ namespace MarketInfoSys
         {
             simulate_trade.SimSwitch = ((CheckBox)sender).Checked;
         }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            simulate_trade.MarketRecorder = ((CheckBox)sender).Checked;
+            MessageBox.Show("行情记录开启，行情信息直接存盘，不会发出。");
+        }
     }
 }

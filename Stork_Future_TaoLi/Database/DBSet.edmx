@@ -56,40 +56,6 @@
           <Property Name="ER_COMPLETED" Type="bit" />
           <Property Name="ER_DIRECTION" Type="int" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6013: The table/view 'MoneyEntity.dbo.MarketData' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
-        <EntityType Name="MarketData">
-          <Property Name="ActionDay" Type="nvarchar" MaxLength="50" />
-          <Property Name="Time" Type="nvarchar" MaxLength="50" />
-          <Property Name="AskPrice" Type="nvarchar" MaxLength="50" />
-          <Property Name="AskVol" Type="nvarchar" MaxLength="50" />
-          <Property Name="BidPrice" Type="nvarchar" MaxLength="50" />
-          <Property Name="BidVol" Type="nvarchar" MaxLength="50" />
-          <Property Name="Code" Type="nvarchar" MaxLength="50" />
-          <Property Name="High" Type="nvarchar" MaxLength="50" />
-          <Property Name="HighLimited" Type="nvarchar" MaxLength="50" />
-          <Property Name="IOPV" Type="nvarchar" MaxLength="50" />
-          <Property Name="Low" Type="nvarchar" MaxLength="50" />
-          <Property Name="LowLimited" Type="nvarchar" MaxLength="50" />
-          <Property Name="Match" Type="nvarchar" MaxLength="50" />
-          <Property Name="NumTrades" Type="nvarchar" MaxLength="50" />
-          <Property Name="dOpen" Type="nvarchar" MaxLength="50" />
-          <Property Name="PreClose" Type="nvarchar" MaxLength="50" />
-          <Property Name="Prefix" Type="nvarchar" MaxLength="50" />
-          <Property Name="SD2" Type="int" />
-          <Property Name="Status" Type="int" />
-          <Property Name="Sy11" Type="int" />
-          <Property Name="Sy12" Type="int" />
-          <Property Name="TotalAskVol" Type="int" />
-          <Property Name="TotalBidVol" Type="int" />
-          <Property Name="TradingDay" Type="int" />
-          <Property Name="Turnover" Type="int" />
-          <Property Name="Volume" Type="int" />
-          <Property Name="WeightedAvgAskPrice" Type="nvarchar" MaxLength="50" />
-          <Property Name="WeightedAvgBidPrice" Type="nvarchar" MaxLength="50" />
-          <Property Name="WindCode" Type="nvarchar" MaxLength="50" />
-          <Property Name="YieldToMaturity" Type="int" />
-        </EntityType>-->
         <EntityType Name="OL_TAOLI_LIST_TABLE">
           <Key>
             <PropertyRef Name="OL_GUID" />
@@ -146,6 +112,18 @@ warning 6013: The table/view 'MoneyEntity.dbo.MarketData' does not have a primar
           <Property Name="SG_STATUS" Type="int" />
           <Property Name="SG_UPDATE_TIME" Type="datetime" />
         </EntityType>
+        <EntityType Name="UserInfo">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="alias" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="password" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" />
+          <Property Name="stockAvailable" Type="nvarchar" MaxLength="50" />
+          <Property Name="futureAvailable" Type="nvarchar" MaxLength="50" />
+          <Property Name="strategy" Type="int" />
+        </EntityType>
         <EntityContainer Name="MoneyEntityModelStoreContainer">
           <EntitySet Name="CC_TAOLI_TABLE" EntityType="Self.CC_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="Self.DL_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
@@ -154,6 +132,7 @@ warning 6013: The table/view 'MoneyEntity.dbo.MarketData' does not have a primar
           <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="Self.SG_TAOLI_CLOSE_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="Self.SG_TAOLI_OPEN_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserInfo" EntityType="Self.UserInfo" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -167,6 +146,7 @@ warning 6013: The table/view 'MoneyEntity.dbo.MarketData' does not have a primar
           <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" />
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="MoneyEntityModel.ER_TAOLI_TABLE" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" />
+          <EntitySet Name="UserInfo" EntityType="MoneyEntityModel.UserInfo" />
         </EntityContainer>
         <EntityType Name="CC_TAOLI_TABLE">
           <Key>
@@ -274,6 +254,18 @@ warning 6013: The table/view 'MoneyEntity.dbo.MarketData' does not have a primar
           <Property Name="SG_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="OL_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="OL_TIME" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="UserInfo">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="alias" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="password" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="stockAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="futureAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="strategy" Type="Int32" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -392,6 +384,19 @@ warning 6013: The table/view 'MoneyEntity.dbo.MarketData' does not have a primar
                 <ScalarProperty Name="OL_LIST" ColumnName="OL_LIST" />
                 <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
                 <ScalarProperty Name="OL_GUID" ColumnName="OL_GUID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserInfo">
+            <EntityTypeMapping TypeName="MoneyEntityModel.UserInfo">
+              <MappingFragment StoreEntitySet="UserInfo">
+                <ScalarProperty Name="strategy" ColumnName="strategy" />
+                <ScalarProperty Name="futureAvailable" ColumnName="futureAvailable" />
+                <ScalarProperty Name="stockAvailable" ColumnName="stockAvailable" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

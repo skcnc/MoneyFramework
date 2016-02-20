@@ -106,12 +106,9 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="user">用户名</param>
         /// <param name="frozenMoney">冻结资金量</param>
-        public static void GetUserAccountInfo(string user, out double frozenMoney)
+        public static void GetUserAccountInfo(string user, out double frozenMoney, out List<ERecord> record)
         {
             frozenMoney = 0;
-
-            List<ERecord> record = new List<ERecord>();
-
 
             if (user == "*")
             {
