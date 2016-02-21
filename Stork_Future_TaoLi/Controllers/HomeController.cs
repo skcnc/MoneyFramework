@@ -57,6 +57,11 @@ namespace Stork_Future_TaoLi.Controllers
             return View();
         }
 
+        public ActionResult RiskControl()
+        {
+            return View();
+        }
+
         public string ImportHarbor(String InputJson)
         {
             try
@@ -85,7 +90,14 @@ namespace Stork_Future_TaoLi.Controllers
             }
         }
 
-        
+        /// <summary>
+        /// 获取风控参数
+        /// </summary>
+        /// <returns>Json格式的风控参数</returns>
+        public string GetRiskParameter(String InputJson)
+        {
+            return riskmonitor.GetRiskParaJson();
+        }
 
         public string ImportTrade(String InputJson)
         {
@@ -105,6 +117,7 @@ namespace Stork_Future_TaoLi.Controllers
                 return ex.ToString();
             }
         }
+
         public string MatchOpenPara(String strategyId)
         {
             try

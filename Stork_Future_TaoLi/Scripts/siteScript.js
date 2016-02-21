@@ -1,5 +1,127 @@
 ﻿
 
+//页面重新进入
+window.onload = function (e) {
+
+    if (e.currentTarget.location.pathname != "/" && e.currentTarget.location.pathname.toLocaleLowerCase() != "/home/syslogin") {
+        if (Modernizr.localstorage) {
+            var userName = localStorage["USERNAME"];
+            var loginTime = localStorage["TIMESTAMP"];
+            var dNow = new Date();
+
+            if (userName == "" || userName == undefined) {
+                window.location.href = "/";
+                return;
+            }
+            if (loginTime == "" || loginTime == undefined) {
+                window.location.href = "/";
+                return;
+            }
+            var days = Math.floor((dNow.getTime() - loginTime) / (24 * 3600 * 1000));
+
+            if (days > 0) {
+                window.location.href = "/";
+                return;
+            }
+        }
+        else {
+            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+            window.location.href = "/";
+        }
+    }
+
+    if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/riskcontrol") {
+        
+        //向后台请求黑白名单信息
+        $.post("/Home/GetRiskParameter",
+            {
+            InputJson: JSONSTRING
+            }, function (data, status)
+            {
+                //alert("数据：" + data + "\n状态：" + status);
+
+                loadRiskParameter(data);
+        })
+    }
+
+    if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/monitorconsole") {
+        if (Modernizr.localstorage) {
+            localStorage.setItem("IDCollection", "");
+            UpdateOPENStrategies(false);
+            $('#userName')[0].innerText = localStorage["USERNAME"];
+        }
+        else {
+            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+            return
+        }
+    }
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/trademonitor") {
+        $('.open_close_panel').hide();
+        $('.exchange_select_panel').show();
+    }
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/open_edit") {
+        if (Modernizr.localstorage) {
+            var _queryString = e.currentTarget.location.href.split('?')[1];
+            var _id = _queryString.split('&')[0].split('=')[1];
+
+            if (_id != "") {
+                var ct = localStorage[_id + ":CT"];
+                var op = localStorage[_id + ":OP"];
+                var hd = localStorage[_id + ":HD"];
+                var Index = localStorage[_id + ":INDEX"];
+                var weight = localStorage[_id + ":WEIGHT"];
+                var order = localStorage[_id + ":BUYLIST"];
+
+                var fullName = GetIndexFullName(Index);
+
+                $('#ct_value').val(ct);
+                $('#op_value').val(op);
+                $('#hd_value').val(hd);
+                $('#index_input').val(fullName);
+                $('#weightList').text(weight);
+                $('#tradeOrder').text(order);
+            }
+        }
+        else {
+            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+            return
+        }
+
+
+    }
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/close_edit") {
+        if (Modernizr.localstorage) {
+            var _queryString = e.currentTarget.location.href.split('?')[1];
+            var _id = _queryString.split('&')[0].split('=')[1];
+
+            if (_id != "") {
+                var ct = localStorage[_id + ":CT"];
+                var sp = localStorage[_id + ":SP"];
+                var hd = localStorage[_id + ":HD"];
+                var coe = localStorage[_id + ":COE"];
+                var sd = localStorage[_id + ":SD"];
+                var sa = localStorage[_id + ":SA"];
+                var pe = localStorage[_id + ":PE"];
+                var basis = localStorage[_id + ":BASIS"];
+                var order = localStorage[_id + ":BUYLIST"];
+
+                $('#ct_value').val(ct);
+                $('#sp_value').val(sp);
+                $('#hd_value').val(hd);
+                $('#coe_value').val(coe);
+                $('#sd_value').val(sd);
+                $('#sa_value').val(sa);
+                $('#pe_value').val(pe);
+                $('#basis_value').val(basis);
+                $('#buylist').val(order);
+            }
+        }
+        else {
+            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+            return;
+        }
+    }
+}
 
 //展开开仓策略细节
 $('#category_panel_open').delegate('button.displaystrategy', 'click', function (e) {
@@ -419,117 +541,6 @@ $('#category_panel_close').delegate('button.modify-strategy', 'click', function 
     window.open(encodeURI(_href), "_blank");
 })
 
-//页面重新进入
-window.onload = function (e) {
-
-    if (e.currentTarget.location.pathname != "/" && e.currentTarget.location.pathname.toLocaleLowerCase() != "/home/syslogin")
-    {
-        if (Modernizr.localstorage) {
-            var userName = localStorage["USERNAME"];
-            var loginTime = localStorage["TIMESTAMP"];
-            var dNow = new Date();
-
-            if (userName == "" || userName == undefined) {
-                window.location.href = "/";
-                return;
-            }
-            if (loginTime == "" || loginTime == undefined) {
-                window.location.href = "/";
-                return;
-            }
-            var days = Math.floor((dNow.getTime() - loginTime) / (24 * 3600 * 1000));
-
-            if (days > 0) {
-                window.location.href = "/";
-                return;
-            }
-        }
-        else
-        {
-            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-            window.location.href = "/";
-        }
-    }
-
-    if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/monitorconsole") {
-        if (Modernizr.localstorage) {
-            localStorage.setItem("IDCollection", "");
-            UpdateOPENStrategies(false);
-            $('#userName')[0].innerText= localStorage["USERNAME"];
-        }
-        else {
-            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-            return
-        }
-    }
-    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/trademonitor") {
-        $('.open_close_panel').hide();
-        $('.exchange_select_panel').show();
-    }
-    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/open_edit") {
-        if (Modernizr.localstorage) {
-            var _queryString = e.currentTarget.location.href.split('?')[1];
-            var _id = _queryString.split('&')[0].split('=')[1];
-            
-            if (_id != "") {
-                var ct = localStorage[_id + ":CT"];
-                var op = localStorage[_id + ":OP"];
-                var hd = localStorage[_id + ":HD"];
-                var Index = localStorage[_id + ":INDEX"];
-                var weight = localStorage[_id + ":WEIGHT"];
-                var order = localStorage[_id + ":BUYLIST"];
-
-                var fullName = GetIndexFullName(Index);
-                
-                $('#ct_value').val(ct);
-                $('#op_value').val(op);
-                $('#hd_value').val(hd);
-                $('#index_input').val(fullName);
-                $('#weightList').text(weight);
-                $('#tradeOrder').text(order);
-            }
-        }
-        else {
-            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-            return
-        }
-
-        
-    }
-    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/close_edit") {
-        if (Modernizr.localstorage) {
-            var _queryString = e.currentTarget.location.href.split('?')[1];
-            var _id = _queryString.split('&')[0].split('=')[1];
-
-            if(_id != "")
-            {
-                var ct = localStorage[_id + ":CT"];
-                var sp = localStorage[_id + ":SP"];
-                var hd = localStorage[_id + ":HD"];
-                var coe = localStorage[_id + ":COE"];
-                var sd = localStorage[_id + ":SD"];
-                var sa = localStorage[_id + ":SA"];
-                var pe = localStorage[_id + ":PE"];
-                var basis = localStorage[_id + ":BASIS"];
-                var order = localStorage[_id + ":BUYLIST"];
-
-                $('#ct_value').val(ct);
-                $('#sp_value').val(sp);
-                $('#hd_value').val(hd);
-                $('#coe_value').val(coe);
-                $('#sd_value').val(sd);
-                $('#sa_value').val(sa);
-                $('#pe_value').val(pe);
-                $('#basis_value').val(basis);
-                $('#buylist').val(order);
-            }
-        }
-        else {
-            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-            return;
-        }
-    }
-}
 
 //刷新策略实例
 function UpdateOPENStrategies(changeFlag)

@@ -65,6 +65,19 @@
           <Property Name="OL_LIST" Type="ntext" />
           <Property Name="OL_TIME" Type="datetime" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'MoneyEntity.dbo.RISK_TABLE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="RISK_TABLE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="date" Type="date" />
+          <Property Name="time" Type="datetime" />
+          <Property Name="alias" Type="nvarchar" MaxLength="50" />
+          <Property Name="strategy_id" Type="nvarchar" MaxLength="50" />
+          <Property Name="err" Type="text" />
+        </EntityType>
         <EntityType Name="SG_TAOLI_CLOSE_TABLE">
           <Key>
             <PropertyRef Name="SG_GUID" />
@@ -133,6 +146,16 @@
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="Self.SG_TAOLI_OPEN_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserInfo" EntityType="Self.UserInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RISK_TABLE" EntityType="Self.RISK_TABLE" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[RISK_TABLE].[ID] AS [ID], 
+[RISK_TABLE].[date] AS [date], 
+[RISK_TABLE].[time] AS [time], 
+[RISK_TABLE].[alias] AS [alias], 
+[RISK_TABLE].[strategy_id] AS [strategy_id], 
+[RISK_TABLE].[err] AS [err]
+FROM [dbo].[RISK_TABLE] AS [RISK_TABLE]</DefiningQuery>
+          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -147,6 +170,7 @@
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="MoneyEntityModel.ER_TAOLI_TABLE" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" />
           <EntitySet Name="UserInfo" EntityType="MoneyEntityModel.UserInfo" />
+          <EntitySet Name="RISK_TABLE" EntityType="MoneyEntityModel.RISK_TABLE" />
         </EntityContainer>
         <EntityType Name="CC_TAOLI_TABLE">
           <Key>
@@ -266,6 +290,17 @@
           <Property Name="stockAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="futureAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="strategy" Type="Int32" />
+        </EntityType>
+        <EntityType Name="RISK_TABLE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="date" Type="DateTime" Precision="0" />
+          <Property Name="time" Type="Time" Precision="3" />
+          <Property Name="alias" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="strategy_id" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="err" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -396,6 +431,18 @@
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RISK_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.RISK_TABLE">
+              <MappingFragment StoreEntitySet="RISK_TABLE">
+                <ScalarProperty Name="err" ColumnName="err" />
+                <ScalarProperty Name="strategy_id" ColumnName="strategy_id" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="time" ColumnName="time" />
+                <ScalarProperty Name="date" ColumnName="date" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

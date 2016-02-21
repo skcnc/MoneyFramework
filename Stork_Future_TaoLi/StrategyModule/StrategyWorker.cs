@@ -670,14 +670,34 @@ namespace Stork_Future_TaoLi.StrategyModule
                             DBAccessLayer.InsertORDERLIST(StrategyInstanceID, json);
                         }
 
-                        //下单到交易预处理模块
-                        queue_prd_trade.GetQueue().Enqueue((object)orderli);
+                        //提交风控模块
+                        string errCode = string.Empty;
 
-                        if (DBAccessLayer.DBEnable)
+                        if (riskmonitor.RiskControl(User, orderli, out errCode))
                         {
-                            DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 3);
-                            DBAccessLayer.UpdateSGOPENStatus(StrategyInstanceID, 3);
+                            //下单到交易预处理模块
+                            queue_prd_trade.GetQueue().Enqueue((object)orderli);
+
+                            if (DBAccessLayer.DBEnable)
+                            {
+                                //写入数据库，策略状态为已下单
+                                DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 3);
+                                DBAccessLayer.UpdateSGOPENStatus(StrategyInstanceID, 3);
+
+                                
+                            }
+                            
                         }
+                        else
+                        {
+                            if (DBAccessLayer.DBEnable)
+                            {
+                                //写入数据库，策略状态为交易拒绝，未写入风控模块
+                                DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 4);
+                                DBAccessLayer.UpdateSGOPENStatus(StrategyInstanceID, 4);
+                            }
+                        }
+                       
 
                         // 列表只会生成一次
                         breaklabel = true;

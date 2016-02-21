@@ -23,6 +23,22 @@ namespace Stork_Future_TaoLi
         //数据库测试标记
         public static bool DBEnable = true;
 
+        public static void AddRiskRecord(string alias , string err, string strid)
+        {
+
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            RISK_TABLE record = new RISK_TABLE()
+            {
+                ID = Guid.NewGuid(),
+                alias = alias,
+                date = DateTime.Now.Date,
+                strategy_id = strid,
+                err = err,
+                time = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second)
+            };
+        }
+
         public static List<UserInfo> GetUser()
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
@@ -31,6 +47,16 @@ namespace Stork_Future_TaoLi
 
             if (tmp.Count() == 0) return null;
             else return tmp.ToList();
+        }
+
+        public static UserInfo GetOneUser(string alias)
+        {
+            if (DBAccessLayer.DBEnable == false) { return null; }
+
+            var tmp = (from item in DbEntity.UserInfo select item);
+
+            if (tmp.Count() == 0) return null;
+            else return tmp.ToList()[0];
         }
 
         public static void InsertSGOPEN(object v)

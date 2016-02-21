@@ -1,4 +1,6 @@
-﻿using Stork_Future_TaoLi.Variables_Type;
+﻿using Newtonsoft.Json;
+using Stork_Future_TaoLi.Database;
+using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +18,14 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public  static bool RiskControl(string name, List<TradeOrderStruct> orderlist, out string result)
         {
+            UserInfo user = DBAccessLayer.GetOneUser(name);
+
+
 
             double overflow = 0.02; //溢价余量，用于控制金额空间和成本空间的差值。
             result = string.Empty;
             int errCode = 0;
-            AccountInfo accInfo = accountMonitor.GetAccountInfo(name, out result);
+            AccountInfo accInfo = accountMonitor.UpdateAccount(user);
 
             if (accInfo == null) { return false; }
 
@@ -63,5 +68,48 @@ namespace Stork_Future_TaoLi
             else return true;
 
         }
+
+        private static riskParameter riskPara = new riskParameter();
+
+        /// <summary>
+        /// 获取风控参数
+        /// </summary>
+        /// <returns>风控参数的json字符串</returns>
+        public static String GetRiskParaJson()
+        {
+            return JsonConvert.SerializeObject(riskPara);
+        }
+    }
+
+    /// <summary>
+    /// 风控参数
+    /// </summary>
+    public class riskParameter
+    {
+        /// <summary>
+        /// 风控白名单
+        /// </summary>
+        public List<String> WhiteNameList = new List<string>();
+
+        /// <summary>
+        /// 风控黑名单
+        /// </summary>
+        public List<String> BlackNameList = new List<string>();
+
+        /// <summary>
+        /// 敞口比例
+        /// </summary>
+        public double changkouRadio = 0;
+
+        /// <summary>
+        /// 风险度限制
+        /// </summary>
+        public double riskLevel = 0;
+
+        /// <summary>
+        /// 单只股票所占资金比例
+        /// </summary>
+        public double PerStockCostPercentage = 0;
+
     }
 }

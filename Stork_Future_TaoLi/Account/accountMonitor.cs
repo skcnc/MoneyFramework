@@ -47,7 +47,7 @@ namespace Stork_Future_TaoLi
         /// 计算账户情况
         /// </summary>
         /// <param name="info"></param>
-        private static AccountInfo UpdateAccount(UserInfo info)
+        public static AccountInfo UpdateAccount(UserInfo info)
         {
             AccountInfo account = new AccountInfo();
 
