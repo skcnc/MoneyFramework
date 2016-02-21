@@ -140,6 +140,54 @@ namespace Stork_Future_TaoLi
             return acc.ToList()[0];
         }
 
+        public static AccountInfo GetTestAccount(string name,out string result)
+        {
+            result = string.Empty;
+
+            AccountInfo info = new AccountInfo()
+            {
+                alias = "testor",
+                account = "10000000",
+                balance = "7000000",
+                cost = "3000000",
+                faccount = "1000000",
+                fbond = "300000",
+                frozen = "20000",
+                fvalue = "1200000",
+                name = "testor",
+                value = "1150000",
+                positions = new List<AccountPosition>(),
+                entrusts = new List<AccountEntrust>()
+            };
+
+            info.positions.Clear();
+            info.positions.Add(new AccountPosition()
+            {
+                code = "600012",
+                name = "testor",
+                amount = "120",
+                price = "25.12",
+                type = "S"
+            });
+            info.positions.Add(new AccountPosition()
+            {
+                code = "600015",
+                name = "testor",
+                amount = "300",
+                price = "1.34",
+                type = "S"
+            });
+            info.positions.Add(new AccountPosition()
+            {
+                code = "600020",
+                name = "testor",
+                amount = "100",
+                price = "7.18",
+                type = "S"
+            });
+            return info;
+        }
+
         public static string GetErrorCode(int code)
         {
             switch (code)
@@ -193,11 +241,25 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public string value { get; set; }
 
-
         /// <summary>
         /// 股票成本
         /// </summary>
         public string cost { get; set; }
+
+        /// <summary>
+        /// 期货资金量
+        /// </summary>
+        public string faccount { get; set; }
+
+        /// <summary>
+        /// 期货权益
+        /// </summary>
+        public string fvalue { get; set; }
+
+        /// <summary>
+        /// 期货保证金
+        /// </summary>
+        public string fbond { get; set; }
 
         /// <summary>
         /// 持仓列表

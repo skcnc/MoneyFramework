@@ -253,6 +253,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Database\BWNameTable.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\CC_TAOLI_TABLE.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>

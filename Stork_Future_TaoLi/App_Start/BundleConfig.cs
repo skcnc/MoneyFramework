@@ -28,7 +28,8 @@ namespace Stork_Future_TaoLi
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.min.js",
                       "~/Scripts/respond.min.js",
-                      "~/Scripts/siteScript.js"));
+                      "~/Scripts/siteScript.js",
+                      "~/Scripts/risk.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/signalr").Include(
                      "~/Scripts/jquery.signalR-2.2.0.min.js"

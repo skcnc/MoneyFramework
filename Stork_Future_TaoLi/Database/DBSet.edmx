@@ -5,6 +5,18 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="MoneyEntityModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BWNameTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Code" Type="nvarchar" MaxLength="50" />
+          <Property Name="Amount" Type="money" />
+          <Property Name="PercentageA" Type="float" />
+          <Property Name="Value" Type="money" />
+          <Property Name="PercentageB" Type="float" />
+          <Property Name="flag" Type="bit" />
+        </EntityType>
         <EntityType Name="CC_TAOLI_TABLE">
           <Key>
             <PropertyRef Name="CC_CODE" />
@@ -65,8 +77,6 @@
           <Property Name="OL_LIST" Type="ntext" />
           <Property Name="OL_TIME" Type="datetime" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'MoneyEntity.dbo.RISK_TABLE' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="RISK_TABLE">
           <Key>
             <PropertyRef Name="ID" />
@@ -138,24 +148,16 @@ warning 6002: The table/view 'MoneyEntity.dbo.RISK_TABLE' does not have a primar
           <Property Name="strategy" Type="int" />
         </EntityType>
         <EntityContainer Name="MoneyEntityModelStoreContainer">
+          <EntitySet Name="BWNameTable" EntityType="Self.BWNameTable" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CC_TAOLI_TABLE" EntityType="Self.CC_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="Self.DL_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="Self.ER_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="Self.OL_TAOLI_LIST_TABLE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RISK_TABLE" EntityType="Self.RISK_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="Self.SG_TAOLI_CLOSE_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="Self.SG_TAOLI_OPEN_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserInfo" EntityType="Self.UserInfo" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="RISK_TABLE" EntityType="Self.RISK_TABLE" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-[RISK_TABLE].[ID] AS [ID], 
-[RISK_TABLE].[date] AS [date], 
-[RISK_TABLE].[time] AS [time], 
-[RISK_TABLE].[alias] AS [alias], 
-[RISK_TABLE].[strategy_id] AS [strategy_id], 
-[RISK_TABLE].[err] AS [err]
-FROM [dbo].[RISK_TABLE] AS [RISK_TABLE]</DefiningQuery>
-          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -170,6 +172,7 @@ FROM [dbo].[RISK_TABLE] AS [RISK_TABLE]</DefiningQuery>
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="MoneyEntityModel.ER_TAOLI_TABLE" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" />
           <EntitySet Name="UserInfo" EntityType="MoneyEntityModel.UserInfo" />
+          <EntitySet Name="BWNameTable" EntityType="MoneyEntityModel.BWNameTable" />
           <EntitySet Name="RISK_TABLE" EntityType="MoneyEntityModel.RISK_TABLE" />
         </EntityContainer>
         <EntityType Name="CC_TAOLI_TABLE">
@@ -291,13 +294,25 @@ FROM [dbo].[RISK_TABLE] AS [RISK_TABLE]</DefiningQuery>
           <Property Name="futureAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="strategy" Type="Int32" />
         </EntityType>
+        <EntityType Name="BWNameTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Amount" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="PercentageA" Type="Double" />
+          <Property Name="Value" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="PercentageB" Type="Double" />
+          <Property Name="flag" Type="Boolean" />
+        </EntityType>
         <EntityType Name="RISK_TABLE">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Guid" Nullable="false" />
           <Property Name="date" Type="DateTime" Precision="0" />
-          <Property Name="time" Type="Time" Precision="3" />
+          <Property Name="time" Type="DateTime" Precision="3" />
           <Property Name="alias" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="strategy_id" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="err" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
@@ -431,6 +446,19 @@ FROM [dbo].[RISK_TABLE] AS [RISK_TABLE]</DefiningQuery>
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BWNameTable">
+            <EntityTypeMapping TypeName="MoneyEntityModel.BWNameTable">
+              <MappingFragment StoreEntitySet="BWNameTable">
+                <ScalarProperty Name="flag" ColumnName="flag" />
+                <ScalarProperty Name="PercentageB" ColumnName="PercentageB" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="PercentageA" ColumnName="PercentageA" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -93,10 +93,16 @@ namespace Stork_Future_TaoLi.Controllers
         /// <summary>
         /// 获取风控参数
         /// </summary>
+        /// <param name="InputJson">用户名</param>
         /// <returns>Json格式的风控参数</returns>
         public string GetRiskParameter(String InputJson)
         {
-            return riskmonitor.GetRiskParaJson();
+            return riskmonitor.GetRiskParaJson(InputJson);
+        }
+
+        public string SetRiskParameter(String InputJson,String WhiteLi,String BlackLi)
+        {
+            return riskmonitor.SetRiskParaJson(InputJson, WhiteLi, BlackLi);
         }
 
         public string ImportTrade(String InputJson)

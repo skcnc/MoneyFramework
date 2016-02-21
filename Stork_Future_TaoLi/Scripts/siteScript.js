@@ -33,13 +33,13 @@ window.onload = function (e) {
     if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/riskcontrol") {
         
         //向后台请求黑白名单信息
+        var InputJson = localStorage["USERNAME"];
         $.post("/Home/GetRiskParameter",
             {
-            InputJson: JSONSTRING
+                InputJson: InputJson
             }, function (data, status)
             {
                 //alert("数据：" + data + "\n状态：" + status);
-
                 loadRiskParameter(data);
         })
     }

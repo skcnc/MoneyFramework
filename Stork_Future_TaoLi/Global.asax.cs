@@ -60,6 +60,8 @@ namespace Stork_Future_TaoLi
 
             SystemMonitorClass.getInstance().Run();
 
+            riskmonitor.Init();
+
             Thread.Sleep(3000);
         }
     }

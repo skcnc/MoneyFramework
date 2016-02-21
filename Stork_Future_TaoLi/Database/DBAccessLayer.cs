@@ -23,6 +23,47 @@ namespace Stork_Future_TaoLi
         //数据库测试标记
         public static bool DBEnable = true;
 
+        /// <summary>
+        /// 获取黑白名单
+        /// </summary>
+        /// <returns>股票黑白名单</returns>
+        public static List<BWNameTable> GetWBNamwList()
+        {
+            if (DBAccessLayer.DBEnable == false) { return null; }
+
+            var tmp = (from item in DbEntity.BWNameTable select item);
+
+            if (tmp.Count() == 0) return null;
+            else return tmp.ToList();
+        }
+
+        /// <summary>
+        /// 设定黑白名单
+        /// </summary>
+        /// <param name="records">名单</param>
+        /// <returns>成功状态</returns>
+        public static bool SetWBNameList(List<BWNameTable> records)
+        {
+            if (DBAccessLayer.DBEnable == false) return false;
+
+            List<BWNameTable> oldRecords = (from item in DbEntity.BWNameTable select item).ToList();
+
+            for (int i = 0; i < oldRecords.Count; i++)
+            {
+                DbEntity.BWNameTable.Remove(oldRecords[i]);
+            }
+
+            foreach (BWNameTable record in records)
+            {
+                DbEntity.BWNameTable.Add(record);
+            }
+
+            Dbsavechage("BWNameTable");
+
+            return true;
+            
+        }
+
         public static void AddRiskRecord(string alias , string err, string strid)
         {
 
@@ -35,8 +76,11 @@ namespace Stork_Future_TaoLi
                 date = DateTime.Now.Date,
                 strategy_id = strid,
                 err = err,
-                time = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second)
+                time = DateTime.Now
             };
+
+            DbEntity.RISK_TABLE.Add(record);
+            Dbsavechage("RISK_TABLE");
         }
 
         public static List<UserInfo> GetUser()
