@@ -25,7 +25,6 @@ namespace Stork_Future_TaoLi
         private static void WorkThread(){
             while(true)
             {
-
                 Thread.Sleep(1000);
 
                 if (DateTime.Now.Second % 5 == 0)
@@ -119,9 +118,49 @@ namespace Stork_Future_TaoLi
             return account;
 
         }
+
+        /// <summary>
+        /// 获取账户信息
+        /// </summary>
+        /// <param name="name">用户名</param>
+        /// <param name="result">返回错误说明</param>
+        /// <returns>账户信息</returns>
+        public static AccountInfo GetAccountInfo(string name,out string result)
+        {
+            result = string.Empty;
+            var acc = (from item in accountList where item.alias == name select item);
+
+            if(acc.Count() == 0)
+            {
+               //没有查到关于该用户的风控信息，直接返回失败
+                result = GetErrorCode(3);
+                return null;
+            }
+
+            return acc.ToList()[0];
+        }
+
+        public static string GetErrorCode(int code)
+        {
+            switch (code)
+            {
+                case 0:
+                    return "验证通过";
+                case 1:
+                    return "股市金额不足";
+                case 2:
+                    return "期货金额不足";
+                case 3:
+                    return "账户不存在";
+                default :
+                    return "验证通过";
+            }
+        }
     }
 
-
+    /// <summary>
+    /// 用户资金类型
+    /// </summary>
     public class AccountInfo
     {
         /// <summary>
@@ -175,31 +214,33 @@ namespace Stork_Future_TaoLi
     /// <summary>
     /// 持仓信息类型
     /// </summary>
-    public class AccountPosition{
+    public class AccountPosition
+    {
+
         /// <summary>
         /// 代码
         /// </summary>
-        public string code {get;set;}
+        public string code { get; set; }
 
         /// <summary>
         /// 类型
         /// </summary>
-        public string type{get;set;}
+        public string type { get; set; }
 
         /// <summary>
         /// 数量
         /// </summary>
-        public string amount {get;set;}
+        public string amount { get; set; }
 
         /// <summary>
         /// 价格
         /// </summary>
-        public string price {get;set;}
+        public string price { get; set; }
 
         /// <summary>
         /// 用户名
         /// </summary>
-        public string name{get;set;}
+        public string name { get; set; }
     }
 
     /// <summary>

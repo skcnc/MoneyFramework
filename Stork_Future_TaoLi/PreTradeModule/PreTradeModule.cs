@@ -163,7 +163,6 @@ namespace Stork_Future_TaoLi
                 if (tos != null)
                 {
 
-
                     log.LogEvent("来自策略的交易数：" + tos.Count.ToString());
 
                     //获取到新的list
