@@ -7,6 +7,7 @@ using Stork_Future_TaoLi;
 using Newtonsoft.Json;
 using System.IO;
 using Stork_Future_TaoLi.Modulars;
+using Stork_Future_TaoLi.Account;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -112,7 +113,17 @@ namespace Stork_Future_TaoLi.Controllers
 
         public string register(String InputJson)
         {
+            return userOper.register(InputJson);
+        }
 
+        public string userlogin(String InputJson)
+        {
+            return userOper.login(InputJson).ToString();
+        }
+
+        public string changePW(String InputJson)
+        {
+            return userOper.ChangePassword(InputJson).ToString();   
         }
 
         public string ImportTrade(String InputJson)

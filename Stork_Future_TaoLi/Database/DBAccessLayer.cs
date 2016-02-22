@@ -6,6 +6,7 @@ using Stork_Future_TaoLi.Database;
 using MCStockLib;
 using System.Threading;
 using Newtonsoft.Json;
+using Stork_Future_TaoLi.Account;
 
 
 namespace Stork_Future_TaoLi
@@ -852,6 +853,76 @@ namespace Stork_Future_TaoLi
             hd = Convert.ToInt16(_records.ToList()[0].SG_HAND_NUM);
 
             return SG_IDs;
+
+        }
+
+        /// <summary>
+        /// 创建新用户
+        /// </summary>
+        /// <param name="para">参数</param>
+        /// <returns></returns>
+        public static string  InsertUser(registerType para)
+        {
+            if (DBAccessLayer.DBEnable == false) { return "数据库未启用"; }
+            if (para == null) return "参数有误";
+
+            Database.UserInfo user = new UserInfo()
+            {
+                ID = Guid.NewGuid(),
+                alias = para.username,
+                name = para.Realname,
+                password = DESoper.EncryptDES(para.Password),
+                userRight = Convert.ToInt16(para.right),
+                stockAvailable = para.StockAccount,
+                futureAvailable = para.FutureAccount
+            };
+
+            DbEntity.UserInfo.Add(user);
+            Dbsavechage("InsertUser");
+
+            return "success";
+        }
+
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        /// <param name="para">参数</param>
+        /// <returns></returns>
+        public static bool Login(loginType para)
+        {
+            if (DBAccessLayer.DBEnable == false) { return false; }
+            if (para == null) return false;
+
+            para.password = DESoper.EncryptDES(para.password);
+
+            var tmp = (from item in DbEntity.UserInfo where item.password == para.password && item.alias == para.name select item);
+
+            if (tmp.Count() > 0) { return true; }
+            else return false;
+        }
+
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        public static bool ChangePassword(ChangePasswordType para)
+        {
+            if (DBAccessLayer.DBEnable == false) { return false; }
+            if (para == null) return false;
+
+            para.op = DESoper.EncryptDES(para.op);
+            para.np = DESoper.EncryptDES(para.np);
+
+            var tmp = (from item in DbEntity.UserInfo where item.password == para.op && item.alias == para.name select item);
+
+            if (tmp.Count() == 0) return false;
+
+            var s = tmp.ToList()[0];
+            s.password = para.np;
+
+            Dbsavechage("ChangePassword");
+            return true;
 
         }
 

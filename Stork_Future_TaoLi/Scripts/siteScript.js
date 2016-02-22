@@ -1075,17 +1075,41 @@ $('#login_btnLogin').click(function (e) {
 
     if (username == "" || password == "" || username == undefined || password == undefined) return;
 
-    var dt = new Date();
-    if (Modernizr.localstorage) {
-        localStorage.setItem("USERNAME", username);
-        localStorage.setItem("TIMESTAMP", dt.getTime());
-    }
-    else {
-        alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-        return;
-    }
+    var para = {
+        name: username,
+        password: password
+    };
 
-    window.location.href = '/home/mainpage'
+    var InputJson = JSON.stringify(para);
+    var result = undefined;
+
+    $.post("/home/userlogin", {
+        InputJson: InputJson
+    }, function (data, status) {
+
+        if (data == "False")
+        {
+            alert("用户名或密码错误！");
+            result = "False";
+            return;
+        }
+        else
+        {
+            var dt = new Date();
+            if (Modernizr.localstorage) {
+                localStorage.setItem("USERNAME", username);
+                localStorage.setItem("TIMESTAMP", dt.getTime());
+            }
+            else {
+                alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+                return;
+            }
+
+
+            window.location.href = '/home/mainpage'
+        }
+    })
+    
 })
 
 //辅助函数

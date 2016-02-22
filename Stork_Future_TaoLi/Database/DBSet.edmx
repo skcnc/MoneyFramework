@@ -146,7 +146,7 @@
           <Property Name="name" Type="nvarchar" MaxLength="50" />
           <Property Name="stockAvailable" Type="nvarchar" MaxLength="50" />
           <Property Name="futureAvailable" Type="nvarchar" MaxLength="50" />
-          <Property Name="strategy" Type="int" />
+          <Property Name="userRight" Type="int" />
         </EntityType>
         <EntityContainer Name="MoneyEntityModelStoreContainer">
           <EntitySet Name="BWNameTable" EntityType="Self.BWNameTable" Schema="dbo" store:Type="Tables" />
@@ -171,10 +171,10 @@
           <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" />
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="MoneyEntityModel.ER_TAOLI_TABLE" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" />
-          <EntitySet Name="UserInfo" EntityType="MoneyEntityModel.UserInfo" />
           <EntitySet Name="BWNameTable" EntityType="MoneyEntityModel.BWNameTable" />
           <EntitySet Name="RISK_TABLE" EntityType="MoneyEntityModel.RISK_TABLE" />
           <EntitySet Name="CC_TAOLI_TABLE" EntityType="MoneyEntityModel.CC_TAOLI_TABLE" />
+          <EntitySet Name="UserInfo" EntityType="MoneyEntityModel.UserInfo" />
         </EntityContainer>
         <EntityType Name="DL_TAOLI_TABLE">
           <Key>
@@ -273,18 +273,6 @@
           <Property Name="OL_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="OL_TIME" Type="DateTime" Precision="3" />
         </EntityType>
-        <EntityType Name="UserInfo">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Guid" Nullable="false" />
-          <Property Name="alias" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="password" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="stockAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="futureAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="strategy" Type="Int32" />
-        </EntityType>
         <EntityType Name="BWNameTable">
           <Key>
             <PropertyRef Name="ID" />
@@ -318,6 +306,18 @@
           <Property Name="CC_AMOUNT" Type="Int32" />
           <Property Name="CC_BUY_PRICE" Type="Double" />
           <Property Name="CC_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="UserInfo">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="alias" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="password" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="stockAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="futureAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="userRight" Type="Int32" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -428,19 +428,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="UserInfo">
-            <EntityTypeMapping TypeName="MoneyEntityModel.UserInfo">
-              <MappingFragment StoreEntitySet="UserInfo">
-                <ScalarProperty Name="strategy" ColumnName="strategy" />
-                <ScalarProperty Name="futureAvailable" ColumnName="futureAvailable" />
-                <ScalarProperty Name="stockAvailable" ColumnName="stockAvailable" />
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="password" ColumnName="password" />
-                <ScalarProperty Name="alias" ColumnName="alias" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="BWNameTable">
             <EntityTypeMapping TypeName="MoneyEntityModel.BWNameTable">
               <MappingFragment StoreEntitySet="BWNameTable">
@@ -475,6 +462,19 @@
                 <ScalarProperty Name="CC_DIRECTION" ColumnName="CC_DIRECTION" />
                 <ScalarProperty Name="CC_TYPE" ColumnName="CC_TYPE" />
                 <ScalarProperty Name="CC_CODE" ColumnName="CC_CODE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserInfo">
+            <EntityTypeMapping TypeName="MoneyEntityModel.UserInfo">
+              <MappingFragment StoreEntitySet="UserInfo">
+                <ScalarProperty Name="userRight" ColumnName="userRight" />
+                <ScalarProperty Name="futureAvailable" ColumnName="futureAvailable" />
+                <ScalarProperty Name="stockAvailable" ColumnName="stockAvailable" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

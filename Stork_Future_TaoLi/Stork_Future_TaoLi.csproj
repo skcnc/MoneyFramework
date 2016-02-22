@@ -243,6 +243,7 @@
   <ItemGroup>
     <Compile Include="Account\accountMonitor.cs" />
     <Compile Include="Account\riskmonitor.cs" />
+    <Compile Include="Account\UserInfo.cs" />
     <Compile Include="AdditionalModule\DESoper.cs" />
     <Compile Include="AdditionalModule\EntrustRecord.cs" />
     <Compile Include="AdditionalModule\sysmonitor.cs" />
