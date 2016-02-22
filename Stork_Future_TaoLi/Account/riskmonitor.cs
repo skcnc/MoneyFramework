@@ -29,8 +29,9 @@ namespace Stork_Future_TaoLi
 
             if (accInfo == null) { return false; }
 
+            
 
-            //判断股票资金限制
+            //判断一：股票资金限制
             List<TradeOrderStruct> stocks_sh = (from item in orderlist where item.cExhcnageID == ExchangeID.SH select item).OrderBy(i => i.cOrderLevel).ToList();
             List<TradeOrderStruct> stocks_sz = (from item in orderlist where item.cExhcnageID == ExchangeID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
 
@@ -62,7 +63,83 @@ namespace Stork_Future_TaoLi
             }
 
 
-            result = accountMonitor.GetErrorCode(errCode);
+            result = accountMonitor.GetErrorCode(errCode,string.Empty);
+
+            if (errCode != 0) return false;
+
+            
+
+            //判断二：交易股票是否存在白名单，比例是否满足 , 单只股票所占金额比例
+
+            List<BWNameTable> whiteli = new List<BWNameTable>();
+
+            foreach (string s in riskPara.WhiteNameList)
+            {
+                whiteli.Add(new BWNameTable()
+                {
+                    Code = s.Split('|')[0].Trim(),
+                    Amount = Convert.ToDecimal(s.Split('|')[1].Trim()),
+                    PercentageA = Convert.ToDouble(s.Split('|')[2].Trim()),
+                    Value = Convert.ToDecimal(s.Split('|')[3].Trim()),
+                    PercentageB = Convert.ToDouble(s.Split('|')[4].Trim())
+                });
+
+               
+            }
+
+            double totalCost = 0;//股票预计成本
+
+            AccountInfo account = accountMonitor.GetAccountInfo(name, out result);
+
+            foreach (TradeOrderStruct tos in orderlist)
+            {
+                totalCost += (tos.nSecurityAmount * tos.dOrderPrice);
+                var tmp = (from item in whiteli where item.Code == tos.cSecurityCode select item);
+
+                if (tmp.Count() == 0)
+                {
+                    errCode = 4;
+                    result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode );
+                    return false;
+                }
+
+                BWNameTable whiteItem = tmp.ToList()[0];
+
+                long posNum = accountMonitor.GetStockTotalPositionAmount(tos.cSecurityCode.Trim());
+
+                if((Convert.ToDecimal(whiteItem.PercentageA) * whiteItem.Amount < posNum)||(Convert.ToDecimal(whiteItem.PercentageB) * whiteItem.Value < posNum))
+                {
+                    errCode = 5;
+                    result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode );
+                    return false;
+                }
+                
+                
+
+                //仅买入时判断单支超限
+                if (tos.cTradeDirection == "0")
+                {
+                    if (tos.dOrderPrice * tos.nSecurityAmount > (Convert.ToDouble(account.value.Trim() + Convert.ToDouble(account.balance.Trim()) * riskPara.PerStockCostPercentage)))
+                    {
+                        errCode = 6;
+                        result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
+                        return false;
+                    }
+                }
+            }
+
+            //判断三：股票成本是否超限
+            if(totalCost < (Convert.ToDouble(account.balance) * 1.02))
+            {
+                errCode = 7;
+                result = accountMonitor.GetErrorCode(errCode, totalCost.ToString());
+                return false;
+            }
+
+            //判断四： 期货风险度
+
+            //判断五： 敞口比例
+            //判断六： 股票占总资金比例
 
             if (errCode != 0) return false;
             else return true;
@@ -176,6 +253,7 @@ namespace Stork_Future_TaoLi
                 riskPara.changkouRadio = para.changkouRadio;
                 riskPara.PerStockCostPercentage = para.PerStockCostPercentage;
                 riskPara.riskLevel = para.riskLevel;
+                riskPara.stockRadio = para.stockRadio;
 
 
                 DBAccessLayer.SetWBNameList(Records);
@@ -197,12 +275,13 @@ namespace Stork_Future_TaoLi
     {
         /// <summary>
         /// 风控白名单
-        /// 代码|流通股|比例
+        /// 代码|流通股|比例|总股本|比例
         /// </summary>
         public List<String> WhiteNameList = new List<string>();
 
         /// <summary>
         /// 风控黑名单
+        /// 代码|流通股|比例|总股本|比例
         /// </summary>
         public List<String> BlackNameList = new List<string>();
 
@@ -215,6 +294,12 @@ namespace Stork_Future_TaoLi
         /// 风险度限制
         /// </summary>
         public double riskLevel = 0;
+
+        /// <summary>
+        /// 股票占总资金比例
+        /// 全部股票市值 除以 （证券总资产 加上期货权益）
+        /// </summary>
+        public double stockRadio = 0;
 
         /// <summary>
         /// 单只股票所占资金比例

@@ -4,8 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="2200c20331cf4a2fb147f2ad2b8d1679" Name="Diagram1" ZoomLevel="98">
-        <EntityTypeShape EntityType="MoneyEntityModel.CC_TAOLI_TABLE" Width="1.5" PointX="0.75" PointY="0.75" />
+      <Diagram DiagramId="2200c20331cf4a2fb147f2ad2b8d1679" Name="Diagram1" ZoomLevel="73">
         <EntityTypeShape EntityType="MoneyEntityModel.DL_TAOLI_TABLE" Width="1.5" PointX="2.75" PointY="0.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_OPEN_TABLE" Width="1.5" PointX="6.75" PointY="0.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_STATUS_TABLE" Width="1.5" PointX="2.75" PointY="6.75" />
@@ -15,6 +14,7 @@
         <EntityTypeShape EntityType="MoneyEntityModel.UserInfo" Width="1.5" PointX="0.75" PointY="9.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.BWNameTable" Width="1.5" PointX="9.375" PointY="3.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.RISK_TABLE" Width="1.5" PointX="9.375" PointY="6.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.CC_TAOLI_TABLE" Width="1.5" PointX="7.375" PointY="9.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

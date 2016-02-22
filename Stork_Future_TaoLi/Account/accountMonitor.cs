@@ -95,7 +95,9 @@ namespace Stork_Future_TaoLi
 
             account.frozen = frozen.ToString();
 
-            account.balance = (Convert.ToDouble(account.account) - Convert.ToDouble(account.cost) - Convert.ToDouble(account.frozen)).ToString();
+            account.riskfrozen = account.riskfrozen;
+
+            account.balance = (Convert.ToDouble(account.account) - Convert.ToDouble(account.cost) - Convert.ToDouble(account.frozen) - Convert.ToDouble(account.riskfrozen)).ToString();
 
             account.value = MarketPrice.CalculateCurrentValue(positionRecord).ToString();
 
@@ -133,7 +135,7 @@ namespace Stork_Future_TaoLi
             if(acc.Count() == 0)
             {
                //没有查到关于该用户的风控信息，直接返回失败
-                result = GetErrorCode(3);
+                result = GetErrorCode(3,string.Empty);
                 return null;
             }
 
@@ -188,7 +190,7 @@ namespace Stork_Future_TaoLi
             return info;
         }
 
-        public static string GetErrorCode(int code)
+        public static string GetErrorCode(int code,string content)
         {
             switch (code)
             {
@@ -200,10 +202,50 @@ namespace Stork_Future_TaoLi
                     return "期货金额不足";
                 case 3:
                     return "账户不存在";
+                case 4:
+                    return "证券" + content + "不在白名单列表";
+                case 5:
+                    return "证券" + content + "超过总股本/流通股比例限制";
+                case 6:
+                    return "单支股票金额超限" + content;
+                case 7:
+                    return "预计股票成本高于可用资金" + content;
                 default :
                     return "验证通过";
             }
         }
+
+
+        /// <summary>
+        /// 获得单只股票的全局总持仓
+        /// </summary>
+        /// <param name="code">股票代码</param>
+        /// <returns>股票总数</returns>
+        public static long GetStockTotalPositionAmount(string code)
+        {
+            long totalnum = 0;
+
+            foreach (AccountInfo acc in accountList)
+            {
+                var tmpA = (from item in acc.positions where item.code == code select item);
+
+                if(tmpA.Count() != 0)
+                {
+                    totalnum += Convert.ToInt16(tmpA.ToList()[0].amount);
+                }
+
+                var tmpB = (from item in acc.entrusts where item.code == code select item);
+
+                if (tmpB.Count() != 0)
+                {
+                    totalnum += Convert.ToInt16(tmpB.ToList()[0].requestAmount);
+                }
+            }
+
+            return totalnum;
+        }
+
+
     }
 
     /// <summary>
@@ -235,6 +277,13 @@ namespace Stork_Future_TaoLi
         /// 冻结资金量
         /// </summary>
         public string frozen { get; set; }
+
+        /// <summary>
+        /// 风控冻结资金量
+        /// 该值在风控模块从剩余资金量中冻结相对于股票购买成本的金额
+        /// 获取委托号成功后解冻相应金额，计入冻结资金量(frozen)中
+        /// </summary>
+        public string riskfrozen { get; set; }
 
         /// <summary>
         /// 股票预估量

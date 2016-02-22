@@ -16,6 +16,7 @@ namespace Stork_Future_TaoLi.Database
     {
         public string CC_CODE { get; set; }
         public string CC_TYPE { get; set; }
+        public string CC_DIRECTION { get; set; }
         public Nullable<int> CC_AMOUNT { get; set; }
         public Nullable<double> CC_BUY_PRICE { get; set; }
         public string CC_USER { get; set; }

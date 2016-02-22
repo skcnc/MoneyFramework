@@ -23,6 +23,7 @@
           </Key>
           <Property Name="CC_CODE" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="CC_TYPE" Type="nvarchar" MaxLength="50" />
+          <Property Name="CC_DIRECTION" Type="nvarchar" MaxLength="50" />
           <Property Name="CC_AMOUNT" Type="int" />
           <Property Name="CC_BUY_PRICE" Type="float" />
           <Property Name="CC_USER" Type="nvarchar" MaxLength="50" />
@@ -164,7 +165,6 @@
     <edmx:ConceptualModels>
       <Schema Namespace="MoneyEntityModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="MoneyEntityEntities1" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="CC_TAOLI_TABLE" EntityType="MoneyEntityModel.CC_TAOLI_TABLE" />
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="MoneyEntityModel.DL_TAOLI_TABLE" />
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_OPEN_TABLE" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_STATUS_TABLE" />
@@ -174,17 +174,8 @@
           <EntitySet Name="UserInfo" EntityType="MoneyEntityModel.UserInfo" />
           <EntitySet Name="BWNameTable" EntityType="MoneyEntityModel.BWNameTable" />
           <EntitySet Name="RISK_TABLE" EntityType="MoneyEntityModel.RISK_TABLE" />
+          <EntitySet Name="CC_TAOLI_TABLE" EntityType="MoneyEntityModel.CC_TAOLI_TABLE" />
         </EntityContainer>
-        <EntityType Name="CC_TAOLI_TABLE">
-          <Key>
-            <PropertyRef Name="CC_CODE" />
-          </Key>
-          <Property Name="CC_CODE" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CC_TYPE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CC_AMOUNT" Type="Int32" />
-          <Property Name="CC_BUY_PRICE" Type="Double" />
-          <Property Name="CC_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="DL_TAOLI_TABLE">
           <Key>
             <PropertyRef Name="DL_GUID" />
@@ -317,23 +308,23 @@
           <Property Name="strategy_id" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="err" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="CC_TAOLI_TABLE">
+          <Key>
+            <PropertyRef Name="CC_CODE" />
+          </Key>
+          <Property Name="CC_CODE" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CC_TYPE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CC_DIRECTION" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CC_AMOUNT" Type="Int32" />
+          <Property Name="CC_BUY_PRICE" Type="Double" />
+          <Property Name="CC_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="MoneyEntityModelStoreContainer" CdmEntityContainer="MoneyEntityEntities1">
-          <EntitySetMapping Name="CC_TAOLI_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.CC_TAOLI_TABLE">
-              <MappingFragment StoreEntitySet="CC_TAOLI_TABLE">
-                <ScalarProperty Name="CC_USER" ColumnName="CC_USER" />
-                <ScalarProperty Name="CC_BUY_PRICE" ColumnName="CC_BUY_PRICE" />
-                <ScalarProperty Name="CC_AMOUNT" ColumnName="CC_AMOUNT" />
-                <ScalarProperty Name="CC_TYPE" ColumnName="CC_TYPE" />
-                <ScalarProperty Name="CC_CODE" ColumnName="CC_CODE" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="DL_TAOLI_TABLE">
             <EntityTypeMapping TypeName="MoneyEntityModel.DL_TAOLI_TABLE">
               <MappingFragment StoreEntitySet="DL_TAOLI_TABLE">
@@ -472,6 +463,18 @@
                 <ScalarProperty Name="time" ColumnName="time" />
                 <ScalarProperty Name="date" ColumnName="date" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CC_TAOLI_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.CC_TAOLI_TABLE">
+              <MappingFragment StoreEntitySet="CC_TAOLI_TABLE">
+                <ScalarProperty Name="CC_USER" ColumnName="CC_USER" />
+                <ScalarProperty Name="CC_BUY_PRICE" ColumnName="CC_BUY_PRICE" />
+                <ScalarProperty Name="CC_AMOUNT" ColumnName="CC_AMOUNT" />
+                <ScalarProperty Name="CC_DIRECTION" ColumnName="CC_DIRECTION" />
+                <ScalarProperty Name="CC_TYPE" ColumnName="CC_TYPE" />
+                <ScalarProperty Name="CC_CODE" ColumnName="CC_CODE" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

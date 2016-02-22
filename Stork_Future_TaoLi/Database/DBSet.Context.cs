@@ -25,7 +25,6 @@ namespace Stork_Future_TaoLi.Database
             throw new UnintentionalCodeFirstException();
         }
     
-        public DbSet<CC_TAOLI_TABLE> CC_TAOLI_TABLE { get; set; }
         public DbSet<DL_TAOLI_TABLE> DL_TAOLI_TABLE { get; set; }
         public DbSet<SG_TAOLI_OPEN_TABLE> SG_TAOLI_OPEN_TABLE { get; set; }
         public DbSet<SG_TAOLI_STATUS_TABLE> SG_TAOLI_STATUS_TABLE { get; set; }
@@ -35,5 +34,6 @@ namespace Stork_Future_TaoLi.Database
         public DbSet<UserInfo> UserInfo { get; set; }
         public DbSet<BWNameTable> BWNameTable { get; set; }
         public DbSet<RISK_TABLE> RISK_TABLE { get; set; }
+        public DbSet<CC_TAOLI_TABLE> CC_TAOLI_TABLE { get; set; }
     }
 }

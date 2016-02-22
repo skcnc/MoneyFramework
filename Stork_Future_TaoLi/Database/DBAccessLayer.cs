@@ -644,29 +644,11 @@ namespace Stork_Future_TaoLi
             int amount = bargin.stock_amount;
             double price = bargin.bargain_price;
             int direction = bargin.direction;
-            string user = string.Empty;
+            string user = bargin.User;
             string strategy = bargin.strategyId;
+            string sDirection = direction.ToString();
 
-
-            //var sg_open_li = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_ID == bargin.strategyId && item.SG_STATUS == 0 select item);
-            //var sg_close_li = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_ID == bargin.strategyId && item.SG_STATUS == 0 select item);
-
-            //if(sg_open_li.Count() == 0 && sg_close_li.Count() == 0)
-            //{
-            //    GlobalErrorLog.LogInstance.LogEvent("策略不存在--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
-            //    return;
-            //}
-
-            //if(sg_close_li.Count()!=0)
-            //{
-            //    user = sg_close_li.ToList()[0].SG_USER;
-            //}
-            //else
-            //{
-            //    user = sg_open_li.ToList()[0].SG_USER;
-            //}
-
-            var selectedrecord = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_TYPE == type && item.CC_USER == user select item);
+            var selectedrecord = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_DIRECTION == sDirection && item.CC_TYPE == type && item.CC_USER == user select item);
 
             if(selectedrecord.Count() == 0)
             {
@@ -679,7 +661,8 @@ namespace Stork_Future_TaoLi
                         CC_TYPE = type,
                         CC_AMOUNT = amount,
                         CC_BUY_PRICE = price,
-                        CC_USER = user
+                        CC_USER = user,
+                        CC_DIRECTION = sDirection
                     };
 
                     DbEntity.CC_TAOLI_TABLE.Add(record);
@@ -690,7 +673,8 @@ namespace Stork_Future_TaoLi
                         type = type,
                         price = price,
                         amount = amount,
-                        user = user
+                        user = user,
+                        direction = sDirection
                     };
                     PositionRecord.UpdateCCRecord(ccRecord);
                     Dbsavechage("UpdateCCRecords");

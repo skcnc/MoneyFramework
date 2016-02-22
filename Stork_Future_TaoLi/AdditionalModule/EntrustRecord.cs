@@ -296,6 +296,11 @@ namespace Stork_Future_TaoLi
         /// 用户名
         /// </summary>
         public string user { get; set; }
+
+        /// <summary>
+        /// 交易方向
+        /// </summary>
+        public string direction { get; set; }
     }
 
     /// <summary>

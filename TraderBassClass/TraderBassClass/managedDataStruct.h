@@ -227,6 +227,7 @@ namespace MCStockLib
 		long bargain_no;
 		String^ strategyId;
 		int direction;
+		String^ User;
 
 
 		Bargainreturnstruct CreateInstance(){
