@@ -321,6 +321,12 @@ namespace Stork_Future_TaoLi
                         OrderRef = REQUEST_ID.ApplyNewID()
                     };
 
+                    if (mo.cSecurityType == "f" || mo.cSecurityType == "F")
+                    {
+                        _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "48" : "49");
+                        _tradeUnit.cOffsetFlag = (_tradeUnit.cOffsetFlag == "0" ? "48" : "49");
+                    }
+
                     UserRequestMap.GetInstance().AddOrUpdate(_tradeUnit.OrderRef, mo.User,(key,oldValue) => oldValue = mo.User);
 
                     _TradeList.Add(_tradeUnit);

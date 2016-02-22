@@ -949,7 +949,7 @@ $('#OpenStrategyCreate').click(function (e) {
     $(this).attr('href', url);
 
 })
-
+//创建新平仓实例对路径的修改
 $('#CloseStrategyCreate').click(function (e) {
     var user = $.trim($('#userName')[0].innerText);
     var href = $(this).attr('href')
@@ -1085,7 +1085,7 @@ $('#login_btnLogin').click(function (e) {
         return;
     }
 
-    window.location.href = '/home/MonitorConsole'
+    window.location.href = '/home/mainpage'
 })
 
 //辅助函数

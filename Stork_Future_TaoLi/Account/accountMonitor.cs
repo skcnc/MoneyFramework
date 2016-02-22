@@ -58,7 +58,7 @@ namespace Stork_Future_TaoLi
             List<CCRecord> positionRecord = new List<CCRecord>();
             double stockcost = 0;
 
-            PositionRecord.LoadCCList(info.alias, out positionRecord, out stockcost);
+            PositionRecord.LoadCCStockList(info.alias, out positionRecord, out stockcost);
 
             account.cost = stockcost.ToString();
 

@@ -243,6 +243,7 @@
   <ItemGroup>
     <Compile Include="Account\accountMonitor.cs" />
     <Compile Include="Account\riskmonitor.cs" />
+    <Compile Include="AdditionalModule\DESoper.cs" />
     <Compile Include="AdditionalModule\EntrustRecord.cs" />
     <Compile Include="AdditionalModule\sysmonitor.cs" />
     <Compile Include="AdditionalModule\TradeAdditionalClass.cs" />
@@ -966,6 +967,7 @@
     <Content Include="Views\Home\ChangePassword.cshtml" />
     <Content Include="Views\Home\AccountOverVIew.cshtml" />
     <Content Include="Views\Home\RiskControl.cshtml" />
+    <Content Include="Views\Home\MainPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

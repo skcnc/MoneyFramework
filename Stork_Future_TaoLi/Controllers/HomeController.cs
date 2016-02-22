@@ -57,6 +57,11 @@ namespace Stork_Future_TaoLi.Controllers
             return View();
         }
 
+        public ActionResult MainPage()
+        {
+            return View();
+        }
+
         public ActionResult RiskControl()
         {
             return View();
@@ -103,6 +108,11 @@ namespace Stork_Future_TaoLi.Controllers
         public string SetRiskParameter(String InputJson,String WhiteLi,String BlackLi)
         {
             return riskmonitor.SetRiskParaJson(InputJson, WhiteLi, BlackLi);
+        }
+
+        public string register(String InputJson)
+        {
+
         }
 
         public string ImportTrade(String InputJson)
