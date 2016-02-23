@@ -65,6 +65,49 @@ namespace Stork_Future_TaoLi
             
         }
 
+        /// <summary>
+        /// 获取用户可用资金量 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>股票|期货</returns>
+        public static string GetAccountAvailable(string user)
+        {
+            if (DBAccessLayer.DBEnable == false) return string.Empty;
+
+            var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
+            if (tmp.Count() == 0)
+            {
+                return string.Empty;
+            }
+
+            return tmp.ToList()[0].stockAvailable.ToString() + "|" + tmp.ToList()[0].futureAvailable.ToString();
+        }
+
+        /// <summary>
+        /// 设置用户资金量
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="stock"></param>
+        /// <param name="future"></param>
+        /// <returns></returns>
+        public static bool SetAccountAvailable(string user,string stock,string future)
+        {
+            if (DBAccessLayer.DBEnable == false) return false;
+
+            var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
+
+            if (tmp.Count() == 0) return false;
+
+            UserInfo info = tmp.ToList()[0];
+
+            info.stockAvailable = stock; 
+            info.futureAvailable = future;
+
+            Dbsavechage("SetAccountAvailable");
+            return true;
+
+        }
+
         public static void AddRiskRecord(string alias , string err, string strid)
         {
 
@@ -686,7 +729,6 @@ namespace Stork_Future_TaoLi
                             offsetflag = offsetflag.ToString(),
 
                         };
-                        PositionRecord.UpdateCCRecord(ccRecord);
                         Dbsavechage("UpdateCCRecords");
                         return;
                     }
@@ -742,7 +784,7 @@ namespace Stork_Future_TaoLi
                                 price = Convert.ToDouble(record.CC_BUY_PRICE)
                             };
 
-                            PositionRecord.UpdateCCRecord(ccrecord);
+                            //PositionRecord.UpdateCCRecord(ccrecord);
                             Dbsavechage("UpdateCCRecords");
                             return;
                         }
@@ -765,7 +807,7 @@ namespace Stork_Future_TaoLi
                             offsetflag = record.CC_OFFSETFLAG.ToString()
                         };
 
-                        PositionRecord.UpdateCCRecord(ccRecord);
+                        //PositionRecord.UpdateCCRecord(ccRecord);
 
                         Dbsavechage("UpdateCCRecords");
 
@@ -807,7 +849,7 @@ namespace Stork_Future_TaoLi
                             direction = sDirection,
                             offsetflag = offsetflag.ToString()
                         };
-                        PositionRecord.UpdateCCRecord(ccRecord);
+                        //PositionRecord.UpdateCCRecord(ccRecord);
                         Dbsavechage("UpdateCCRecords");
                         return;
                     }
@@ -837,7 +879,7 @@ namespace Stork_Future_TaoLi
                             direction = record.CC_DIRECTION
                         };
 
-                        PositionRecord.UpdateCCRecord(ccRecord);
+                        //PositionRecord.UpdateCCRecord(ccRecord);
 
                         Dbsavechage("UpdateCCRecords");
                     }
@@ -898,7 +940,7 @@ namespace Stork_Future_TaoLi
                                 amount = Convert.ToInt16(record.CC_AMOUNT)
                             };
 
-                            PositionRecord.UpdateCCRecord(ccrecord);
+                            //PositionRecord.UpdateCCRecord(ccrecord);
                             Dbsavechage("UpdateCCRecords");
                             return;
                         }
@@ -906,6 +948,61 @@ namespace Stork_Future_TaoLi
                 }
             }
 
+        }
+
+        /// <summary>
+        /// 获取股票持仓列表
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="records"></param>
+        /// <param name="stockcost"></param>
+        public static void LoadCCStockList(string userName, out List<CC_TAOLI_TABLE> records, out double stockcost)
+        {
+            records = new List<CC_TAOLI_TABLE>();
+            stockcost = 0;
+
+            if (userName != "*")
+            {
+                var tmp = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == userName && item.CC_TYPE == "49" select item);
+                records = tmp.ToList();
+            }
+            else
+            {
+                var tmp = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_TYPE == "49" select item);
+                records = tmp.ToList();
+            }
+
+            if (records.Count() > 0)
+            {
+                foreach (var i in records)
+                {
+                    //records.Add(i);
+                    stockcost += Convert.ToDouble(i.CC_AMOUNT * i.CC_BUY_PRICE);
+                }
+            }
+
+            stockcost /= 1000;
+        }
+
+        /// <summary>
+        /// 获取期货持仓列表
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="records"></param>
+        public static void LoadCCFutureList(string userName, out List<CC_TAOLI_TABLE> records)
+        {
+            records = new List<CC_TAOLI_TABLE>();
+
+            if (userName != "*")
+            {
+                var tmp = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == userName && item.CC_TYPE == "1" select item);
+                records = tmp.ToList();
+            }
+            else
+            {
+                var tmp = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_TYPE == "1" select item);
+                records = tmp.ToList();
+            }
         }
 
         /// <summary>

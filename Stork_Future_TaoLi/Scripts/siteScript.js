@@ -151,6 +151,12 @@ window.onload = function (e) {
     {
         return;
     }
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/AccountInfo")
+    {
+        var user = localStorage["USERNAME"];
+
+        loadAccountInfo(user);
+    }
     else {
         //alert("您当前使用的浏览器版本过低，网站功能将被限制！");
         return;

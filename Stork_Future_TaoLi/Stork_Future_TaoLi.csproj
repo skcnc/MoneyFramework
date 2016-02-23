@@ -301,6 +301,9 @@
     <Compile Include="Database\UserInfo.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\VariablesList.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Hubs\AccountHub.cs" />
@@ -970,6 +973,7 @@
     <Content Include="Views\Home\RiskControl.cshtml" />
     <Content Include="Views\Home\MainPage.cshtml" />
     <Content Include="Views\Home\UserManger.cshtml" />
+    <Content Include="Views\Home\AccountInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -73,6 +73,11 @@ namespace Stork_Future_TaoLi.Controllers
             return View();
         }
 
+        public ActionResult AccountInfo()
+        {
+            return View();
+        }
+
         public string ImportHarbor(String InputJson)
         {
             try
@@ -171,6 +176,14 @@ namespace Stork_Future_TaoLi.Controllers
             string s = file.Name;
 
             return "SUCCESS";
+        }
+
+        public string LoadAccountInfo(String user)
+        {
+            string result = string.Empty;
+            AccountInfo info = accountMonitor.GetAccountInfo(user, out result);
+
+            return JsonConvert.SerializeObject(info);
         }
 
         public ActionResult OPEN_EDIT()

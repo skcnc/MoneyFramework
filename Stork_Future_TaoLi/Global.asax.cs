@@ -62,6 +62,8 @@ namespace Stork_Future_TaoLi
 
             riskmonitor.Init();
 
+            accountMonitor.RUN();
+
             Thread.Sleep(3000);
         }
     }

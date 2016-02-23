@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Stork_Future_TaoLi.Database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -194,68 +195,69 @@ namespace Stork_Future_TaoLi
     /// </summary>
     public class PositionRecord
     {
-        /// <summary>
-        /// 持仓列表记录
-        /// </summary>
-        public static List<CCRecord> CCRecordList = new List<CCRecord>();
+        ///// <summary>
+        ///// 持仓列表记录
+        ///// </summary>
+        //public static List<CCRecord> CCRecordList = new List<CCRecord>();
 
-        /// <summary>
-        /// 更新持仓列表
-        /// </summary>
-        /// <param name="record">新持仓记录</param>
-        public static void UpdateCCRecord(CCRecord record)
-        {
 
-            if(record.type == "0")
-            {
-                //股票
-                var tmp = (from item in CCRecordList where item.code == record.code && item.type == record.type && item.user == record.user  select item);
+        ///// <summary>
+        ///// 更新持仓列表
+        ///// </summary>
+        ///// <param name="record">新持仓记录</param>
+        //public static void UpdateCCRecord(CCRecord record)
+        //{
 
-                if (tmp.Count() == 0)
-                {
-                    CCRecordList.Add(record);
-                }
-                else
-                {
-                    tmp.ToList()[0].amount = record.amount;
-                    tmp.ToList()[0].price = record.price;
-                }
+        //    if(record.type == "0")
+        //    {
+        //        //股票
+        //        var tmp = (from item in CCRecordList where item.code == record.code && item.type == record.type && item.user == record.user  select item);
 
-            }
-            else
-            {
-                //期货
-                var tmp = (from item in CCRecordList where item.code == record.code && item.type == record.type && item.user == record.user && item.direction == record.direction select item);
+        //        if (tmp.Count() == 0)
+        //        {
+        //            CCRecordList.Add(record);
+        //        }
+        //        else
+        //        {
+        //            tmp.ToList()[0].amount = record.amount;
+        //            tmp.ToList()[0].price = record.price;
+        //        }
 
-                if (tmp.Count() == 0)
-                {
-                    CCRecordList.Add(record);
-                }
-                else
-                {
-                    if (record.amount > 0)
-                    {
-                        tmp.ToList()[0].amount = record.amount;
-                        tmp.ToList()[0].price = record.price;
-                    }
-                    else
-                    {
-                        DeleteCCRecord(record);
-                    }
+        //    }
+        //    else
+        //    {
+        //        //期货
+        //        var tmp = (from item in CCRecordList where item.code == record.code && item.type == record.type && item.user == record.user && item.direction == record.direction select item);
+
+        //        if (tmp.Count() == 0)
+        //        {
+        //            CCRecordList.Add(record);
+        //        }
+        //        else
+        //        {
+        //            if (record.amount > 0)
+        //            {
+        //                tmp.ToList()[0].amount = record.amount;
+        //                tmp.ToList()[0].price = record.price;
+        //            }
+        //            else
+        //            {
+        //                DeleteCCRecord(record);
+        //            }
                    
-                }
-            }
-        }
+        //        }
+        //    }
+        //}
 
-        public static void DeleteCCRecord(CCRecord record)
-        {
-            var tmp = (from item in CCRecordList where item.user == record.user && item.code == record.code && item.type == record.type && item.direction == record.direction select item);
+        //public static void DeleteCCRecord(CCRecord record)
+        //{
+        //    var tmp = (from item in CCRecordList where item.user == record.user && item.code == record.code && item.type == record.type && item.direction == record.direction select item);
 
-            if (tmp.Count() > 0)
-            {
-                CCRecordList.Remove(tmp.ToList()[0]);
-            }
-        }
+        //    if (tmp.Count() > 0)
+        //    {
+        //        CCRecordList.Remove(tmp.ToList()[0]);
+        //    }
+        //}
 
         /// <summary>
         /// 获取用户股票持仓
@@ -263,68 +265,68 @@ namespace Stork_Future_TaoLi
         /// <param name="userName">用户名,如果为'*'则查看所有</param>
         /// <param name="records">股票持仓记录</param>
         /// <param name="stockcost">股票成本</param>
-        public static void LoadCCStockList(string userName, out List<CCRecord> records , out double stockcost)
-        {
-            records = new List<CCRecord>();
-            stockcost = 0;
+        //public static void LoadCCStockList(string userName, out List<CCRecord> records , out double stockcost)
+        //{
+        //    records = new List<CCRecord>();
+        //    stockcost = 0;
 
 
          
-            if (userName != "*")
-            {
-                var tmp = (from item in CCRecordList where item.user == userName && item.type == "49" select item);
-                records = tmp.ToList();
-            }
-            else
-            {
-                var tmp = (from item in CCRecordList where item.type == "49"  select item);
-                records = tmp.ToList();
-            }
+        //    if (userName != "*")
+        //    {
+        //        var tmp = (from item in CCRecordList where item.user == userName && item.type == "49" select item);
+        //        records = tmp.ToList();
+        //    }
+        //    else
+        //    {
+        //        var tmp = (from item in CCRecordList where item.type == "49"  select item);
+        //        records = tmp.ToList();
+        //    }
 
 
 
-            if (records.Count() > 0)
-            {
+        //    if (records.Count() > 0)
+        //    {
 
-                foreach (var i in records)
-                {
-                    records.Add(i);
-                    stockcost += (i.amount * i.price);
-                }
-            }
-        }
+        //        foreach (var i in records)
+        //        {
+        //            records.Add(i);
+        //            stockcost += (i.amount * i.price);
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// 获取期货成交列表
         /// </summary>
         /// <param name="userName">用户名，如果为'*'则查看所有</param>
         /// <param name="records">期货持仓记录</param>
-        public static void LoadCCFutureList(string userName, out List<CCRecord> records)
-        {
-            records = new List<CCRecord>();
+        //public static void LoadCCFutureList(string userName, out List<CCRecord> records)
+        //{
+        //    records = new List<CCRecord>();
 
-            if (userName != "*")
-            {
-                var tmp = (from item in CCRecordList where item.user == userName && item.type == "49" select item);
-                records = tmp.ToList();
-            }
-            else
-            {
-                var tmp = (from item in CCRecordList where item.type== "49" select item);
-                records = tmp.ToList();
-            }
+        //    if (userName != "*")
+        //    {
+        //        var tmp = (from item in CCRecordList where item.user == userName && item.type == "49" select item);
+        //        records = tmp.ToList();
+        //    }
+        //    else
+        //    {
+        //        var tmp = (from item in CCRecordList where item.type== "49" select item);
+        //        records = tmp.ToList();
+        //    }
 
 
 
-            if (records.Count() > 0)
-            {
+        //    if (records.Count() > 0)
+        //    {
 
-                foreach (var i in records)
-                {
-                    records.Add(i);
-                }
-            }
-        }
+        //        foreach (var i in records)
+        //        {
+        //            records.Add(i);
+        //        }
+        //    }
+        //}
     }
 
     /// <summary>
@@ -383,15 +385,27 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="records"></param>
         /// <returns></returns>
-        public static double CalculateCurrentValue(List<CCRecord> records)
+        public static double CalculateCurrentValue(List<CC_TAOLI_TABLE> records)
         {
             double value = 0;
-            foreach (CCRecord i in records)
-            {
-                value += market[i.code] * i.amount;
-            }
 
-            return value;
+                foreach (CC_TAOLI_TABLE i in records)
+                {
+
+                    if (market.Keys.Contains(i.CC_CODE))
+                    {
+                        value += Convert.ToDouble(market[i.CC_CODE] / 1000 * i.CC_AMOUNT);
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+
+                }
+
+                return value;
+
+
         }
     }
 }

@@ -18,6 +18,8 @@ namespace Stork_Future_TaoLi
 
         private static double factor = 300; //股票对应市值系数
 
+        private static double future_margin_factor = 0.12; //期货保证金系数
+
         public static void RUN()
         {
             excuteThread.Start();
@@ -35,10 +37,7 @@ namespace Stork_Future_TaoLi
 
                     foreach (UserInfo info in users)
                     {
-                        if (AccountCalculate.Instance.checkAccountInfo(info.alias))
-                        {
-                            AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(UpdateAccount(info)));
-                        }
+                        AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(UpdateAccount(info)));
                     }
                 }
                
@@ -57,30 +56,37 @@ namespace Stork_Future_TaoLi
             account.name = info.name;
             account.account = info.stockAvailable;
 
-            List<CCRecord> positionRecord = new List<CCRecord>();
+            List<CC_TAOLI_TABLE> positionRecord = new List<CC_TAOLI_TABLE>();
             double stockcost = 0;
 
-            PositionRecord.LoadCCStockList(info.alias, out positionRecord, out stockcost);
+            //PositionRecord.LoadCCStockList(info.alias, out positionRecord, out stockcost);
 
-            List<CCRecord> fPositionRecord = new List<CCRecord>();
+            DBAccessLayer.LoadCCStockList(info.alias, out positionRecord, out stockcost);
 
-            PositionRecord.LoadCCFutureList(info.alias, out fPositionRecord);
+            List<CC_TAOLI_TABLE> fPositionRecord = new List<CC_TAOLI_TABLE>();
+
+            //PositionRecord.LoadCCFutureList(info.alias, out fPositionRecord);
+
+            DBAccessLayer.LoadCCFutureList(info.alias, out fPositionRecord);
 
 
             double fstock = 0;          //期货对应股票市值
             double fweight = 0;         //期货权益
+            double fearn = 0;           //期货浮动盈亏
 
-            foreach (CCRecord record in fPositionRecord)
+            foreach (CC_TAOLI_TABLE record in fPositionRecord)
             {
-                if (MarketPrice.market.ContainsKey(record.code))
+                if (MarketPrice.market.ContainsKey(record.CC_CODE))
                 {
                     int x = -1;
-                    if (record.direction == "0")
+                    if (record.CC_DIRECTION == "0")
                     {
                         x = 1;
                     }
 
-                    fstock += (record.amount) * MarketPrice.market[record.code] * factor * x;
+                    fstock += Convert.ToDouble((record.CC_AMOUNT) * MarketPrice.market[record.CC_CODE] * factor * x);
+
+                    fearn += Convert.ToDouble((record.CC_AMOUNT) * (MarketPrice.market[record.CC_CODE] - record.CC_BUY_PRICE) * x);
                 }
             }
 
@@ -88,25 +94,50 @@ namespace Stork_Future_TaoLi
 
             account.fstockvalue = fstock.ToString();
 
+            account.fincome = fearn.ToString();
+
             //期货权益
 
+            string accountLimit = DBAccessLayer.GetAccountAvailable(info.alias);
+            double stockAccount = 0;                //股票资金量
+            double futureAccount = 0;               //期货原始权益
+
+            if (accountLimit == string.Empty)
+            {
+                return null;
+
+            }
+
+            stockAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
+            futureAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
+
+            fweight = futureAccount + fearn;
+
+            account.fvalue = fweight.ToString();
 
 
+            double future_margin = 0;               //期货保证金
 
+            future_margin = fstock * future_margin_factor;
 
-
+            account.fbond = future_margin.ToString();
 
             account.cost = stockcost.ToString();
 
-            foreach (CCRecord record in positionRecord)
+            if (account.positions == null)
+            {
+                account.positions = new List<AccountPosition>();
+            }
+
+            foreach (CC_TAOLI_TABLE record in positionRecord)
             {
                 account.positions.Add(new AccountPosition()
                 {
-                    amount = record.amount.ToString(),
-                    code = record.code,
-                    name = record.user,
-                    price = record.price.ToString(),
-                    type = record.type
+                    amount = record.CC_AMOUNT.ToString(),
+                    code = record.CC_CODE,
+                    name = record.CC_USER,
+                    price = record.CC_BUY_PRICE.ToString(),
+                    type = record.CC_TYPE
                 });
 
             }
@@ -115,6 +146,10 @@ namespace Stork_Future_TaoLi
 
             List<ERecord> entrusts = new List<ERecord>();
             EntrustRecord.GetUserAccountInfo(info.alias, out frozen, out entrusts);
+
+            account.faccount = (futureAccount - future_margin + fearn).ToString();
+
+            if (account.entrusts == null) account.entrusts = new List<AccountEntrust>();
 
             foreach (ERecord record in entrusts)
             {
@@ -129,15 +164,30 @@ namespace Stork_Future_TaoLi
                 });
             }
 
+            //冻结资金
             account.frozen = frozen.ToString();
 
-            account.riskfrozen = account.riskfrozen;
+            //风控资金
+            if(account.riskfrozen == null)
+            { account.riskfrozen = "0"; }
 
+            //剩余资金量
             account.balance = (Convert.ToDouble(account.account) - Convert.ToDouble(account.cost) - Convert.ToDouble(account.frozen) - Convert.ToDouble(account.riskfrozen)).ToString();
 
+            //股票市值
             account.value = MarketPrice.CalculateCurrentValue(positionRecord).ToString();
 
-            var tmp = (from item in accountList select item.alias);
+            //敞口比例
+            double risk_exposure = ((Convert.ToDouble(account.value) + fstock) / fstock);
+
+            //风险度
+            account.frisk = (Convert.ToDouble(account.fbond) / Convert.ToDouble(account.fvalue)).ToString();
+
+            account.risk_exposure = risk_exposure.ToString();
+
+            account.earning = (Convert.ToDouble(account.value) - Convert.ToDouble(account.cost)).ToString();
+
+            var tmp = (from item in accountList where item.alias == info.alias select item.alias);
 
             if(tmp.Count() == 0)
             {
@@ -299,7 +349,7 @@ namespace Stork_Future_TaoLi
         public string name { get; set; }
 
         /// <summary>
-        /// 可用资金量
+        /// 股票可用资金量
         /// </summary>
         public string account { get; set; }
 
@@ -312,6 +362,11 @@ namespace Stork_Future_TaoLi
         /// 冻结资金量
         /// </summary>
         public string frozen { get; set; }
+
+        /// <summary>
+        /// 股票总盈亏
+        /// </summary>
+        public string earning { get; set; }
 
         /// <summary>
         /// 风控冻结资金量
@@ -331,7 +386,7 @@ namespace Stork_Future_TaoLi
         public string cost { get; set; }
 
         /// <summary>
-        /// 期货资金量
+        /// 期货可用资金量
         /// </summary>
         public string faccount { get; set; }
 
@@ -349,6 +404,21 @@ namespace Stork_Future_TaoLi
         /// 期货对应的股票市值
         /// </summary>
         public string fstockvalue { get; set; }
+
+        /// <summary>
+        /// 期货盈亏
+        /// </summary>
+        public string fincome { get; set; }
+
+        /// <summary>
+        /// 期货风险度
+        /// </summary>
+        public string frisk { get; set; }
+        
+        /// <summary>
+        /// 敞口比例
+        /// </summary>
+        public string risk_exposure { get; set; }
 
         /// <summary>
         /// 持仓列表
