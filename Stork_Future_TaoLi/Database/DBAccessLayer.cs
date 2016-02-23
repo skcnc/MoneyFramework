@@ -635,7 +635,7 @@ namespace Stork_Future_TaoLi
 
             managedBargainreturnstruct bargin = (managedBargainreturnstruct)v;
 
-            if(bargin == null)
+            if (bargin == null)
             {
                 return;
             }
@@ -645,109 +645,267 @@ namespace Stork_Future_TaoLi
             int amount = bargin.stock_amount;
             double price = bargin.bargain_price;
             int direction = bargin.direction;
+            int offsetflag = bargin.offsetflag;
             string user = bargin.User;
             string strategy = bargin.strategyId;
             string sDirection = direction.ToString();
 
-            var selectedrecord = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_DIRECTION == sDirection && item.CC_TYPE == type && item.CC_USER == user select item);
-
-            if(selectedrecord.Count() == 0)
+            if (type == "49")
             {
-                //说明数据库中不存在当前票券的持仓
-                if (direction == (int)TradeDirection.Buy)
+                //股票
+                var selectedStock = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_TYPE == type && item.CC_USER == user select item);
+
+                if (selectedStock.Count() == 0)
                 {
-                    CC_TAOLI_TABLE record = new CC_TAOLI_TABLE()
+                    //新股票持仓
+                    if (direction == (int)TradeDirection.Buy)
                     {
-                        CC_CODE = code,
-                        CC_TYPE = type,
-                        CC_AMOUNT = amount,
-                        CC_BUY_PRICE = price,
-                        CC_USER = user,
-                        CC_DIRECTION = sDirection
-                    };
+                        //买入
+                        CC_TAOLI_TABLE record = new CC_TAOLI_TABLE()
+                        {
+                            ID = Guid.NewGuid(),
+                            CC_CODE = code,
+                            CC_TYPE = type,
+                            CC_AMOUNT = amount,
+                            CC_BUY_PRICE = price,
+                            CC_USER = user,
+                            CC_DIRECTION = sDirection,
+                            CC_OFFSETFLAG = 0
+                        };
 
-                    DbEntity.CC_TAOLI_TABLE.Add(record);
+                        DbEntity.CC_TAOLI_TABLE.Add(record);
 
-                    CCRecord ccRecord = new CCRecord()
+                        CCRecord ccRecord = new CCRecord()
+                        {
+                            code = code,
+                            type = type,
+                            price = price,
+                            amount = amount,
+                            user = user,
+                            direction = sDirection,
+                            offsetflag = offsetflag.ToString(),
+
+                        };
+                        PositionRecord.UpdateCCRecord(ccRecord);
+                        Dbsavechage("UpdateCCRecords");
+                        return;
+                    }
+                    else
                     {
-                        code = code,
-                        type = type,
-                        price = price,
-                        amount = amount,
-                        user = user,
-                        direction = sDirection
-                    };
-                    PositionRecord.UpdateCCRecord(ccRecord);
-                    Dbsavechage("UpdateCCRecords");
-                    return;
+                        //不可能持仓列表是负值，肯定有问题
+                        GlobalErrorLog.LogInstance.LogEvent("对空仓卖出--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
+                        return;
+                    }
                 }
                 else
                 {
-                    //不可能持仓列表是负值，肯定有问题
-                    GlobalErrorLog.LogInstance.LogEvent("对空仓卖出--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
-                    return;
+                    var record = selectedStock.ToList()[0];
+
+                    int? db_amount = record.CC_AMOUNT;
+                    double? db_price = record.CC_BUY_PRICE;
+
+                    if (db_amount == null || db_price == null)
+                    { return; }
+
+                    //已经持仓的股票
+                    if (direction == (int)TradeDirection.Sell)
+                    {
+                        //卖出
+                        if (db_amount < amount)
+                        {
+                            GlobalErrorLog.LogInstance.LogEvent("持仓小于卖出--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
+                            return;
+                        }
+
+                        else
+                        {
+                            if (db_amount == amount)
+                            {
+                                record.CC_BUY_PRICE = 0;
+                            }
+                            else
+                            {
+                                record.CC_BUY_PRICE = (db_amount * db_price - amount * price) / (db_amount - amount);
+                            }
+
+                            record.CC_AMOUNT = db_amount - amount;
+                            DbEntity.CC_TAOLI_TABLE.Remove(record);
+
+                            CCRecord ccrecord = new CCRecord()
+                            {
+                                code = record.CC_CODE,
+                                type = record.CC_TYPE,
+                                user = record.CC_USER,
+                                amount = Convert.ToInt16(record.CC_AMOUNT),
+                                offsetflag = record.CC_OFFSETFLAG.ToString(),
+                                direction = record.CC_DIRECTION,
+                                price = Convert.ToDouble(record.CC_BUY_PRICE)
+                            };
+
+                            PositionRecord.UpdateCCRecord(ccrecord);
+                            Dbsavechage("UpdateCCRecords");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        //买入
+                        record.CC_BUY_PRICE = (db_amount * db_price + amount * price) / (db_amount + amount);
+                        record.CC_AMOUNT = db_amount + amount;
+
+
+                        CCRecord ccRecord = new CCRecord()
+                        {
+                            amount = Convert.ToInt16(record.CC_AMOUNT),
+                            code = record.CC_CODE,
+                            price = Convert.ToDouble(record.CC_BUY_PRICE),
+                            type = record.CC_TYPE,
+                            user = record.CC_USER,
+                            direction = record.CC_DIRECTION,
+                            offsetflag = record.CC_OFFSETFLAG.ToString()
+                        };
+
+                        PositionRecord.UpdateCCRecord(ccRecord);
+
+                        Dbsavechage("UpdateCCRecords");
+
+                    }
                 }
             }
             else
             {
-                var record = selectedrecord.ToList()[0];
+                //期货
 
-                int? db_amount = record.CC_AMOUNT;
-                double? db_price = record.CC_BUY_PRICE;
-
-                if (db_amount == null || db_price == null)
-                { return; }
-
-                //对该券有仓位
-                if(direction == (int)TradeDirection.Buy)
+                if (offsetflag == 48)
                 {
-                    record.CC_BUY_PRICE = (db_amount * db_price + amount * price) / (db_amount + amount);
-                    record.CC_AMOUNT = db_amount + amount;
-
-
-                    CCRecord ccRecord = new CCRecord()
+                    //开仓
+                    var selectedFuture = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_DIRECTION == sDirection && item.CC_TYPE == type && item.CC_USER == user select item);
+                    if (selectedFuture.Count() == 0)
                     {
-                        amount = Convert.ToInt16(record.CC_AMOUNT),
-                        code = record.CC_CODE,
-                        price = Convert.ToDouble(record.CC_BUY_PRICE),
-                        type = record.CC_TYPE,
-                        user = record.CC_USER
-                    };
-
-                    PositionRecord.UpdateCCRecord(ccRecord);
-
-                    Dbsavechage("UpdateCCRecords");
-                }
-                else
-                {
-                    if (db_amount < amount)
-                    {
-                        GlobalErrorLog.LogInstance.LogEvent("持仓小于卖出--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
-                        return;
-                    }
-
-                    else
-                    {
-                        record.CC_BUY_PRICE = (db_amount * db_price - amount * price) / (db_amount - amount);
-                        record.CC_AMOUNT = db_amount - amount;
-                        DbEntity.CC_TAOLI_TABLE.Remove(record);
-
-                        CCRecord ccrecord = new CCRecord()
+                        //持仓不存在
+                        CC_TAOLI_TABLE record = new CC_TAOLI_TABLE()
                         {
-                            code = record.CC_CODE,
-                            type = record.CC_TYPE,
-                            user = record.CC_USER
+                            ID = Guid.NewGuid(),
+                            CC_CODE = code,
+                            CC_TYPE = type,
+                            CC_AMOUNT = amount,
+                            CC_BUY_PRICE = price,
+                            CC_USER = user,
+                            CC_DIRECTION = sDirection,
+                            CC_OFFSETFLAG = offsetflag
                         };
 
-                        PositionRecord.DeleteCCRecord(ccrecord);
+                        DbEntity.CC_TAOLI_TABLE.Add(record);
+
+                        CCRecord ccRecord = new CCRecord()
+                        {
+                            code = code,
+                            type = type,
+                            price = price,
+                            amount = amount,
+                            user = user,
+                            direction = sDirection,
+                            offsetflag = offsetflag.ToString()
+                        };
+                        PositionRecord.UpdateCCRecord(ccRecord);
                         Dbsavechage("UpdateCCRecords");
                         return;
                     }
-                }
+                    else
+                    {
+                        //持仓存在
+                        var record = selectedFuture.ToList()[0];
 
+                        int? db_amount = record.CC_AMOUNT;
+                        double? db_price = record.CC_BUY_PRICE;
+
+                        if (db_amount == null || db_price == null)
+                        { return; }
+
+                        record.CC_BUY_PRICE = (db_amount * db_price + amount * price) / (db_amount + amount);
+                        record.CC_AMOUNT = db_amount + amount;
+
+
+                        CCRecord ccRecord = new CCRecord()
+                        {
+                            amount = Convert.ToInt16(record.CC_AMOUNT),
+                            code = record.CC_CODE,
+                            price = Convert.ToDouble(record.CC_BUY_PRICE),
+                            type = record.CC_TYPE,
+                            user = record.CC_USER,
+                            offsetflag = record.CC_OFFSETFLAG.ToString(),
+                            direction = record.CC_DIRECTION
+                        };
+
+                        PositionRecord.UpdateCCRecord(ccRecord);
+
+                        Dbsavechage("UpdateCCRecords");
+                    }
+                }
+                else
+                {
+                    //平仓
+
+                    var selectedFuture = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_DIRECTION != sDirection && item.CC_TYPE == type && item.CC_USER == user select item);
+
+                    if(selectedFuture.Count() == 0)
+                    {
+                        //不可能持仓列表是负值，肯定有问题
+                        GlobalErrorLog.LogInstance.LogEvent("对空仓平仓--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
+                        return;
+                    }
+                    else
+                    {
+                        var record = selectedFuture.ToList()[0];
+
+                        int? db_amount = record.CC_AMOUNT;
+                        double? db_price = record.CC_BUY_PRICE;
+
+                        if (db_amount == null || db_price == null)
+                        { return; }
+
+                        if (db_amount < amount)
+                        {
+                            GlobalErrorLog.LogInstance.LogEvent("持仓小于平仓--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
+                            return;
+                        }
+
+                        else
+                        {
+                            if (db_amount == amount)
+                            {
+                                record.CC_BUY_PRICE = 0;
+                            }
+                            else
+                            {
+                                record.CC_BUY_PRICE = (db_amount * db_price - amount * price) / (db_amount - amount);
+                            }
+                            record.CC_AMOUNT = db_amount - amount;
+
+                            if (record.CC_AMOUNT == 0)
+                            {
+                                DbEntity.CC_TAOLI_TABLE.Remove(record);
+                            }
+
+                            CCRecord ccrecord = new CCRecord()
+                            {
+                                code = record.CC_CODE,
+                                type = record.CC_TYPE,
+                                user = record.CC_USER,
+                                direction = record.CC_DIRECTION,
+                                offsetflag = record.CC_OFFSETFLAG.ToString(),
+                                price = Convert.ToDouble(record.CC_BUY_PRICE),
+                                amount = Convert.ToInt16(record.CC_AMOUNT)
+                            };
+
+                            PositionRecord.UpdateCCRecord(ccrecord);
+                            Dbsavechage("UpdateCCRecords");
+                            return;
+                        }
+                    }
+                }
             }
-            
-            
+
         }
 
         /// <summary>
@@ -888,17 +1046,17 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="para">参数</param>
         /// <returns></returns>
-        public static bool Login(loginType para)
+        public static int? Login(loginType para)
         {
-            if (DBAccessLayer.DBEnable == false) { return false; }
-            if (para == null) return false;
+            if (DBAccessLayer.DBEnable == false) { return 0; }
+            if (para == null) return 0;
 
             para.password = DESoper.EncryptDES(para.password);
 
             var tmp = (from item in DbEntity.UserInfo where item.password == para.password && item.alias == para.name select item);
 
-            if (tmp.Count() > 0) { return true; }
-            else return false;
+            if (tmp.Count() > 0) { return tmp.ToList()[0].userRight; }
+            else return 0;
         }
 
         /// <summary>

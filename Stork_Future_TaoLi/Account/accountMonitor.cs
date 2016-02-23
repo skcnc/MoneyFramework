@@ -16,6 +16,8 @@ namespace Stork_Future_TaoLi
 
         private static List<AccountInfo> accountList = new List<AccountInfo>();
 
+        private static double factor = 300; //股票对应市值系数
+
         public static void RUN()
         {
             excuteThread.Start();
@@ -59,6 +61,40 @@ namespace Stork_Future_TaoLi
             double stockcost = 0;
 
             PositionRecord.LoadCCStockList(info.alias, out positionRecord, out stockcost);
+
+            List<CCRecord> fPositionRecord = new List<CCRecord>();
+
+            PositionRecord.LoadCCFutureList(info.alias, out fPositionRecord);
+
+
+            double fstock = 0;          //期货对应股票市值
+            double fweight = 0;         //期货权益
+
+            foreach (CCRecord record in fPositionRecord)
+            {
+                if (MarketPrice.market.ContainsKey(record.code))
+                {
+                    int x = -1;
+                    if (record.direction == "0")
+                    {
+                        x = 1;
+                    }
+
+                    fstock += (record.amount) * MarketPrice.market[record.code] * factor * x;
+                }
+            }
+
+            fstock = Math.Abs(fstock);
+
+            account.fstockvalue = fstock.ToString();
+
+            //期货权益
+
+
+
+
+
+
 
             account.cost = stockcost.ToString();
 
@@ -215,7 +251,6 @@ namespace Stork_Future_TaoLi
             }
         }
 
-
         /// <summary>
         /// 获得单只股票的全局总持仓
         /// </summary>
@@ -309,6 +344,11 @@ namespace Stork_Future_TaoLi
         /// 期货保证金
         /// </summary>
         public string fbond { get; set; }
+
+        /// <summary>
+        /// 期货对应的股票市值
+        /// </summary>
+        public string fstockvalue { get; set; }
 
         /// <summary>
         /// 持仓列表

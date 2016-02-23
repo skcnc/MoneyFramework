@@ -7,21 +7,23 @@
     <div class="col-md-6 col-md-push-2">
         <p>仓位管理</p>
 
-        <span>股票预估市值：</span>
+        <span>市值：</span>
         <span id="riskpage_value" style="color:blue"></span><br /><br />
-        <span>股票可用资金量：</span>
+        <span>总资产：</span>
         <span id="riskpage_account" style="color:blue"></span><br /><br />
-        <span>股票剩余资金量：</span>
+        <span>可用资金：</span>
         <span id="riskpage_balance" style="color:blue"></span><br /><br />
-        <span>股票总成本：</span>
+        <span>股票成本：</span>
         <span id="riskpage_cost" style="color:blue"></span><br /><br /><br />
 
-        <span>期货可用资金量：</span>
+        <span>期货可用资金：</span>
         <span id="riskpage_faccount" style="color:blue"></span><br /><br />
-        <span>期货权益：</span>
+        <span>期货动态权益：</span>
         <span id="riskpage_fvalue" style="color:blue"></span><br /><br />
-        <span>期货保证金：</span>
-        <span id="riskpage_fbond" style="color:blue"></span><br />
+        <span>期货占用保证金：</span>
+        <span id="riskpage_fbond" style="color:blue"></span><br /><br />
+        <span>期货风险度：</span>
+        <span id="riskpage_friskdegree" style="color:blue"></span><br /><br />
         <br />
         <br />
     </div>
@@ -42,23 +44,16 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-8">
-        <div class="col-md-6">
+    <div class="col-md-12">
+        <div class="col-md-12">
             <p>股票白名单</p>
             <p>代码|流通股|比例|总股本|比例</p>
             <div class="col-md-12">
                 <textarea id="whiteList" placeholder="白名单列表" style="max-width:1000px;width:inherit;height:500px"></textarea>
             </div>
         </div>
-        <div class="col-md-6">
-            <p>股票黑名单</p>
-            <p>代码|流通股|比例|总股本|比例</p>
-            <div class="col-md-12">
-                <textarea id="blackList" placeholder="黑名单列表" style="max-width:1000px;width:inherit;height:500px"></textarea>
-            </div>
-        </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 sr-only">
         <p>持仓列表</p>
         <p>代码|类型|数量|价格</p>
         <div class="col-md-12">

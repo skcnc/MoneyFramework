@@ -68,6 +68,11 @@ namespace Stork_Future_TaoLi.Controllers
             return View();
         }
 
+        public ActionResult UserManger()
+        {
+            return View();
+        }
+
         public string ImportHarbor(String InputJson)
         {
             try
@@ -106,9 +111,9 @@ namespace Stork_Future_TaoLi.Controllers
             return riskmonitor.GetRiskParaJson(InputJson);
         }
 
-        public string SetRiskParameter(String InputJson,String WhiteLi,String BlackLi)
+        public string SetRiskParameter(String InputJson,String WhiteLi)
         {
-            return riskmonitor.SetRiskParaJson(InputJson, WhiteLi, BlackLi);
+            return riskmonitor.SetRiskParaJson(InputJson, WhiteLi);
         }
 
         public string register(String InputJson)
@@ -118,7 +123,9 @@ namespace Stork_Future_TaoLi.Controllers
 
         public string userlogin(String InputJson)
         {
+
             return userOper.login(InputJson).ToString();
+            
         }
 
         public string changePW(String InputJson)

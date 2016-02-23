@@ -310,7 +310,7 @@ namespace Stork_Future_TaoLi
                         nSecurityAmount = mo.nSecurityAmount,
                         dOrderPrice = mo.dOrderPrice,
                         cTradeDirection = mo.cTradeDirection,
-                        cOffsetFlag = mo.cOffsetFlag,
+                        cOffsetFlag = mo.offsetflag,
                         SecurityName = String.Empty,
                         cOrderPriceType = "0",
                         cUser = mo.User,
@@ -325,6 +325,10 @@ namespace Stork_Future_TaoLi
                     {
                         _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "48" : "49");
                         _tradeUnit.cOffsetFlag = (_tradeUnit.cOffsetFlag == "0" ? "48" : "49");
+                    }
+                    if(mo.cSecurityType == "s" || mo.cSecurityType == "S")
+                    {
+                        _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "1" : "2");
                     }
 
                     UserRequestMap.GetInstance().AddOrUpdate(_tradeUnit.OrderRef, mo.User,(key,oldValue) => oldValue = mo.User);

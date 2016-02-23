@@ -8,6 +8,7 @@ using Stork_Future_TaoLi.Modulars;
 using System.Web;
 using Stork_Future_TaoLi.Queues;
 using CTP_CLI;
+using MCStockLib;
 
 namespace Stork_Future_TaoLi
 {
@@ -286,7 +287,7 @@ namespace Stork_Future_TaoLi
                             args.VolumeTotalOriginal = Convert.ToInt16(order.nSecurityAmount);
                             args.LimitPrice = Convert.ToDouble(order.dOrderPrice);
                             args.OrderRef = order.OrderRef.ToString();
-                            args.OrderPriceType =Convert.ToByte(order.cOrderPriceType);
+                            args.OrderPriceType =Convert.ToByte("50");
                             args.CombHedgeFlag_0 = Convert.ToByte('1');
                             args.MinVolume = 1;
                             args.ContingentCondition = Convert.ToByte('1');      
@@ -317,6 +318,8 @@ namespace Stork_Future_TaoLi
                             item.Type = "1";
                             item.VolumeTotalOriginal = item.VolumeTotal = Convert.ToInt32(order.nSecurityAmount);
                             item.VolumeTraded = 0;
+                            item.User = order.cUser;
+
                             
                             TradeRecord.GetInstance().CreateOrder(order.OrderRef, item);
                         }

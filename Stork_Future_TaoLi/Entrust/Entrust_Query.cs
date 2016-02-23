@@ -170,6 +170,7 @@ namespace Stork_Future_TaoLi.Entrust
                         bargin.strategyId = item.StrategyId;
                         bargin.direction = item.Direction;
                         bargin.User = USERNAME;
+                        bargin.OrderType = Convert.ToSByte("49"); 
                     
 
                         ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateDLRecord), (object)bargin);

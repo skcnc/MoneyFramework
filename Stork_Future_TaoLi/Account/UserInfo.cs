@@ -28,7 +28,7 @@ namespace Stork_Future_TaoLi.Account
             return DBAccessLayer.InsertUser(para);
         }
 
-        public static bool login(String InputJson)
+        public static int? login(String InputJson)
         {
             loginType para = JsonConvert.DeserializeObject<loginType>(InputJson);
             if (para.password.Length < 16)
@@ -45,6 +45,7 @@ namespace Stork_Future_TaoLi.Account
 
         public static bool ChangePassword(String InputJson)
         {
+            if (InputJson == null) return false;
             ChangePasswordType para = JsonConvert.DeserializeObject<ChangePasswordType>(InputJson);
 
             if(para.op.Length <  16)

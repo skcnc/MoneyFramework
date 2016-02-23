@@ -969,6 +969,7 @@
     <Content Include="Views\Home\AccountOverVIew.cshtml" />
     <Content Include="Views\Home\RiskControl.cshtml" />
     <Content Include="Views\Home\MainPage.cshtml" />
+    <Content Include="Views\Home\UserManger.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

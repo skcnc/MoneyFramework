@@ -205,23 +205,51 @@ namespace Stork_Future_TaoLi
         /// <param name="record">新持仓记录</param>
         public static void UpdateCCRecord(CCRecord record)
         {
-            var tmp = (from item in CCRecordList where item.code == record.code && item.type == record.type && item.user == record.user select item);
 
-            if (tmp.Count() == 0)
+            if(record.type == "0")
             {
-                CCRecordList.Add(record);
+                //股票
+                var tmp = (from item in CCRecordList where item.code == record.code && item.type == record.type && item.user == record.user  select item);
+
+                if (tmp.Count() == 0)
+                {
+                    CCRecordList.Add(record);
+                }
+                else
+                {
+                    tmp.ToList()[0].amount = record.amount;
+                    tmp.ToList()[0].price = record.price;
+                }
+
             }
             else
             {
-                tmp.ToList()[0].amount = record.amount;
-                tmp.ToList()[0].price = record.price;
-            }
+                //期货
+                var tmp = (from item in CCRecordList where item.code == record.code && item.type == record.type && item.user == record.user && item.direction == record.direction select item);
 
+                if (tmp.Count() == 0)
+                {
+                    CCRecordList.Add(record);
+                }
+                else
+                {
+                    if (record.amount > 0)
+                    {
+                        tmp.ToList()[0].amount = record.amount;
+                        tmp.ToList()[0].price = record.price;
+                    }
+                    else
+                    {
+                        DeleteCCRecord(record);
+                    }
+                   
+                }
+            }
         }
 
         public static void DeleteCCRecord(CCRecord record)
         {
-            var tmp = (from item in CCRecordList where item.user == record.user && item.code == record.code && item.type == record.type select item);
+            var tmp = (from item in CCRecordList where item.user == record.user && item.code == record.code && item.type == record.type && item.direction == record.direction select item);
 
             if (tmp.Count() > 0)
             {
@@ -333,6 +361,11 @@ namespace Stork_Future_TaoLi
         /// 交易方向
         /// </summary>
         public string direction { get; set; }
+
+        /// <summary>
+        /// 开平标志
+        /// </summary>
+        public string offsetflag { get; set; }
     }
 
     /// <summary>

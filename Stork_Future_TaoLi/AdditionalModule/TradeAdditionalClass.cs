@@ -5,6 +5,8 @@ using System.Web;
 using System.Collections.Concurrent;
 using Stork_Future_TaoLi.Hubs;
 using Newtonsoft.Json;
+using System.Threading;
+using MCStockLib;
 
 namespace Stork_Future_TaoLi
 {
@@ -199,6 +201,20 @@ namespace Stork_Future_TaoLi
             {
                 CompletedTradeRecord.GetInstance().Update(_record.OrderRef, _record);
                 CompletedTradeRecord.GetInstance().Delete(_record.OrderRef, _record);
+
+                managedBargainreturnstruct bargin = new managedBargainreturnstruct()
+                {
+                    Security_code = _record.Code,
+                    OrderType = Convert.ToSByte(_record.Type),
+                    stock_amount = _record.VolumeTraded,
+                    bargain_price = Convert.ToDouble(Price),
+                    User = _record.User,
+                    offsetflag = _record.CombOffsetFlag,
+                    direction = Convert.ToInt16(_record.Orientation)
+                };
+
+                //更新持仓列表
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
             }
         }
 
@@ -348,6 +364,11 @@ namespace Stork_Future_TaoLi
         /// 已经成交数量
         /// </summary>
         public int VolumeTraded { get; set; }
+
+        /// <summary>
+        /// 用户姓名
+        /// </summary>
+        public string User { get; set; }
 
 
         /// <summary>

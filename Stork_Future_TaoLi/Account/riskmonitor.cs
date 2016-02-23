@@ -203,7 +203,7 @@ namespace Stork_Future_TaoLi
             return JsonConvert.SerializeObject(riskPara);
         }
 
-        public static String SetRiskParaJson(String InputJson, String WhiteLi,String BlackLi)
+        public static String SetRiskParaJson(String InputJson, String WhiteLi)
         {
             try
             {
@@ -232,24 +232,7 @@ namespace Stork_Future_TaoLi
                     });
                 }
 
-                riskPara.BlackNameList.Clear();
-                foreach (string s in BlackLi.Split('\n'))
-                {
-                    if (s.Trim() == string.Empty) continue;
-                    riskPara.BlackNameList.Add(s);
-                    Records.Add(new BWNameTable()
-                    {
-                        ID = Guid.NewGuid(),
-                        Code = s.Split('|')[0],
-                        Amount = Convert.ToDecimal(s.Split('|')[1]),
-                        PercentageA = Convert.ToDouble(s.Split('|')[2]),
-                        Value = Convert.ToDecimal(s.Split('|')[3]),
-                        PercentageB = Convert.ToDouble(s.Split('|')[4]),
-                        flag = false
-
-                    });
-                }
-
+                
                 riskPara.changkouRadio = para.changkouRadio;
                 riskPara.PerStockCostPercentage = para.PerStockCostPercentage;
                 riskPara.riskLevel = para.riskLevel;

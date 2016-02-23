@@ -327,7 +327,7 @@ namespace Stork_Future_TaoLi
         //买卖类别（见数据字典说明)
         public string cTradeDirection { get; set; }
         //开平标志
-        public string cOffsetFlag { get; set; }
+        public string offsetflag { get; set; }
         //证券类型
         public string cSecurityType { get; set; }
         // 列表所属策略实例ID

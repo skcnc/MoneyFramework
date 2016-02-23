@@ -31,20 +31,18 @@ window.onload = function (e) {
     }
 
     if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/riskcontrol") {
-        
+
         //向后台请求黑白名单信息
         var InputJson = localStorage["USERNAME"];
         $.post("/Home/GetRiskParameter",
             {
                 InputJson: InputJson
-            }, function (data, status)
-            {
+            }, function (data, status) {
                 //alert("数据：" + data + "\n状态：" + status);
                 loadRiskParameter(data);
-        })
+            })
     }
-
-    if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/monitorconsole") {
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/monitorconsole") {
         if (Modernizr.localstorage) {
             localStorage.setItem("IDCollection", "");
             UpdateOPENStrategies(false);
@@ -116,11 +114,48 @@ window.onload = function (e) {
                 $('#buylist').val(order);
             }
         }
-        else {
-            alert("您当前使用的浏览器版本过低，网站功能将被限制！");
-            return;
+    }
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/mainpage") {
+        var right = localStorage["USERRIGHT"];
+
+        if (right == "1") {
+            $("[name='mainpage_usermanage']").removeClass('sr-only');
+            $("[name='mainpage_userinfo']").addClass('sr-only');
+            $("[name='mainpage_strategy']").addClass('sr-only');
+            $("[name='mainpage_trade']").addClass('sr-only');
+            $("[name='mainpage_riskcontrol']").removeClass('sr-only');
+            $("[name='mainpage_sysstatus']").removeClass('sr-only');
+            $("[name='mainpage_account']").removeClass('sr-only');
+        }
+        if (right == "2") {
+
+            $("[name='mainpage_usermanage']").addClass('sr-only');
+            $("[name='mainpage_userinfo']").removeClass('sr-only');
+            $("[name='mainpage_strategy']").removeClass('sr-only');
+            $("[name='mainpage_trade']").removeClass('sr-only');
+            $("[name='mainpage_riskcontrol']").addClass('sr-only');
+            $("[name='mainpage_sysstatus']").addClass('sr-only');
+            $("[name='mainpage_account']").removeClass('sr-only');
+        }
+        if (right == "3") {
+            $("[name='mainpage_usermanage']").addClass('sr-only');
+            $("[name='mainpage_userinfo']").removeClass('sr-only');
+            $("[name='mainpage_strategy']").addClass('sr-only');
+            $("[name='mainpage_trade']").addClass('sr-only');
+            $("[name='mainpage_riskcontrol']").removeClass('sr-only');
+            $("[name='mainpage_sysstatus']").removeClass('sr-only');
+            $("[name='mainpage_account']").addClass('sr-only');
         }
     }
+    else if (e.currentTarget.location.pathname == "/" || e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/syslogin") 
+    {
+        return;
+    }
+    else {
+        //alert("您当前使用的浏览器版本过低，网站功能将被限制！");
+        return;
+    }
+
 }
 
 //展开开仓策略细节
@@ -1051,7 +1086,7 @@ $('#tm_btnMakeOrder').click(function (e) {
         nSecurityAmount: volume,
         dOrderPrice: price,
         cTradeDirection: direction,
-        cOffsetFlag: mark,
+        offsetflag: mark,
         cSecurityType: type,
         belongStrategy: "00",
         OrderRef: "0",
@@ -1087,10 +1122,10 @@ $('#login_btnLogin').click(function (e) {
         InputJson: InputJson
     }, function (data, status) {
 
-        if (data == "False")
+        if (data == "0")
         {
             alert("用户名或密码错误！");
-            result = "False";
+            result = "0";
             return;
         }
         else
@@ -1099,12 +1134,12 @@ $('#login_btnLogin').click(function (e) {
             if (Modernizr.localstorage) {
                 localStorage.setItem("USERNAME", username);
                 localStorage.setItem("TIMESTAMP", dt.getTime());
+                localStorage.setItem("USERRIGHT", data);
             }
             else {
                 alert("您当前使用的浏览器版本过低，网站功能将被限制！");
                 return;
             }
-
 
             window.location.href = '/home/mainpage'
         }

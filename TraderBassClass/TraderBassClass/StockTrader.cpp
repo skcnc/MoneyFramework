@@ -161,7 +161,7 @@ bool CStockTrader::trader(const Traderorderstruct  mytraderoder, QueryEntrustord
 		{
 			strcpy(Errormsg, getErrorCodeMsg(pAddEntrustRtn->return_status));
 			bRunning = false;
-			return false;
+ 			return false;
 		}
 	}
 	Errormsg = "none konw";
