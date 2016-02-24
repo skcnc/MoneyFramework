@@ -116,6 +116,15 @@ namespace Stork_Future_TaoLi.Controllers
             return riskmonitor.GetRiskParaJson(InputJson);
         }
 
+        /// <summary>
+        /// 获取白名单
+        /// </summary>
+        /// <returns></returns>
+        public string GetWhiteList()
+        {
+            return riskmonitor.LoadWhiteList();
+        }
+
         public string SetRiskParameter(String InputJson,String WhiteLi)
         {
             return riskmonitor.SetRiskParaJson(InputJson, WhiteLi);
@@ -227,7 +236,5 @@ namespace Stork_Future_TaoLi.Controllers
         {
             return View();
         }
-
-        
     }
 }

@@ -241,8 +241,12 @@ namespace Stork_Future_TaoLi
             {
                 if(info.userRight == 2)
                 {
-                    //交易员
-                    Accounts.Add(GetAccountInfo(info.alias, out result));
+                    AccountInfo acc = GetAccountInfo(info.alias, out result);
+                    if (acc.positions.Count() > 0)
+                    {
+                        //交易员
+                        Accounts.Add(acc);
+                    }
                 }
             }
 

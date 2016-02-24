@@ -40,18 +40,17 @@
                 <input type="radio" name="sysregister_right" style="margin-left:20px" value="3" /><span class="label label-success" style="font-size:large">审计员</span>
             </div>
         </div>
-        <div>
-            <br />
-            <br />
-        </div>
-        <div class="col-ms-12">
-            <button class="btn btn-default btn-block" id="sysRegister_btnRegist">确认添加</button>
-        </div>
     </div>
 
     <div>
         <br />
     </div>
+
+    <div class="row">
+        <button class="btn btn-default btn-block" id="sysRegister_btnRegist">确认添加</button>
+    </div>
+
+    
 
     <h2><span class="label label-primary">修改密码</span></h2>
 
@@ -69,10 +68,70 @@
             <h3><span class="label label-info">新密码</span></h3>
             <input type="text" class="form-control" id="sysregister_newpassword" />
         </div>
+    </div>
+    <div class="col-ms-12">
+
         <br />
         <br />
-        <div class="col-ms-12">
-            <button class="btn btn-default  btn-block" id="sysRegister_btnChangePassword">确认修改</button>
+        <button class="btn btn-default  btn-block" id="sysRegister_btnChangePassword">确认修改</button>
+    </div>
+
+    <div>
+        <br />
+    </div>
+
+    <h2><span class="label label-primary">修改系统参数</span></h2>
+
+    <div class="col-sm-6">
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">股票交易地址</span></h3>
+            <input type="text" class="form-control" id="sysregister_stockconn_addr" />
         </div>
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">股票通信端口</span></h3>
+            <input type="text" class="form-control" id="sysregister_stockconn_port" />
+        </div>
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">资金账户</span></h3>
+            <input type="text" class="form-control" id="sysregister_stockconn_account" />
+        </div>
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">部门编号</span></h3>
+            <input type="text" class="form-control" id="sysregister_stockconn_deptno" />
+        </div>
+        <div class="input-group col-sm-3 ">
+            <h3><span class="label label-info">账户号码</span></h3>
+            <input type="text" class="form-control" id="sysregister_stockconn_no" />
+        </div>
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">账户密码</span></h3>
+            <input type="password" class="form-control" id="sysregister_stockconn_password" />
+        </div>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">期货交易地址</span></h3>
+            <input type="text" class="form-control" id="sysregister_futureconn_addr" />
+        </div>
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">期货BROKER编号</span></h3>
+            <input type="text" class="form-control" id="sysregister_futureconn_broker" />
+        </div>
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">期货账户号</span></h3>
+            <input type="text" class="form-control" id="sysregister_futureconn_account" />
+        </div>
+        <div class="input-group col-sm-3">
+            <h3><span class="label label-info">期货密码</span></h3>
+            <input type="password" class="form-control" id="sysregister_futureconn_password" />
+        </div>
+    </div>
+
+    <div class="col-ms-12">
+
+        <br />
+        <br />
+        <button class="btn btn-default  btn-block" >确认修改</button>
     </div>
 </div> 

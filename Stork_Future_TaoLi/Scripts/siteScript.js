@@ -32,19 +32,58 @@ window.onload = function (e) {
 
     if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/riskcontrol") {
 
-        //向后台请求黑白名单信息
-        var InputJson = localStorage["USERNAME"];
-        $.post("/Home/GetRiskParameter",
-            {
-                InputJson: InputJson
-            }, function (data, status) {
-                //alert("数据：" + data + "\n状态：" + status);
-                loadRiskParameter(data);
-            })
-
-         
         $.post("/home/GetRiskInfo", {}, function (data, status) {
+            //alert(data);
+            var accounts = eval('(' + data + ')');
 
+            var length = $("[name='risk_list_row']").length;
+
+            while (length > 0) {
+                var tr = $("[name='risk_list_row']")[0];
+
+
+                tr.remove();
+
+                length = $("[name='risk_list_row']").length;
+            }
+
+            for (var i = 0; i < accounts.length; i++) {
+
+                var acc = accounts[i];
+
+                $('#risk_list_body').append('<tr name="risk_list_row"><td>' + acc.alias + '</td><td>' + acc.balance + '</td><td>' + acc.frozen + '</td><td>' + acc.earning + '</td><td>' + acc.value + '</td><td>' + acc.cost + '</td><td>' + acc.faccount + '</td><td>' + acc.fvalue + '</td><td>' + acc.frisk + '</td><td>' + acc.risk_exposure + '</td></tr>');
+            }
+        });
+
+        $.post("/home/GetRiskParameter", {}, function (data, status) {
+            var risk = eval('(' + data + ')');
+
+            $('#changkouRadio').val(risk.changkouRadio);
+            $('#riskLevel').val(risk.riskLevel);
+            $('#PerStockCostPercentage').val(risk.PerStockCostPercentage);
+            $('#stockRadio').val(risk.stockRadio);
+            $('#PerFundCostPercentage').val(0.05);
+
+        });
+
+        $.post("/home/GetWhiteList", {}, function (data, status) {
+            var obj = eval('(' + data + ')');
+
+            var length = $("[name='white_list_row']").length;
+
+            while (length > 0) {
+                var tr = $("[name='white_list_row']")[0];
+
+                tr.remove();
+
+                length = $("[name='white_list_row']").length;
+            }
+
+            for (var i = 0; i < obj.length; i++) {
+                var acc = obj[i];
+
+                $('#white_list_body').append('<tr name="white_list_row"><td>' + acc.Code + '</td><td>' + acc.Amount + '</td><td>' + acc.PercentageA + '</td><td>' + acc.Value + '</td><td>' + acc.PercentageB + '</td></tr>');
+            }
         });
 
     }
@@ -156,6 +195,19 @@ window.onload = function (e) {
     else if (e.currentTarget.location.pathname == "/" || e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/syslogin") 
     {
         return;
+    }
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/sysregister") {
+        $('#sysregister_stockconn_addr').val("10.65.8.14");
+        $('#sysregister_stockconn_port').val("18887");
+        $('#sysregister_stockconn_account').val("1653043461");
+        $('#sysregister_stockconn_deptno').val("001");
+        $('#sysregister_stockconn_no').val("201509");
+        $('#sysregister_stockconn_password').val("607178");
+
+        $('#sysregister_futureconn_addr').val("tcp://119.15.140.81:41205");
+        $('#sysregister_futureconn_broker').val("8890");
+        $('#sysregister_futureconn_account').val("17730203");
+        $('#sysregister_futureconn_password').val("111111");
     }
     else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/AccountInfo")
     {

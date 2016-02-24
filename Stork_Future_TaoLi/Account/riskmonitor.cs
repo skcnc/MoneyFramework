@@ -136,10 +136,6 @@ namespace Stork_Future_TaoLi
                 return false;
             }
 
-            //判断四： 期货风险度
-
-            //判断五： 敞口比例
-            //判断六： 股票占总资金比例
 
             if (errCode != 0) return false;
             else return true;
@@ -153,6 +149,11 @@ namespace Stork_Future_TaoLi
         {
             //初始化加载风控参数
             List<BWNameTable> BWRecords = DBAccessLayer.GetWBNamwList();
+
+            riskPara.changkouRadio = 0.1;
+            riskPara.riskLevel = 0.4;
+            riskPara.PerStockCostPercentage = 0.05;
+            riskPara.stockRadio = 0.05;
 
             if (BWRecords == null || BWRecords.Count == 0)
             {
@@ -189,6 +190,24 @@ namespace Stork_Future_TaoLi
         }
 
         /// <summary>
+        /// 获取白名单列表
+        /// </summary>
+        public static string LoadWhiteList()
+        {
+            //初始化加载风控参数
+            List<BWNameTable> BWRecords = DBAccessLayer.GetWBNamwList();
+
+            riskPara.WhiteNameList.Clear();
+
+            foreach (BWNameTable record in BWRecords)
+            {
+                riskPara.WhiteNameList.Add(record.Code + "|" + record.Amount + "|" + record.PercentageA + "|" + record.Value + "|" + record.PercentageB);
+            }
+
+            return JsonConvert.SerializeObject(BWRecords);
+        }
+
+        /// <summary>
         /// 获取风控参数
         /// </summary>
         /// <returns>风控参数的json字符串</returns>
@@ -212,42 +231,45 @@ namespace Stork_Future_TaoLi
 
                 riskPara.WhiteNameList.Clear();
 
-
-                foreach (string s in WhiteLi.Split('\n'))
+                if (WhiteLi.Trim() != string.Empty)
                 {
-                    if (s.Trim() == string.Empty) continue;
-                    riskPara.WhiteNameList.Add(s);
-
-                    Records.Add(new BWNameTable()
+                    foreach (string s in WhiteLi.Split('\n'))
                     {
-                        ID = Guid.NewGuid(),
-                        Code = s.Split('|')[0],
-                        Amount = Convert.ToDecimal(s.Split('|')[1]),
-                        PercentageA = Convert.ToDouble(s.Split('|')[2]),
-                        Value = Convert.ToDecimal(s.Split('|')[3]),
-                        PercentageB = Convert.ToDouble(s.Split('|')[4]),
-                        flag = true
+                        if (s.Trim() == string.Empty) continue;
+                        riskPara.WhiteNameList.Add(s);
 
-                    });
+                        Records.Add(new BWNameTable()
+                        {
+                            ID = Guid.NewGuid(),
+                            Code = s.Split('|')[0],
+                            Amount = Convert.ToDecimal(s.Split('|')[1]),
+                            PercentageA = Convert.ToDouble(s.Split('|')[2]),
+                            Value = Convert.ToDecimal(s.Split('|')[3]),
+                            PercentageB = Convert.ToDouble(s.Split('|')[4]),
+                            flag = true
+
+                        });
+                    }
+
+                    DBAccessLayer.SetWBNameList(Records);
+
                 }
 
-                
+
                 riskPara.changkouRadio = para.changkouRadio;
                 riskPara.PerStockCostPercentage = para.PerStockCostPercentage;
                 riskPara.riskLevel = para.riskLevel;
                 riskPara.stockRadio = para.stockRadio;
 
-
-                DBAccessLayer.SetWBNameList(Records);
-                
-
                 return "success";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return ex.ToString();
             }
         }
+
+
     }
 
     /// <summary>
@@ -270,23 +292,23 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 敞口比例
         /// </summary>
-        public double changkouRadio = 0;
+        public double changkouRadio = 0.1;
 
         /// <summary>
         /// 风险度限制
         /// </summary>
-        public double riskLevel = 0;
+        public double riskLevel = 0.4;
 
         /// <summary>
         /// 股票占总资金比例
         /// 全部股票市值 除以 （证券总资产 加上期货权益）
         /// </summary>
-        public double stockRadio = 0;
+        public double stockRadio = 0.05;
 
         /// <summary>
         /// 单只股票所占资金比例
         /// </summary>
-        public double PerStockCostPercentage = 0;
+        public double PerStockCostPercentage = 0.05;
 
         /// <summary>
         /// 持仓信息
