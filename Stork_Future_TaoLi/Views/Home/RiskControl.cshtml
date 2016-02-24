@@ -4,7 +4,7 @@
 
 <h2>风控参数</h2>
 <div class="row">
-    <div class="col-md-6 col-md-push-2">
+    @*<div class="col-md-6 col-md-push-2 sr-only">
         <p>仓位管理</p>
 
         <span>市值：</span>
@@ -26,6 +26,21 @@
         <span id="riskpage_friskdegree" style="color:blue"></span><br /><br />
         <br />
         <br />
+    </div>*@
+
+    <div class="col-md-6">
+        <p>风控参数</p>
+
+        <span>敞口比例：</span><br />
+        <span id="riskcontrol_changkouRadio" style="color:blue"></span><br /><br />
+        <span>风险度限制：</span><br />
+        <span id="riskcontrol_changkouRadio" style="color:blue"></span><br /><br />
+        <span>单只股票所占资金比例：</span><br />
+        <span id="riskcontrol_changkouRadio" style="color:blue"></span><br /><br />
+        <span>股票权益所占资金比例：</span><br />
+        <span id="riskcontrol_changkouRadio" style="color:blue"></span><br /><br />
+
+        
     </div>
 
     <div class="col-md-6">
@@ -63,5 +78,12 @@
 
 </div>
 <div class="row" style="margin:0 auto">
-    <button id="riskpage_submit" type="button" class="btn btn-primary" style="margin:auto">提交修改</button>
+    <br />
+    <br />
+    <div class="col-md-3 col-md-push-9">
+        <button id="riskpage_submit" type="button" class="btn btn-primary" style="margin:auto">提交修改</button>
+        <button type="button" class="btn btn-primary" id="riskinfo_refresh">
+            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+        </button>
+    </div>
 </div>

@@ -41,6 +41,12 @@ window.onload = function (e) {
                 //alert("数据：" + data + "\n状态：" + status);
                 loadRiskParameter(data);
             })
+
+         
+        $.post("/home/GetRiskInfo", {}, function (data, status) {
+
+        });
+
     }
     else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/monitorconsole") {
         if (Modernizr.localstorage) {

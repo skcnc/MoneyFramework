@@ -228,54 +228,28 @@ namespace Stork_Future_TaoLi
             return acc.ToList()[0];
         }
 
-        public static AccountInfo GetTestAccount(string name,out string result)
+        /// <summary>
+        /// 获取所有交易员的账户信息
+        /// </summary>
+        /// <returns></returns>
+        public static List<AccountInfo> GetAccountInfoAll()
         {
-            result = string.Empty;
+            List<AccountInfo> Accounts = new List<AccountInfo>();
+            List<UserInfo> Users = DBAccessLayer.GetUser();
+            String result = String.Empty;
+            foreach (UserInfo info in Users)
+            {
+                if(info.userRight == 2)
+                {
+                    //交易员
+                    Accounts.Add(GetAccountInfo(info.alias, out result));
+                }
+            }
 
-            AccountInfo info = new AccountInfo()
-            {
-                alias = "testor",
-                account = "10000000",
-                balance = "7000000",
-                cost = "3000000",
-                faccount = "1000000",
-                fbond = "300000",
-                frozen = "20000",
-                fvalue = "1200000",
-                name = "testor",
-                value = "1150000",
-                positions = new List<AccountPosition>(),
-                entrusts = new List<AccountEntrust>()
-            };
-
-            info.positions.Clear();
-            info.positions.Add(new AccountPosition()
-            {
-                code = "600012",
-                name = "testor",
-                amount = "120",
-                price = "25.12",
-                type = "S"
-            });
-            info.positions.Add(new AccountPosition()
-            {
-                code = "600015",
-                name = "testor",
-                amount = "300",
-                price = "1.34",
-                type = "S"
-            });
-            info.positions.Add(new AccountPosition()
-            {
-                code = "600020",
-                name = "testor",
-                amount = "100",
-                price = "7.18",
-                type = "S"
-            });
-            return info;
+            return Accounts;
         }
 
+        
         public static string GetErrorCode(int code,string content)
         {
             switch (code)

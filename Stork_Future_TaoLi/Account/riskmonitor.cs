@@ -194,12 +194,11 @@ namespace Stork_Future_TaoLi
         /// <returns>风控参数的json字符串</returns>
         public static String GetRiskParaJson(String InputJson)
         {
+
             
-
             string err = string.Empty;
-            //riskPara.account = accountMonitor.GetAccountInfo(InputJson, out err);
-            riskPara.account = accountMonitor.GetTestAccount(InputJson, out err);
-
+            riskPara.account = accountMonitor.GetAccountInfo(InputJson, out err);
+            
             return JsonConvert.SerializeObject(riskPara);
         }
 

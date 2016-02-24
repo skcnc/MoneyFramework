@@ -186,6 +186,13 @@ namespace Stork_Future_TaoLi.Controllers
             return JsonConvert.SerializeObject(info);
         }
 
+        public string GetRiskInfo()
+        {
+            List<AccountInfo> infos = accountMonitor.GetAccountInfoAll();
+
+            return JsonConvert.SerializeObject(infos);
+        }
+
         public ActionResult OPEN_EDIT()
         {
             ViewBag.ID = Request.QueryString["StrategyID"];
@@ -220,5 +227,7 @@ namespace Stork_Future_TaoLi.Controllers
         {
             return View();
         }
+
+        
     }
 }
