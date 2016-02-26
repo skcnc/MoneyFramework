@@ -7,6 +7,9 @@ using Stork_Future_TaoLi.Modulars;
 using System.Threading;
 using Stork_Future_TaoLi;
 using Stork_Future_TaoLi.Queues;
+using Stork_Future_TaoLi.Hubs;
+using Newtonsoft.Json;
+using Stork_Future_TaoLi.Database;
 
 namespace Stork_Future_TaoLi
 {
@@ -334,6 +337,40 @@ namespace Stork_Future_TaoLi
                     UserRequestMap.GetInstance().AddOrUpdate(_tradeUnit.OrderRef, mo.User,(key,oldValue) => oldValue = mo.User);
 
                     _TradeList.Add(_tradeUnit);
+
+
+                    //风控检测
+                    string result = string.Empty;
+                     bool brisk = riskmonitor.RiskControl(_tradeUnit.cUser, _TradeList, out result);
+
+                     DBAccessLayer.AddRiskRecord(_tradeUnit.cUser, result, "00", _tradeUnit.cSecurityCode, Convert.ToInt16(_tradeUnit.nSecurityAmount), _tradeUnit.dOrderPrice, _tradeUnit.cTradeDirection);
+
+                     List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(_tradeUnit.cUser);
+
+                     int count = 0;
+
+                     if (risks.Count > 0)
+                     {
+                         List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
+
+                         foreach(RISK_TABLE risk in risks)
+                         {
+                             count++;
+                             if (count > 10) break;
+                             riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
+                         }
+
+
+                         TradeMonitor.Instance.updateRiskList(_tradeUnit.cUser, JsonConvert.SerializeObject(riskinfos));
+     
+                     }
+
+                   
+
+                    if(!brisk)
+                    {
+                        continue;
+                    }
 
                     log.LogEvent("来自交易管理页面的交易");
                     if (mo.cSecurityType == "s" || mo.cSecurityType == "S")

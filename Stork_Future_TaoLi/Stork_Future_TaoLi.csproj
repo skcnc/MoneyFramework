@@ -301,9 +301,6 @@
     <Compile Include="Database\UserInfo.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
-    <Compile Include="Database\VariablesList.cs">
-      <DependentUpon>DBSet.tt</DependentUpon>
-    </Compile>
     <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Hubs\AccountHub.cs" />
@@ -349,16 +346,6 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\login.css" />
-    <Content Include="Database\DBSet.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>DBSet.edmx</DependentUpon>
-      <LastGenOutput>DBSet.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Database\DBSet.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>DBSet.edmx</DependentUpon>
-      <LastGenOutput>DBSet.cs</LastGenOutput>
-    </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -375,13 +362,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
-    <EntityDeploy Include="Database\DBSet.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>DBSet.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Database\DBSet.edmx.diagram">
-      <DependentUpon>DBSet.edmx</DependentUpon>
-    </Content>
     <Content Include="Lib\zipfile.py" />
     <Content Include="Lib\xmlrpclib.py" />
     <Content Include="Lib\xmllib.py" />
@@ -892,6 +872,23 @@
     <Content Include="Lib\_abcoll.py" />
     <Content Include="Lib\__phello__.foo.py" />
     <Content Include="Lib\__future__.py" />
+    <EntityDeploy Include="Database\DBSet.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DBSet.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Database\DBSet.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DBSet.edmx</DependentUpon>
+      <LastGenOutput>DBSet.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Database\DBSet.edmx.diagram">
+      <DependentUpon>DBSet.edmx</DependentUpon>
+    </Content>
+    <Content Include="Database\DBSet.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DBSet.edmx</DependentUpon>
+      <LastGenOutput>DBSet.cs</LastGenOutput>
+    </Content>
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.9.1.js" />
     <Content Include="Scripts\jquery-1.9.1.min.js" />

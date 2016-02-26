@@ -16,9 +16,9 @@ namespace Stork_Future_TaoLi
 
         private static List<AccountInfo> accountList = new List<AccountInfo>();
 
-        private static double factor = 300; //股票对应市值系数
+        public static double factor = 300; //股票对应市值系数
 
-        private static double future_margin_factor = 0.12; //期货保证金系数
+        public  static double future_margin_factor = 0.12; //期货保证金系数
 
         public static void RUN()
         {
@@ -274,6 +274,12 @@ namespace Stork_Future_TaoLi
                     return "单支股票金额超限" + content;
                 case 7:
                     return "预计股票成本高于可用资金" + content;
+                case 8:
+                    return "风险度超过阈值，交易未允许";
+                case 9:
+                    return "敞口过高，交易未允许";
+                case 10:
+                    return "单日期货交易过多（超过十次）";
                 default :
                     return "验证通过";
             }

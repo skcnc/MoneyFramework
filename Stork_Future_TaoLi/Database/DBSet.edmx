@@ -90,6 +90,10 @@
           <Property Name="alias" Type="nvarchar" MaxLength="50" />
           <Property Name="strategy_id" Type="nvarchar" MaxLength="50" />
           <Property Name="err" Type="text" />
+          <Property Name="code" Type="nvarchar" MaxLength="50" />
+          <Property Name="amount" Type="int" />
+          <Property Name="price" Type="float" />
+          <Property Name="orientation" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="SG_TAOLI_CLOSE_TABLE">
           <Key>
@@ -150,16 +154,6 @@
           <Property Name="futureAvailable" Type="nvarchar" MaxLength="50" />
           <Property Name="userRight" Type="int" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'MoneyEntity.dbo.VariablesList' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
-        <EntityType Name="VariablesList">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="varName" Type="nvarchar" MaxLength="50" />
-          <Property Name="varValue" Type="nvarchar" MaxLength="50" />
-        </EntityType>
         <EntityContainer Name="MoneyEntityModelStoreContainer">
           <EntitySet Name="BWNameTable" EntityType="Self.BWNameTable" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="CC_TAOLI_TABLE" EntityType="Self.CC_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
@@ -171,31 +165,36 @@ warning 6002: The table/view 'MoneyEntity.dbo.VariablesList' does not have a pri
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="Self.SG_TAOLI_OPEN_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserInfo" EntityType="Self.UserInfo" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="VariablesList" EntityType="Self.VariablesList" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-[VariablesList].[ID] AS [ID], 
-[VariablesList].[varName] AS [varName], 
-[VariablesList].[varValue] AS [varValue]
-FROM [dbo].[VariablesList] AS [VariablesList]</DefiningQuery>
-          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="MoneyEntityModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="MoneyEntityEntities1" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="DL_TAOLI_TABLE" EntityType="MoneyEntityModel.DL_TAOLI_TABLE" />
-          <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_OPEN_TABLE" />
-          <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_STATUS_TABLE" />
-          <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" />
-          <EntitySet Name="ER_TAOLI_TABLE" EntityType="MoneyEntityModel.ER_TAOLI_TABLE" />
-          <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" />
-          <EntitySet Name="BWNameTable" EntityType="MoneyEntityModel.BWNameTable" />
-          <EntitySet Name="RISK_TABLE" EntityType="MoneyEntityModel.RISK_TABLE" />
-          <EntitySet Name="UserInfo" EntityType="MoneyEntityModel.UserInfo" />
-          <EntitySet Name="CC_TAOLI_TABLE" EntityType="MoneyEntityModel.CC_TAOLI_TABLE" />
-          <EntitySet Name="VariablesList" EntityType="MoneyEntityModel.VariablesList" />
-        </EntityContainer>
+        <EntityType Name="BWNameTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Amount" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="PercentageA" Type="Double" />
+          <Property Name="Value" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="PercentageB" Type="Double" />
+          <Property Name="flag" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="CC_TAOLI_TABLE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="CC_CODE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CC_TYPE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CC_DIRECTION" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CC_AMOUNT" Type="Int32" />
+          <Property Name="CC_BUY_PRICE" Type="Double" />
+          <Property Name="CC_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CC_OFFSETFLAG" Type="Int32" />
+        </EntityType>
         <EntityType Name="DL_TAOLI_TABLE">
           <Key>
             <PropertyRef Name="DL_GUID" />
@@ -214,59 +213,12 @@ FROM [dbo].[VariablesList] AS [VariablesList]</DefiningQuery>
           <Property Name="DL_NO" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="DL_LOAD" Type="Boolean" />
         </EntityType>
-        <EntityType Name="SG_TAOLI_OPEN_TABLE">
-          <Key>
-            <PropertyRef Name="SG_GUID" />
-          </Key>
-          <Property Name="SG_GUID" Type="Guid" Nullable="false" />
-          <Property Name="SG_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="SG_Contract" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="SG_OP_POINT" Type="Double" />
-          <Property Name="SG_HAND_NUM" Type="Int32" />
-          <Property Name="SG_INDEX" Type="Int32" />
-          <Property Name="SG_WEIGHT_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SG_INIT_TRADE_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SG_LATEST_TRADE_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SG_STATUS" Type="Int32" />
-          <Property Name="SG_CREATE_TIME" Type="DateTime" Precision="3" />
-          <Property Name="SG_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="SG_TAOLI_STATUS_TABLE">
-          <Key>
-            <PropertyRef Name="SG_GUID" />
-          </Key>
-          <Property Name="SG_GUID" Type="Guid" Nullable="false" />
-          <Property Name="SG_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="SG_STATUS" Type="Int32" />
-          <Property Name="SG_UPDATE_TIME" Type="DateTime" Precision="3" />
-        </EntityType>
-        <EntityType Name="SG_TAOLI_CLOSE_TABLE">
-          <Key>
-            <PropertyRef Name="SG_GUID" />
-          </Key>
-          <Property Name="SG_GUID" Type="Guid" Nullable="false" />
-          <Property Name="SG_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="SG_OPEN_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="SG_INIT_POSITION_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SG_LATEST_POSITION_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SG_FUTURE_CONTRACT" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="SG_SHORT_POINT" Type="Int32" />
-          <Property Name="SG_HAND" Type="Int32" />
-          <Property Name="SG_COE" Type="Double" />
-          <Property Name="SG_SD" Type="Double" />
-          <Property Name="SG_SA" Type="Double" />
-          <Property Name="SG_PE" Type="Double" />
-          <Property Name="SG_BAS" Type="Double" />
-          <Property Name="SG_STATUS" Type="Int32" />
-          <Property Name="SG_CREATE_TIME" Type="DateTime" Precision="3" />
-          <Property Name="SG_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="ER_TAOLI_TABLE">
           <Key>
             <PropertyRef Name="ER_GUID" />
           </Key>
           <Property Name="ER_GUID" Type="Guid" Nullable="false" />
-          <Property Name="ER_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="ER_STRATEGY" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="ER_CODE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="ER_ORDER_EXCHANGE_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
@@ -289,22 +241,81 @@ FROM [dbo].[VariablesList] AS [VariablesList]</DefiningQuery>
             <PropertyRef Name="OL_GUID" />
           </Key>
           <Property Name="OL_GUID" Type="Guid" Nullable="false" />
-          <Property Name="SG_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SG_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="OL_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="OL_TIME" Type="DateTime" Precision="3" />
         </EntityType>
-        <EntityType Name="BWNameTable">
+        <EntityType Name="SG_TAOLI_CLOSE_TABLE">
+          <Key>
+            <PropertyRef Name="SG_GUID" />
+          </Key>
+          <Property Name="SG_GUID" Type="Guid" Nullable="false" />
+          <Property Name="SG_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SG_OPEN_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SG_INIT_POSITION_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SG_LATEST_POSITION_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SG_FUTURE_CONTRACT" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SG_SHORT_POINT" Type="Int32" />
+          <Property Name="SG_HAND" Type="Int32" />
+          <Property Name="SG_COE" Type="Double" />
+          <Property Name="SG_SD" Type="Double" />
+          <Property Name="SG_SA" Type="Double" />
+          <Property Name="SG_PE" Type="Double" />
+          <Property Name="SG_BAS" Type="Double" />
+          <Property Name="SG_STATUS" Type="Int32" />
+          <Property Name="SG_CREATE_TIME" Type="DateTime" Precision="3" />
+          <Property Name="SG_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="SG_TAOLI_OPEN_TABLE">
+          <Key>
+            <PropertyRef Name="SG_GUID" />
+          </Key>
+          <Property Name="SG_GUID" Type="Guid" Nullable="false" />
+          <Property Name="SG_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SG_Contract" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SG_OP_POINT" Type="Double" />
+          <Property Name="SG_HAND_NUM" Type="Int32" />
+          <Property Name="SG_INDEX" Type="Int32" />
+          <Property Name="SG_WEIGHT_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SG_INIT_TRADE_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SG_LATEST_TRADE_LIST" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SG_STATUS" Type="Int32" />
+          <Property Name="SG_CREATE_TIME" Type="DateTime" Precision="3" />
+          <Property Name="SG_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="SG_TAOLI_STATUS_TABLE">
+          <Key>
+            <PropertyRef Name="SG_GUID" />
+          </Key>
+          <Property Name="SG_GUID" Type="Guid" Nullable="false" />
+          <Property Name="SG_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SG_STATUS" Type="Int32" />
+          <Property Name="SG_UPDATE_TIME" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="UserInfo">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Guid" Nullable="false" />
-          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Amount" Type="Decimal" Precision="19" Scale="4" />
-          <Property Name="PercentageA" Type="Double" />
-          <Property Name="Value" Type="Decimal" Precision="19" Scale="4" />
-          <Property Name="PercentageB" Type="Double" />
-          <Property Name="flag" Type="Boolean" />
+          <Property Name="alias" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="stockAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="futureAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="userRight" Type="Int32" />
         </EntityType>
+        <EntityContainer Name="MoneyEntityEntities3" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BWNameTable" EntityType="Self.BWNameTable" />
+          <EntitySet Name="CC_TAOLI_TABLE" EntityType="Self.CC_TAOLI_TABLE" />
+          <EntitySet Name="DL_TAOLI_TABLE" EntityType="Self.DL_TAOLI_TABLE" />
+          <EntitySet Name="ER_TAOLI_TABLE" EntityType="Self.ER_TAOLI_TABLE" />
+          <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="Self.OL_TAOLI_LIST_TABLE" />
+          <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="Self.SG_TAOLI_CLOSE_TABLE" />
+          <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="Self.SG_TAOLI_OPEN_TABLE" />
+          <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" />
+          <EntitySet Name="UserInfo" EntityType="Self.UserInfo" />
+          <EntitySet Name="RISK_TABLE" EntityType="MoneyEntityModel.RISK_TABLE" />
+        </EntityContainer>
         <EntityType Name="RISK_TABLE">
           <Key>
             <PropertyRef Name="ID" />
@@ -315,206 +326,172 @@ FROM [dbo].[VariablesList] AS [VariablesList]</DefiningQuery>
           <Property Name="alias" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="strategy_id" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="err" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-        </EntityType>
-        <EntityType Name="UserInfo">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Guid" Nullable="false" />
-          <Property Name="alias" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="password" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="stockAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="futureAvailable" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="userRight" Type="Int32" />
-        </EntityType>
-        <EntityType Name="CC_TAOLI_TABLE">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Guid" Nullable="false" />
-          <Property Name="CC_CODE" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CC_TYPE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CC_DIRECTION" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CC_AMOUNT" Type="Int32" />
-          <Property Name="CC_BUY_PRICE" Type="Double" />
-          <Property Name="CC_USER" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="CC_OFFSETFLAG" Type="Int32" />
-        </EntityType>
-        <EntityType Name="VariablesList">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="varName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="varValue" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="amount" Type="Int32" />
+          <Property Name="price" Type="Double" />
+          <Property Name="orientation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="MoneyEntityModelStoreContainer" CdmEntityContainer="MoneyEntityEntities1">
-          <EntitySetMapping Name="DL_TAOLI_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.DL_TAOLI_TABLE">
-              <MappingFragment StoreEntitySet="DL_TAOLI_TABLE">
-                <ScalarProperty Name="DL_LOAD" ColumnName="DL_LOAD" />
-                <ScalarProperty Name="DL_NO" ColumnName="DL_NO" />
-                <ScalarProperty Name="DL_BARGAIN_TIME" ColumnName="DL_BARGAIN_TIME" />
-                <ScalarProperty Name="DL_BARGAIN_MONEY" ColumnName="DL_BARGAIN_MONEY" />
-                <ScalarProperty Name="DL_BARGAIN_PRICE" ColumnName="DL_BARGAIN_PRICE" />
-                <ScalarProperty Name="DL_STOCK_AMOUNT" ColumnName="DL_STOCK_AMOUNT" />
-                <ScalarProperty Name="DL_TYPE" ColumnName="DL_TYPE" />
-                <ScalarProperty Name="DL_STATUS" ColumnName="DL_STATUS" />
-                <ScalarProperty Name="DL_NAME" ColumnName="DL_NAME" />
-                <ScalarProperty Name="DL_CODE" ColumnName="DL_CODE" />
-                <ScalarProperty Name="DL_DIRECTION" ColumnName="DL_DIRECTION" />
-                <ScalarProperty Name="DL_STRATEGY" ColumnName="DL_STRATEGY" />
-                <ScalarProperty Name="DL_GUID" ColumnName="DL_GUID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="SG_TAOLI_OPEN_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.SG_TAOLI_OPEN_TABLE">
-              <MappingFragment StoreEntitySet="SG_TAOLI_OPEN_TABLE">
-                <ScalarProperty Name="SG_USER" ColumnName="SG_USER" />
-                <ScalarProperty Name="SG_CREATE_TIME" ColumnName="SG_CREATE_TIME" />
-                <ScalarProperty Name="SG_STATUS" ColumnName="SG_STATUS" />
-                <ScalarProperty Name="SG_LATEST_TRADE_LIST" ColumnName="SG_LATEST_TRADE_LIST" />
-                <ScalarProperty Name="SG_INIT_TRADE_LIST" ColumnName="SG_INIT_TRADE_LIST" />
-                <ScalarProperty Name="SG_WEIGHT_LIST" ColumnName="SG_WEIGHT_LIST" />
-                <ScalarProperty Name="SG_INDEX" ColumnName="SG_INDEX" />
-                <ScalarProperty Name="SG_HAND_NUM" ColumnName="SG_HAND_NUM" />
-                <ScalarProperty Name="SG_OP_POINT" ColumnName="SG_OP_POINT" />
-                <ScalarProperty Name="SG_Contract" ColumnName="SG_Contract" />
-                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
-                <ScalarProperty Name="SG_GUID" ColumnName="SG_GUID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="SG_TAOLI_STATUS_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.SG_TAOLI_STATUS_TABLE">
-              <MappingFragment StoreEntitySet="SG_TAOLI_STATUS_TABLE">
-                <ScalarProperty Name="SG_UPDATE_TIME" ColumnName="SG_UPDATE_TIME" />
-                <ScalarProperty Name="SG_STATUS" ColumnName="SG_STATUS" />
-                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
-                <ScalarProperty Name="SG_GUID" ColumnName="SG_GUID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="SG_TAOLI_CLOSE_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE">
-              <MappingFragment StoreEntitySet="SG_TAOLI_CLOSE_TABLE">
-                <ScalarProperty Name="SG_USER" ColumnName="SG_USER" />
-                <ScalarProperty Name="SG_CREATE_TIME" ColumnName="SG_CREATE_TIME" />
-                <ScalarProperty Name="SG_STATUS" ColumnName="SG_STATUS" />
-                <ScalarProperty Name="SG_BAS" ColumnName="SG_BAS" />
-                <ScalarProperty Name="SG_PE" ColumnName="SG_PE" />
-                <ScalarProperty Name="SG_SA" ColumnName="SG_SA" />
-                <ScalarProperty Name="SG_SD" ColumnName="SG_SD" />
-                <ScalarProperty Name="SG_COE" ColumnName="SG_COE" />
-                <ScalarProperty Name="SG_HAND" ColumnName="SG_HAND" />
-                <ScalarProperty Name="SG_SHORT_POINT" ColumnName="SG_SHORT_POINT" />
-                <ScalarProperty Name="SG_FUTURE_CONTRACT" ColumnName="SG_FUTURE_CONTRACT" />
-                <ScalarProperty Name="SG_LATEST_POSITION_LIST" ColumnName="SG_LATEST_POSITION_LIST" />
-                <ScalarProperty Name="SG_INIT_POSITION_LIST" ColumnName="SG_INIT_POSITION_LIST" />
-                <ScalarProperty Name="SG_OPEN_ID" ColumnName="SG_OPEN_ID" />
-                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
-                <ScalarProperty Name="SG_GUID" ColumnName="SG_GUID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ER_TAOLI_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.ER_TAOLI_TABLE">
-              <MappingFragment StoreEntitySet="ER_TAOLI_TABLE">
-                <ScalarProperty Name="ER_DIRECTION" ColumnName="ER_DIRECTION" />
-                <ScalarProperty Name="ER_COMPLETED" ColumnName="ER_COMPLETED" />
-                <ScalarProperty Name="ER_CANCEL_TIME" ColumnName="ER_CANCEL_TIME" />
-                <ScalarProperty Name="ER_ORDER_TIME" ColumnName="ER_ORDER_TIME" />
-                <ScalarProperty Name="ER_DATE" ColumnName="ER_DATE" />
-                <ScalarProperty Name="ER_FROZEN_AMOUNT" ColumnName="ER_FROZEN_AMOUNT" />
-                <ScalarProperty Name="ER_FROZEN_MONEY" ColumnName="ER_FROZEN_MONEY" />
-                <ScalarProperty Name="ER_WITHDRAW_AMOUNT" ColumnName="ER_WITHDRAW_AMOUNT" />
-                <ScalarProperty Name="ER_VOLUME_REMAIN" ColumnName="ER_VOLUME_REMAIN" />
-                <ScalarProperty Name="ER_VOLUME_TRADED" ColumnName="ER_VOLUME_TRADED" />
-                <ScalarProperty Name="ER_VOLUME_TOTAL_ORIGINAL" ColumnName="ER_VOLUME_TOTAL_ORIGINAL" />
-                <ScalarProperty Name="ER_ORDER_TYPE" ColumnName="ER_ORDER_TYPE" />
-                <ScalarProperty Name="ER_ORDER_STATUS" ColumnName="ER_ORDER_STATUS" />
-                <ScalarProperty Name="ER_ORDER_EXCHANGE_ID" ColumnName="ER_ORDER_EXCHANGE_ID" />
-                <ScalarProperty Name="ER_CODE" ColumnName="ER_CODE" />
-                <ScalarProperty Name="ER_STRATEGY" ColumnName="ER_STRATEGY" />
-                <ScalarProperty Name="ER_ID" ColumnName="ER_ID" />
-                <ScalarProperty Name="ER_GUID" ColumnName="ER_GUID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="OL_TAOLI_LIST_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.OL_TAOLI_LIST_TABLE">
-              <MappingFragment StoreEntitySet="OL_TAOLI_LIST_TABLE">
-                <ScalarProperty Name="OL_TIME" ColumnName="OL_TIME" />
-                <ScalarProperty Name="OL_LIST" ColumnName="OL_LIST" />
-                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
-                <ScalarProperty Name="OL_GUID" ColumnName="OL_GUID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
+        <EntityContainerMapping StorageEntityContainer="MoneyEntityModelStoreContainer" CdmEntityContainer="MoneyEntityEntities3">
           <EntitySetMapping Name="BWNameTable">
             <EntityTypeMapping TypeName="MoneyEntityModel.BWNameTable">
               <MappingFragment StoreEntitySet="BWNameTable">
-                <ScalarProperty Name="flag" ColumnName="flag" />
-                <ScalarProperty Name="PercentageB" ColumnName="PercentageB" />
-                <ScalarProperty Name="Value" ColumnName="Value" />
-                <ScalarProperty Name="PercentageA" ColumnName="PercentageA" />
-                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Code" ColumnName="Code" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="RISK_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.RISK_TABLE">
-              <MappingFragment StoreEntitySet="RISK_TABLE">
-                <ScalarProperty Name="err" ColumnName="err" />
-                <ScalarProperty Name="strategy_id" ColumnName="strategy_id" />
-                <ScalarProperty Name="alias" ColumnName="alias" />
-                <ScalarProperty Name="time" ColumnName="time" />
-                <ScalarProperty Name="date" ColumnName="date" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="UserInfo">
-            <EntityTypeMapping TypeName="MoneyEntityModel.UserInfo">
-              <MappingFragment StoreEntitySet="UserInfo">
-                <ScalarProperty Name="userRight" ColumnName="userRight" />
-                <ScalarProperty Name="futureAvailable" ColumnName="futureAvailable" />
-                <ScalarProperty Name="stockAvailable" ColumnName="stockAvailable" />
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="password" ColumnName="password" />
-                <ScalarProperty Name="alias" ColumnName="alias" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="PercentageA" ColumnName="PercentageA" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="PercentageB" ColumnName="PercentageB" />
+                <ScalarProperty Name="flag" ColumnName="flag" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="CC_TAOLI_TABLE">
             <EntityTypeMapping TypeName="MoneyEntityModel.CC_TAOLI_TABLE">
               <MappingFragment StoreEntitySet="CC_TAOLI_TABLE">
-                <ScalarProperty Name="CC_OFFSETFLAG" ColumnName="CC_OFFSETFLAG" />
-                <ScalarProperty Name="CC_USER" ColumnName="CC_USER" />
-                <ScalarProperty Name="CC_BUY_PRICE" ColumnName="CC_BUY_PRICE" />
-                <ScalarProperty Name="CC_AMOUNT" ColumnName="CC_AMOUNT" />
-                <ScalarProperty Name="CC_DIRECTION" ColumnName="CC_DIRECTION" />
-                <ScalarProperty Name="CC_TYPE" ColumnName="CC_TYPE" />
-                <ScalarProperty Name="CC_CODE" ColumnName="CC_CODE" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="CC_CODE" ColumnName="CC_CODE" />
+                <ScalarProperty Name="CC_TYPE" ColumnName="CC_TYPE" />
+                <ScalarProperty Name="CC_DIRECTION" ColumnName="CC_DIRECTION" />
+                <ScalarProperty Name="CC_AMOUNT" ColumnName="CC_AMOUNT" />
+                <ScalarProperty Name="CC_BUY_PRICE" ColumnName="CC_BUY_PRICE" />
+                <ScalarProperty Name="CC_USER" ColumnName="CC_USER" />
+                <ScalarProperty Name="CC_OFFSETFLAG" ColumnName="CC_OFFSETFLAG" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="VariablesList">
-            <EntityTypeMapping TypeName="MoneyEntityModel.VariablesList">
-              <MappingFragment StoreEntitySet="VariablesList">
-                <ScalarProperty Name="varValue" ColumnName="varValue" />
-                <ScalarProperty Name="varName" ColumnName="varName" />
+          <EntitySetMapping Name="DL_TAOLI_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.DL_TAOLI_TABLE">
+              <MappingFragment StoreEntitySet="DL_TAOLI_TABLE">
+                <ScalarProperty Name="DL_GUID" ColumnName="DL_GUID" />
+                <ScalarProperty Name="DL_STRATEGY" ColumnName="DL_STRATEGY" />
+                <ScalarProperty Name="DL_DIRECTION" ColumnName="DL_DIRECTION" />
+                <ScalarProperty Name="DL_CODE" ColumnName="DL_CODE" />
+                <ScalarProperty Name="DL_NAME" ColumnName="DL_NAME" />
+                <ScalarProperty Name="DL_STATUS" ColumnName="DL_STATUS" />
+                <ScalarProperty Name="DL_TYPE" ColumnName="DL_TYPE" />
+                <ScalarProperty Name="DL_STOCK_AMOUNT" ColumnName="DL_STOCK_AMOUNT" />
+                <ScalarProperty Name="DL_BARGAIN_PRICE" ColumnName="DL_BARGAIN_PRICE" />
+                <ScalarProperty Name="DL_BARGAIN_MONEY" ColumnName="DL_BARGAIN_MONEY" />
+                <ScalarProperty Name="DL_BARGAIN_TIME" ColumnName="DL_BARGAIN_TIME" />
+                <ScalarProperty Name="DL_NO" ColumnName="DL_NO" />
+                <ScalarProperty Name="DL_LOAD" ColumnName="DL_LOAD" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ER_TAOLI_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.ER_TAOLI_TABLE">
+              <MappingFragment StoreEntitySet="ER_TAOLI_TABLE">
+                <ScalarProperty Name="ER_GUID" ColumnName="ER_GUID" />
+                <ScalarProperty Name="ER_ID" ColumnName="ER_ID" />
+                <ScalarProperty Name="ER_STRATEGY" ColumnName="ER_STRATEGY" />
+                <ScalarProperty Name="ER_CODE" ColumnName="ER_CODE" />
+                <ScalarProperty Name="ER_ORDER_EXCHANGE_ID" ColumnName="ER_ORDER_EXCHANGE_ID" />
+                <ScalarProperty Name="ER_ORDER_STATUS" ColumnName="ER_ORDER_STATUS" />
+                <ScalarProperty Name="ER_ORDER_TYPE" ColumnName="ER_ORDER_TYPE" />
+                <ScalarProperty Name="ER_VOLUME_TOTAL_ORIGINAL" ColumnName="ER_VOLUME_TOTAL_ORIGINAL" />
+                <ScalarProperty Name="ER_VOLUME_TRADED" ColumnName="ER_VOLUME_TRADED" />
+                <ScalarProperty Name="ER_VOLUME_REMAIN" ColumnName="ER_VOLUME_REMAIN" />
+                <ScalarProperty Name="ER_WITHDRAW_AMOUNT" ColumnName="ER_WITHDRAW_AMOUNT" />
+                <ScalarProperty Name="ER_FROZEN_MONEY" ColumnName="ER_FROZEN_MONEY" />
+                <ScalarProperty Name="ER_FROZEN_AMOUNT" ColumnName="ER_FROZEN_AMOUNT" />
+                <ScalarProperty Name="ER_DATE" ColumnName="ER_DATE" />
+                <ScalarProperty Name="ER_ORDER_TIME" ColumnName="ER_ORDER_TIME" />
+                <ScalarProperty Name="ER_CANCEL_TIME" ColumnName="ER_CANCEL_TIME" />
+                <ScalarProperty Name="ER_COMPLETED" ColumnName="ER_COMPLETED" />
+                <ScalarProperty Name="ER_DIRECTION" ColumnName="ER_DIRECTION" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OL_TAOLI_LIST_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.OL_TAOLI_LIST_TABLE">
+              <MappingFragment StoreEntitySet="OL_TAOLI_LIST_TABLE">
+                <ScalarProperty Name="OL_GUID" ColumnName="OL_GUID" />
+                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
+                <ScalarProperty Name="OL_LIST" ColumnName="OL_LIST" />
+                <ScalarProperty Name="OL_TIME" ColumnName="OL_TIME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SG_TAOLI_CLOSE_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE">
+              <MappingFragment StoreEntitySet="SG_TAOLI_CLOSE_TABLE">
+                <ScalarProperty Name="SG_GUID" ColumnName="SG_GUID" />
+                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
+                <ScalarProperty Name="SG_OPEN_ID" ColumnName="SG_OPEN_ID" />
+                <ScalarProperty Name="SG_INIT_POSITION_LIST" ColumnName="SG_INIT_POSITION_LIST" />
+                <ScalarProperty Name="SG_LATEST_POSITION_LIST" ColumnName="SG_LATEST_POSITION_LIST" />
+                <ScalarProperty Name="SG_FUTURE_CONTRACT" ColumnName="SG_FUTURE_CONTRACT" />
+                <ScalarProperty Name="SG_SHORT_POINT" ColumnName="SG_SHORT_POINT" />
+                <ScalarProperty Name="SG_HAND" ColumnName="SG_HAND" />
+                <ScalarProperty Name="SG_COE" ColumnName="SG_COE" />
+                <ScalarProperty Name="SG_SD" ColumnName="SG_SD" />
+                <ScalarProperty Name="SG_SA" ColumnName="SG_SA" />
+                <ScalarProperty Name="SG_PE" ColumnName="SG_PE" />
+                <ScalarProperty Name="SG_BAS" ColumnName="SG_BAS" />
+                <ScalarProperty Name="SG_STATUS" ColumnName="SG_STATUS" />
+                <ScalarProperty Name="SG_CREATE_TIME" ColumnName="SG_CREATE_TIME" />
+                <ScalarProperty Name="SG_USER" ColumnName="SG_USER" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SG_TAOLI_OPEN_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.SG_TAOLI_OPEN_TABLE">
+              <MappingFragment StoreEntitySet="SG_TAOLI_OPEN_TABLE">
+                <ScalarProperty Name="SG_GUID" ColumnName="SG_GUID" />
+                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
+                <ScalarProperty Name="SG_Contract" ColumnName="SG_Contract" />
+                <ScalarProperty Name="SG_OP_POINT" ColumnName="SG_OP_POINT" />
+                <ScalarProperty Name="SG_HAND_NUM" ColumnName="SG_HAND_NUM" />
+                <ScalarProperty Name="SG_INDEX" ColumnName="SG_INDEX" />
+                <ScalarProperty Name="SG_WEIGHT_LIST" ColumnName="SG_WEIGHT_LIST" />
+                <ScalarProperty Name="SG_INIT_TRADE_LIST" ColumnName="SG_INIT_TRADE_LIST" />
+                <ScalarProperty Name="SG_LATEST_TRADE_LIST" ColumnName="SG_LATEST_TRADE_LIST" />
+                <ScalarProperty Name="SG_STATUS" ColumnName="SG_STATUS" />
+                <ScalarProperty Name="SG_CREATE_TIME" ColumnName="SG_CREATE_TIME" />
+                <ScalarProperty Name="SG_USER" ColumnName="SG_USER" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SG_TAOLI_STATUS_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.SG_TAOLI_STATUS_TABLE">
+              <MappingFragment StoreEntitySet="SG_TAOLI_STATUS_TABLE">
+                <ScalarProperty Name="SG_GUID" ColumnName="SG_GUID" />
+                <ScalarProperty Name="SG_ID" ColumnName="SG_ID" />
+                <ScalarProperty Name="SG_STATUS" ColumnName="SG_STATUS" />
+                <ScalarProperty Name="SG_UPDATE_TIME" ColumnName="SG_UPDATE_TIME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserInfo">
+            <EntityTypeMapping TypeName="MoneyEntityModel.UserInfo">
+              <MappingFragment StoreEntitySet="UserInfo">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="stockAvailable" ColumnName="stockAvailable" />
+                <ScalarProperty Name="futureAvailable" ColumnName="futureAvailable" />
+                <ScalarProperty Name="userRight" ColumnName="userRight" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RISK_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.RISK_TABLE">
+              <MappingFragment StoreEntitySet="RISK_TABLE">
+                <ScalarProperty Name="orientation" ColumnName="orientation" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="amount" ColumnName="amount" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="err" ColumnName="err" />
+                <ScalarProperty Name="strategy_id" ColumnName="strategy_id" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="time" ColumnName="time" />
+                <ScalarProperty Name="date" ColumnName="date" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

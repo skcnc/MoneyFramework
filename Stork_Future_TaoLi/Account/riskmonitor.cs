@@ -13,21 +13,43 @@ namespace Stork_Future_TaoLi
     /// </summary>
     public class riskmonitor
     {
+
+        private static Dictionary<String, int> FutureTradeTimes = new Dictionary<string, int>();
+        private static DateTime FutureTradeTimes_reInitDate = new DateTime(2000, 1, 1);
+
         /// <summary>
-        /// 查看交易资金余量
+        /// 股票风控检测
         /// </summary>
         public  static bool RiskControl(string name, List<TradeOrderStruct> orderlist, out string result)
         {
+            name = name.Trim();
+            if(!FutureTradeTimes.Keys.Contains(name))
+            {
+                FutureTradeTimes.Add(name, 10);
+            }
+
+            if((DateTime.Now - FutureTradeTimes_reInitDate).TotalDays > 1)
+            {
+                FutureTradeTimes_reInitDate = DateTime.Now;
+
+                for(int i =0;i<FutureTradeTimes.Count;i++)
+                {
+                    FutureTradeTimes[FutureTradeTimes.Keys.ToList()[i]] = 10;
+                }
+            }
+
             UserInfo user = DBAccessLayer.GetOneUser(name);
-
-
 
             double overflow = 0.02; //溢价余量，用于控制金额空间和成本空间的差值。
             result = string.Empty;
             int errCode = 0;
             AccountInfo accInfo = accountMonitor.UpdateAccount(user);
 
-            if (accInfo == null) { return false; }
+            if (accInfo == null)
+            {
+                result = "未能获得实时账户";
+                return false;
+            }
 
             
 
@@ -71,28 +93,63 @@ namespace Stork_Future_TaoLi
 
             //判断二：交易股票是否存在白名单，比例是否满足 , 单只股票所占金额比例
 
-            List<BWNameTable> whiteli = new List<BWNameTable>();
-
-            foreach (string s in riskPara.WhiteNameList)
-            {
-                whiteli.Add(new BWNameTable()
-                {
-                    Code = s.Split('|')[0].Trim(),
-                    Amount = Convert.ToDecimal(s.Split('|')[1].Trim()),
-                    PercentageA = Convert.ToDouble(s.Split('|')[2].Trim()),
-                    Value = Convert.ToDecimal(s.Split('|')[3].Trim()),
-                    PercentageB = Convert.ToDouble(s.Split('|')[4].Trim())
-                });
-
-               
-            }
-
-            double totalCost = 0;//股票预计成本
-
-            AccountInfo account = accountMonitor.GetAccountInfo(name, out result);
+            List<BWNameTable> whiteli = DBAccessLayer.GetWBNamwList();
 
             foreach (TradeOrderStruct tos in orderlist)
             {
+                if (tos.cSecurityType == "s" || tos.cSecurityType == "S")
+                {
+                    if (!((from item in whiteli select item.Code).ToList()).Contains(tos.cSecurityCode.Trim()))
+                    {
+                        errCode = 4;
+                        result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
+                        return false;
+                    }
+                    else
+                    {
+                        BWNameTable bw = (from item in whiteli where item.Code == tos.cSecurityCode select item).ToList()[0];
+
+                        if ((from item in accInfo.positions where item.code == bw.Code select item).Count() > 0)
+                        {
+                            AccountPosition ap = (from item in accInfo.positions where item.code == bw.Code select item).ToList()[0];
+
+                            if ((Convert.ToDouble(ap.amount) + Convert.ToDouble(tos.nSecurityAmount)) > (Convert.ToDouble(bw.Amount) * bw.PercentageA))
+                            {
+                                errCode = 5;
+                                result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //if (whiteli.Count != 0)
+            //{
+            //    foreach (string s in riskPara.WhiteNameList)
+            //    {
+            //        whiteli.Add(new BWNameTable()
+            //        {
+            //            Code = s.Split('|')[0].Trim(),
+            //            Amount = Convert.ToDecimal(s.Split('|')[1].Trim()),
+            //            PercentageA = Convert.ToDouble(s.Split('|')[2].Trim()),
+            //            Value = Convert.ToDecimal(s.Split('|')[3].Trim()),
+            //            PercentageB = Convert.ToDouble(s.Split('|')[4].Trim())
+            //        });
+
+
+            //    }
+            //}
+            double totalCost = 0;//股票预计成本
+
+
+            foreach (TradeOrderStruct tos in orderlist)
+            {
+                if(tos.cSecurityType != "S" && tos.cSecurityType != "s")
+                {
+                    continue;
+                }
+
                 totalCost += (tos.nSecurityAmount * tos.dOrderPrice);
                 var tmp = (from item in whiteli where item.Code == tos.cSecurityCode select item);
 
@@ -119,7 +176,7 @@ namespace Stork_Future_TaoLi
                 //仅买入时判断单支超限
                 if (tos.cTradeDirection == "0")
                 {
-                    if (tos.dOrderPrice * tos.nSecurityAmount > (Convert.ToDouble(account.value.Trim() + Convert.ToDouble(account.balance.Trim()) * riskPara.PerStockCostPercentage)))
+                    if (tos.dOrderPrice * tos.nSecurityAmount > (Convert.ToDouble(accInfo.value.Trim() + Convert.ToDouble(accInfo.balance.Trim()))) * riskPara.PerStockCostPercentage)
                     {
                         errCode = 6;
                         result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
@@ -129,7 +186,7 @@ namespace Stork_Future_TaoLi
             }
 
             //判断三：股票成本是否超限
-            if(totalCost < (Convert.ToDouble(account.balance) * 1.02))
+            if (totalCost * (1 + overflow) > Convert.ToDouble(accInfo.balance))
             {
                 errCode = 7;
                 result = accountMonitor.GetErrorCode(errCode, totalCost.ToString());
@@ -137,10 +194,104 @@ namespace Stork_Future_TaoLi
             }
 
 
+            double fearning = Convert.ToDouble(accInfo.fincome);        //期货盈亏
+            double fstock = Convert.ToDouble(accInfo.fstockvalue);      //期货对应股票市值
+            double fweight = Convert.ToDouble(accInfo.fvalue);          //期货权益
+
+
+            string accountLimit = DBAccessLayer.GetAccountAvailable(user.alias);
+            double stockAccount = 0;                //股票资金量
+            double futureAccount = 0;               //期货原始权益
+
+            if (accountLimit == string.Empty)
+            {
+                result = "无用户可用资金和用户权益";
+                return false;
+            }
+
+
+            stockAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
+            futureAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
+
+            //预估交易后的期货风控参数
+            //客户权益 = 当日结存 + 浮动盈亏 ，其中新交易不受浮动盈亏影响，所以客户权益不变
+            //期货保证金 = 期货对应股票市值 * 系数 
+
+            foreach (TradeOrderStruct record in orderlist)
+            {
+                if(record.cSecurityType != "f" && record.cSecurityType != "F")
+                {
+                    continue;
+                }
+                FutureTradeTimes[name] -= Convert.ToInt16(record.nSecurityAmount);
+                if (MarketPrice.market.ContainsKey(record.cSecurityCode))
+                {
+                    int x = -1;
+                    if (record.cTradeDirection == "48")
+                    {
+                        x = 1;
+                    }
+
+                    // 模拟新期货开仓后
+                    fstock += Convert.ToDouble((record.nSecurityAmount) * MarketPrice.market[record.cSecurityCode] * accountMonitor.factor * x);
+
+                    fearning += Convert.ToDouble((record.nSecurityAmount) * (MarketPrice.market[record.cSecurityCode] - record.dOrderPrice) * x);
+                    futureAccount += Convert.ToDouble((record.nSecurityAmount) * (MarketPrice.market[record.cSecurityCode] - record.dOrderPrice) * x);
+                }
+            }
+
+            fstock = Math.Abs(fstock);
+
+            fweight = futureAccount + fearning;
+
+            double future_margin = fstock * accountMonitor.future_margin_factor;
+
+            double frisk = future_margin / fweight;                     //期货风险度
+
+            double fchangkou = (fstock + totalCost) / fstock;           //敞口比例
+
+
+            foreach (TradeOrderStruct record in orderlist)
+            {
+                if (record.cSecurityType != "f" && record.cSecurityType != "F")
+                {
+                    continue;
+                }
+                //单日期货不超过十笔
+                if (FutureTradeTimes[name] < 0)
+                {
+                    errCode = 10;
+                    result = accountMonitor.GetErrorCode(errCode, String.Empty);
+                    return false;
+                }
+
+                //期货风险度判断
+                if (Convert.ToDouble(frisk) > riskPara.riskLevel)
+                {
+                    errCode = 8;
+                    result = accountMonitor.GetErrorCode(errCode, string.Empty);
+                    return false;
+                }
+
+
+
+            }
+
+
+            //敞口比例
+            if (fchangkou > riskPara.changkouRadio)
+            {
+                errCode = 9;
+                result = accountMonitor.GetErrorCode(errCode, String.Empty);
+                return false;
+            }
+
             if (errCode != 0) return false;
             else return true;
 
         }
+
+      
 
         private static riskParameter riskPara = new riskParameter();
 
@@ -297,7 +448,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 风险度限制
         /// </summary>
-        public double riskLevel = 0.4;
+        public double riskLevel = 0.65;
 
         /// <summary>
         /// 股票占总资金比例
@@ -316,4 +467,6 @@ namespace Stork_Future_TaoLi
         public AccountInfo account = new AccountInfo();
 
     }
+
+
 }

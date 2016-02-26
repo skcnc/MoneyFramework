@@ -127,7 +127,7 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public static void CheckDB()
         {
-            MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
+            MoneyEntityEntities3 DbEntity = new MoneyEntityEntities3();
             SG_TAOLI_OPEN_TABLE record = new SG_TAOLI_OPEN_TABLE()
             {
                 SG_GUID = Guid.NewGuid(),

@@ -17,7 +17,7 @@ namespace Stork_Future_TaoLi
     /// </summary>
     public static class DBAccessLayer
     {
-        static MoneyEntityEntities1 DbEntity = new MoneyEntityEntities1();
+        static MoneyEntityEntities3 DbEntity = new MoneyEntityEntities3();
         static object ERtableLock = new object();
         static object DLtableLock = new object();
         static object DBChangeLock = new object();
@@ -75,7 +75,7 @@ namespace Stork_Future_TaoLi
             if (DBAccessLayer.DBEnable == false) return string.Empty;
 
             var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
-            if (tmp.Count() == 0)
+            if (tmp == null || tmp.Count() == 0)
             {
                 return string.Empty;
             }
@@ -108,7 +108,7 @@ namespace Stork_Future_TaoLi
 
         }
 
-        public static void AddRiskRecord(string alias , string err, string strid)
+        public static void AddRiskRecord(string alias , string err, string strid,string code,int amount,double price,string orientation )
         {
 
             if (DBAccessLayer.DBEnable == false) { return; }
@@ -120,11 +120,33 @@ namespace Stork_Future_TaoLi
                 date = DateTime.Now.Date,
                 strategy_id = strid,
                 err = err,
-                time = DateTime.Now
+                time = DateTime.Now,
+                code = code,
+                amount = amount,
+                orientation = orientation,
+                price = price
             };
 
             DbEntity.RISK_TABLE.Add(record);
             Dbsavechage("RISK_TABLE");
+        }
+
+        /// <summary>
+        /// 返回当天风控记录，按照时间降序
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public static List<RISK_TABLE> GetRiskRecord(string alias)
+        {
+            if (DBAccessLayer.DBEnable == false) { return null; }
+
+            var risks = (from item in DbEntity.RISK_TABLE  select item);
+
+            if (risks == null || risks.Count() == 0) { return null; }
+            else
+            {
+                return risks.OrderByDescending(i => i.time).ToList();
+            }
         }
 
         public static List<UserInfo> GetUser()
@@ -141,9 +163,9 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
 
-            var tmp = (from item in DbEntity.UserInfo select item);
+            var tmp = (from item in DbEntity.UserInfo where item.alias == alias select item);
 
-            if (tmp.Count() == 0) return null;
+            if (tmp == null || tmp.Count() == 0) return null;
             else return tmp.ToList()[0];
         }
 

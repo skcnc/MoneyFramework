@@ -122,34 +122,6 @@ namespace Stork_Future_TaoLi
             if (_record.Status == TradeDealStatus.ORDERCOMPLETED)
             {
 
-                //RecordItem _completed = new RecordItem();
-                //_completed.AveragePrice = _record.AveragePrice;
-                //_completed.Code = _record.Code;
-                //_completed.CombOffsetFlag = _record.CombOffsetFlag;
-                //_completed.ErrMsg = _record.ErrMsg;
-                //_completed.OrderRef = _record.OrderRef;
-                //_completed.OrderStatus = _record.OrderStatus;
-                //_completed.OrderSysID = _record.OrderSysID;
-                //_completed.OrderTime_Completed = _record.OrderTime_Completed;
-                //_completed.OrderTime_Start = _record.OrderTime_Start;
-                //_completed.Orientation = _record.Orientation;
-                //_completed.Price = _record.Price;
-                //_completed.Status = _record.Status;
-                //_completed.StrategyId = _record.StrategyId;
-                //_completed.Type = _record.Type;
-                //_completed.VolumeTotal = _record.VolumeTotal;
-                //_completed.VolumeTotalOriginal = _record.VolumeTotalOriginal;
-                //_completed.VolumeTraded = _record.VolumeTraded;
-                //_completed.Trades = new List<TradeItem>();
-                //foreach (var t in _record.Trades)
-                //{
-                //    TradeItem item = new TradeItem();
-                //    item.Price = t.Price;
-                //    item.TradeID = t.TradeID;
-                //    item.Volume = t.Volume;
-                //    _completed.Trades.Add(t);
-
-                //}
                 CompletedTradeRecord.GetInstance().Update(_record.OrderRef, _record);
             }
         }
