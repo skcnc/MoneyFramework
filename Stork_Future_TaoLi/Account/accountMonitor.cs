@@ -37,9 +37,32 @@ namespace Stork_Future_TaoLi
 
                     foreach (UserInfo info in users)
                     {
-                        AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(UpdateAccount(info)));
+                        if(info.userRight == 3)
+                        {
+
+                            //审计员没有风控和持仓信息
+                            continue;
+
+                        }
+
+                        AccountInfo acc = UpdateAccount(info);
+
+                        if (info.userRight == 2)
+                        {
+                            //交易员显示个人账户信息
+                            AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(acc), false);
+                        }
+                        else if(info.userRight == 1)
+                        {
+                            //管理员显示所有用户账户信息
+                            AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(accountList), true);
+                        }
                     }
+
+
                 }
+
+                
                
             }
         }
@@ -59,16 +82,11 @@ namespace Stork_Future_TaoLi
             List<CC_TAOLI_TABLE> positionRecord = new List<CC_TAOLI_TABLE>();
             double stockcost = 0;
 
-            //PositionRecord.LoadCCStockList(info.alias, out positionRecord, out stockcost);
-
             DBAccessLayer.LoadCCStockList(info.alias, out positionRecord, out stockcost);
 
             List<CC_TAOLI_TABLE> fPositionRecord = new List<CC_TAOLI_TABLE>();
 
-            //PositionRecord.LoadCCFutureList(info.alias, out fPositionRecord);
-
             DBAccessLayer.LoadCCFutureList(info.alias, out fPositionRecord);
-
 
             double fstock = 0;          //期货对应股票市值
             double fweight = 0;         //期货权益
@@ -244,7 +262,7 @@ namespace Stork_Future_TaoLi
                     AccountInfo acc = GetAccountInfo(info.alias, out result);
                     if (acc.positions.Count() > 0)
                     {
-                        //交易员
+                        //交易员，管理员
                         Accounts.Add(acc);
                     }
                 }

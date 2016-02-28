@@ -166,8 +166,8 @@ window.onload = function (e) {
         if (right == "1") {
             $("[name='mainpage_usermanage']").removeClass('sr-only');
             $("[name='mainpage_userinfo']").addClass('sr-only');
-            $("[name='mainpage_strategy']").addClass('sr-only');
-            $("[name='mainpage_trade']").addClass('sr-only');
+            $("[name='mainpage_strategy']").removeClass('sr-only');
+            $("[name='mainpage_trade']").removeClass('sr-only');
             $("[name='mainpage_riskcontrol']").removeClass('sr-only');
             $("[name='mainpage_sysstatus']").removeClass('sr-only');
             $("[name='mainpage_account']").removeClass('sr-only');
@@ -1199,6 +1199,8 @@ $('#login_btnLogin').click(function (e) {
                 localStorage.setItem("USERNAME", username);
                 localStorage.setItem("TIMESTAMP", dt.getTime());
                 localStorage.setItem("USERRIGHT", data);
+
+                $('#login_container').css({ "visibility": "visible" });
             }
             else {
                 alert("您当前使用的浏览器版本过低，网站功能将被限制！");

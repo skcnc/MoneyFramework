@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Stork_Future_TaoLi.Database;
+using Stork_Future_TaoLi.Hubs;
 using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,12 @@ namespace Stork_Future_TaoLi
 
         private static Dictionary<String, int> FutureTradeTimes = new Dictionary<string, int>();
         private static DateTime FutureTradeTimes_reInitDate = new DateTime(2000, 1, 1);
+
+
+        /// <summary>
+        /// 本地缓存风控信息，本地风控信息逐秒更新
+        /// </summary>
+        public static Dictionary<String, TMRiskInfo> LocalRiskInfo = new Dictionary<string, TMRiskInfo>();
 
         /// <summary>
         /// 股票风控检测
@@ -124,22 +131,6 @@ namespace Stork_Future_TaoLi
                 }
             }
 
-            //if (whiteli.Count != 0)
-            //{
-            //    foreach (string s in riskPara.WhiteNameList)
-            //    {
-            //        whiteli.Add(new BWNameTable()
-            //        {
-            //            Code = s.Split('|')[0].Trim(),
-            //            Amount = Convert.ToDecimal(s.Split('|')[1].Trim()),
-            //            PercentageA = Convert.ToDouble(s.Split('|')[2].Trim()),
-            //            Value = Convert.ToDecimal(s.Split('|')[3].Trim()),
-            //            PercentageB = Convert.ToDouble(s.Split('|')[4].Trim())
-            //        });
-
-
-            //    }
-            //}
             double totalCost = 0;//股票预计成本
 
 

@@ -407,9 +407,7 @@ namespace Stork_Future_TaoLi
                     KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_PRE_TRADE", (object)true);
                     queue_system_status.GetQueue().Enqueue((object)message1);
                     PreTradeModule.isRunning = DateTime.Now;
-                }
-
-                
+                } 
 
             }
         }

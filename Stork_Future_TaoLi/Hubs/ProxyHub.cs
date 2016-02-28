@@ -129,7 +129,7 @@ namespace Stork_Future_TaoLi
         /// <returns></returns>
         public string GetConnectedId(string strategy_name)
         {
-            if (RegisterRelation.ContainsKey(strategy_name)) return string.Empty;
+            if (!RegisterRelation.ContainsKey(strategy_name)) return string.Empty;
             else return RegisterRelation[strategy_name];
         }
 
