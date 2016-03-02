@@ -283,6 +283,9 @@
     <Compile Include="Database\ER_TAOLI_TABLE.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\FutureAccountTable.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\OL_TAOLI_LIST_TABLE.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
@@ -296,6 +299,9 @@
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\SG_TAOLI_STATUS_TABLE.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\StockAccountTable.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
     <Compile Include="Database\UserInfo.cs">

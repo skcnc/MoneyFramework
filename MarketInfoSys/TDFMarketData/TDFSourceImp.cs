@@ -144,11 +144,12 @@ namespace MarketInfoSys
 
                 foreach (TDFFutureData data in futureDataArr)
                 {
-                    EnQueueType obj = new EnQueueType() { Type = "F", value = (object)data };
-                    if (Queue_Data.Suspend == false)
-                    {
-                        Queue_Data.GetQueue().Enqueue((object)obj);
-                    }
+                        EnQueueType obj = new EnQueueType() { Type = "F", value = (object)data };
+                        if (Queue_Data.Suspend == false)
+                        {
+                            Queue_Data.GetQueue().Enqueue((object)obj);
+                        }
+                    
                 }
 
             }

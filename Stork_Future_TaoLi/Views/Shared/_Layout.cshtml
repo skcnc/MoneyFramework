@@ -24,7 +24,7 @@
                     <li>@Html.ActionLink("关于", "About", "Home")</li>
                     <li>@Html.ActionLink("联系方式", "Contact", "Home")</li>
                 </ul>
-                <ul class="nav navbar-nav" style="float:right;visibility:hidden" id="login_container" >
+                <ul class="nav navbar-nav" style="float:right;visibility:visible" id="login_container" >
                     <li style="margin-top:10px">
                         <span style="font-size:20px;color:white" id="loginName">
                         </span>
@@ -35,6 +35,9 @@
                         </button>
                     </li>
                 </ul>
+                <div id="logout_confirm_dialog" title="Confirmation Required">
+                    Are you sure about this?
+                </div>
             </div>
 
         </div>

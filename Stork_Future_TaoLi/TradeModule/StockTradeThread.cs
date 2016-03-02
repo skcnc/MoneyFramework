@@ -286,6 +286,8 @@ namespace Stork_Future_TaoLi.TradeModule
                             i++;
                         }
 
+                        string user = trades[0].cUser;
+
                         if (DebugMark == true)
                         {
                             
@@ -307,6 +309,15 @@ namespace Stork_Future_TaoLi.TradeModule
                                 {
                                     entrustorli.Add(unit);
                                 }
+                                else
+                                {
+                                    //委托失败处理
+                                    GlobalErrorLog.LogInstance.LogEvent("获取委托号失败！用户: " + user + ",代码：" + unit.Code);
+                                }
+
+                                //清除风控冷冻金额
+                                accountMonitor.UpdateRiskFrozonAccount(user, unit.Code, tradesUnit[i].SecurityAmount * (-1), (-1) * tradesUnit[i].SecurityAmount * tradesUnit[i].OrderPrice, "S","0");
+
                             }
                         }
                     }
@@ -320,6 +331,7 @@ namespace Stork_Future_TaoLi.TradeModule
                         QueryEntrustOrderStruct_M entrustUnit = new QueryEntrustOrderStruct_M();
                         string s = string.Empty;
 
+                        string user = trades[0].cUser;
 
                         if (DebugMark == true)
                         {
@@ -334,6 +346,14 @@ namespace Stork_Future_TaoLi.TradeModule
                         {
                             entrustorli.Add(entrustUnit);
                         }
+                        else
+                        {
+                            //委托失败处理
+                            GlobalErrorLog.LogInstance.LogEvent("获取委托号失败！用户: " + user + ",代码：" + tradesUnit.SecurityCode);
+                        }
+
+                        //清除风控冷冻金额
+                        accountMonitor.UpdateRiskFrozonAccount(user, tradesUnit.SecurityCode, tradesUnit.SecurityAmount * (-1), (-1) * tradesUnit.SecurityAmount * tradesUnit.OrderPrice, "S",tradesUnit.TradeDirection.ToString());
                     }
 
                     //*********************************

@@ -17,6 +17,33 @@ namespace Stork_Future_TaoLi
     };
 
     /// <summary>
+    /// 股票交易方向枚举
+    /// </summary>
+    public enum StockTradeDirection
+    {
+        Buy = "1",
+        Sell = "2"
+    }
+
+    /// <summary>
+    /// 期货交易方向枚举
+    /// </summary>
+    public enum FutureTradeDirectionEnum
+    {
+        Buy = "48",
+        Sell = "49"
+    }
+
+    /// <summary>
+    /// 开平方向枚举
+    /// </summary>
+    public enum OffsetFlagEnum
+    {
+        Open = "48",
+        Close = "49"
+    }
+
+    /// <summary>
     /// 交易线程的流程控制参数
     /// </summary>
     public enum FutureTradeThreadStatus

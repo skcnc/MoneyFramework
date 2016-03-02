@@ -18,6 +18,8 @@ namespace Stork_Future_TaoLi
         private static Dictionary<String, int> FutureTradeTimes = new Dictionary<string, int>();
         private static DateTime FutureTradeTimes_reInitDate = new DateTime(2000, 1, 1);
 
+        private static int FutureTradeHandLimitation = 10;
+
 
         /// <summary>
         /// 本地缓存风控信息，本地风控信息逐秒更新
@@ -41,7 +43,7 @@ namespace Stork_Future_TaoLi
 
                 for(int i =0;i<FutureTradeTimes.Count;i++)
                 {
-                    FutureTradeTimes[FutureTradeTimes.Keys.ToList()[i]] = 10;
+                    FutureTradeTimes[FutureTradeTimes.Keys.ToList()[i]] = FutureTradeHandLimitation;
                 }
             }
 
@@ -58,6 +60,83 @@ namespace Stork_Future_TaoLi
                 return false;
             }
 
+
+            //判断卖出股票数量小于持仓
+
+            foreach(TradeOrderStruct order in orderlist)
+            {
+                if(order.cSecurityType == "S" || order.cSecurityType == "s")
+                {
+                    if(order.cTradeDirection == "2")
+                    {
+                        //卖出股票
+                        var pos = (from item in accInfo.positions where item.code == order.cSecurityCode select item.amount);
+
+                        if(!(pos.Count() > 0 && Convert.ToInt32(pos.ToList()[0].Trim()) > order.nSecurityAmount))
+                        {
+                            errCode = 11;
+
+                            int current_amount = 0;
+
+                            if(pos.Count() > 0)
+                            {
+                                current_amount = Convert.ToInt32(pos.ToList()[0]);
+                            }
+
+                            result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + current_amount);
+                            return false;
+                        }
+                    }
+                }
+                else if(order.cSecurityType == "F" || order.cSecurityType == "f")
+                {
+                    if(order.cOffsetFlag == "49")
+                    {
+                        //平仓
+                        if(order.cTradeDirection == "48")
+                        {
+                            //买入平仓，对应于卖出开仓，查看卖出仓位情况
+
+                            var pos = (from item in accInfo.positions where item.code == order.cSecurityCode && item.direction == "49" select item.amount);
+                            if (pos.Count() == 0)
+                            {
+                                errCode = 12;
+                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + "0" + "|" + "买入");
+                                return false;
+                            }
+                            else
+                            {
+                                if (Convert.ToInt32(order.nSecurityAmount) < Convert.ToInt32(pos.ToList()[0]))
+                                {
+                                    errCode = 12;
+                                    result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + Convert.ToInt32(pos.ToList()[0]) + "|" + "买入");
+                                    return false;
+                                }
+                            }
+                        }
+                        else if(order.cTradeDirection == "49")
+                        {
+                            //卖出平仓，对应于买入开仓，查看买入仓位的情况
+                            var pos = (from item in accInfo.positions where item.code == order.cSecurityCode && item.direction == "48" select item.amount);
+                            if (pos.Count() == 0)
+                            {
+                                errCode = 12;
+                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + "0" + "|" + "卖出");
+                                return false;
+                            }
+                            else
+                            {
+                                if (Convert.ToInt32(order.nSecurityAmount) < Convert.ToInt32(pos.ToList()[0]))
+                                {
+                                    errCode = 12;
+                                    result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + Convert.ToInt32(pos.ToList()[0]) + "|" + "卖出");
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
 
             //判断一：股票资金限制
@@ -116,8 +195,9 @@ namespace Stork_Future_TaoLi
                     {
                         BWNameTable bw = (from item in whiteli where item.Code == tos.cSecurityCode select item).ToList()[0];
 
-                        if ((from item in accInfo.positions where item.code == bw.Code select item).Count() > 0)
+                        if ((from item in accInfo.positions where item.code == bw.Code select item).Count() > 0) //
                         {
+                            //持仓存在的情况下，判断持仓数量加上本次购买数量总和是否超标
                             AccountPosition ap = (from item in accInfo.positions where item.code == bw.Code select item).ToList()[0];
 
                             if ((Convert.ToDouble(ap.amount) + Convert.ToDouble(tos.nSecurityAmount)) > (Convert.ToDouble(bw.Amount) * bw.PercentageA))
@@ -127,6 +207,19 @@ namespace Stork_Future_TaoLi
                                 return false;
                             }
                         }
+                        else
+                        {
+                            //无持仓情况下，判断本次购买数量是否超标
+
+                            if(Convert.ToDouble(tos.nSecurityAmount) > (Convert.ToDouble(bw.Amount) * bw.PercentageA))
+                            {
+                                errCode = 5;
+                                result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
+                                return false;
+                            }
+                        }
+                        
+
                     }
                 }
             }
@@ -202,7 +295,7 @@ namespace Stork_Future_TaoLi
 
 
             stockAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
-            futureAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
+            futureAccount = Convert.ToDouble(accountLimit.Split('|')[1].Trim());
 
             //预估交易后的期货风控参数
             //客户权益 = 当日结存 + 浮动盈亏 ，其中新交易不受浮动盈亏影响，所以客户权益不变
@@ -235,11 +328,11 @@ namespace Stork_Future_TaoLi
 
             fweight = futureAccount + fearning;
 
-            double future_margin = fstock * accountMonitor.future_margin_factor;
+            double future_margin = fstock * accountMonitor.future_margin_factor; //期货保证金
 
             double frisk = future_margin / fweight;                     //期货风险度
 
-            double fchangkou = (fstock + totalCost) / fstock;           //敞口比例
+            double fchangkou = (fstock + totalCost) / fstock;           //敞口比例 ？？？计算中分母的股票市值为股票账户中的股票市值 加上当前预计买入的股票市值    
 
 
             foreach (TradeOrderStruct record in orderlist)
@@ -277,8 +370,23 @@ namespace Stork_Future_TaoLi
                 return false;
             }
 
+            if (Double.IsNaN(fchangkou ))
+            {
+                errCode = 9;
+                result = accountMonitor.GetErrorCode(errCode, String.Empty);
+                return false;
+            }
+
             if (errCode != 0) return false;
-            else return true;
+            else
+            {
+                //风控冻结信息写入内存
+                foreach (TradeOrderStruct order in orderlist)
+                {
+                    accountMonitor.UpdateRiskFrozonAccount(user.alias, order.cSecurityCode, Convert.ToInt32(order.nSecurityAmount), Convert.ToDouble(order.nSecurityAmount * order.dOrderPrice), order.cSecurityType, order.cTradeDirection);
+                }
+                return true; 
+            }
 
         }
 

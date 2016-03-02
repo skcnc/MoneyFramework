@@ -394,11 +394,18 @@ namespace Stork_Future_TaoLi
 
                     if (market.Keys.Contains(i.CC_CODE))
                     {
-                        value += Convert.ToDouble(market[i.CC_CODE] / 1000 * i.CC_AMOUNT);
+                        if (market[i.CC_CODE] == 0)
+                        {
+                            value += Convert.ToDouble(i.CC_BUY_PRICE * i.CC_AMOUNT);
+                        }
+                        else
+                        {
+                            value += Convert.ToDouble(market[i.CC_CODE] / 1000 * i.CC_AMOUNT);
+                        }
                     }
                     else
                     {
-                        return 0;
+                        value += Convert.ToDouble(i.CC_BUY_PRICE * i.CC_AMOUNT);
                     }
 
                 }

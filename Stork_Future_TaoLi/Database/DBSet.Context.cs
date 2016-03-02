@@ -35,5 +35,7 @@ namespace Stork_Future_TaoLi.Database
         public DbSet<SG_TAOLI_STATUS_TABLE> SG_TAOLI_STATUS_TABLE { get; set; }
         public DbSet<UserInfo> UserInfo { get; set; }
         public DbSet<RISK_TABLE> RISK_TABLE { get; set; }
+        public DbSet<FutureAccountTable> FutureAccountTable { get; set; }
+        public DbSet<StockAccountTable> StockAccountTable { get; set; }
     }
 }

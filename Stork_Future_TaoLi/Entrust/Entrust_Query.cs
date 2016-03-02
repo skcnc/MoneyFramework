@@ -179,6 +179,7 @@ namespace Stork_Future_TaoLi.Entrust
 
                         //更新持仓列表
                         ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
+
                     }
                 }
 

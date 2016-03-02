@@ -169,6 +169,23 @@ namespace Stork_Future_TaoLi
             else return tmp.ToList()[0];
         }
 
+        public static void UpdateUserAccount(string alias,double stockaccount,double futureaccount)
+        {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            var user = (from item in DbEntity.UserInfo where item.alias == alias select item);
+
+            if (user == null || user.Count() == 0) return;
+
+            user.ToList()[0].stockAvailable = stockaccount.ToString();
+            user.ToList()[0].futureAvailable = futureaccount.ToString();
+
+
+            //ToDo : 测试account修改能否生效
+            Dbsavechage("UpdateUserAccount");
+
+        }
+
         public static void InsertSGOPEN(object v)
         {
 
@@ -751,6 +768,12 @@ namespace Stork_Future_TaoLi
                             offsetflag = offsetflag.ToString(),
 
                         };
+
+                        
+                        //修改本地CC列表
+                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                        accountMonitor.ChangeLocalCC(user.Trim(), records);
+
                         Dbsavechage("UpdateCCRecords");
                         return;
                     }
@@ -785,7 +808,8 @@ namespace Stork_Future_TaoLi
                         {
                             if (db_amount == amount)
                             {
-                                record.CC_BUY_PRICE = 0;
+                                DbEntity.CC_TAOLI_TABLE.Remove(record);
+                                Dbsavechage("UpdateCCRecords");
                             }
                             else
                             {
@@ -793,7 +817,9 @@ namespace Stork_Future_TaoLi
                             }
 
                             record.CC_AMOUNT = db_amount - amount;
-                            DbEntity.CC_TAOLI_TABLE.Remove(record);
+
+
+                            //ToDo : 确认卖出部分股票是否记库成功
 
                             CCRecord ccrecord = new CCRecord()
                             {
@@ -805,6 +831,10 @@ namespace Stork_Future_TaoLi
                                 direction = record.CC_DIRECTION,
                                 price = Convert.ToDouble(record.CC_BUY_PRICE)
                             };
+
+                            //更新本地持仓列表
+                            List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                            accountMonitor.ChangeLocalCC(user.Trim(), records);
 
                             //PositionRecord.UpdateCCRecord(ccrecord);
                             Dbsavechage("UpdateCCRecords");
@@ -831,6 +861,10 @@ namespace Stork_Future_TaoLi
 
                         //PositionRecord.UpdateCCRecord(ccRecord);
 
+                        //更新本地持仓列表
+                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                        accountMonitor.ChangeLocalCC(user.Trim(), records);
+
                         Dbsavechage("UpdateCCRecords");
 
                     }
@@ -846,6 +880,8 @@ namespace Stork_Future_TaoLi
                     var selectedFuture = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_DIRECTION == sDirection && item.CC_TYPE == type && item.CC_USER == user select item);
                     if (selectedFuture.Count() == 0)
                     {
+                        accountMonitor.ChangeFutureAccountDuToFutureDeal(user, code, price, amount, sDirection, 0, 0);
+
                         //持仓不存在
                         CC_TAOLI_TABLE record = new CC_TAOLI_TABLE()
                         {
@@ -871,7 +907,11 @@ namespace Stork_Future_TaoLi
                             direction = sDirection,
                             offsetflag = offsetflag.ToString()
                         };
-                        //PositionRecord.UpdateCCRecord(ccRecord);
+
+                        //更新本地持仓列表
+                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                        accountMonitor.ChangeLocalCC(user.Trim(), records);
+
                         Dbsavechage("UpdateCCRecords");
                         return;
                     }
@@ -879,6 +919,7 @@ namespace Stork_Future_TaoLi
                     {
                         //持仓存在
                         var record = selectedFuture.ToList()[0];
+
 
                         int? db_amount = record.CC_AMOUNT;
                         double? db_price = record.CC_BUY_PRICE;
@@ -889,6 +930,7 @@ namespace Stork_Future_TaoLi
                         record.CC_BUY_PRICE = (db_amount * db_price + amount * price) / (db_amount + amount);
                         record.CC_AMOUNT = db_amount + amount;
 
+                        accountMonitor.ChangeFutureAccountDuToFutureDeal(user, code, Convert.ToDouble(price), Convert.ToInt32(amount), sDirection, Convert.ToDouble(db_price), Convert.ToInt32(db_amount));
 
                         CCRecord ccRecord = new CCRecord()
                         {
@@ -901,7 +943,9 @@ namespace Stork_Future_TaoLi
                             direction = record.CC_DIRECTION
                         };
 
-                        //PositionRecord.UpdateCCRecord(ccRecord);
+                        //更新本地持仓列表
+                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                        accountMonitor.ChangeLocalCC(user.Trim(), records);
 
                         Dbsavechage("UpdateCCRecords");
                     }
@@ -922,6 +966,8 @@ namespace Stork_Future_TaoLi
                     {
                         var record = selectedFuture.ToList()[0];
 
+
+
                         int? db_amount = record.CC_AMOUNT;
                         double? db_price = record.CC_BUY_PRICE;
 
@@ -938,7 +984,7 @@ namespace Stork_Future_TaoLi
                         {
                             if (db_amount == amount)
                             {
-                                record.CC_BUY_PRICE = 0;
+                                DbEntity.CC_TAOLI_TABLE.Remove(record); Dbsavechage("UpdateCCRecords");
                             }
                             else
                             {
@@ -946,10 +992,7 @@ namespace Stork_Future_TaoLi
                             }
                             record.CC_AMOUNT = db_amount - amount;
 
-                            if (record.CC_AMOUNT == 0)
-                            {
-                                DbEntity.CC_TAOLI_TABLE.Remove(record);
-                            }
+                            accountMonitor.ChangeFutureAccountDuToFutureDeal(user, code, Convert.ToDouble(price), (-1) * Convert.ToInt32(amount), sDirection, Convert.ToDouble(db_price), Convert.ToInt32(db_amount));
 
                             CCRecord ccrecord = new CCRecord()
                             {
@@ -962,7 +1005,9 @@ namespace Stork_Future_TaoLi
                                 amount = Convert.ToInt16(record.CC_AMOUNT)
                             };
 
-                            //PositionRecord.UpdateCCRecord(ccrecord);
+                            //更新本地持仓列表
+                            List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                            accountMonitor.ChangeLocalCC(user.Trim(), records);
                             Dbsavechage("UpdateCCRecords");
                             return;
                         }
@@ -1155,6 +1200,13 @@ namespace Stork_Future_TaoLi
             };
 
             DbEntity.UserInfo.Add(user);
+
+            //为新用户分配股市资金流动信息
+            InsertStockAccountTable(para.StockAccount, "0", "0", para.StockAccount, "0", para.username, "0");
+
+            //为新用户分配期货资金流动信息
+            InsertFutureAccountTable(para.FutureAccount, "0", "0", "0", para.FutureAccount, "0", para.FutureAccount, para.username);
+
             Dbsavechage("InsertUser");
 
             return "success";
@@ -1202,6 +1254,114 @@ namespace Stork_Future_TaoLi
             return true;
 
         }
+
+
+        /// <summary>
+        /// 记录新股票资金变动
+        /// </summary>
+        /// <param name="balance">可用资金</param>
+        /// <param name="marketvalue">股票市值</param>
+        /// <param name="stockvalue">股票成本</param>
+        /// <param name="total">股票权益</param>
+        /// <param name="frozen">风控+委托冻结资金</param>
+        /// <param name="earning">盈亏</param>
+        /// <param name="alias">用户名</param>
+        public static void InsertStockAccountTable(string balance,string marketvalue,string stockvalue,string total,string earning,string alias,string frozen)
+        {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            StockAccountTable item = new StockAccountTable()
+            {
+                ID = Guid.NewGuid(),
+                Balance = balance,
+                MarketValue = marketvalue,
+                StockValue = stockvalue,
+                Total = total,
+                StockFrozenValue = frozen,
+                Earning = earning,
+                Alias = alias,
+                UpdateTime = DateTime.Now
+            };
+
+            DbEntity.StockAccountTable.Add(item);
+            Dbsavechage("InsertStockAccountTable");
+        }
+
+        /// <summary>
+        /// 获取最新的资金状态
+        /// </summary>
+        /// <param name="alias">用户名</param>
+        /// <returns>最新资金状态</returns>
+        public static StockAccountTable GetStockAccount(string alias)
+        {
+            if (DBAccessLayer.DBEnable == false) return null;
+
+            var records = (from item in DbEntity.StockAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
+
+            if (records.Count() > 0)
+            {
+                return records.ToList()[0];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 记录新资金变动
+        /// </summary>
+        /// <param name="staticInterests">静态权益</param>
+        /// <param name="OffsetGain">平仓盈亏</param>
+        /// <param name="OpsitionGain">持仓盈亏</param>
+        /// <param name="DynamicInterests">动态权益</param>
+        /// <param name="frozen">风控+委托冻结资金</param>
+        /// <param name="CashDeposit">保证金</param>
+        /// <param name="ExpendableFund">可用资金</param>
+        /// <param name="alias">用户名</param>
+        public static void InsertFutureAccountTable(string staticInterests,string OffsetGain,string frozen,string OpsitionGain,string DynamicInterests,string CashDeposit,string ExpendableFund,string alias)
+        {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            FutureAccountTable item = new FutureAccountTable()
+            {
+                ID = Guid.NewGuid(),
+                StatisInterests = staticInterests,
+                OffsetGain = OffsetGain,
+                OpsitionGain = OpsitionGain,
+                DynamicInterests = DynamicInterests,
+                CashDeposit = CashDeposit,
+                FrozenValue = frozen,
+                ExpendableFund = ExpendableFund,
+                Alias = alias,
+                UpdateTime = DateTime.Now
+            };
+
+            DbEntity.FutureAccountTable.Add(item);
+            Dbsavechage("InsertFutureAccountTable");
+        }
+
+        /// <summary>
+        /// 获取期货账户
+        /// </summary>
+        /// <param name="alias">用户名</param>
+        /// <returns>期货资金</returns>
+        public static FutureAccountTable GetFutureAccount(string alias)
+        {
+            if (DBAccessLayer.DBEnable == false) return null;
+
+            var records = (from item in DbEntity.FutureAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
+
+            if (records.Count() > 0)
+            {
+                return records.ToList()[0];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
 
         public static void Dbsavechage(string type)
         {

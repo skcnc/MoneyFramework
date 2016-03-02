@@ -154,4 +154,28 @@ namespace Stork_Future_TaoLi.Variables_Type
         private static string _password = "admin";
     }
 
+    /// <summary>
+    /// 账户相关全局参数
+    /// </summary>
+    public class AccountPARA
+    {
+        /// <summary>
+        /// 期货系数
+        /// </summary>
+        public static double Factor
+        {
+            get { return factor; }
+        }
+        private static double factor = 300;
+
+        /// <summary>
+        /// 保证金系数
+        /// </summary>
+        public static double MarginValue { get { return marginValue; } }
+        private static double marginValue = 0.12;
+
+
+
+    }
+
 }

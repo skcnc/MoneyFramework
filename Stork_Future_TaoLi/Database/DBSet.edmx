@@ -71,6 +71,21 @@
           <Property Name="ER_COMPLETED" Type="bit" />
           <Property Name="ER_DIRECTION" Type="int" />
         </EntityType>
+        <EntityType Name="FutureAccountTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="StatisInterests" Type="nvarchar" MaxLength="50" />
+          <Property Name="OffsetGain" Type="nvarchar" MaxLength="50" />
+          <Property Name="OpsitionGain" Type="nvarchar" MaxLength="50" />
+          <Property Name="DynamicInterests" Type="nvarchar" MaxLength="50" />
+          <Property Name="FrozenValue" Type="nvarchar" MaxLength="50" />
+          <Property Name="CashDeposit" Type="nvarchar" MaxLength="50" />
+          <Property Name="ExpendableFund" Type="nvarchar" MaxLength="50" />
+          <Property Name="Alias" Type="nvarchar" MaxLength="50" />
+          <Property Name="UpdateTime" Type="datetime" />
+        </EntityType>
         <EntityType Name="OL_TAOLI_LIST_TABLE">
           <Key>
             <PropertyRef Name="OL_GUID" />
@@ -142,6 +157,20 @@
           <Property Name="SG_STATUS" Type="int" />
           <Property Name="SG_UPDATE_TIME" Type="datetime" />
         </EntityType>
+        <EntityType Name="StockAccountTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Balance" Type="nvarchar" MaxLength="50" />
+          <Property Name="MarketValue" Type="nvarchar" MaxLength="50" />
+          <Property Name="StockValue" Type="nvarchar" MaxLength="50" />
+          <Property Name="StockFrozenValue" Type="nvarchar" MaxLength="50" />
+          <Property Name="Total" Type="nvarchar" MaxLength="50" />
+          <Property Name="Earning" Type="nvarchar" MaxLength="50" />
+          <Property Name="Alias" Type="nvarchar" MaxLength="50" />
+          <Property Name="UpdateTime" Type="datetime" />
+        </EntityType>
         <EntityType Name="UserInfo">
           <Key>
             <PropertyRef Name="ID" />
@@ -159,11 +188,13 @@
           <EntitySet Name="CC_TAOLI_TABLE" EntityType="Self.CC_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="Self.DL_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="Self.ER_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FutureAccountTable" EntityType="Self.FutureAccountTable" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="Self.OL_TAOLI_LIST_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RISK_TABLE" EntityType="Self.RISK_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="Self.SG_TAOLI_CLOSE_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="Self.SG_TAOLI_OPEN_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StockAccountTable" EntityType="Self.StockAccountTable" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserInfo" EntityType="Self.UserInfo" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -315,6 +346,8 @@
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" />
           <EntitySet Name="UserInfo" EntityType="Self.UserInfo" />
           <EntitySet Name="RISK_TABLE" EntityType="MoneyEntityModel.RISK_TABLE" />
+          <EntitySet Name="FutureAccountTable" EntityType="MoneyEntityModel.FutureAccountTable" />
+          <EntitySet Name="StockAccountTable" EntityType="MoneyEntityModel.StockAccountTable" />
         </EntityContainer>
         <EntityType Name="RISK_TABLE">
           <Key>
@@ -330,6 +363,35 @@
           <Property Name="amount" Type="Int32" />
           <Property Name="price" Type="Double" />
           <Property Name="orientation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="FutureAccountTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="StatisInterests" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OffsetGain" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OpsitionGain" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DynamicInterests" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FrozenValue" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CashDeposit" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ExpendableFund" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Alias" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="UpdateTime" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="StockAccountTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="Balance" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MarketValue" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="StockValue" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="StockFrozenValue" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Total" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Earning" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Alias" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="UpdateTime" Type="DateTime" Precision="3" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -496,7 +558,38 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-        </EntityContainerMapping>
+          <EntitySetMapping Name="FutureAccountTable">
+            <EntityTypeMapping TypeName="MoneyEntityModel.FutureAccountTable">
+              <MappingFragment StoreEntitySet="FutureAccountTable">
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="Alias" ColumnName="Alias" />
+                <ScalarProperty Name="ExpendableFund" ColumnName="ExpendableFund" />
+                <ScalarProperty Name="CashDeposit" ColumnName="CashDeposit" />
+                <ScalarProperty Name="FrozenValue" ColumnName="FrozenValue" />
+                <ScalarProperty Name="DynamicInterests" ColumnName="DynamicInterests" />
+                <ScalarProperty Name="OpsitionGain" ColumnName="OpsitionGain" />
+                <ScalarProperty Name="OffsetGain" ColumnName="OffsetGain" />
+                <ScalarProperty Name="StatisInterests" ColumnName="StatisInterests" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StockAccountTable">
+            <EntityTypeMapping TypeName="MoneyEntityModel.StockAccountTable">
+              <MappingFragment StoreEntitySet="StockAccountTable">
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="Alias" ColumnName="Alias" />
+                <ScalarProperty Name="Earning" ColumnName="Earning" />
+                <ScalarProperty Name="Total" ColumnName="Total" />
+                <ScalarProperty Name="StockFrozenValue" ColumnName="StockFrozenValue" />
+                <ScalarProperty Name="StockValue" ColumnName="StockValue" />
+                <ScalarProperty Name="MarketValue" ColumnName="MarketValue" />
+                <ScalarProperty Name="Balance" ColumnName="Balance" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>

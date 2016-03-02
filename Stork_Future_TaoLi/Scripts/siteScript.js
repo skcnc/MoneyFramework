@@ -1200,7 +1200,8 @@ $('#login_btnLogin').click(function (e) {
                 localStorage.setItem("TIMESTAMP", dt.getTime());
                 localStorage.setItem("USERRIGHT", data);
 
-                $('#login_container').css({ "visibility": "visible" });
+                $('#loginName').val("欢迎：" + username);
+                $('#login_container').css({ "visibility": "hidden" });
             }
             else {
                 alert("您当前使用的浏览器版本过低，网站功能将被限制！");

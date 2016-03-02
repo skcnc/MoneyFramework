@@ -343,7 +343,7 @@ namespace Stork_Future_TaoLi
                     string result = string.Empty;
                      bool brisk = riskmonitor.RiskControl(_tradeUnit.cUser, _TradeList, out result);
 
-                     DBAccessLayer.AddRiskRecord(_tradeUnit.cUser, result, "00", _tradeUnit.cSecurityCode, Convert.ToInt16(_tradeUnit.nSecurityAmount), _tradeUnit.dOrderPrice, _tradeUnit.cTradeDirection);
+                     DBAccessLayer.AddRiskRecord(_tradeUnit.cUser, result, "00", _tradeUnit.cSecurityCode, Convert.ToInt32(_tradeUnit.nSecurityAmount), _tradeUnit.dOrderPrice, _tradeUnit.cTradeDirection);
 
                      List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(_tradeUnit.cUser);
 
