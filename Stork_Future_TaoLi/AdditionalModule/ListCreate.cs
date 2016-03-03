@@ -10,37 +10,32 @@ using System.Threading.Tasks;
 
 namespace Stork_Future_TaoLi
 {
-    public enum  TradeDirection
-    {
-        Buy = 0,
-        Sell = 1
-    };
-
+  
     /// <summary>
-    /// 股票交易方向枚举
+    /// 股票交易方向
     /// </summary>
     public enum StockTradeDirection
     {
-        Buy = "1",
-        Sell = "2"
+        Buy = 1,
+        Sell = 2
     }
 
     /// <summary>
-    /// 期货交易方向枚举
+    /// 期货交易方向
     /// </summary>
-    public enum FutureTradeDirectionEnum
+    public enum FutureTradeDirection
     {
-        Buy = "48",
-        Sell = "49"
+        Buy = 48,
+        Sell = 49
     }
 
     /// <summary>
-    /// 开平方向枚举
+    /// 期货交易开平
     /// </summary>
-    public enum OffsetFlagEnum
+    public enum FutureTradeOffSet
     {
-        Open = "48",
-        Close = "49"
+        Open = 48,
+        Close = 49
     }
 
     /// <summary>

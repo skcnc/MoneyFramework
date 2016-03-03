@@ -38,6 +38,13 @@ namespace Stork_Future_TaoLi
         /// </summary>
         private static Dictionary<String, AccountInfo> AccountInfoDictionary = new Dictionary<string, AccountInfo>();
 
+        /// <summary>
+        /// 风控冻结资金列表
+        /// 股票交易： 通过风控后写入该表，获取委托后离开该表
+        /// 期货交易： 通过风控后写入该表，期货交易成交或者失败后离开该表
+        /// </summary>
+        private static Dictionary<String, List<RiskFrozenInfo>> RiskFrozenDictionary = new Dictionary<string, List<RiskFrozenInfo>>();
+
         private static List<AccountInfo> accountList = new List<AccountInfo>();
 
         public static double factor = 300; //股票对应市值系数
@@ -71,7 +78,7 @@ namespace Stork_Future_TaoLi
 
                         }
 
-                        AccountInfo acc = UpdateAccount(info);
+                        AccountInfo acc = UpdateAccountList(info);
 
                         if (info.userRight == 2)
                         {
@@ -91,183 +98,6 @@ namespace Stork_Future_TaoLi
                 
                
             }
-        }
-
-        /// <summary>
-        /// 计算账户情况
-        /// </summary>
-        /// <param name="info"></param>
-        public static AccountInfo UpdateAccount(UserInfo info)
-        {
-            AccountInfo account = new AccountInfo();
-            account.positions = new List<AccountPosition>();
-            account.entrusts = new List<AccountEntrust>();
-            account.riskFrozenInfo = new List<RiskFrozenInfo>();
-
-            StockAccountTable stockAccount = StockAccountDictionary[info.alias.Trim()];
-            FutureAccountTable futureAccount = FutureAccountDictionary[info.alias.Trim()];
-
-            //ToDo ： 1. 创建资金表，股票，期货分开，标记股票和期货资金状态根据交易改变 2. 添加期货结算日结算函数（设定最近结算日并记库）。
-
-            double staticBalance = 0;       //静态权益
-            double closeEarning = 0;        //平仓盈亏
-            double holdEarning = 0;         //持仓盈亏
-
-            account.alias = info.alias;
-            account.name = info.name;
-            account.account = info.stockAvailable;
-
-            List<CC_TAOLI_TABLE> positionRecord = new List<CC_TAOLI_TABLE>();
-            double stockcost = 0;
-
-            DBAccessLayer.LoadCCStockList(info.alias, out positionRecord, out stockcost);
-
-            List<CC_TAOLI_TABLE> fPositionRecord = new List<CC_TAOLI_TABLE>();
-
-            DBAccessLayer.LoadCCFutureList(info.alias, out fPositionRecord);
-
-            double fstock = 0;          //期货对应股票市值
-            double fweight = 0;         //期货权益
-            double fearn = 0;           //期货浮动盈亏
-
-            foreach (CC_TAOLI_TABLE record in fPositionRecord)
-            {
-                if (MarketPrice.market.ContainsKey(record.CC_CODE))
-                {
-                    int x = -1;
-                    if (record.CC_DIRECTION == "0")
-                    {
-                        x = 1;
-                    }
-
-                    fstock += Convert.ToDouble((record.CC_AMOUNT) * MarketPrice.market[record.CC_CODE] * factor * x);
-
-                    fearn += Convert.ToDouble((record.CC_AMOUNT) * (MarketPrice.market[record.CC_CODE] - record.CC_BUY_PRICE) * x);
-                }
-            }
-
-            fstock = Math.Abs(fstock);
-
-            account.fstockvalue = fstock.ToString();
-
-            account.fincome = fearn.ToString();
-
-            //期货权益
-
-            string accountLimit = DBAccessLayer.GetAccountAvailable(info.alias);
-
-            if (accountLimit == string.Empty)
-            {
-                return null;
-
-            }
-
-            stockAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
-            futureAccount = Convert.ToDouble(accountLimit.Split('|')[1].Trim());
-
-            fweight = futureAccount + fearn;
-
-            account.fvalue = fweight.ToString();
-
-
-            double future_margin = 0;               //期货保证金
-
-            future_margin = fstock * future_margin_factor;
-
-            account.fbond = future_margin.ToString();
-
-            account.cost = stockcost.ToString();
-
-            if (account.positions == null)
-            {
-                account.positions = new List<AccountPosition>();
-            }
-
-            foreach (CC_TAOLI_TABLE record in positionRecord)
-            {
-                account.positions.Add(new AccountPosition()
-                {
-                    amount = record.CC_AMOUNT.ToString(),
-                    code = record.CC_CODE,
-                    name = record.CC_USER,
-                    price = record.CC_BUY_PRICE.ToString(),
-                    type = record.CC_TYPE,
-                    direction = record.CC_DIRECTION
-                });
-            }
-
-            double frozen = 0;
-
-            List<ERecord> entrusts = new List<ERecord>();
-            EntrustRecord.GetUserAccountInfo(info.alias, out frozen, out entrusts);
-
-            account.faccount = (futureAccount - future_margin + fearn).ToString();
-
-            if (account.entrusts == null) account.entrusts = new List<AccountEntrust>();
-
-            foreach (ERecord record in entrusts)
-            {
-                account.entrusts.Add(new AccountEntrust()
-                {
-                    code = record.Code,
-                    dealAmount = record.DealAmount.ToString(),
-                    requestAmount = record.Amount.ToString(),
-                    requestPrice = record.OrderPrice.ToString(),
-                    exchange = record.ExchangeId,
-                    dealMoney = record.DealFrezonMoney.ToString()
-                });
-            }
-
-            //冻结资金
-            account.frozen = frozen.ToString();
-
-            //风控资金
-            if(account.riskFrozenInfo == null)
-            { 
-                account.riskFrozenInfo = new List<RiskFrozenInfo>(); 
-            }
-
-            int riskFrozenTotalCost = 0;
-
-            for (int i = 0; i < account.riskFrozenInfo.Count;i++ )
-            {
-                riskFrozenTotalCost += Convert.ToInt32(account.riskFrozenInfo[i].FrozenCost);
-            }
-
-            //剩余资金量
-            account.balance = (Convert.ToDouble(account.account) - Convert.ToDouble(account.cost) - Convert.ToDouble(account.frozen) - Convert.ToDouble(riskFrozenTotalCost)).ToString();
-
-            //股票市值
-            account.value = MarketPrice.CalculateCurrentValue(positionRecord).ToString();
-
-            //敞口比例
-            double risk_exposure = ((Convert.ToDouble(account.value) + fstock) / fstock);
-
-            //风险度
-            account.frisk = (Convert.ToDouble(account.fbond) / Convert.ToDouble(account.fvalue)).ToString();
-
-            account.risk_exposure = risk_exposure.ToString();
-
-            account.earning = (Convert.ToDouble(account.value) - Convert.ToDouble(account.cost)).ToString();
-
-            var tmp = (from item in accountList where item.alias == info.alias select item.alias);
-
-            if(tmp.Count() == 0)
-            {
-                accountList.Add(account);
-            }
-            else
-            {
-                 if(tmp.ToList().Contains(account.alias))
-                 {
-                     var acc = (from item in accountList where item.alias  == account.alias select item).ToList()[0];
-                     accountList.Remove(acc);
-                     accountList.Add(account);
-                 }
-            }
-
-            return account;
-
         }
 
         /// <summary>
@@ -317,7 +147,12 @@ namespace Stork_Future_TaoLi
             return Accounts;
         }
 
-        
+        /// <summary>
+        /// 获取错误返回代码
+        /// </summary>
+        /// <param name="code">代码</param>
+        /// <param name="content">内容参数</param>
+        /// <returns>错误描述</returns>
         public static string GetErrorCode(int code,string content)
         {
             switch (code)
@@ -392,116 +227,147 @@ namespace Stork_Future_TaoLi
             return totalnum;
         }
 
-
         /// <summary>
         /// 更新风控冻结证券信息
         /// </summary>
         /// <param name="alias">用户</param>
         /// <param name="code">证券代码</param>
-        /// <param name="amount">数量</param>
-        /// <param name="cost">成本</param>
+        /// <param name="amount">数量，正为加入风控列表，负为从风控列表中移除</param>
+        /// <param name="cost">成本 (数量 * 买入价)，正为加入风控列表，负为从风控列表移除</param>
         /// <param name="type">类型</param>
         /// <param name="direction">期货交易方向</param>
         /// <returns></returns>
         public static double UpdateRiskFrozonAccount(string alias,string code ,int amount ,double cost,string type,string direction)
         {
-            for (int i = 0; i < accountList.Count; i++)
+            alias = alias.Trim();
+
+            if (RiskFrozenDictionary.Keys.Contains(alias))
             {
-                if (accountList[i].alias.Trim() == alias.Trim())
+                //证券存在于风控列表
+                for (int i = 0; i < RiskFrozenDictionary[alias].Count; i++)
                 {
-
-                    if (accountList[i].riskFrozenInfo == null) accountList[i].riskFrozenInfo = new List<RiskFrozenInfo>();
-
-                    // 先判断已经有存量风控资金的情况
-                    for (int j = 0; j < accountList[i].riskFrozenInfo.Count; j++)
+                    if (RiskFrozenDictionary[alias][i].Code == code && RiskFrozenDictionary[alias][i].Type == type && RiskFrozenDictionary[alias][i].TradeDirection == direction)
                     {
-                        if (accountList[i].riskFrozenInfo[j].Code.Trim() == code.Trim())
+                        //风控信息已经存在
+                        if (amount > 0)
                         {
-                            if (type == "F" || type == "f")
+                            //追加风控信息
+
+                            RiskFrozenInfo riskinfo = RiskFrozenDictionary[alias][i];
+                            int totalamount = Convert.ToInt32(riskinfo.FrozenAmount) + amount;
+                            double totalcost = Convert.ToDouble(riskinfo.FrozenCost) + cost;
+
+
+                            RiskFrozenDictionary[alias][i].FrozenAmount = totalamount.ToString();
+                            RiskFrozenDictionary[alias][i].FrozenCost = totalcost.ToString();
+
+                            if (type == "S" || type == "s")
                             {
-                                if (accountList[i].riskFrozenInfo[j].TradeDirection.Trim() == direction.Trim())
-                                {
-                                    int camount = Convert.ToInt32(accountList[i].riskFrozenInfo[j].FrozenAmount);
-                                    double ccost = Convert.ToInt32(accountList[i].riskFrozenInfo[j].FrozenCost);
-
-                                    accountList[i].riskFrozenInfo[j].FrozenAmount = (camount + amount).ToString();
-                                    accountList[i].riskFrozenInfo[j].FrozenCost = (ccost + cost).ToString();
-
-                                    return (ccost + cost);
-                                }
-                            }
-                            else if (type == "S" || type == "s")
-                            {
-
-                                int camount = Convert.ToInt32(accountList[i].riskFrozenInfo[j].FrozenAmount);
-                                double ccost = Convert.ToInt32(accountList[i].riskFrozenInfo[j].FrozenCost);
-
-
-                                //买入
-                                accountList[i].riskFrozenInfo[j].FrozenAmount = (camount + amount).ToString();
-                                accountList[i].riskFrozenInfo[j].FrozenCost = (ccost + cost).ToString();
-
-                                return (ccost + cost);
+                                //风控中增加的资金，是可用资金里面减少的值
+                                //股票的可用资金直接减少，期货需要再通过计算保证金和动态权益获取可用资金，这个在updateaccount中计算
+                                StockAccountDictionary[alias].Balance = (Convert.ToDouble(StockAccountDictionary[alias].Balance) - cost).ToString();
                             }
 
-                        
-
+                            return totalcost;
                         }
+                        else
+                        {
+                            //减少风控信息
+
+                            RiskFrozenInfo riskinfo = RiskFrozenDictionary[alias][i];
+
+                            int totalamount = Convert.ToInt32(riskinfo.FrozenAmount) + amount;
+                            double totalcost = Convert.ToDouble(riskinfo.FrozenCost) + cost;
+
+                            if (totalamount <= 0 || totalcost <= 0)
+                            {
+                                //说明该证券已无风控冻结资金
+                                RiskFrozenDictionary[alias].Remove(riskinfo);
+
+                            }
+                            else
+                            {
+                                //减少风控后还会剩余风控信息
+                                RiskFrozenDictionary[alias][i].FrozenAmount = totalamount.ToString();
+                                RiskFrozenDictionary[alias][i].FrozenCost = totalcost.ToString();
+                            }
+
+                            return totalcost;
+                        }
+
                     }
-                    
-                    //判断无风控资金存量的情况
-                    accountList[i].riskFrozenInfo.Add(new RiskFrozenInfo()
+                }
+
+                //风控列表存在用户，但是不存在对应的证券冻结情况
+
+                if (amount > 0)
+                {
+                    //加入风控列表
+                    RiskFrozenDictionary[alias].Add(new RiskFrozenInfo()
                     {
-                        Code = code.Trim(),
-                        FrozenAmount = amount.ToString().Trim(),
-                        FrozenCost = cost.ToString().Trim(),
-                        TradeDirection = direction.ToString().Trim(),
-                        Type = type.ToString().Trim()
+                        Code = code,
+                        FrozenAmount = amount.ToString(),
+                        FrozenCost = cost.ToString(),
+                        TradeDirection = direction,
+                        Type = type
                     });
 
-                    return cost;
-                 }
+                    if (type == "S" || type == "s")
+                    {
+                        //风控中增加的资金，是可用资金里面减少的值
+                        //股票的可用资金直接减少，期货需要再通过计算保证金和动态权益获取可用资金，这个在updateaccount中计算
+                        StockAccountDictionary[alias].Balance = (Convert.ToDouble(StockAccountDictionary[alias].Balance) - cost).ToString();
+                    }
+
+
+                    return amount * cost;
+                }
+                else
+                {
+                    //列表中本来没有记录，无需再移除
+                    return 0;
+                }
             }
-
-            return 0;
-        }
-
-        /// <summary>
-        /// 更新可用资金
-        /// </summary>
-        /// <param name="alias">用户名</param>
-        /// <param name="type">类型</param>
-        /// <param name="money">变动金额</param>
-        /// <returns></returns>
-        public static double UpdateAccountMoney(string alias, string type, double money)
-        {
-
-            string accountLimit = DBAccessLayer.GetAccountAvailable(alias);
-            if (accountLimit == null || accountLimit == string.Empty) return 0;
-
-            double futureAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
-            double stockAccount = Convert.ToDouble(accountLimit.Split('|')[1].Trim());
-
-            if (type == "F" || type == "f")
+            else
             {
-                
-            }
-            else if (type == "S" || type == "s")
-            {
-                stockAccount += money;
-                return stockAccount;
-            }
+                //未加入风控列表
+                RiskFrozenDictionary.Add(alias, new List<RiskFrozenInfo>());
 
-            return 0;
+                if (amount > 0)
+                {
+                    //加入风控列表
+                    RiskFrozenDictionary[alias].Add(new RiskFrozenInfo()
+                    {
+                        Code = code,
+                        FrozenAmount = amount.ToString(),
+                        FrozenCost = cost.ToString(),
+                        TradeDirection = direction,
+                        Type = type
+                    });
+
+                    if (type == "S" || type == "s")
+                    {
+                        //风控中增加的资金，是可用资金里面减少的值
+                        //股票的可用资金直接减少，期货需要再通过计算保证金和动态权益获取可用资金，这个在updateaccount中计算
+                        StockAccountDictionary[alias].Balance = (Convert.ToDouble(StockAccountDictionary[alias].Balance) - cost).ToString();
+                    }
+
+                    return amount * cost;
+                }
+                else
+                {
+                    //列表中本来没有记录，无需再移除
+                    return 0;
+                }
+            }
+          
         }
-
 
         /// <summary>
         ///  股票成交后更新本地股票资金信息
         ///  修改：
         ///     1. 可用资金
         ///     2. 股票成本
-        ///     3. 冻结资金
         /// </summary>
         /// <param name="alias">用户名</param>
         /// <param name="amount">交易数量，正为买入，负为卖出</param>
@@ -516,14 +382,8 @@ namespace Stork_Future_TaoLi
                     
                     if(amount < 0)
                     {
-                        //卖出会变动可用资金
+                        //卖出会增加可用资金
                         StockAccountDictionary[alias.Trim()].Balance = (Convert.ToDouble(StockAccountDictionary[alias.Trim()].Balance) - price * amount).ToString();
-                    }
-
-                    if (amount > 0)
-                    {
-                        //买入才涉及冻结金额
-                        StockAccountDictionary[alias.Trim()].StockFrozenValue = (Convert.ToDouble(StockAccountDictionary[alias.Trim()].StockFrozenValue) - price * amount).ToString();
                     }
                 }
                 else
@@ -531,12 +391,6 @@ namespace Stork_Future_TaoLi
                     StockAccountTable stock = DBAccessLayer.GetStockAccount(alias.Trim());
 
                     stock.StockValue = (Convert.ToDouble(stock.StockValue) + price * amount).ToString();
-
-                    if (amount > 0)
-                    {
-                        //买入才涉及冻结金额
-                        stock.StockFrozenValue = (Convert.ToDouble(stock.StockFrozenValue) - price * amount).ToString();
-                    }
 
                     if(amount < 0)
                     {
@@ -549,13 +403,11 @@ namespace Stork_Future_TaoLi
             }
         }
 
-
         /// <summary>
         /// 期货成交后更新本地期货资金信息
         /// 修改：
         ///     平仓盈亏
         ///     保证金
-        ///     期货冻结资金
         /// </summary>
         /// <param name="alias">用户名</param>
         /// <param name="hand">手数，正为开仓, 负为平仓</param>
@@ -574,28 +426,18 @@ namespace Stork_Future_TaoLi
                     FutureAccountDictionary[alias.Trim()].CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit) + AccountPARA.Factor * hand * price * AccountPARA.MarginValue).ToString();
 
                     //平仓盈亏改变
-
                     if(hand < 0)
                     {
                         double earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
                          earning += (price - old_price) * hand;
                         FutureAccountDictionary[alias.Trim()].OffsetGain = earning.ToString();
                     }
-
-
-
-                    //冻结资金改变
-                    if (hand > 0)
-                    {
-                        //平仓不涉及冻期货结资金的改变
-                        FutureAccountDictionary[alias.Trim()].FrozenValue = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].FrozenValue) - hand * price).ToString();
-                    }
                 }
                 else
                 {
                     FutureAccountTable future = DBAccessLayer.GetFutureAccount(alias.Trim());
 
-                    future.CashDeposit = ((Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit)  + AccountPARA.Factor * hand * price * AccountPARA.MarginValue).ToString();
+                    future.CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit)  + AccountPARA.Factor * hand * price * AccountPARA.MarginValue).ToString();
 
                     if(hand < 0){
                         double earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
@@ -603,21 +445,256 @@ namespace Stork_Future_TaoLi
                         FutureAccountDictionary[alias.Trim()].OffsetGain = earning.ToString();
                     }
 
-
-                      if (hand > 0)
-                      {
-                          future.FrozenValue = (Convert.ToDouble(future.FrozenValue) - hand * price).ToString();
-                      }
-
                     FutureAccountDictionary.Add(alias.Trim(),future);
                 }
             }
         }
 
-
-        public static AccountInfo UpdateAccountList(string alias)
+        /// <summary>
+        /// 更新用户仓位信息包含股票和期货
+        /// 该函数按照WorkThread的周期执行
+        /// </summary>
+        /// <param name="info">输入用户信息</param>
+        /// <returns>用户仓位信息</returns>
+        public static AccountInfo UpdateAccountList(UserInfo info)
         {
+             string alias = info.alias.Trim();
+           
+            //获取全部持仓，该值会拆分成CC_Stock_records 和 CC_Future_records
+            List<CC_TAOLI_TABLE> CC_records = CCDictionary[alias];
 
+            //获取股票持仓
+            List<CC_TAOLI_TABLE> CC_Stock_records = (from item in CC_records where item.CC_TYPE == "F" || item.CC_TYPE == "f" select item).ToList();
+
+            //获取期货持仓
+            List<CC_TAOLI_TABLE> CC_Future_records = (from item in CC_records where item.CC_TYPE == "s" || item.CC_TYPE == "F" select item).ToList();
+
+            //获取风控预冻结资金
+            List<RiskFrozenInfo> Risk_Frozen_records = new List<RiskFrozenInfo>();
+            if(RiskFrozenDictionary.Keys.Contains(alias))
+            {
+                Risk_Frozen_records = RiskFrozenDictionary[alias];
+            }
+
+            //获取股票委托冻结资金
+            double Entrust_frozen = 0;
+            List<ERecord> Erecords = new List<ERecord>();
+
+            //获取委托持仓
+            EntrustRecord.GetUserAccountInfo(alias, out Entrust_frozen, out Erecords);
+
+            //内存股票账户，记录其中的可用资金，股票成本，冻结资金不随行情改变，直接使用
+            StockAccountTable stockAccount = StockAccountDictionary[alias];
+
+            //股票可用资金
+            //1. 经过风控股票买入时改变，从减少可用资金，增加风控冻结资金；
+            //2. 经过持仓股票卖出时改变，减少股票成本，增加股票可用资金
+            // 股票可用资金，不会因行情改变而改变
+            double stock_balance = Convert.ToDouble(stockAccount.Balance.Trim());
+
+            //股票成本
+            double stock_cost = Convert.ToDouble(stockAccount.StockValue.Trim());
+
+            //冻结资金 (委托冻结资金 + 风控冻结资金)
+            double stock_frozen_value = 0;
+            
+            foreach(ERecord record in Erecords)
+            {
+                stock_frozen_value += record.Amount * record.OrderPrice;
+            }
+
+            foreach(RiskFrozenInfo record in Risk_Frozen_records)
+            {
+                if(record.Type == "S" || record.Type =="s")
+                {
+                    stock_frozen_value += Convert.ToDouble(record.FrozenCost);
+                }
+            }
+
+            //计算股票市值
+            double market_value = 0;
+
+            //股票盈亏
+            double stock_earning = 0;
+
+            foreach(CC_TAOLI_TABLE item in CC_Stock_records)
+            {
+                double price = MarketPrice.market[item.CC_CODE.Trim()];
+                if (price != 0)
+                {
+                    //存在最新市值，采用最新市值计算
+                    market_value += (Convert.ToInt32(item.CC_AMOUNT) * price);
+
+                    //知道最新市值才能求盈亏
+                    stock_earning += (price - Convert.ToDouble(item.CC_BUY_PRICE)) * Convert.ToInt32(item.CC_AMOUNT);
+                }
+                else
+                {
+                    //未找到最新市值，用成交价计算
+                    market_value += (Convert.ToInt32(item.CC_AMOUNT) * Convert.ToDouble(item.CC_BUY_PRICE));
+                }
+            }
+
+            //股票权益 （可用资金 + 股票市值 + 冻结资金量）
+            double stock_total = stock_balance + market_value + stock_frozen_value;
+
+
+            //内存期货账户，记录其中的平仓盈亏，静态权益，保证金，期货冻结资金不随行情改变，直接使用
+            FutureAccountTable futureAccount = FutureAccountDictionary[alias];
+
+            //静态权益
+            double static_intrests = Convert.ToDouble(futureAccount.StatisInterests.Trim());
+
+            //平仓盈亏
+            double offset_gain = Convert.ToDouble(futureAccount.OffsetGain.Trim());
+
+            //保证金
+            double cash_deposit = Convert.ToDouble(futureAccount.CashDeposit.Trim());
+
+            //期货冻结保证金
+            double frozen_cash_deposit = 0;
+
+            foreach(RiskFrozenInfo record in Risk_Frozen_records)
+            {
+                if(record.Type == "F" || record.Type =="F")
+                {
+                    frozen_cash_deposit += Convert.ToDouble(record.FrozenCost);
+                }
+             }
+
+            frozen_cash_deposit = frozen_cash_deposit * AccountPARA.Factor * AccountPARA.MarginValue;
+
+
+            //期货对应股票市值
+            double future_stock_marketvalue = 0;
+
+            //持仓盈亏
+            double opsition_gain = 0;
+
+            foreach(CC_TAOLI_TABLE item in CC_Future_records)
+            {
+                double fprice = MarketPrice.market[item.CC_CODE.Trim()];
+
+                if(item.CC_DIRECTION == TradeOrientationAndFlag.FutureTradeDirectionBuy)
+                {
+                    if(fprice != 0)
+                    {
+                        //期货买入仓位
+                        //没有实时行情信息，无需再运行持仓盈亏
+                        opsition_gain += (fprice - Convert.ToDouble(item.CC_BUY_PRICE)) * Convert.ToInt32(item.CC_AMOUNT);
+
+                        //存在实时行情，用期货行情计算期货对应股票市值
+                        future_stock_marketvalue += (AccountPARA.Factor * Convert.ToInt32(item.CC_AMOUNT) * fprice);
+                    }
+                    else
+                    {
+                        //不存在实时行情，用成交价格计算期货对应股票市值
+                        future_stock_marketvalue += (AccountPARA.Factor * Convert.ToInt32(item.CC_AMOUNT) * Convert.ToDouble(item.CC_BUY_PRICE));
+                    }
+
+                 
+                }
+                else if(item.CC_DIRECTION == TradeOrientationAndFlag.FutureTradeDirectionSell)
+                {
+                    if(fprice != 0)
+                    {
+                        //期货买入仓位
+                        //没有实时行情信息，无需再运行持仓盈亏
+                        opsition_gain += (Convert.ToDouble(item.CC_BUY_PRICE) - fprice) * Convert.ToInt32(item.CC_AMOUNT);
+
+                        //存在实时行情，用期货行情计算期货对应股票市值
+                        future_stock_marketvalue -= (AccountPARA.Factor * Convert.ToInt32(item.CC_AMOUNT) * fprice);
+                    }
+                    else
+                    {
+                        //不存在实时行情，用成交价格计算期货对应股票市值
+                        future_stock_marketvalue -= (AccountPARA.Factor * Convert.ToInt32(item.CC_AMOUNT) * Convert.ToDouble(item.CC_BUY_PRICE));
+                    }
+                }
+            }
+
+            //动态权益 （静态权益 + 平仓盈亏 + 持仓盈亏）
+            double dynamic_interests = static_intrests + offset_gain + opsition_gain;
+
+            //可用资金 （动态权益 - 保证金）
+            double expendableFund = dynamic_interests - cash_deposit;
+
+            //期货风险度 （占用保证金 / 动态权益）
+            double future_risk = cash_deposit / dynamic_interests ;
+
+            //返回账户信息
+            AccountInfo accinfo = new AccountInfo();
+
+            accinfo.positions = new List<AccountPosition>();
+            accinfo.entrusts = new List<AccountEntrust>();
+            accinfo.riskFrozenInfo = new List<RiskFrozenInfo>();
+
+            accinfo.account = stock_balance.ToString();
+            accinfo.alias = alias;
+            accinfo.balance = stock_balance.ToString();
+            accinfo.cost = stock_cost.ToString();
+            accinfo.earning = stock_earning.ToString();
+
+            foreach (ERecord item in Erecords)
+            {
+                accinfo.entrusts.Add(new AccountEntrust()
+                {
+                    code = item.Code,
+                    dealAmount = item.DealAmount.ToString(),
+                    dealMoney = item.DealFrezonMoney.ToString(),
+                    exchange = item.ExchangeId,
+                    requestAmount = item.Amount.ToString(),
+                    requestPrice = item.OrderPrice.ToString()
+                });
+            }
+
+            accinfo.faccount = expendableFund.ToString();
+            accinfo.fbond = cash_deposit.ToString();
+            accinfo.fincome = (opsition_gain + offset_gain).ToString();
+            accinfo.frisk = (future_risk * 100).ToString() + "%";
+            accinfo.frozen = frozen_cash_deposit.ToString();
+            accinfo.fstockvalue = future_stock_marketvalue.ToString();
+            accinfo.fvalue = dynamic_interests.ToString();
+            accinfo.name = info.name;
+            
+            foreach(CC_TAOLI_TABLE item in CC_Stock_records)
+            {
+                accinfo.positions.Add(new AccountPosition()
+                {
+                    amount = item.CC_AMOUNT.ToString(),
+                    code = item.CC_CODE,
+                    direction = item.CC_DIRECTION,
+                    name = item.CC_USER,
+                    price = item.CC_BUY_PRICE.ToString(),
+                    type = item.CC_TYPE
+                });
+            }
+
+            foreach(CC_TAOLI_TABLE item in CC_Future_records)
+            {
+                accinfo.positions.Add(new AccountPosition()
+                {
+                    amount = item.CC_AMOUNT.ToString(),
+                    code = item.CC_CODE,
+                    direction = item.CC_DIRECTION,
+                    name = item.CC_USER,
+                    price = item.CC_BUY_PRICE.ToString(),
+                    type = item.CC_TYPE
+                });
+            }
+
+            accinfo.risk_exposure = "0";
+            accinfo.riskFrozenInfo = new List<RiskFrozenInfo>();
+
+            foreach (RiskFrozenInfo record in Risk_Frozen_records)
+            {
+                accinfo.riskFrozenInfo.Add(record);
+            }
+
+            accinfo.value = future_stock_marketvalue.ToString();
+
+            return accinfo;
+           
         }
 
         /// <summary>
@@ -648,6 +725,185 @@ namespace Stork_Future_TaoLi
                     }
             }
         }
+
+        #region GC_Save_Code
+        /// <summary>
+        /// 计算账户情况
+        /// </summary>
+        /// <param name="info"></param>
+        //public static AccountInfo UpdateAccount(UserInfo info)
+        //{
+        //    AccountInfo account = new AccountInfo();
+        //    account.positions = new List<AccountPosition>();
+        //    account.entrusts = new List<AccountEntrust>();
+        //    account.riskFrozenInfo = new List<RiskFrozenInfo>();
+
+        //    StockAccountTable stockAccount = StockAccountDictionary[info.alias.Trim()];
+        //    FutureAccountTable futureAccount = FutureAccountDictionary[info.alias.Trim()];
+
+        //    //ToDo ： 1. 创建资金表，股票，期货分开，标记股票和期货资金状态根据交易改变 2. 添加期货结算日结算函数（设定最近结算日并记库）。
+
+        //    double staticBalance = 0;       //静态权益
+        //    double closeEarning = 0;        //平仓盈亏
+        //    double holdEarning = 0;         //持仓盈亏
+
+        //    account.alias = info.alias;
+        //    account.name = info.name;
+        //    account.account = info.stockAvailable;
+
+        //    List<CC_TAOLI_TABLE> positionRecord = new List<CC_TAOLI_TABLE>();
+        //    double stockcost = 0;
+
+        //    DBAccessLayer.LoadCCStockList(info.alias, out positionRecord, out stockcost);
+
+        //    List<CC_TAOLI_TABLE> fPositionRecord = new List<CC_TAOLI_TABLE>();
+
+        //    DBAccessLayer.LoadCCFutureList(info.alias, out fPositionRecord);
+
+        //    double fstock = 0;          //期货对应股票市值
+        //    double fweight = 0;         //期货权益
+        //    double fearn = 0;           //期货浮动盈亏
+
+        //    foreach (CC_TAOLI_TABLE record in fPositionRecord)
+        //    {
+        //        if (MarketPrice.market.ContainsKey(record.CC_CODE))
+        //        {
+        //            int x = -1;
+        //            if (record.CC_DIRECTION == "0")
+        //            {
+        //                x = 1;
+        //            }
+
+        //            fstock += Convert.ToDouble((record.CC_AMOUNT) * MarketPrice.market[record.CC_CODE] * factor * x);
+
+        //            fearn += Convert.ToDouble((record.CC_AMOUNT) * (MarketPrice.market[record.CC_CODE] - record.CC_BUY_PRICE) * x);
+        //        }
+        //    }
+
+        //    fstock = Math.Abs(fstock);
+
+        //    account.fstockvalue = fstock.ToString();
+
+        //    account.fincome = fearn.ToString();
+
+        //    //期货权益
+
+        //    string accountLimit = DBAccessLayer.GetAccountAvailable(info.alias);
+
+        //    if (accountLimit == string.Empty)
+        //    {
+        //        return null;
+
+        //    }
+
+        //    stockAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
+        //    futureAccount = Convert.ToDouble(accountLimit.Split('|')[1].Trim());
+
+        //    fweight = futureAccount + fearn;
+
+        //    account.fvalue = fweight.ToString();
+
+
+        //    double future_margin = 0;               //期货保证金
+
+        //    future_margin = fstock * future_margin_factor;
+
+        //    account.fbond = future_margin.ToString();
+
+        //    account.cost = stockcost.ToString();
+
+        //    if (account.positions == null)
+        //    {
+        //        account.positions = new List<AccountPosition>();
+        //    }
+
+        //    foreach (CC_TAOLI_TABLE record in positionRecord)
+        //    {
+        //        account.positions.Add(new AccountPosition()
+        //        {
+        //            amount = record.CC_AMOUNT.ToString(),
+        //            code = record.CC_CODE,
+        //            name = record.CC_USER,
+        //            price = record.CC_BUY_PRICE.ToString(),
+        //            type = record.CC_TYPE,
+        //            direction = record.CC_DIRECTION
+        //        });
+        //    }
+
+        //    double frozen = 0;
+
+        //    List<ERecord> entrusts = new List<ERecord>();
+        //    EntrustRecord.GetUserAccountInfo(info.alias, out frozen, out entrusts);
+
+        //    account.faccount = (futureAccount - future_margin + fearn).ToString();
+
+        //    if (account.entrusts == null) account.entrusts = new List<AccountEntrust>();
+
+        //    foreach (ERecord record in entrusts)
+        //    {
+        //        account.entrusts.Add(new AccountEntrust()
+        //        {
+        //            code = record.Code,
+        //            dealAmount = record.DealAmount.ToString(),
+        //            requestAmount = record.Amount.ToString(),
+        //            requestPrice = record.OrderPrice.ToString(),
+        //            exchange = record.ExchangeId,
+        //            dealMoney = record.DealFrezonMoney.ToString()
+        //        });
+        //    }
+
+        //    //冻结资金
+        //    account.frozen = frozen.ToString();
+
+        //    //风控资金
+        //    if (account.riskFrozenInfo == null)
+        //    {
+        //        account.riskFrozenInfo = new List<RiskFrozenInfo>();
+        //    }
+
+        //    int riskFrozenTotalCost = 0;
+
+        //    for (int i = 0; i < account.riskFrozenInfo.Count; i++)
+        //    {
+        //        riskFrozenTotalCost += Convert.ToInt32(account.riskFrozenInfo[i].FrozenCost);
+        //    }
+
+        //    //剩余资金量
+        //    account.balance = (Convert.ToDouble(account.account) - Convert.ToDouble(account.cost) - Convert.ToDouble(account.frozen) - Convert.ToDouble(riskFrozenTotalCost)).ToString();
+
+        //    //股票市值
+        //    account.value = MarketPrice.CalculateCurrentValue(positionRecord).ToString();
+
+        //    //敞口比例
+        //    double risk_exposure = ((Convert.ToDouble(account.value) + fstock) / fstock);
+
+        //    //风险度
+        //    account.frisk = (Convert.ToDouble(account.fbond) / Convert.ToDouble(account.fvalue)).ToString();
+
+        //    account.risk_exposure = risk_exposure.ToString();
+
+        //    account.earning = (Convert.ToDouble(account.value) - Convert.ToDouble(account.cost)).ToString();
+
+        //    var tmp = (from item in accountList where item.alias == info.alias select item.alias);
+
+        //    if (tmp.Count() == 0)
+        //    {
+        //        accountList.Add(account);
+        //    }
+        //    else
+        //    {
+        //        if (tmp.ToList().Contains(account.alias))
+        //        {
+        //            var acc = (from item in accountList where item.alias == account.alias select item).ToList()[0];
+        //            accountList.Remove(acc);
+        //            accountList.Add(account);
+        //        }
+        //    }
+
+        //    return account;
+
+        //}
+        #endregion
     }
 
     /// <summary>

@@ -96,4 +96,38 @@ namespace Stork_Future_TaoLi.Variables_Type
         public static string STOCK { get { return "1"; } }
         public static string FUTURE { get { return "0"; } }
     }
+
+
+    public static class TradeOrientationAndFlag
+    {
+        /// <summary>
+        /// 股票买入方向
+        /// </summary>
+        public static string StockTradeDirectionBuy { get { return "1"; } }
+
+        /// <summary>
+        /// 股票卖出方向
+        /// </summary>
+        public static string StockTradeDirectionSell { get { return "2"; } }
+
+        /// <summary>
+        /// 期货买入方向
+        /// </summary>
+        public static string FutureTradeDirectionBuy { get { return "48"; } }
+
+        /// <summary>
+        /// 期货卖出方向
+        /// </summary>
+        public static string FutureTradeDirectionSell { get { return "49"; } }
+
+        /// <summary>
+        /// 期货开仓标记
+        /// </summary>
+        public static string FutureTradeOffsetOpen { get { return "48"; } }
+
+        /// <summary>
+        /// 期货平仓标记
+        /// </summary>
+        public static string FutureTradeOffsetClose { get { return "49"; } }
+    }
 }

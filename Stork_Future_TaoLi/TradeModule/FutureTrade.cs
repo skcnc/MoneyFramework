@@ -293,7 +293,7 @@ namespace Stork_Future_TaoLi
                             args.ContingentCondition = Convert.ToByte('1');      
                             args.TimeCondition = Convert.ToByte('3');
                             args.VolumeCondition = Convert.ToByte('1');
-
+                            args.UserID = order.cUser;
                             args.ForceCloseReason = Convert.ToByte('0');
                             args.IsAutoSuspend = 0;
                             args.UserForceClose = 0;
@@ -335,7 +335,6 @@ namespace Stork_Future_TaoLi
         /// <param name="log"></param>
         public void SetLog(LogWirter log) { sublog = log; }
 
-
         public FutureTrade()
         {
             
@@ -349,10 +348,15 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo"></param>
         static void _client_ErrRtnOrderInsert(CThostFtdcInputOrderField_M pInputOrder, CThostFtdcRspInfoField_M pRspInfo)
         {
-            //throw new NotImplementedException();
             TradeRecord.GetInstance().MarkFailure(Convert.ToInt16(pInputOrder.OrderRef), pRspInfo.ErrorMsg);
-        }
 
+            if (pInputOrder.CombOffsetFlag_0 == (byte)(FutureTradeOffSet.Open))
+            {
+                //只有开仓涉及冻结资金
+                //交易失败，需要释放冻结掉的期货交易资金
+                accountMonitor.UpdateRiskFrozonAccount(pInputOrder.UserID, pInputOrder.InstrumentID, pInputOrder.VolumeTotalOriginal * (-1), pInputOrder.VolumeTotalOriginal * pInputOrder.LimitPrice * (-1), "F", pInputOrder.Direction.ToString());
+            }
+        }
 
         /// <summary>
         /// 连接成功
@@ -381,6 +385,12 @@ namespace Stork_Future_TaoLi
         static void _client_RspOrderInsert(CTP_CLI.CThostFtdcInputOrderField_M pInputOrder, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             TradeRecord.GetInstance().MarkFailure(Convert.ToInt16(pInputOrder.OrderRef), pRspInfo.ErrorMsg);
+            if (pInputOrder.CombOffsetFlag_0 == (byte)(FutureTradeOffSet.Open))
+            {
+                //只有开仓涉及冻结资金
+                //交易失败，需要释放冻结掉的期货交易资金
+                accountMonitor.UpdateRiskFrozonAccount(pInputOrder.UserID, pInputOrder.InstrumentID, pInputOrder.VolumeTotalOriginal * (-1), pInputOrder.VolumeTotalOriginal * pInputOrder.LimitPrice * (-1), "F", pInputOrder.Direction.ToString());
+            }
         }
 
         /// <summary>
@@ -419,6 +429,13 @@ namespace Stork_Future_TaoLi
                     {
                         //全部成交
                         TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded,Convert.ToInt16(pOrder.OrderRef),pOrder.OrderSysID,pOrder.StatusMsg,pOrder.OrderStatus,pOrder.VolumeTotal);
+
+                        if (pOrder.CombOffsetFlag_0 == (byte)(FutureTradeOffSet.Open))
+                        {
+                            //只有开仓涉及冻结资金
+                            //交易失败，需要释放冻结掉的期货交易资金
+                            accountMonitor.UpdateRiskFrozonAccount(pOrder.UserID, pOrder.InstrumentID, pOrder.VolumeTotalOriginal * (-1), pOrder.VolumeTotalOriginal * pOrder.LimitPrice * (-1), "F", pOrder.Direction.ToString());
+                        }
                     }
                     break;
                 case 49:
@@ -454,8 +471,6 @@ namespace Stork_Future_TaoLi
             }
         }
 
-
-        
         /// <summary>
         /// 登陆成功回掉函数
         /// </summary>
@@ -471,6 +486,7 @@ namespace Stork_Future_TaoLi
             }
             //throw new NotImplementedException();
         }
+
 
         static void _client_RspError(CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {

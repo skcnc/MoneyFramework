@@ -52,7 +52,7 @@ namespace Stork_Future_TaoLi
             double overflow = 0.02; //溢价余量，用于控制金额空间和成本空间的差值。
             result = string.Empty;
             int errCode = 0;
-            AccountInfo accInfo = accountMonitor.UpdateAccount(user);
+            AccountInfo accInfo = accountMonitor.UpdateAccountList(user);
 
             if (accInfo == null)
             {
@@ -383,6 +383,7 @@ namespace Stork_Future_TaoLi
                 //风控冻结信息写入内存
                 foreach (TradeOrderStruct order in orderlist)
                 {
+                    //ToDo : 只有股票买入，或者期货开仓，才需要计入风控资金冻结
                     accountMonitor.UpdateRiskFrozonAccount(user.alias, order.cSecurityCode, Convert.ToInt32(order.nSecurityAmount), Convert.ToDouble(order.nSecurityAmount * order.dOrderPrice), order.cSecurityType, order.cTradeDirection);
                 }
                 return true; 

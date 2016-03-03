@@ -315,8 +315,14 @@ namespace Stork_Future_TaoLi.TradeModule
                                     GlobalErrorLog.LogInstance.LogEvent("获取委托号失败！用户: " + user + ",代码：" + unit.Code);
                                 }
 
-                                //清除风控冷冻金额
-                                accountMonitor.UpdateRiskFrozonAccount(user, unit.Code, tradesUnit[i].SecurityAmount * (-1), (-1) * tradesUnit[i].SecurityAmount * tradesUnit[i].OrderPrice, "S","0");
+                                
+
+                                if (unit.Direction == 49)
+                                {
+                                    //清除风控冷冻金额
+                                    //只有股票买入，才需要移除风控列表
+                                    accountMonitor.UpdateRiskFrozonAccount(user, unit.Code, tradesUnit[i].SecurityAmount * (-1), tradesUnit[i].SecurityAmount * tradesUnit[i].OrderPrice * (-1), "S", "0");
+                                }
 
                             }
                         }
@@ -352,8 +358,11 @@ namespace Stork_Future_TaoLi.TradeModule
                             GlobalErrorLog.LogInstance.LogEvent("获取委托号失败！用户: " + user + ",代码：" + tradesUnit.SecurityCode);
                         }
 
-                        //清除风控冷冻金额
-                        accountMonitor.UpdateRiskFrozonAccount(user, tradesUnit.SecurityCode, tradesUnit.SecurityAmount * (-1), (-1) * tradesUnit.SecurityAmount * tradesUnit.OrderPrice, "S",tradesUnit.TradeDirection.ToString());
+                        if (entrustUnit.Direction == 49)
+                        {
+                            //清除风控冷冻金额,只有买入需要清除风控列表
+                            accountMonitor.UpdateRiskFrozonAccount(user, tradesUnit.SecurityCode, tradesUnit.SecurityAmount * (-1), tradesUnit.SecurityAmount * tradesUnit.OrderPrice * (-1), "S", tradesUnit.TradeDirection.ToString());
+                        }
                     }
 
                     //*********************************

@@ -7,6 +7,7 @@ using MCStockLib;
 using System.Threading;
 using Newtonsoft.Json;
 using Stork_Future_TaoLi.Account;
+using Stork_Future_TaoLi.Variables_Type;
 
 
 namespace Stork_Future_TaoLi
@@ -740,7 +741,7 @@ namespace Stork_Future_TaoLi
                 if (selectedStock.Count() == 0)
                 {
                     //新股票持仓
-                    if (direction == (int)TradeDirection.Buy)
+                    if (direction == Convert.ToInt32(TradeOrientationAndFlag.StockTradeDirectionBuy))
                     {
                         //买入
                         CC_TAOLI_TABLE record = new CC_TAOLI_TABLE()
@@ -774,6 +775,9 @@ namespace Stork_Future_TaoLi
                         List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
                         accountMonitor.ChangeLocalCC(user.Trim(), records);
 
+                        //修改股票可用资金和股票成本
+                        accountMonitor.ChangeStockAccountDuToStockDeal(user.Trim(), price, amount);
+
                         Dbsavechage("UpdateCCRecords");
                         return;
                     }
@@ -795,7 +799,7 @@ namespace Stork_Future_TaoLi
                     { return; }
 
                     //已经持仓的股票
-                    if (direction == (int)TradeDirection.Sell)
+                    if (direction == Convert.ToInt32(TradeOrientationAndFlag.StockTradeDirectionSell))
                     {
                         //卖出
                         if (db_amount < amount)
@@ -810,6 +814,11 @@ namespace Stork_Future_TaoLi
                             {
                                 DbEntity.CC_TAOLI_TABLE.Remove(record);
                                 Dbsavechage("UpdateCCRecords");
+
+                                //修改股票可用资金和股票成本
+                                accountMonitor.ChangeStockAccountDuToStockDeal(user.Trim(), price, amount * (-1));
+
+                                return;
                             }
                             else
                             {
@@ -838,6 +847,10 @@ namespace Stork_Future_TaoLi
 
                             //PositionRecord.UpdateCCRecord(ccrecord);
                             Dbsavechage("UpdateCCRecords");
+
+                            //修改股票可用资金和股票成本
+                            accountMonitor.ChangeStockAccountDuToStockDeal(user.Trim(), price, amount * (-1));
+
                             return;
                         }
                     }
@@ -864,6 +877,9 @@ namespace Stork_Future_TaoLi
                         //更新本地持仓列表
                         List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
                         accountMonitor.ChangeLocalCC(user.Trim(), records);
+
+                        //修改股票可用资金和股票成本
+                        accountMonitor.ChangeStockAccountDuToStockDeal(user.Trim(), price, amount);
 
                         Dbsavechage("UpdateCCRecords");
 
