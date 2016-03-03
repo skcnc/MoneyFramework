@@ -45,8 +45,6 @@ namespace Stork_Future_TaoLi
         /// </summary>
         private static Dictionary<String, List<RiskFrozenInfo>> RiskFrozenDictionary = new Dictionary<string, List<RiskFrozenInfo>>();
 
-        private static List<AccountInfo> accountList = new List<AccountInfo>();
-
         public static double factor = 300; //股票对应市值系数
 
         public  static double future_margin_factor = 0.12; //期货保证金系数
@@ -88,7 +86,7 @@ namespace Stork_Future_TaoLi
                         else if(info.userRight == 1)
                         {
                             //管理员显示所有用户账户信息
-                            AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(accountList), true);
+                            AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(AccountInfoDictionary.Values), true);
                         }
                     }
 
@@ -106,19 +104,20 @@ namespace Stork_Future_TaoLi
         /// <param name="name">用户名</param>
         /// <param name="result">返回错误说明</param>
         /// <returns>账户信息</returns>
-        public static AccountInfo GetAccountInfo(string name,out string result)
+        public static AccountInfo GetAccountInfo(string alias,out string result)
         {
+            alias = alias.Trim();
             result = string.Empty;
-            var acc = (from item in accountList where item.alias == name select item);
 
-            if(acc.Count() == 0)
+            if(AccountInfoDictionary.Keys.Contains(alias))
             {
-               //没有查到关于该用户的风控信息，直接返回失败
+                return AccountInfoDictionary[alias];
+            }
+            else
+            {
                 result = GetErrorCode(3,string.Empty);
                 return null;
             }
-
-            return acc.ToList()[0];
         }
 
         /// <summary>
@@ -196,35 +195,6 @@ namespace Stork_Future_TaoLi
                 default :
                     return "验证通过";
             }
-        }
-
-        /// <summary>
-        /// 获得单只股票的全局总持仓
-        /// </summary>
-        /// <param name="code">股票代码</param>
-        /// <returns>股票总数</returns>
-        public static long GetStockTotalPositionAmount(string code)
-        {
-            long totalnum = 0;
-
-            foreach (AccountInfo acc in accountList)
-            {
-                var tmpA = (from item in acc.positions where item.code == code select item);
-
-                if(tmpA.Count() != 0)
-                {
-                    totalnum += Convert.ToInt16(tmpA.ToList()[0].amount);
-                }
-
-                var tmpB = (from item in acc.entrusts where item.code == code select item);
-
-                if (tmpB.Count() != 0)
-                {
-                    totalnum += Convert.ToInt16(tmpB.ToList()[0].requestAmount);
-                }
-            }
-
-            return totalnum;
         }
 
         /// <summary>
@@ -538,7 +508,6 @@ namespace Stork_Future_TaoLi
             //股票权益 （可用资金 + 股票市值 + 冻结资金量）
             double stock_total = stock_balance + market_value + stock_frozen_value;
 
-
             //内存期货账户，记录其中的平仓盈亏，静态权益，保证金，期货冻结资金不随行情改变，直接使用
             FutureAccountTable futureAccount = FutureAccountDictionary[alias];
 
@@ -621,6 +590,31 @@ namespace Stork_Future_TaoLi
 
             //期货风险度 （占用保证金 / 动态权益）
             double future_risk = cash_deposit / dynamic_interests ;
+
+            //更新股票资金Dictionary
+            lock(StockAccountDictionary)
+            {
+                StockAccountDictionary[alias].Balance = stock_balance.ToString();
+                StockAccountDictionary[alias].Earning = stock_earning.ToString();
+                StockAccountDictionary[alias].MarketValue = market_value.ToString();
+                StockAccountDictionary[alias].StockFrozenValue = stock_frozen_value.ToString();
+                StockAccountDictionary[alias].StockValue = stock_cost.ToString();
+                StockAccountDictionary[alias].Total = stock_total.ToString();
+                StockAccountDictionary[alias].UpdateTime = DateTime.Now;
+            }
+
+            //更新期货资金Dictionary
+            lock(FutureAccountDictionary)
+            {
+                FutureAccountDictionary[alias].CashDeposit = cash_deposit.ToString();
+                FutureAccountDictionary[alias].DynamicInterests = dynamic_interests.ToString();
+                FutureAccountDictionary[alias].ExpendableFund = expendableFund.ToString();
+                FutureAccountDictionary[alias].FrozenValue = frozen_cash_deposit.ToString();
+                FutureAccountDictionary[alias].OffsetGain = offset_gain.ToString();
+                FutureAccountDictionary[alias].OpsitionGain = opsition_gain.ToString();
+                FutureAccountDictionary[alias].StatisInterests = static_intrests.ToString();
+                FutureAccountDictionary[alias].UpdateTime = DateTime.Now;
+            }
 
             //返回账户信息
             AccountInfo accinfo = new AccountInfo();
@@ -723,6 +717,49 @@ namespace Stork_Future_TaoLi
                     {
                         CCDictionary[alias].Add(item);
                     }
+            }
+        }
+
+        /// <summary>
+        /// 获得股票资金对象
+        /// </summary>
+        /// <param name="alias">用户名</param>
+        /// <returns>
+        ///     null: 不存在该股票资金信息，这个基本上不可能，如果出现，一定是出现程序问题。
+        /// </returns>
+        public static StockAccountTable GetStockAccount(string alias)
+        {
+            alias = alias.Trim();
+
+            if (StockAccountDictionary.Keys.Contains(alias))
+            {
+                return StockAccountDictionary[alias];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获得期货资金对象
+        /// </summary>
+        /// <param name="alias">用户名</param>
+        /// <returns>
+        ///     null: 不存在该期货资金信息，这个基本上不可能，如果出现，一定是出现程序问题。
+        /// </returns>
+        public static FutureAccountTable GetFutureAccount(string alias)
+        {
+            alias = alias.Trim();
+
+            if(FutureAccountDictionary.Keys.Contains(alias))
+            {
+                return FutureAccountDictionary[alias];
+
+            }
+            else
+            {
+                return null;
             }
         }
 

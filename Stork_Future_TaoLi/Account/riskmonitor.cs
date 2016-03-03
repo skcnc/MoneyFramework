@@ -22,376 +22,9 @@ namespace Stork_Future_TaoLi
 
 
         /// <summary>
-        /// 本地缓存风控信息，本地风控信息逐秒更新
+        /// 本地缓存风控信息
         /// </summary>
         public static Dictionary<String, TMRiskInfo> LocalRiskInfo = new Dictionary<string, TMRiskInfo>();
-
-        /// <summary>
-        /// 股票风控检测
-        /// </summary>
-        public  static bool RiskControl(string name, List<TradeOrderStruct> orderlist, out string result)
-        {
-            name = name.Trim();
-            if(!FutureTradeTimes.Keys.Contains(name))
-            {
-                FutureTradeTimes.Add(name, 10);
-            }
-
-            if((DateTime.Now - FutureTradeTimes_reInitDate).TotalDays > 1)
-            {
-                FutureTradeTimes_reInitDate = DateTime.Now;
-
-                for(int i =0;i<FutureTradeTimes.Count;i++)
-                {
-                    FutureTradeTimes[FutureTradeTimes.Keys.ToList()[i]] = FutureTradeHandLimitation;
-                }
-            }
-
-            UserInfo user = DBAccessLayer.GetOneUser(name);
-
-            double overflow = 0.02; //溢价余量，用于控制金额空间和成本空间的差值。
-            result = string.Empty;
-            int errCode = 0;
-            AccountInfo accInfo = accountMonitor.UpdateAccountList(user);
-
-            if (accInfo == null)
-            {
-                result = "未能获得实时账户";
-                return false;
-            }
-
-
-            //判断卖出股票数量小于持仓
-
-            foreach(TradeOrderStruct order in orderlist)
-            {
-                if(order.cSecurityType == "S" || order.cSecurityType == "s")
-                {
-                    if(order.cTradeDirection == "2")
-                    {
-                        //卖出股票
-                        var pos = (from item in accInfo.positions where item.code == order.cSecurityCode select item.amount);
-
-                        if(!(pos.Count() > 0 && Convert.ToInt32(pos.ToList()[0].Trim()) > order.nSecurityAmount))
-                        {
-                            errCode = 11;
-
-                            int current_amount = 0;
-
-                            if(pos.Count() > 0)
-                            {
-                                current_amount = Convert.ToInt32(pos.ToList()[0]);
-                            }
-
-                            result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + current_amount);
-                            return false;
-                        }
-                    }
-                }
-                else if(order.cSecurityType == "F" || order.cSecurityType == "f")
-                {
-                    if(order.cOffsetFlag == "49")
-                    {
-                        //平仓
-                        if(order.cTradeDirection == "48")
-                        {
-                            //买入平仓，对应于卖出开仓，查看卖出仓位情况
-
-                            var pos = (from item in accInfo.positions where item.code == order.cSecurityCode && item.direction == "49" select item.amount);
-                            if (pos.Count() == 0)
-                            {
-                                errCode = 12;
-                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + "0" + "|" + "买入");
-                                return false;
-                            }
-                            else
-                            {
-                                if (Convert.ToInt32(order.nSecurityAmount) < Convert.ToInt32(pos.ToList()[0]))
-                                {
-                                    errCode = 12;
-                                    result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + Convert.ToInt32(pos.ToList()[0]) + "|" + "买入");
-                                    return false;
-                                }
-                            }
-                        }
-                        else if(order.cTradeDirection == "49")
-                        {
-                            //卖出平仓，对应于买入开仓，查看买入仓位的情况
-                            var pos = (from item in accInfo.positions where item.code == order.cSecurityCode && item.direction == "48" select item.amount);
-                            if (pos.Count() == 0)
-                            {
-                                errCode = 12;
-                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + "0" + "|" + "卖出");
-                                return false;
-                            }
-                            else
-                            {
-                                if (Convert.ToInt32(order.nSecurityAmount) < Convert.ToInt32(pos.ToList()[0]))
-                                {
-                                    errCode = 12;
-                                    result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + Convert.ToInt32(pos.ToList()[0]) + "|" + "卖出");
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-
-            //判断一：股票资金限制
-            List<TradeOrderStruct> stocks_sh = (from item in orderlist where item.cExhcnageID == ExchangeID.SH select item).OrderBy(i => i.cOrderLevel).ToList();
-            List<TradeOrderStruct> stocks_sz = (from item in orderlist where item.cExhcnageID == ExchangeID.SZ select item).OrderBy(i => i.cOrderLevel).ToList();
-
-            //新交易股票成本
-            double stock_cost = 0;
-
-            if (stocks_sh.Count > 0)
-            {
-                foreach (TradeOrderStruct stock in stocks_sh)
-                {
-                    stock_cost += (stock.nSecurityAmount * stock.dOrderPrice);
-                }
-            }
-            if (stocks_sz.Count > 0)
-            {
-                foreach (TradeOrderStruct stock in stocks_sz)
-                {
-                    stock_cost += (stock.nSecurityAmount * stock.dOrderPrice);
-                }
-            }
-
-            if (Convert.ToDouble(accInfo.balance) > (1 + overflow) * stock_cost)
-            {
-                errCode = 0;
-            }
-            else
-            {
-                errCode = 1;
-            }
-
-
-            result = accountMonitor.GetErrorCode(errCode,string.Empty);
-
-            if (errCode != 0) return false;
-
-            
-
-            //判断二：交易股票是否存在白名单，比例是否满足 , 单只股票所占金额比例
-
-            List<BWNameTable> whiteli = DBAccessLayer.GetWBNamwList();
-
-            foreach (TradeOrderStruct tos in orderlist)
-            {
-                if (tos.cSecurityType == "s" || tos.cSecurityType == "S")
-                {
-                    if (!((from item in whiteli select item.Code).ToList()).Contains(tos.cSecurityCode.Trim()))
-                    {
-                        errCode = 4;
-                        result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
-                        return false;
-                    }
-                    else
-                    {
-                        BWNameTable bw = (from item in whiteli where item.Code == tos.cSecurityCode select item).ToList()[0];
-
-                        if ((from item in accInfo.positions where item.code == bw.Code select item).Count() > 0) //
-                        {
-                            //持仓存在的情况下，判断持仓数量加上本次购买数量总和是否超标
-                            AccountPosition ap = (from item in accInfo.positions where item.code == bw.Code select item).ToList()[0];
-
-                            if ((Convert.ToDouble(ap.amount) + Convert.ToDouble(tos.nSecurityAmount)) > (Convert.ToDouble(bw.Amount) * bw.PercentageA))
-                            {
-                                errCode = 5;
-                                result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            //无持仓情况下，判断本次购买数量是否超标
-
-                            if(Convert.ToDouble(tos.nSecurityAmount) > (Convert.ToDouble(bw.Amount) * bw.PercentageA))
-                            {
-                                errCode = 5;
-                                result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
-                                return false;
-                            }
-                        }
-                        
-
-                    }
-                }
-            }
-
-            double totalCost = 0;//股票预计成本
-
-
-            foreach (TradeOrderStruct tos in orderlist)
-            {
-                if(tos.cSecurityType != "S" && tos.cSecurityType != "s")
-                {
-                    continue;
-                }
-
-                totalCost += (tos.nSecurityAmount * tos.dOrderPrice);
-                var tmp = (from item in whiteli where item.Code == tos.cSecurityCode select item);
-
-                if (tmp.Count() == 0)
-                {
-                    errCode = 4;
-                    result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode );
-                    return false;
-                }
-
-                BWNameTable whiteItem = tmp.ToList()[0];
-
-                long posNum = accountMonitor.GetStockTotalPositionAmount(tos.cSecurityCode.Trim());
-
-                if((Convert.ToDecimal(whiteItem.PercentageA) * whiteItem.Amount < posNum)||(Convert.ToDecimal(whiteItem.PercentageB) * whiteItem.Value < posNum))
-                {
-                    errCode = 5;
-                    result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode );
-                    return false;
-                }
-                
-                
-
-                //仅买入时判断单支超限
-                if (tos.cTradeDirection == "0")
-                {
-                    if (tos.dOrderPrice * tos.nSecurityAmount > (Convert.ToDouble(accInfo.value.Trim() + Convert.ToDouble(accInfo.balance.Trim()))) * riskPara.PerStockCostPercentage)
-                    {
-                        errCode = 6;
-                        result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
-                        return false;
-                    }
-                }
-            }
-
-            //判断三：股票成本是否超限
-            if (totalCost * (1 + overflow) > Convert.ToDouble(accInfo.balance))
-            {
-                errCode = 7;
-                result = accountMonitor.GetErrorCode(errCode, totalCost.ToString());
-                return false;
-            }
-
-
-            double fearning = Convert.ToDouble(accInfo.fincome);        //期货盈亏
-            double fstock = Convert.ToDouble(accInfo.fstockvalue);      //期货对应股票市值
-            double fweight = Convert.ToDouble(accInfo.fvalue);          //期货权益
-
-
-            string accountLimit = DBAccessLayer.GetAccountAvailable(user.alias);
-            double stockAccount = 0;                //股票资金量
-            double futureAccount = 0;               //期货原始权益
-
-            if (accountLimit == string.Empty)
-            {
-                result = "无用户可用资金和用户权益";
-                return false;
-            }
-
-
-            stockAccount = Convert.ToDouble(accountLimit.Split('|')[0].Trim());
-            futureAccount = Convert.ToDouble(accountLimit.Split('|')[1].Trim());
-
-            //预估交易后的期货风控参数
-            //客户权益 = 当日结存 + 浮动盈亏 ，其中新交易不受浮动盈亏影响，所以客户权益不变
-            //期货保证金 = 期货对应股票市值 * 系数 
-
-            foreach (TradeOrderStruct record in orderlist)
-            {
-                if(record.cSecurityType != "f" && record.cSecurityType != "F")
-                {
-                    continue;
-                }
-                FutureTradeTimes[name] -= Convert.ToInt16(record.nSecurityAmount);
-                if (MarketPrice.market.ContainsKey(record.cSecurityCode))
-                {
-                    int x = -1;
-                    if (record.cTradeDirection == "48")
-                    {
-                        x = 1;
-                    }
-
-                    // 模拟新期货开仓后
-                    fstock += Convert.ToDouble((record.nSecurityAmount) * MarketPrice.market[record.cSecurityCode] * accountMonitor.factor * x);
-
-                    fearning += Convert.ToDouble((record.nSecurityAmount) * (MarketPrice.market[record.cSecurityCode] - record.dOrderPrice) * x);
-                    futureAccount += Convert.ToDouble((record.nSecurityAmount) * (MarketPrice.market[record.cSecurityCode] - record.dOrderPrice) * x);
-                }
-            }
-
-            fstock = Math.Abs(fstock);
-
-            fweight = futureAccount + fearning;
-
-            double future_margin = fstock * accountMonitor.future_margin_factor; //期货保证金
-
-            double frisk = future_margin / fweight;                     //期货风险度
-
-            double fchangkou = (fstock + totalCost) / fstock;           //敞口比例 ？？？计算中分母的股票市值为股票账户中的股票市值 加上当前预计买入的股票市值    
-
-
-            foreach (TradeOrderStruct record in orderlist)
-            {
-                if (record.cSecurityType != "f" && record.cSecurityType != "F")
-                {
-                    continue;
-                }
-                //单日期货不超过十笔
-                if (FutureTradeTimes[name] < 0)
-                {
-                    errCode = 10;
-                    result = accountMonitor.GetErrorCode(errCode, String.Empty);
-                    return false;
-                }
-
-                //期货风险度判断
-                if (Convert.ToDouble(frisk) > riskPara.riskLevel)
-                {
-                    errCode = 8;
-                    result = accountMonitor.GetErrorCode(errCode, string.Empty);
-                    return false;
-                }
-
-
-
-            }
-
-
-            //敞口比例
-            if (fchangkou > riskPara.changkouRadio)
-            {
-                errCode = 9;
-                result = accountMonitor.GetErrorCode(errCode, String.Empty);
-                return false;
-            }
-
-            if (Double.IsNaN(fchangkou ))
-            {
-                errCode = 9;
-                result = accountMonitor.GetErrorCode(errCode, String.Empty);
-                return false;
-            }
-
-            if (errCode != 0) return false;
-            else
-            {
-                //风控冻结信息写入内存
-                foreach (TradeOrderStruct order in orderlist)
-                {
-                    //ToDo : 只有股票买入，或者期货开仓，才需要计入风控资金冻结
-                    accountMonitor.UpdateRiskFrozonAccount(user.alias, order.cSecurityCode, Convert.ToInt32(order.nSecurityAmount), Convert.ToDouble(order.nSecurityAmount * order.dOrderPrice), order.cSecurityType, order.cTradeDirection);
-                }
-                return true; 
-            }
-
-        }
-
-      
 
         private static riskParameter riskPara = new riskParameter();
 
@@ -520,7 +153,127 @@ namespace Stork_Future_TaoLi
             }
         }
 
+        /// <summary>
+        /// 风控检测
+        /// 仅针对股票买入和期货开仓进行判断
+        /// 新交易影响持仓参数：
+        ///     股票：
+        ///         可用资金减少
+        ///         股票成本增加
+        ///         风控冻结资金量增加
+        ///     期货：
+        ///         期货冻结资金增加
+        ///         可用资金减少
+        /// </summary>
+        /// <param name="alias">用户名</param>
+        /// <param name="orderlist">交易列表</param>
+        /// <param name="result">结果</param>
+        /// <returns>是否通过风控</returns>
+        public static bool RiskDetection(string alias, List<TradeOrderStruct> orderlist, out string result)
+        {
+            //第一步： 计算新交易引入后对于股票，期货持仓参数的预见性影响
+            alias = alias.Trim();
 
+            //获取真实实时账户信息
+            UserInfo user = DBAccessLayer.GetOneUser(alias);
+
+            if (user == null) 
+            {
+                result = "未查到用户：" + alias;
+                return false; 
+            }
+
+            //刷新内存中的资金信息
+            AccountInfo current_account = accountMonitor.UpdateAccountList(user);
+
+            StockAccountTable stock_account = accountMonitor.GetStockAccount(alias);
+
+            if (stock_account == null) {
+                result = "stockAccountDictionary中不存在用户：" + alias;
+                return false;
+            }
+
+            FutureAccountTable future_account = accountMonitor.GetFutureAccount(alias);
+
+            if (future_account == null)
+            {
+
+                result = "futureAccountDictionary中不存在用户： " + alias;
+            }
+
+            //计划买入股票交易列表
+            var Stock_to_buy_var = (from item
+                                in orderlist
+                                where item.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy &&
+                                (item.cSecurityType == "S" || item.cSecurityType == "s")
+                                select item);
+
+           
+            List<TradeOrderStruct> Stock_to_buy = new List<TradeOrderStruct>();
+
+            if (Stock_to_buy_var.Count() != 0) Stock_to_buy = Stock_to_buy_var.ToList();
+
+            //计划卖出股票交易列表
+            var Stock_to_sell_var = (from item
+                                in orderlist
+                                where item.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionSell &&
+                                (item.cSecurityType == "S" || item.cSecurityType == "s")
+                                select item);
+
+             List<TradeOrderStruct> Stock_to_sell = new List<TradeOrderStruct>();
+
+            if (Stock_to_sell_var.Count() != 0) Stock_to_sell = Stock_to_sell_var.ToList();
+
+            //计划开仓期货交易列表
+            var Future_to_open_var = (from item
+                                     in orderlist
+                                 where item.cOffsetFlag == TradeOrientationAndFlag.FutureTradeOffsetOpen &&
+                                 (item.cSecurityType == "F" || item.cSecurityType == "f")
+                                 select item);
+
+            List<TradeOrderStruct> Future_to_open = new List<TradeOrderStruct>();
+
+            if (Future_to_open_var.Count() != 0) Future_to_open = Future_to_open_var.ToList();
+
+            //计划平仓期货交易列表
+            var Future_to_close_var = (from item
+                                     in orderlist
+                                 where item.cOffsetFlag == TradeOrientationAndFlag.FutureTradeOffsetClose &&
+                                 (item.cSecurityType == "F" || item.cSecurityType == "f")
+                                 select item);
+
+            List<TradeOrderStruct> Future_to_close = new List<TradeOrderStruct>();
+
+            if (Future_to_close_var.Count() != 0) Future_to_close = Future_to_close_var.ToList();
+            
+            //计算预期购买股票成本
+            double stock_etimate_add_cost = 0;
+
+            foreach (TradeOrderStruct order in Stock_to_buy)
+            {
+                stock_etimate_add_cost += order.dOrderPrice * order.nSecurityAmount;
+            }
+
+            //计算预期期货追加保证金
+            double future_estimate_add_deposit = 0;
+
+            foreach(TradeOrderStruct order in Future_to_open)
+            {
+                future_estimate_add_deposit += (order.nSecurityAmount * order.dOrderPrice * AccountPARA.MarginValue);
+            }
+
+
+            //第二步： 计算修改的资金账户参数是否满足风控指标要求
+
+            //判断卖出股票是否小于持仓
+            foreach(TradeOrderStruct order in Stock_to_sell)
+            {
+                //计算当前该股票持仓减去
+                int current_position_entrust_amount = 
+            }
+
+            //第三部： 实际减少股票资金
+        }
     }
 
     /// <summary>

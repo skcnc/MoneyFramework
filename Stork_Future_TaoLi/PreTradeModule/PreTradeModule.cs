@@ -341,7 +341,7 @@ namespace Stork_Future_TaoLi
 
                     //风控检测
                     string result = string.Empty;
-                     bool brisk = riskmonitor.RiskControl(_tradeUnit.cUser, _TradeList, out result);
+                    bool brisk = riskmonitor.RiskDetection(_tradeUnit.cUser, _TradeList, out result);
 
                      DBAccessLayer.AddRiskRecord(_tradeUnit.cUser, result, "00", _tradeUnit.cSecurityCode, Convert.ToInt32(_tradeUnit.nSecurityAmount), _tradeUnit.dOrderPrice, _tradeUnit.cTradeDirection);
 
