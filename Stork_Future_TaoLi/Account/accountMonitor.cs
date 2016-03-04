@@ -192,6 +192,10 @@ namespace Stork_Future_TaoLi
 
                         return "平仓期货" + security + "方向" + direction + "数量低于持仓，当前持仓" + amount;
                     }
+                case 13:
+                    {
+                        return "股票总成本，超过总资产的80%，达到" + content;
+                    }
                 default :
                     return "验证通过";
             }
@@ -638,7 +642,8 @@ namespace Stork_Future_TaoLi
                     dealMoney = item.DealFrezonMoney.ToString(),
                     exchange = item.ExchangeId,
                     requestAmount = item.Amount.ToString(),
-                    requestPrice = item.OrderPrice.ToString()
+                    requestPrice = item.OrderPrice.ToString(),
+                    direction = item.Direction.ToString()
                 });
             }
 
@@ -1113,6 +1118,11 @@ namespace Stork_Future_TaoLi
         /// 成交价
         /// </summary>
         public string dealMoney { get; set; }
+
+        /// <summary>
+        /// 交易方向
+        /// </summary>
+        public string direction { get; set; }
     }
 
     /// <summary>

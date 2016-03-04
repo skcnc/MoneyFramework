@@ -174,6 +174,10 @@ namespace Stork_Future_TaoLi
             //第一步： 计算新交易引入后对于股票，期货持仓参数的预见性影响
             alias = alias.Trim();
 
+            //风控错误码
+            int errCode = 0;
+
+
             //获取真实实时账户信息
             UserInfo user = DBAccessLayer.GetOneUser(alias);
 
@@ -262,17 +266,310 @@ namespace Stork_Future_TaoLi
                 future_estimate_add_deposit += (order.nSecurityAmount * order.dOrderPrice * AccountPARA.MarginValue);
             }
 
-
             //第二步： 计算修改的资金账户参数是否满足风控指标要求
 
-            //判断卖出股票是否小于持仓
-            foreach(TradeOrderStruct order in Stock_to_sell)
+            //判断卖出/平仓证券是否小于持仓
+
+            #region 黑白名单判断及总股本限制
+
+            //获得白名单
+            List<BWNameTable> BWRecords = DBAccessLayer.GetWBNamwList();
+
+            foreach(TradeOrderStruct tos in orderlist)
             {
-                //计算当前该股票持仓减去
-                int current_position_entrust_amount = 
+                BWNameTable BW_record=  BWRecords.Find(delegate(BWNameTable item) { return item.Code.Trim() == tos.cSecurityCode.Trim(); });
+
+                if (BW_record == null) { errCode = 4; result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode); return false; }
+
+                if(tos.cSecurityType.ToUpper() == "S" && tos.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy)
+                {
+                    //判断总股本数量限制
+                    double buylimit = Convert.ToDouble(BW_record.PercentageA) * Convert.ToDouble(BW_record.Amount);
+
+                    
+                    int entrust_amount = 0;
+
+                    AccountEntrust entrust_record = current_account.entrusts.Find(
+                            delegate(AccountEntrust item)
+                            {
+                                return item.code == tos.cSecurityCode;
+                            }
+                        );
+
+                    if (entrust_record != null) entrust_amount = Convert.ToInt32(entrust_record.dealAmount);
+
+                    int position_amount = 0;
+
+                    AccountPosition position_record = current_account.positions.Find(
+                            delegate(AccountPosition item)
+                            {
+                                return item.code == tos.cSecurityCode;
+                            }
+                        );
+
+                    if (position_record != null) { position_amount = Convert.ToInt32(position_record.amount); }
+
+                   if(tos.nSecurityAmount + entrust_amount + position_amount > buylimit)
+                   {
+                       errCode = 5;
+                       result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
+                       return false;
+                   }
+                }
             }
 
+            #endregion
+
+            #region 判断卖出/平仓证券是否小于持仓
+            foreach (TradeOrderStruct order in Stock_to_sell)
+            {
+                if (order.cSecurityType == "F" || order.cSecurityType == "f")
+                {
+                    if (order.cOffsetFlag == TradeOrientationAndFlag.FutureTradeOffsetClose)
+                    {
+                        int position_amount = 0;
+
+                        //期货平仓交易，需要判断对应开仓数量是否满足
+                        if (order.cTradeDirection == TradeOrientationAndFlag.FutureTradeDirectionBuy)
+                        {
+                            //买入平仓，需要判断卖出开仓数量
+
+                            AccountPosition position_record = current_account.positions.Find(
+                                    delegate(AccountPosition item)
+                                    {
+                                        return item.direction == TradeOrientationAndFlag.FutureTradeDirectionSell && order.cSecurityCode == item.code;
+                                    }
+                                );
+
+                            if (position_record != null) { position_amount = Convert.ToInt32(position_record.amount); }
+
+                            if(order.nSecurityAmount < position_amount)
+                            {
+                                //买入平仓数量小于卖出仓位，交易被拒绝。
+                                errCode = 12;
+                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + order.nSecurityAmount + "|" + order.cTradeDirection);
+                                return false;
+                            }
+
+                        }
+                        else if (order.cTradeDirection == TradeOrientationAndFlag.FutureTradeDirectionSell)
+                        {
+                            //卖出平仓，需要判断买入开仓的数量
+
+                            AccountPosition position_record = current_account.positions.Find(
+                                    delegate(AccountPosition item)
+                                    {
+                                        return item.direction == TradeOrientationAndFlag.FutureTradeDirectionBuy && order.cSecurityCode == item.code;
+                                    }
+                                );
+
+                            if (position_record != null) { position_amount = Convert.ToInt32(position_record.amount); }
+
+                            if (order.nSecurityAmount < position_amount)
+                            {
+                                //卖出平仓数量小于买入仓位，交易被拒绝。
+                                errCode = 12;
+                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + order.nSecurityAmount + "|" + order.cTradeDirection);
+                                return false;
+                            }
+                        }
+                    }
+                }
+                else if (order.cSecurityType == "S" || order.cSecurityType == "s")
+                {
+                    if (order.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionSell)
+                    {
+                        //股票卖出交易，需要判断当前持仓数量是否满足
+                        int entrust_amount = 0;
+
+                        AccountEntrust entrust_record = current_account.entrusts.Find(
+                                delegate(AccountEntrust item)
+                                {
+                                    return item.code == order.cSecurityCode;
+                                }
+                            );
+
+                        if (entrust_record != null) entrust_amount = Convert.ToInt32(entrust_record.dealAmount);
+
+                        int position_amount = 0;
+
+                        AccountPosition position_record = current_account.positions.Find(
+                                delegate(AccountPosition item)
+                                {
+                                    return item.code == order.cSecurityCode;
+                                }
+                            );
+
+                        if (position_record != null) { position_amount = Convert.ToInt32(position_record.amount); }
+
+                        if (order.nSecurityAmount < entrust_amount + position_amount)
+                        {
+                            errCode = 11;
+                            result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + (entrust_amount + position_amount).ToString());
+                            return false;
+                        }
+                    }
+                }
+
+
+
+
+
+            }
+            #endregion
+
+            #region 判断买入股票和期货需要资金是否高于当前可用资金
+
+            //预期股票剩余资金
+            double stock_balance = Convert.ToDouble(current_account.account) - stock_etimate_add_cost;
+
+            if (stock_balance <= 0)
+            {
+                errCode = 1;
+                result = accountMonitor.GetErrorCode(errCode, string.Empty);
+                return false;
+            }
+
+            //预期期货可用资金
+            double future_balance = Convert.ToDouble(current_account.faccount) - future_estimate_add_deposit;
+
+            if(future_balance <= 0)
+            {
+                errCode = 2;
+                result = accountMonitor.GetErrorCode(errCode, string.Empty);
+                return false;
+            }
+
+            #endregion
+
+            #region 单一股票占总资产不超过5%
+
+            //总资产
+            double totalAccount = Convert.ToDouble(current_account.account) + Convert.ToDouble(current_account.cost) + Convert.ToDouble(current_account.fvalue);
+
+            foreach(TradeOrderStruct tos in orderlist)
+            {
+                if(tos.cSecurityType.ToUpper() == "S")
+                {
+                    if(tos.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy)
+                    {
+                        double entrust_value  = 0;
+
+                        AccountEntrust entrust_record = current_account.entrusts.Find(
+                                delegate(AccountEntrust item)
+                                {
+                                    return item.code == tos.cSecurityCode;
+                                }
+                            );
+
+                        if (entrust_record != null) entrust_value = Convert.ToDouble(entrust_record.dealMoney) * Convert.ToDouble(entrust_record.dealAmount;
+
+                        double position_value = 0;
+
+                        AccountPosition position_record = current_account.positions.Find(
+                                delegate(AccountPosition item)
+                                {
+                                    return item.code == tos.cSecurityCode;
+                                }
+                            );
+
+                        if (position_record != null) { position_value = Convert.ToDouble(position_record.price) * Convert.ToDouble(position_record.amount); }
+
+                        if((entrust_value + position_value) / totalAccount * 100 > 5)
+                        {
+                            errCode  = 6;
+                            result = accountMonitor.GetErrorCode(errCode,tos.cSecurityCode);
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            #region 股票所占投资总额不超过80%
+            //总市值，totalAccount
+            //当前股票成本 ， current_account.cost + 委托中的买入股票成本
+            double estimate_stock_cost = Convert.ToDouble(current_account.cost);
+
+            foreach(AccountEntrust record in current_account.entrusts)
+            {
+                if(record.direction == TradeOrientationAndFlag.StockTradeDirectionBuy)
+                {
+                    estimate_stock_cost += Convert.ToDouble(record.dealMoney) * Convert.ToDouble(record.dealAmount);
+                }
+            }
+
+            if(estimate_stock_cost / totalAccount * 100 > 80)
+            {
+                errCode = 13;
+                result = accountMonitor.GetErrorCode(errCode,(estimate_stock_cost / totalAccount * 100).ToString());
+                return false;
+            }
+            #endregion
+
+            #region 单日期货交易次数不超过10手
+
+            if(FutureTradeTimes.Keys.Contains(alias))
+            {
+                if(DateTime.Now.Hour > 16)
+                {
+                    //下午四点后，默认计数清零
+                    FutureTradeTimes[alias] = 0;
+                }
+
+                if(DateTime.Now.DayOfWeek == DayOfWeek.Saturday || DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    //周末直接清零
+                    FutureTradeTimes[alias] = 0;
+                }
+            }
+            else
+            {
+                FutureTradeTimes.Add(alias,0);
+            }
+
+
+            int future_trade_hand_count = 0;
+
+            foreach(TradeOrderStruct tos in orderlist)
+            {
+                if(tos.cSecurityType.ToUpper() == "F" && tos.cOffsetFlag == TradeOrientationAndFlag.FutureTradeOffsetOpen)
+                {
+                    //只有期货开仓才会计入数量限制，平仓不限
+                    future_trade_hand_count += Convert.ToInt32(tos.nSecurityAmount);
+                }
+            }
+
+
+            if(FutureTradeTimes[alias] + future_trade_hand_count > 10)
+            {
+                errCode = 10;
+                result = accountMonitor.GetErrorCode(errCode,string.Empty);
+                return false;
+            }
+
+            #endregion
+
+            #region 期货风险度和敞口比例
+
+            //期货风险度
+            double risk_radio = (Convert.ToDouble(current_account.fbond) + future_estimate_add_deposit) / (Convert.ToDouble(current_account.fvalue));
+
+            if(risk_radio >= riskPara.riskLevel)
+            {
+                errCode = 8;
+                result = accountMonitor.GetErrorCode(errCode,string.Empty);
+                return false;
+            }
+
+            //敞口
+
+            #endregion
+
             //第三部： 实际减少股票资金
+
+
         }
     }
 

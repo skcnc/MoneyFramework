@@ -188,6 +188,11 @@ namespace Stork_Future_TaoLi
         /// 冻结金额
         /// </summary>
         public double DealFrezonMoney { get; set; }
+
+        /// <summary>
+        /// 股票买入卖出标记
+        /// </summary>
+        public string Direction { get; set; }
     }
 
     /// <summary>
