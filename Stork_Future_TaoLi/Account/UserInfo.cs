@@ -8,6 +8,12 @@ namespace Stork_Future_TaoLi.Account
 {
     public class userOper
     {
+
+        /// <summary>
+        /// 记录所有已经登录的用户
+        /// </summary>
+        public static Dictionary<string, loginType> LoginUserDirection = new Dictionary<string, loginType>();
+
         /// <summary>
         /// 注册新用户
         /// </summary>
@@ -28,6 +34,11 @@ namespace Stork_Future_TaoLi.Account
             return DBAccessLayer.InsertUser(para);
         }
 
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        /// <param name="InputJson"></param>
+        /// <returns></returns>
         public static int? login(String InputJson)
         {
             loginType para = JsonConvert.DeserializeObject<loginType>(InputJson);
@@ -39,8 +50,37 @@ namespace Stork_Future_TaoLi.Account
                 }
             }
 
-            return DBAccessLayer.Login(para);
+            int? result = DBAccessLayer.Login(para);
 
+            if (result != 0)
+            {
+                //说明登录成功，需要记录当前已经连入用户的信息
+                if(LoginUserDirection.Keys.Contains(para.name))
+                {
+                    LoginUserDirection[para.name] = para;
+                }
+                else
+                {
+                    LoginUserDirection.Add(para.name, para);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 用户登出
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string logout(String name)
+        {
+            if(LoginUserDirection.Keys.Contains(name.Trim()))
+            {
+                LoginUserDirection.Remove(name.Trim());
+            }
+
+            return "0";
         }
 
         public static bool ChangePassword(String InputJson)
@@ -65,6 +105,25 @@ namespace Stork_Future_TaoLi.Account
             }
 
             return DBAccessLayer.ChangePassword(para);
+        }
+
+        /// <summary>
+        /// 判断监控用户是否登录
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool CheckMonitorUser(String name)
+        {
+            name = name.Trim();
+
+            if(LoginUserDirection.Keys.Contains(name))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 

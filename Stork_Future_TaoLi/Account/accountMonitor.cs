@@ -51,6 +51,37 @@ namespace Stork_Future_TaoLi
 
         public static void RUN()
         {
+
+            //首次启动需要load全部持仓到本地
+            List<UserInfo> users = DBAccessLayer.GetUser();
+
+            foreach(UserInfo user in users)
+            {
+                List<CC_TAOLI_TABLE> records = new List<CC_TAOLI_TABLE>();
+                DBAccessLayer.LoadCCList(user.alias,out records);
+
+                if(records.Count != 0)
+                {
+                    ChangeLocalCC(user.alias, records);   
+                }
+            }
+
+            //初始化 stockAccountDictionary futureAccountDictionary
+            foreach(UserInfo user in users)
+            {
+                StockAccountTable stockAccount = DBAccessLayer.GetStockAccount(user.alias);
+                StockAccountDictionary.Add(user.alias, stockAccount);
+
+                FutureAccountTable futureAccount = DBAccessLayer.GetFutureAccount(user.alias);
+                FutureAccountDictionary.Add(user.alias, futureAccount);
+            }
+
+            //初始化 riskFrozenDictionary
+            foreach(UserInfo user in users)
+            {
+                RiskFrozenDictionary.Add(user.alias, new List<RiskFrozenInfo>());
+            }
+
             excuteThread.Start();
             Thread.Sleep(1000);
         }
@@ -68,6 +99,28 @@ namespace Stork_Future_TaoLi
 
                     foreach (UserInfo info in users)
                     {
+                        List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(info.alias);
+
+                        int count = 0;
+
+                        if (risks.Count > 0)
+                        {
+                            List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
+
+                            foreach (RISK_TABLE risk in risks)
+                            {
+                                count++;
+                                if (count > 10) break;
+                                riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
+                            }
+
+
+                            TradeMonitor.Instance.updateRiskList(info.alias, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
+
+                        }
+
+            
+
                         if(info.userRight == 3)
                         {
 
@@ -77,6 +130,18 @@ namespace Stork_Future_TaoLi
                         }
 
                         AccountInfo acc = UpdateAccountList(info);
+
+                        if(AccountInfoDictionary.Keys.Contains(info.alias))
+                        {
+                            lock(AccountInfoDictionary)
+                            {
+                                AccountInfoDictionary[info.alias] = acc;
+                            }
+                        }
+                        else
+                        {
+                            AccountInfoDictionary.Add(info.alias, acc);
+                        }
 
                         if (info.userRight == 2)
                         {
@@ -195,6 +260,10 @@ namespace Stork_Future_TaoLi
                 case 13:
                     {
                         return "股票总成本，超过总资产的80%，达到" + content;
+                    }
+                case 14:
+                    {
+                        return "风险监控用户未在线，交易禁止！";
                     }
                 default :
                     return "验证通过";
@@ -435,7 +504,11 @@ namespace Stork_Future_TaoLi
              string alias = info.alias.Trim();
            
             //获取全部持仓，该值会拆分成CC_Stock_records 和 CC_Future_records
-            List<CC_TAOLI_TABLE> CC_records = CCDictionary[alias];
+             List<CC_TAOLI_TABLE> CC_records = new List<CC_TAOLI_TABLE>();
+             if (CCDictionary.Keys.Contains(alias))
+             {
+                 CC_records = CCDictionary[alias];
+             }
 
             //获取股票持仓
             List<CC_TAOLI_TABLE> CC_Stock_records = (from item in CC_records where item.CC_TYPE == "F" || item.CC_TYPE == "f" select item).ToList();

@@ -343,6 +343,7 @@ namespace Stork_Future_TaoLi
                     string result = string.Empty;
                     bool brisk = riskmonitor.RiskDetection(_tradeUnit.cUser, _TradeList, out result);
 
+                    //风控结果记入数据库
                      DBAccessLayer.AddRiskRecord(_tradeUnit.cUser, result, "00", _tradeUnit.cSecurityCode, Convert.ToInt32(_tradeUnit.nSecurityAmount), _tradeUnit.dOrderPrice, _tradeUnit.cTradeDirection);
 
                      List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(_tradeUnit.cUser);
@@ -361,7 +362,7 @@ namespace Stork_Future_TaoLi
                          }
 
 
-                         TradeMonitor.Instance.updateRiskList(_tradeUnit.cUser, JsonConvert.SerializeObject(riskinfos));
+                         TradeMonitor.Instance.updateRiskList(_tradeUnit.cUser, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
      
                      }
 

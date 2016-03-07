@@ -358,7 +358,7 @@ namespace Stork_Future_TaoLi.TradeModule
                             GlobalErrorLog.LogInstance.LogEvent("获取委托号失败！用户: " + user + ",代码：" + tradesUnit.SecurityCode);
                         }
 
-                        if (entrustUnit.Direction == 49)
+                        if (entrustUnit.Direction.ToString() == TradeOrientationAndFlag.StockTradeDirectionBuy)
                         {
                             //清除风控冷冻金额,只有买入需要清除风控列表
                             accountMonitor.UpdateRiskFrozonAccount(user, tradesUnit.SecurityCode, tradesUnit.SecurityAmount * (-1), tradesUnit.SecurityAmount * tradesUnit.OrderPrice * (-1), "S", tradesUnit.TradeDirection.ToString());

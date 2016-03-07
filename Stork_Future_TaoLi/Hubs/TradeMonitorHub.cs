@@ -62,13 +62,14 @@ namespace Stork_Future_TaoLi.Hubs
             }
         }
 
-        public void updateRiskList(String name,String JsonString)
+        public void updateRiskList(String name,String JsonStringRisk, String JsonStringRiskPara)
         {
             try
             {
                 if (!UserConnectionRelation.ContainsKey(name)) { return; }
 
-                _context.Clients.Client(UserConnectionRelation[name]).updateRiskList(JsonString);
+                _context.Clients.Client(UserConnectionRelation[name]).updateRiskList(JsonStringRisk);
+                _context.Clients.Client(UserConnectionRelation[name]).updateRiskPara(JsonStringRiskPara);
             }
             catch (Exception ex) { GlobalErrorLog.LogInstance.LogEvent(ex.ToString()); }
         }

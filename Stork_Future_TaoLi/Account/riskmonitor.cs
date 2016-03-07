@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Stork_Future_TaoLi.Account;
 using Stork_Future_TaoLi.Database;
 using Stork_Future_TaoLi.Hubs;
 using Stork_Future_TaoLi.Variables_Type;
@@ -26,7 +27,7 @@ namespace Stork_Future_TaoLi
         /// </summary>
         public static Dictionary<String, TMRiskInfo> LocalRiskInfo = new Dictionary<string, TMRiskInfo>();
 
-        private static riskParameter riskPara = new riskParameter();
+        public static riskParameter riskPara = new riskParameter();
 
 
         public static void Init()
@@ -34,7 +35,7 @@ namespace Stork_Future_TaoLi
             //初始化加载风控参数
             List<BWNameTable> BWRecords = DBAccessLayer.GetWBNamwList();
 
-            riskPara.changkouRadio = 0.1;
+            riskPara.changkouRatio = 0.1;
             riskPara.riskLevel = 0.4;
             riskPara.PerStockCostPercentage = 0.05;
             riskPara.stockRadio = 0.05;
@@ -97,11 +98,11 @@ namespace Stork_Future_TaoLi
         /// <returns>风控参数的json字符串</returns>
         public static String GetRiskParaJson(String InputJson)
         {
-
-            
             string err = string.Empty;
-            riskPara.account = accountMonitor.GetAccountInfo(InputJson, out err);
-            
+            if (InputJson != null && InputJson != String.Empty)
+            {
+                riskPara.account = accountMonitor.GetAccountInfo(InputJson, out err);
+            }
             return JsonConvert.SerializeObject(riskPara);
         }
 
@@ -140,7 +141,7 @@ namespace Stork_Future_TaoLi
                 }
 
 
-                riskPara.changkouRadio = para.changkouRadio;
+                riskPara.changkouRatio = para.changkouRatio;
                 riskPara.PerStockCostPercentage = para.PerStockCostPercentage;
                 riskPara.riskLevel = para.riskLevel;
                 riskPara.stockRadio = para.stockRadio;
@@ -171,6 +172,8 @@ namespace Stork_Future_TaoLi
         /// <returns>是否通过风控</returns>
         public static bool RiskDetection(string alias, List<TradeOrderStruct> orderlist, out string result)
         {
+            result = string.Empty;
+            if (alias == null) return false;
             //第一步： 计算新交易引入后对于股票，期货持仓参数的预见性影响
             alias = alias.Trim();
 
@@ -385,7 +388,7 @@ namespace Stork_Future_TaoLi
                         AccountEntrust entrust_record = current_account.entrusts.Find(
                                 delegate(AccountEntrust item)
                                 {
-                                    return item.code == order.cSecurityCode;
+                                    return item.code == order.cSecurityCode && item.direction == TradeOrientationAndFlag.StockTradeDirectionSell;
                                 }
                             );
 
@@ -402,7 +405,8 @@ namespace Stork_Future_TaoLi
 
                         if (position_record != null) { position_amount = Convert.ToInt32(position_record.amount); }
 
-                        if (order.nSecurityAmount < entrust_amount + position_amount)
+                        //判断当前持仓和委托+下单卖出总和比较
+                        if (order.nSecurityAmount + entrust_amount > position_amount)
                         {
                             errCode = 11;
                             result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + (entrust_amount + position_amount).ToString());
@@ -462,7 +466,7 @@ namespace Stork_Future_TaoLi
                                 }
                             );
 
-                        if (entrust_record != null) entrust_value = Convert.ToDouble(entrust_record.dealMoney) * Convert.ToDouble(entrust_record.dealAmount;
+                        if (entrust_record != null) entrust_value = Convert.ToDouble(entrust_record.dealMoney) * Convert.ToDouble(entrust_record.dealAmount);
 
                         double position_value = 0;
 
@@ -475,7 +479,7 @@ namespace Stork_Future_TaoLi
 
                         if (position_record != null) { position_value = Convert.ToDouble(position_record.price) * Convert.ToDouble(position_record.amount); }
 
-                        if((entrust_value + position_value) / totalAccount * 100 > 5)
+                        if ((tos.nSecurityAmount * tos.dOrderPrice + entrust_value + position_value) / totalAccount > riskPara.PerStockCostPercentage)
                         {
                             errCode  = 6;
                             result = accountMonitor.GetErrorCode(errCode,tos.cSecurityCode);
@@ -500,7 +504,7 @@ namespace Stork_Future_TaoLi
                 }
             }
 
-            if(estimate_stock_cost / totalAccount * 100 > 80)
+            if (estimate_stock_cost / totalAccount> riskPara.StockCostRatio)
             {
                 errCode = 13;
                 result = accountMonitor.GetErrorCode(errCode,(estimate_stock_cost / totalAccount * 100).ToString());
@@ -567,9 +571,44 @@ namespace Stork_Future_TaoLi
 
             #endregion
 
+            #region 监控用户登录判断
+
+            if (!userOper.CheckMonitorUser(CONFIG.GlobalMonitor))
+            {
+                errCode = 14;
+                result = accountMonitor.GetErrorCode(errCode, string.Empty);
+                return false;
+            }
+
+            #endregion
+
             //第三部： 实际减少股票资金
 
+            foreach(TradeOrderStruct tos in orderlist)
+            {
+                if(tos.cSecurityType.ToUpper() == "S"){
+                    if(tos.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy)
+                    {
+                        //股票交易买入需要计入风控列表
+                        accountMonitor.UpdateRiskFrozonAccount(user.alias,tos.cSecurityCode,Convert.ToInt32(tos.nSecurityAmount),tos.nSecurityAmount
+                             * tos.dOrderPrice,"S",tos.cTradeDirection);
+                    }
+                }
+                else if(tos.cSecurityType.ToUpper() == "F")
+                {
+                    if(tos.cOffsetFlag == TradeOrientationAndFlag.FutureTradeOffsetOpen)
+                    {
+                        //期货交易开仓需要计入风控列表
+                        accountMonitor.UpdateRiskFrozonAccount(user.alias, tos.cSecurityCode, Convert.ToInt32(tos.nSecurityAmount), tos.nSecurityAmount * tos.dOrderPrice, "F", tos.cTradeDirection);
+                    }
+                }
+            }
 
+            errCode = 0;
+
+            result = accountMonitor.GetErrorCode(errCode, string.Empty);
+
+            return true;
         }
     }
 
@@ -593,7 +632,7 @@ namespace Stork_Future_TaoLi
         /// <summary>
         /// 敞口比例
         /// </summary>
-        public double changkouRadio = 0.1;
+        public double changkouRatio = 0.1;
 
         /// <summary>
         /// 风险度限制
@@ -610,6 +649,11 @@ namespace Stork_Future_TaoLi
         /// 单只股票所占资金比例
         /// </summary>
         public double PerStockCostPercentage = 0.05;
+
+        /// <summary>
+        /// 股票占总投资比例
+        /// </summary>
+        public double StockCostRatio = 0.8;
 
         /// <summary>
         /// 持仓信息

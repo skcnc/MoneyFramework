@@ -68,6 +68,12 @@ namespace Stork_Future_TaoLi.Variables_Type
         {
             return false;
         }
+
+        /// <summary>
+        /// 全局监控用户
+        /// </summary>
+        public static string GlobalMonitor { get { return globalmonitor; } }
+        private static string globalmonitor = "sc";
     }
 
     public class CommConfig

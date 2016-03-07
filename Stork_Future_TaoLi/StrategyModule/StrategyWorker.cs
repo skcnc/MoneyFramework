@@ -631,12 +631,12 @@ namespace Stork_Future_TaoLi.StrategyModule
                     // 生成交易列表
                     if (_reached)
                     {
-                        
+
 
                         List<managedTraderorderstruct> ol = (Type == "OPEN") ? m_strategy_open.getTradeList().ToList() : m_strategy_close.getTradeList().ToList();
 
 
-                        
+
                         //交易列表送往交易线程下单（下单的线程，股票和期货是分开的）
                         List<TradeOrderStruct> orderli = new List<TradeOrderStruct>();
 
@@ -671,33 +671,18 @@ namespace Stork_Future_TaoLi.StrategyModule
                         }
 
                         //提交风控模块
-                        string errCode = string.Empty;
 
-                        if (riskmonitor.RiskControl(User, orderli, out errCode))
+                        //下单到交易预处理模块
+                        queue_prd_trade.GetQueue().Enqueue((object)orderli);
+
+                        if (DBAccessLayer.DBEnable)
                         {
-                            //下单到交易预处理模块
-                            queue_prd_trade.GetQueue().Enqueue((object)orderli);
+                            //写入数据库，策略状态为已下单
+                            DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 3);
+                            DBAccessLayer.UpdateSGOPENStatus(StrategyInstanceID, 3);
 
-                            if (DBAccessLayer.DBEnable)
-                            {
-                                //写入数据库，策略状态为已下单
-                                DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 3);
-                                DBAccessLayer.UpdateSGOPENStatus(StrategyInstanceID, 3);
+                        }
 
-                                
-                            }
-                            
-                        }
-                        else
-                        {
-                            if (DBAccessLayer.DBEnable)
-                            {
-                                //写入数据库，策略状态为交易拒绝，未写入风控模块
-                                DBAccessLayer.UpdateStrategyStatusRecord(StrategyInstanceID, 4);
-                                DBAccessLayer.UpdateSGOPENStatus(StrategyInstanceID, 4);
-                            }
-                        }
-                       
 
                         // 列表只会生成一次
                         breaklabel = true;

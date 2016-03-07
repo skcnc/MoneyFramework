@@ -142,6 +142,14 @@ namespace Stork_Future_TaoLi.Controllers
             
         }
 
+        public string userlogout(String username)
+        {
+            if (username == null) { return "1"; }
+
+            return userOper.logout(username);
+                
+        }
+
         public string changePW(String InputJson)
         {
             return userOper.ChangePassword(InputJson).ToString();   

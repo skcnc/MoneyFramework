@@ -1041,8 +1041,12 @@ namespace Stork_Future_TaoLi
         /// <param name="stockcost"></param>
         public static void LoadCCStockList(string userName, out List<CC_TAOLI_TABLE> records, out double stockcost)
         {
+
+
             records = new List<CC_TAOLI_TABLE>();
             stockcost = 0;
+
+            if (DBAccessLayer.DBEnable == false) return;
 
             if (userName != "*")
             {
@@ -1076,6 +1080,8 @@ namespace Stork_Future_TaoLi
         {
             records = new List<CC_TAOLI_TABLE>();
 
+            if (DBAccessLayer.DBEnable == false) return;
+
             if (userName != "*")
             {
                 var tmp = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == userName && item.CC_TYPE == "1" select item);
@@ -1087,6 +1093,32 @@ namespace Stork_Future_TaoLi
                 records = tmp.ToList();
             }
         }
+
+        /// <summary>
+        /// 获取证券持仓列表
+        /// </summary>
+        /// <param name="userName">用户名,"*"为输出所有用户的持仓</param>
+        /// <param name="records">输出记录</param>
+        public static void LoadCCList(string userName, out List<CC_TAOLI_TABLE> records)
+        {
+            records = new List<CC_TAOLI_TABLE>();
+
+            if (DBAccessLayer.DBEnable == false) return;
+
+            if(userName != "*")
+            {
+                var tmp = (from item in DbEntity.CC_TAOLI_TABLE select item);
+                records = tmp.ToList();
+            }
+            else
+            {
+                var tmp = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == userName select item);
+                records = tmp.ToList();
+            }
+            
+        }
+
+
 
         /// <summary>
         /// 更新持仓列表

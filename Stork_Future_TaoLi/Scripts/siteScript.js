@@ -3,6 +3,9 @@
 //页面重新进入
 window.onload = function (e) {
 
+   
+    SetLayoutInfo();
+
     if (e.currentTarget.location.pathname != "/" && e.currentTarget.location.pathname.toLocaleLowerCase() != "/home/syslogin") {
         if (Modernizr.localstorage) {
             var userName = localStorage["USERNAME"];
@@ -1200,8 +1203,21 @@ $('#login_btnLogin').click(function (e) {
                 localStorage.setItem("TIMESTAMP", dt.getTime());
                 localStorage.setItem("USERRIGHT", data);
 
-                $('#loginName').val("欢迎：" + username);
-                $('#login_container').css({ "visibility": "hidden" });
+                var right = "";
+                if(data == 1)
+                {
+                    right = "管理员";
+                }
+                else if(data == 2)
+                {
+                    right = "交易员";
+                }
+                else if(data == 3)
+                {
+                    right = "审计员";
+                }
+
+                $('#loginName').text("欢迎： " + right + "  " + username + "  ");
             }
             else {
                 alert("您当前使用的浏览器版本过低，网站功能将被限制！");
