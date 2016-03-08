@@ -82,6 +82,9 @@ namespace Stork_Future_TaoLi
                 RiskFrozenDictionary.Add(user.alias, new List<RiskFrozenInfo>());
             }
 
+
+            
+
             excuteThread.Start();
             Thread.Sleep(1000);
         }
@@ -123,6 +126,12 @@ namespace Stork_Future_TaoLi
 
                         if(info.userRight == 3)
                         {
+                            List<AccountInfo> accounts = new List<AccountInfo>();
+                            foreach (KeyValuePair<string, AccountInfo> pair in AccountInfoDictionary)
+                            {
+                                accounts.Add(pair.Value);
+                            }
+                            TradeMonitor.Instance.updateAuditInfo(accounts);
 
                             //审计员没有风控和持仓信息
                             continue;
@@ -141,6 +150,7 @@ namespace Stork_Future_TaoLi
                         else
                         {
                             AccountInfoDictionary.Add(info.alias, acc);
+
                         }
 
                         
@@ -154,6 +164,10 @@ namespace Stork_Future_TaoLi
                             List<DL_TAOLI_TABLE> Deal_records = DBAccessLayer.GetUserDeals(info.alias);
                             if (Deal_records == null) Deal_records = new List<DL_TAOLI_TABLE>();
                             TradeMonitor.Instance.updateTradeList(info.alias, JsonConvert.SerializeObject(Deal_records));
+
+                            //更新持仓列表视图
+                            TradeMonitor.Instance.updateOrderList(info.alias, null);
+                            TradeMonitor.Instance.updateCCList(info.alias, acc.positions);
                         }
                         else if(info.userRight == 1)
                         {
@@ -164,7 +178,12 @@ namespace Stork_Future_TaoLi
                             List<DL_TAOLI_TABLE> Deal_records = DBAccessLayer.GetUserDeals(info.alias);
                             if (Deal_records == null) Deal_records = new List<DL_TAOLI_TABLE>();
                             TradeMonitor.Instance.updateTradeList(info.alias, JsonConvert.SerializeObject(Deal_records));
+
+                            //更新持仓列表视图
+                            TradeMonitor.Instance.updateOrderList(info.alias, null);
+                            TradeMonitor.Instance.updateCCList(info.alias, acc.positions);
                         }
+                        
                     }
 
 
@@ -523,10 +542,10 @@ namespace Stork_Future_TaoLi
              }
 
             //获取股票持仓
-            List<CC_TAOLI_TABLE> CC_Stock_records = (from item in CC_records where item.CC_TYPE == "F" || item.CC_TYPE == "f" select item).ToList();
+            List<CC_TAOLI_TABLE> CC_Stock_records = (from item in CC_records where item.CC_TYPE == "0"  select item).ToList();
 
             //获取期货持仓
-            List<CC_TAOLI_TABLE> CC_Future_records = (from item in CC_records where item.CC_TYPE == "s" || item.CC_TYPE == "F" select item).ToList();
+            List<CC_TAOLI_TABLE> CC_Future_records = (from item in CC_records where item.CC_TYPE == "1"  select item).ToList();
 
             //获取风控预冻结资金
             List<RiskFrozenInfo> Risk_Frozen_records = new List<RiskFrozenInfo>();
@@ -630,7 +649,16 @@ namespace Stork_Future_TaoLi
 
             foreach(CC_TAOLI_TABLE item in CC_Future_records)
             {
-                double fprice = MarketPrice.market[item.CC_CODE.Trim()];
+                double fprice = 0;
+
+                if (MarketPrice.market.Keys.Contains(item.CC_CODE.Trim()))
+                {
+                    fprice = MarketPrice.market[item.CC_CODE.Trim()];
+                }
+                else
+                {
+                    fprice = Convert.ToDouble(item.CC_BUY_PRICE);
+                }
 
                 if(item.CC_DIRECTION == TradeOrientationAndFlag.FutureTradeDirectionBuy)
                 {
@@ -727,7 +755,9 @@ namespace Stork_Future_TaoLi
                     exchange = item.ExchangeId,
                     requestAmount = item.Amount.ToString(),
                     requestPrice = item.OrderPrice.ToString(),
-                    direction = item.Direction.ToString()
+                    direction = item.Direction.ToString(),
+                    orderRef = item.OrderRef.ToString(),
+                    orderSysRef = item.SysOrderRef.ToString()
                 });
             }
 
@@ -1174,10 +1204,17 @@ namespace Stork_Future_TaoLi
     public class AccountEntrust
     {
         /// <summary>
+        /// 系统号
+        /// </summary>
+        public string orderRef { get; set; }
+        /// <summary>
+        /// 报单编号
+        /// </summary>
+        public string orderSysRef { get; set; }
+        /// <summary>
         /// 交易代码
         /// </summary>
         public string code { get; set; }
-
         /// <summary>
         /// 交易所
         /// </summary>
@@ -1207,6 +1244,11 @@ namespace Stork_Future_TaoLi
         /// 交易方向
         /// </summary>
         public string direction { get; set; }
+
+        /// <summary>
+        /// 订单状态
+        /// </summary>
+        public string status { get; set; }
     }
 
     /// <summary>

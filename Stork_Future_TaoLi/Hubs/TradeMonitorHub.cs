@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
+using Stork_Future_TaoLi.Database;
 
 namespace Stork_Future_TaoLi.Hubs
 {
@@ -41,32 +42,49 @@ namespace Stork_Future_TaoLi.Hubs
         {
             try
             {
-                if (!OrderLists.Keys.Contains(name))
+                if (item != null)
                 {
-                    List<OrderViewItem> ss = new List<OrderViewItem>();
-                    ss.Add(item);
-                    OrderLists.Add(name, ss);
+                    if (!OrderLists.Keys.Contains(name))
+                    {
+                        List<OrderViewItem> ss = new List<OrderViewItem>();
+                        ss.Add(item);
+                        OrderLists.Add(name, ss);
+                    }
+
+                    List<OrderViewItem> orders = OrderLists[name];
+
+                    OrderViewItem order = orders.Find(
+                             delegate(OrderViewItem record)
+                             {
+                                 return record.OrderRef == item.OrderRef;
+                             }
+                         );
+
+                    if (order == null) OrderLists[name].Add(item);
+                    else
+                    {
+                        order.MSG = item.MSG;
+                        order.VolumeTotal = item.VolumeTotal;
+                    }
+
+                    if (!UserConnectionRelation.ContainsKey(name)) { return; }
+
+                    _context.Clients.Client(UserConnectionRelation[name]).updateOrderList(JsonConvert.SerializeObject(orders));
                 }
+                else
+                {
+                    if (!UserConnectionRelation.ContainsKey(name)) { return; }
 
-                List<OrderViewItem> orders = OrderLists[name];
+                     if (!OrderLists.Keys.Contains(name))
+                     {
+                         List<OrderViewItem> ss = new List<OrderViewItem>();
+                         OrderLists.Add(name, ss);
+                     }
 
-               OrderViewItem order = orders.Find(
-                        delegate(OrderViewItem record)
-                        {
-                            return record.OrderRef == item.OrderRef;
-                        }
-                    );
-
-               if (order == null) OrderLists[name].Add(item);
-               else
-               {
-                   order.MSG = item.MSG;
-                   order.VolumeTotal = item.VolumeTotal;
-               }
-
-               if (!UserConnectionRelation.ContainsKey(name)) { return; }
-
-               _context.Clients.Client(UserConnectionRelation[name]).updateOrderList(JsonConvert.SerializeObject(orders));
+                     List<OrderViewItem> orders = OrderLists[name];
+                     _context.Clients.Client(UserConnectionRelation[name]).updateOrderList(JsonConvert.SerializeObject(orders));
+                }
+               
             }
             catch (Exception ex) { GlobalErrorLog.LogInstance.LogEvent(ex.ToString()); }
         }
@@ -120,6 +138,13 @@ namespace Stork_Future_TaoLi.Hubs
             if (!UserConnectionRelation.ContainsKey(name)) { return; }
 
             _context.Clients.Client(UserConnectionRelation[name]).updateCCList(JsonConvert.SerializeObject(CList));
+        }
+
+        public void updateAuditInfo(List<AccountInfo> accounts)
+        {
+            List<RISK_TABLE> risks = DBAccessLayer.GetLatestRiskRecord();
+            if (risks == null) risks = new List<RISK_TABLE>();
+            _context.Clients.All.updateauditInfo(JsonConvert.SerializeObject(accounts), JsonConvert.SerializeObject(risks));
         }
     }
 

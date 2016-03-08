@@ -37,7 +37,7 @@ namespace Stork_Future_TaoLi
             riskPara.changkouRatio = 0.1;
             riskPara.riskLevel = 0.4;
             riskPara.PerStockCostPercentage = 0.05;
-            riskPara.stockRadio = 0.05;
+            riskPara.stockRatio = 0.05;
 
             if (BWRecords == null || BWRecords.Count == 0)
             {
@@ -143,7 +143,7 @@ namespace Stork_Future_TaoLi
                 riskPara.changkouRatio = para.changkouRatio;
                 riskPara.PerStockCostPercentage = para.PerStockCostPercentage;
                 riskPara.riskLevel = para.riskLevel;
-                riskPara.stockRadio = para.stockRadio;
+                riskPara.stockRatio = para.stockRatio;
 
                 return "success";
             }
@@ -323,7 +323,7 @@ namespace Stork_Future_TaoLi
             #endregion
 
             #region 判断卖出/平仓证券是否小于持仓
-            foreach (TradeOrderStruct order in Stock_to_sell)
+            foreach (TradeOrderStruct order in orderlist)
             {
                 if (order.cSecurityType == "F" || order.cSecurityType == "f")
                 {
@@ -345,11 +345,11 @@ namespace Stork_Future_TaoLi
 
                             if (position_record != null) { position_amount = Convert.ToInt32(position_record.amount); }
 
-                            if(order.nSecurityAmount < position_amount)
+                            if(order.nSecurityAmount > position_amount)
                             {
                                 //买入平仓数量小于卖出仓位，交易被拒绝。
                                 errCode = 12;
-                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + order.nSecurityAmount + "|" + order.cTradeDirection);
+                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + position_amount + "|" + order.cTradeDirection);
                                 return false;
                             }
 
@@ -367,11 +367,11 @@ namespace Stork_Future_TaoLi
 
                             if (position_record != null) { position_amount = Convert.ToInt32(position_record.amount); }
 
-                            if (order.nSecurityAmount < position_amount)
+                            if (order.nSecurityAmount > position_amount)
                             {
                                 //卖出平仓数量小于买入仓位，交易被拒绝。
                                 errCode = 12;
-                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + order.nSecurityAmount + "|" + order.cTradeDirection);
+                                result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + position_amount + "|" + order.cTradeDirection);
                                 return false;
                             }
                         }
@@ -579,7 +579,6 @@ namespace Stork_Future_TaoLi
                 return false;
             }
 
-            //敞口
 
             #endregion
 
@@ -593,6 +592,14 @@ namespace Stork_Future_TaoLi
             }
 
             #endregion
+
+
+            //敞口
+
+            //MD直接拒绝交易
+           // errCode = 9;
+           // result = accountMonitor.GetErrorCode(errCode, string.Empty);
+           // return false;
 
             //第三部： 实际减少股票资金
 
@@ -677,7 +684,7 @@ namespace Stork_Future_TaoLi
         /// 股票占总资金比例
         /// 全部股票市值 除以 （证券总资产 加上期货权益）
         /// </summary>
-        public double stockRadio = 0.05;
+        public double stockRatio = 0.05;
 
         /// <summary>
         /// 单只股票所占资金比例

@@ -205,8 +205,8 @@
 
                 for (var i = 0; i < _orders.length; i++) {
 
-                    var _order = eval('(' + _orders[i] + ')');
-                    $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _entrust.OrderRef + '</td><td>' + _entrust.OrderSysID + '</td><td>' + _entrust.CODE + '</td><td>' + _entrust.Direction + '</td><td>' + _entrust.ComboOff + '</td><td>' + _entrust.VolumeTotalOrigin + '</td><td>' + _entrust.VolumeTotal + '</td><td>' + _entrust.Price + '</td><td>' + _entrust.MSG + '</td><td>' + _entrust.DealTime + '</td></tr>');
+                    var _order = _orders[i];
+                    $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _order.OrderRef + '</td><td>' + _order.OrderSysID + '</td><td>' + _order.CODE + '</td><td>' + _order.Direction + '</td><td>' + _order.ComboOff + '</td><td>' + _order.VolumeTotalOrigin + '</td><td>' + _order.VolumeTotal + '</td><td>' + _order.Price + '</td><td>' + _order.MSG + '</td><td>' + _order.DealTime + '</td></tr>');
                 }
             };
 
@@ -254,7 +254,8 @@
                 for (var i = 0; i < count; i++) {
                     var CC = _CCs[i];
 
-                    var item = '<tr name="deal_item_info"><td>' + CC.code + "</td><td>" + CC.direction + "</td><td>" + CC.amount + "</td><td>" + CC.price + "</td></tr>"
+                    var item = '<tr name="CC_item_info"><td>' + CC.code + "</td><td>" + CC.direction + "</td><td>" + CC.amount + "</td><td>" + CC.price + "</td></tr>"
+                    $('#tm_tb_position').append(item);
                 }
             }
 

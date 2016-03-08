@@ -141,7 +141,24 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
 
-            var risks = (from item in DbEntity.RISK_TABLE  select item);
+            var risks = (from item in DbEntity.RISK_TABLE where item.alias == alias select item);
+
+            if (risks == null || risks.Count() == 0) { return new List<RISK_TABLE>(); }
+            else
+            {
+                return risks.OrderByDescending(i => i.time).ToList();
+            }
+        }
+
+        /// <summary>
+        /// 获取最新的list列表
+        /// </summary>
+        /// <returns></returns>
+        public static List<RISK_TABLE> GetLatestRiskRecord()
+        {
+            if (DBAccessLayer.DBEnable == false) { return null; }
+
+            var risks = (from item in DbEntity.RISK_TABLE select item);
 
             if (risks == null || risks.Count() == 0) { return null; }
             else

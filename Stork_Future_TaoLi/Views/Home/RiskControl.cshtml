@@ -12,25 +12,21 @@
     <div class="col-md-12">
         <p>参数设置</p>
 
-        <div class="col-md-2">
-            <span>敞口比例：</span>
-            <input id="changkouRadio" type="text" placeholder="0">
+        <div class="col-md-3">
+            <h5>敞口比例：</h5>
+            <input id="changkouRatio" type="text" placeholder="0">
         </div>
-        <div class="col-md-2">
-            <span>风险度限制：</span>
+        <div class="col-md-3">
+            <h5>风险度限制：</h5>
             <input id="riskLevel" type="text" placeholder="0">
         </div>
-        <div class="col-md-2">
-            <span>单只股票所占总资产比例：</span>
+        <div class="col-md-3">
+            <h5>单只股票/基金所占总资产比例：</h5>
             <input id="PerStockCostPercentage" type="text" placeholder="0">
         </div>
-        <div class="col-md-2">
-            <span>单只基金所占资产比例：</span>
-            <input id="PerFundCostPercentage" type="text" placeholder="0">
-        </div>
-        <div class="col-md-2">
-            <span>股票市值所占总资产比例：</span>
-            <input id="stockRadio" type="text" placeholder="0">
+        <div class="col-md-3">
+            <h5>股票成本占总资产比例：</h5>
+            <input id="stockRatio" type="text" placeholder="0">
         </div>
     </div>
 </div>
@@ -71,7 +67,7 @@
 </div>
 
 
-<div class="col-md-12">
+<div class="col-md-12" style="overflow-y:auto;overflow-x:auto;height:300px">
     <table class="table table-striped table-hover ">
         <!--委托列表-->
         <thead>
@@ -85,13 +81,12 @@
                 <th>未成交手数</th>
                 <th>报单价格</th>
                 <th>报单状态</th>
-                <th>报单时间</th>
             </tr>
         </thead>
         <tbody id="rc_tb_inComplete" style="overflow-y:scroll;height:300px;position:relative"></tbody>
     </table>
 </div>
-<div class="col-md-12">
+<div class="col-md-12" style="overflow-y:auto;overflow-x:auto;height:300px">
     <table class="table table-striped">
         <!--账户信息-->
         <thead>
@@ -111,21 +106,23 @@
         <tbody id="rc_tb_account"></tbody>
     </table>
 </div>
-<div class="col-md-12">
+<div class="col-md-12" style="overflow-y:auto;overflow-x:auto;height:300px">
     <table class="table table-striped table-hover">
         <!--持仓列表-->
         <thead>
             <tr>
                 <th>合约/代码</th>
-                <th>买卖</th>
+                <th>类型</th>
                 <th>总持仓</th>
                 <th>持仓均价</th>
+                <th>用户</th>
+                <th>买卖</th>
             </tr>
         </thead>
         <tbody id="tm_tb_position"></tbody>
     </table>
 </div>
-<div class="col-md-12">
+<div class="col-md-12" style="overflow-y:auto;overflow-x:auto;height:300px">
     <table class="table table-striped table-hover">
         <!--风控信息-->
         <thead>
@@ -201,28 +198,32 @@
                 }
 
                 var accounts = eval('(' + jsonAccount + ')');
+                var _risk = eval('(' + jsonRisk + ')');
 
-                for(var i =0;i<accounts.length;i++)
-                {
-                    var account = eval('(' + accounts[i] + ')');
+                for (var i = 0; i < accounts.length; i++) {
+                    var account = accounts[i];
+
+                    for (var j = 0; j < account.entrusts.length; j++) {
+                        var entrust = accounts[i].entrusts[j];
+
+                        var entrustitem = '<tr name="rc_entrust_info"><td>' + entrust.orderRef + '</td><td>' + entrust.orderSysRef + '</td><td>' + entrust.code + '</td><td>' + entrust.direction + '</td><td>' + entrust.ComboOff + '</td><td>' + entrust.requestAmount + '</td><td>' + entrust.dealAmount + '</td><td>' + entrust.dealMoney + '</td><td>' + entrust.status + '</td></tr>'
+                        $('#rc_tb_inComplete').append(entrustitem);
+                    }
+
+                    for (var j = 0; j < account.positions.length; j++) {
+                        var position = account[i].positions[j];
+
+                        var positionitem = '<tr name="rc_cc_info"><td>' + position.code + '</td><td>' + position.type + '</td><td>' + position.amount + '</td><td>' + position.price + '</td><td>' + position.name + '</td><td>' + position.direction + '</td></tr>'
+                        $('#tm_tb_position').append(positionitem);
+                    }
+
+                    var accountitem = '<tr name="rc_account_info"><td>' + account.alias + '</td><td>' + account.account + '</td><td>' + account.frozen + '</td><td>' + account.earning + '</td><td>' + account.value + '</td><td>' + account.cost + '</td><td>' + account.faccount + '</td><td>' + account.fvalue + '</td><td>' + account.frisk + '</td><td>' + account.risk_exposure + '</td></tr>'
+                    $('#rc_tb_account').append(accountitem);
                 }
 
-                var entrusts = eval('(' + jsonEntrust + ')');
-
-                for (var i = 0; i < entrusts.length; i++) {
-                    var entrust = eval('(' + entrusts[i] + ')');
-                }
-
-                var CCs = eval('(' + jsonCC + ')');
-
-                for (var i = 0; i < CCs.length; i++) {
-                    var CC = eval('(' + CCs[i] + ')');
-                }
-
-                var Risks = eval('(' + jsonRisk + ')');
-
-                for (var i = 0; i < Risks.length; i++) {
-                    var Risk = eval('(' + Risks[i] + ')');
+                for (var i = 0; i < _risk.length; i++) {
+                    var riskitem = '<tr name="rc_risk_info"><td>' + _risk[i].code + '</td><td>' + _risk[i].amount + '</td><td>' + _risk[i].price + '</td><td>' + _risk[i].orientation + '</td><td>' + _risk[i].time + '</td><td>' + _risk[i].alias + '</td><td>' + _risk[i].strategy_id + '</td><td>' + _risk[i].err + '</td></tr>'
+                    $('#tm_tb_risk').append(riskitem);
                 }
             }
 

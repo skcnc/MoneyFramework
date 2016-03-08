@@ -421,6 +421,8 @@ namespace Stork_Future_TaoLi
             MSG = _MSG;
         }
 
+        public OrderViewItem() { }
+
         /// <summary>
         /// 标注类型为委托回报
         /// </summary>

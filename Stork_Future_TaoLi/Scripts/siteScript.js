@@ -61,11 +61,10 @@ window.onload = function (e) {
         $.post("/home/GetRiskParameter", {}, function (data, status) {
             var risk = eval('(' + data + ')');
 
-            $('#changkouRadio').val(risk.changkouRadio);
+            $('#changkouRatio').val(risk.changkouRatio);
             $('#riskLevel').val(risk.riskLevel);
             $('#PerStockCostPercentage').val(risk.PerStockCostPercentage);
-            $('#stockRadio').val(risk.stockRadio);
-            $('#PerFundCostPercentage').val(0.05);
+            $('#stockRatio').val(risk.stockRatio);
 
         });
 
