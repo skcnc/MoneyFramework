@@ -143,15 +143,27 @@ namespace Stork_Future_TaoLi
                             AccountInfoDictionary.Add(info.alias, acc);
                         }
 
+                        
+
                         if (info.userRight == 2)
                         {
                             //交易员显示个人账户信息
                             AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(acc), false);
+
+                            //更新用户交易列表视图
+                            List<DL_TAOLI_TABLE> Deal_records = DBAccessLayer.GetUserDeals(info.alias);
+                            if (Deal_records == null) Deal_records = new List<DL_TAOLI_TABLE>();
+                            TradeMonitor.Instance.updateTradeList(info.alias, JsonConvert.SerializeObject(Deal_records));
                         }
                         else if(info.userRight == 1)
                         {
                             //管理员显示所有用户账户信息
                             AccountCalculate.Instance.updateAccountInfo(info.alias, JsonConvert.SerializeObject(AccountInfoDictionary.Values), true);
+
+                            //更新用户交易列表视图
+                            List<DL_TAOLI_TABLE> Deal_records = DBAccessLayer.GetUserDeals(info.alias);
+                            if (Deal_records == null) Deal_records = new List<DL_TAOLI_TABLE>();
+                            TradeMonitor.Instance.updateTradeList(info.alias, JsonConvert.SerializeObject(Deal_records));
                         }
                     }
 
@@ -466,7 +478,7 @@ namespace Stork_Future_TaoLi
                 if(FutureAccountDictionary.Keys.Contains(alias))
                 {
                     //保证金改变
-                    FutureAccountDictionary[alias.Trim()].CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit) + AccountPARA.Factor * hand * price * AccountPARA.MarginValue).ToString();
+                    FutureAccountDictionary[alias.Trim()].CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit) + AccountPARA.Factor(code) * hand * price * AccountPARA.MarginValue).ToString();
 
                     //平仓盈亏改变
                     if(hand < 0)
@@ -480,7 +492,7 @@ namespace Stork_Future_TaoLi
                 {
                     FutureAccountTable future = DBAccessLayer.GetFutureAccount(alias.Trim());
 
-                    future.CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit)  + AccountPARA.Factor * hand * price * AccountPARA.MarginValue).ToString();
+                    future.CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit)  + AccountPARA.Factor(code) * hand * price * AccountPARA.MarginValue).ToString();
 
                     if(hand < 0){
                         double earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
@@ -604,11 +616,10 @@ namespace Stork_Future_TaoLi
             {
                 if(record.Type == "F" || record.Type =="F")
                 {
-                    frozen_cash_deposit += Convert.ToDouble(record.FrozenCost);
+                    frozen_cash_deposit += Convert.ToDouble(record.FrozenCost) * AccountPARA.Factor(record.Code) * AccountPARA.MarginValue;
                 }
              }
 
-            frozen_cash_deposit = frozen_cash_deposit * AccountPARA.Factor * AccountPARA.MarginValue;
 
 
             //期货对应股票市值
@@ -630,12 +641,12 @@ namespace Stork_Future_TaoLi
                         opsition_gain += (fprice - Convert.ToDouble(item.CC_BUY_PRICE)) * Convert.ToInt32(item.CC_AMOUNT);
 
                         //存在实时行情，用期货行情计算期货对应股票市值
-                        future_stock_marketvalue += (AccountPARA.Factor * Convert.ToInt32(item.CC_AMOUNT) * fprice);
+                        future_stock_marketvalue += (AccountPARA.Factor(item.CC_CODE) * Convert.ToInt32(item.CC_AMOUNT) * fprice);
                     }
                     else
                     {
                         //不存在实时行情，用成交价格计算期货对应股票市值
-                        future_stock_marketvalue += (AccountPARA.Factor * Convert.ToInt32(item.CC_AMOUNT) * Convert.ToDouble(item.CC_BUY_PRICE));
+                        future_stock_marketvalue += (AccountPARA.Factor(item.CC_CODE) * Convert.ToInt32(item.CC_AMOUNT) * Convert.ToDouble(item.CC_BUY_PRICE));
                     }
 
                  
@@ -649,12 +660,12 @@ namespace Stork_Future_TaoLi
                         opsition_gain += (Convert.ToDouble(item.CC_BUY_PRICE) - fprice) * Convert.ToInt32(item.CC_AMOUNT);
 
                         //存在实时行情，用期货行情计算期货对应股票市值
-                        future_stock_marketvalue -= (AccountPARA.Factor * Convert.ToInt32(item.CC_AMOUNT) * fprice);
+                        future_stock_marketvalue -= (AccountPARA.Factor(item.CC_CODE) * Convert.ToInt32(item.CC_AMOUNT) * fprice);
                     }
                     else
                     {
                         //不存在实时行情，用成交价格计算期货对应股票市值
-                        future_stock_marketvalue -= (AccountPARA.Factor * Convert.ToInt32(item.CC_AMOUNT) * Convert.ToDouble(item.CC_BUY_PRICE));
+                        future_stock_marketvalue -= (AccountPARA.Factor(item.CC_CODE) * Convert.ToInt32(item.CC_AMOUNT) * Convert.ToDouble(item.CC_BUY_PRICE));
                     }
                 }
             }

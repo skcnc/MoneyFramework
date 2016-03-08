@@ -16,9 +16,9 @@ namespace Stork_Future_TaoLi.Database
     {
         public System.Guid ID { get; set; }
         public string Code { get; set; }
-        public Nullable<decimal> Amount { get; set; }
+        public string Amount { get; set; }
         public Nullable<double> PercentageA { get; set; }
-        public Nullable<decimal> Value { get; set; }
+        public string Value { get; set; }
         public Nullable<double> PercentageB { get; set; }
         public Nullable<bool> flag { get; set; }
     }

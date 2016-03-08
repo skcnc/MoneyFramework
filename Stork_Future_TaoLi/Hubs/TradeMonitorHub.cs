@@ -24,27 +24,49 @@ namespace Stork_Future_TaoLi.Hubs
         private static object syncRoot = new object();
         public static TradeMonitor Instance { get { return _instance; } }
 
-        public static Dictionary<string, List<string>> OrderLists = new Dictionary<string, List<string>>();
+        public static Dictionary<string, List<OrderViewItem>> OrderLists = new Dictionary<string, List<OrderViewItem>>();
 
         //用户名和链接ID的关系
         private Dictionary<String, String> UserConnectionRelation = new Dictionary<string, string>();
 
-        public void updateOrderList(String name, String JsonString)
+        /// <summary>
+        /// 页面股票/期货委托信息更新
+        /// 股票通过Entrust_query查询最新委托状态并更新
+        /// 期货通过UpdateOrder 函数更新最新状态
+        /// 该函数传入参数中的JsonString，是单只股票期货的状态，本地维护OrderList来保存之前交易的状态。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="JsonString"></param>
+        public void updateOrderList(String name, OrderViewItem item)
         {
             try
             {
                 if (!OrderLists.Keys.Contains(name))
                 {
-                    List<string> ss = new List<string>();
-                    ss.Add(JsonString);
+                    List<OrderViewItem> ss = new List<OrderViewItem>();
+                    ss.Add(item);
                     OrderLists.Add(name, ss);
                 }
 
-                if (!UserConnectionRelation.ContainsKey(name)) { return; }
-                List<string> jsons = OrderLists[name];
+                List<OrderViewItem> orders = OrderLists[name];
 
+               OrderViewItem order = orders.Find(
+                        delegate(OrderViewItem record)
+                        {
+                            return record.OrderRef == item.OrderRef;
+                        }
+                    );
 
-                _context.Clients.Client(UserConnectionRelation[name]).updateOrderList(JsonConvert.SerializeObject(jsons));
+               if (order == null) OrderLists[name].Add(item);
+               else
+               {
+                   order.MSG = item.MSG;
+                   order.VolumeTotal = item.VolumeTotal;
+               }
+
+               if (!UserConnectionRelation.ContainsKey(name)) { return; }
+
+               _context.Clients.Client(UserConnectionRelation[name]).updateOrderList(JsonConvert.SerializeObject(orders));
             }
             catch (Exception ex) { GlobalErrorLog.LogInstance.LogEvent(ex.ToString()); }
         }
@@ -90,7 +112,15 @@ namespace Stork_Future_TaoLi.Hubs
             }
         }
 
+        public void updateCCList(String name,List<AccountPosition> CList)
+        {
+            if (name == null) return;
+            name = name.Trim();
 
+            if (!UserConnectionRelation.ContainsKey(name)) { return; }
+
+            _context.Clients.Client(UserConnectionRelation[name]).updateCCList(JsonConvert.SerializeObject(CList));
+        }
     }
 
     /// <summary>

@@ -5,9 +5,7 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="f6f3534b5a4e4355a01b4dfe3b080dde" Name="Diagram1">
-        <EntityTypeShape EntityType="MoneyEntityModel.BWNameTable" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="MoneyEntityModel.CC_TAOLI_TABLE" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="MoneyEntityModel.DL_TAOLI_TABLE" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="MoneyEntityModel.ER_TAOLI_TABLE" Width="1.5" PointX="0.75" PointY="4.75" IsExpanded="true" />
         <EntityTypeShape EntityType="MoneyEntityModel.OL_TAOLI_LIST_TABLE" Width="1.5" PointX="2.75" PointY="4.75" IsExpanded="true" />
         <EntityTypeShape EntityType="MoneyEntityModel.SG_TAOLI_CLOSE_TABLE" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
@@ -17,6 +15,8 @@
         <EntityTypeShape EntityType="MoneyEntityModel.RISK_TABLE" Width="1.5" PointX="9.375" PointY="3.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.FutureAccountTable" Width="1.5" PointX="5.375" PointY="9.75" />
         <EntityTypeShape EntityType="MoneyEntityModel.StockAccountTable" Width="1.5" PointX="9.375" PointY="7.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.BWNameTable" Width="1.5" PointX="11.375" PointY="0.75" />
+        <EntityTypeShape EntityType="MoneyEntityModel.DL_TAOLI_TABLE" Width="1.5" PointX="0.75" PointY="11.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

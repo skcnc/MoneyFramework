@@ -29,7 +29,6 @@ namespace Stork_Future_TaoLi
 
         public static riskParameter riskPara = new riskParameter();
 
-
         public static void Init()
         {
             //初始化加载风控参数
@@ -127,9 +126,9 @@ namespace Stork_Future_TaoLi
                         {
                             ID = Guid.NewGuid(),
                             Code = s.Split('|')[0],
-                            Amount = Convert.ToDecimal(s.Split('|')[1]),
+                            Amount = s.Split('|')[1],
                             PercentageA = Convert.ToDouble(s.Split('|')[2]),
-                            Value = Convert.ToDecimal(s.Split('|')[3]),
+                            Value = s.Split('|')[3],
                             PercentageB = Convert.ToDouble(s.Split('|')[4]),
                             flag = true
 
@@ -266,7 +265,7 @@ namespace Stork_Future_TaoLi
 
             foreach(TradeOrderStruct order in Future_to_open)
             {
-                future_estimate_add_deposit += (order.nSecurityAmount * order.dOrderPrice * AccountPARA.MarginValue);
+                future_estimate_add_deposit += (order.nSecurityAmount * order.dOrderPrice * AccountPARA.MarginValue * AccountPARA.Factor(order.cSecurityCode));
             }
 
             //第二步： 计算修改的资金账户参数是否满足风控指标要求
@@ -449,12 +448,15 @@ namespace Stork_Future_TaoLi
             #region 单一股票占总资产不超过5%
 
             //总资产
-            double totalAccount = Convert.ToDouble(current_account.account) + Convert.ToDouble(current_account.cost) + Convert.ToDouble(current_account.fvalue);
+            double totalAccount = Convert.ToDouble(current_account.account) + Convert.ToDouble(current_account.fstockvalue) + Convert.ToDouble(current_account.fvalue);
 
             foreach(TradeOrderStruct tos in orderlist)
             {
                 if(tos.cSecurityType.ToUpper() == "S")
                 {
+                    if (CheckStockException(tos.cSecurityCode))
+                        continue;
+
                     if(tos.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy)
                     {
                         double entrust_value  = 0;
@@ -503,6 +505,16 @@ namespace Stork_Future_TaoLi
                     estimate_stock_cost += Convert.ToDouble(record.dealMoney) * Convert.ToDouble(record.dealAmount);
                 }
             }
+
+            foreach(RiskFrozenInfo record in current_account.riskFrozenInfo)
+            {
+                if(record.Type.ToUpper() == "S" && record.TradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy)
+                {
+                    estimate_stock_cost += Convert.ToDouble(record.FrozenCost);
+                }
+            }
+
+            estimate_stock_cost += Convert.ToDouble(stock_account.MarketValue);
 
             if (estimate_stock_cost / totalAccount> riskPara.StockCostRatio)
             {
@@ -609,6 +621,28 @@ namespace Stork_Future_TaoLi
             result = accountMonitor.GetErrorCode(errCode, string.Empty);
 
             return true;
+        }
+
+        /// <summary>
+        /// 判断比例意外情况
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static bool CheckStockException(string code)
+        {
+            if (code.Length > 3 && code.Substring(0, 3) == "510")
+                return true;
+
+            if (code.Length >= 4 && code.Substring(0, 4) == "2040")
+                return true;
+
+            if (code.Length >= 4 && code.Substring(0, 4) == "1318")
+                return true;
+
+            if (code == "519888" || code == "511990" || code == "511880" || code == "159001")
+                return true;
+
+            return false;
         }
     }
 

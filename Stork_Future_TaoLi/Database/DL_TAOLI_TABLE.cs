@@ -16,7 +16,8 @@ namespace Stork_Future_TaoLi.Database
     {
         public System.Guid DL_GUID { get; set; }
         public string DL_STRATEGY { get; set; }
-        public Nullable<int> DL_DIRECTION { get; set; }
+        public string DL_DIRECTION { get; set; }
+        public string DL_OFFSETFLAG { get; set; }
         public string DL_CODE { get; set; }
         public string DL_NAME { get; set; }
         public string DL_STATUS { get; set; }
@@ -27,5 +28,6 @@ namespace Stork_Future_TaoLi.Database
         public string DL_BARGAIN_TIME { get; set; }
         public string DL_NO { get; set; }
         public Nullable<bool> DL_LOAD { get; set; }
+        public string DL_USER { get; set; }
     }
 }

@@ -126,8 +126,7 @@ namespace Stork_Future_TaoLi.Entrust
                         GetStatusWord(ret.cOrderStatus),
                         ret.cInsertTime);
 
-                    String JSONString = JsonConvert.SerializeObject(order);
-                    TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
+                    TradeMonitor.Instance.updateOrderList(USERNAME, order);
 
 
                     //目前仅考虑 1对1 返回的情况，不考虑出现1对多 ，类似基金交易的情况

@@ -115,9 +115,8 @@ namespace Stork_Future_TaoLi
 
             String USERNAME = UserRequestMap.GetInstance()[OrderRef];
             OrderViewItem order = new OrderViewItem(_record.OrderRef.ToString(),_record.OrderSysID,_record.Code,_record.Orientation,_record.CombOffsetFlag.ToString(),_record.VolumeTotalOriginal.ToString(),_record.VolumeTotal.ToString(),_record.Price.ToString(),_record.ErrMsg,_record.OrderTime_Start.ToString());
-            String JSONString = JsonConvert.SerializeObject(order);
 
-            TradeMonitor.Instance.updateOrderList(USERNAME, JSONString);
+            TradeMonitor.Instance.updateOrderList(USERNAME, order);
 
             if (_record.Status == TradeDealStatus.ORDERCOMPLETED)
             {
@@ -163,7 +162,7 @@ namespace Stork_Future_TaoLi
 
             String JsonString = JsonConvert.SerializeObject(trade);
 
-            TradeMonitor.Instance.updateTradeList(UserName, JsonString);
+            //TradeMonitor.Instance.updateTradeList(UserName, JsonString); 不从这里收集成交信息，直接从数据库中同步
 
             this.AddOrUpdate(OrderRef, _record, (key, oldValue) =>
                 oldValue = _record

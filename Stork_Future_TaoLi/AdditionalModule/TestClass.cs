@@ -253,7 +253,7 @@ namespace Stork_Future_TaoLi
             {
                 DL_GUID = Guid.NewGuid(),
                 DL_STRATEGY = "test",
-                DL_DIRECTION = 0,
+                DL_DIRECTION = "0",
                 DL_CODE = "test",
                 DL_NAME = "test",
                 DL_STATUS = "test",

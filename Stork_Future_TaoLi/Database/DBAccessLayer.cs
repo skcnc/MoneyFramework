@@ -506,7 +506,8 @@ namespace Stork_Future_TaoLi
                     {
                         DL_GUID = Guid.NewGuid(),
                         DL_STRATEGY = record.strategyId,
-                        DL_DIRECTION = record.direction,
+                        DL_DIRECTION = record.direction.ToString(),
+                        DL_OFFSETFLAG = record.offsetflag.ToString(),
                         DL_CODE = record.Security_code,
                         DL_NAME = record.Security_name,
                         DL_STATUS = record.OrderStatus.ToString(),
@@ -516,7 +517,8 @@ namespace Stork_Future_TaoLi
                         DL_BARGAIN_MONEY = record.bargain_money,
                         DL_BARGAIN_TIME =bargin_time,
                         DL_NO = record.OrderSysID.ToString(),
-                        DL_LOAD = true
+                        DL_LOAD = true,
+                        DL_USER = record.User
                     };
 
                     DbEntity.DL_TAOLI_TABLE.Add(item);
@@ -559,7 +561,8 @@ namespace Stork_Future_TaoLi
                     {
                         DL_GUID = Guid.NewGuid(),
                         DL_STRATEGY = record.StrategyId,
-                        DL_DIRECTION = Convert.ToInt16(record.Orientation),
+                        DL_DIRECTION = record.Orientation,
+                        DL_OFFSETFLAG = record.CombOffsetFlag.ToString(),
                         DL_CODE = record.Code,
                         DL_NAME = record.Code,
                         DL_STATUS = record.Status.ToString(),
@@ -568,7 +571,9 @@ namespace Stork_Future_TaoLi
                         DL_BARGAIN_PRICE = Convert.ToDouble(record.Price),
                         DL_BARGAIN_MONEY = Convert.ToDouble(record.Price) * record.VolumeTraded,
                         DL_BARGAIN_TIME = record.OrderTime_Start.ToString(),
-                        DL_NO = record.OrderSysID.Trim()
+                        DL_NO = record.OrderSysID.Trim(),
+                        DL_USER = record.User,
+                        DL_LOAD = false
                     };
 
                     DbEntity.DL_TAOLI_TABLE.Add(item);
@@ -1184,6 +1189,29 @@ namespace Stork_Future_TaoLi
             else
             {
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取用户交易
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public static List<DL_TAOLI_TABLE> GetUserDeals(string alias)
+        {
+            if (alias == null) return null;
+
+            alias = alias.Trim();
+
+            List<DL_TAOLI_TABLE> deals_record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_USER == alias select item).ToList();
+
+            if(deals_record != null && deals_record.Count > 0)
+            {
+                return deals_record;
+            }
+            else
+            {
+                return new List<DL_TAOLI_TABLE>();
             }
         }
 

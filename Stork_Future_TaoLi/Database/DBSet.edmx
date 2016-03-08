@@ -11,9 +11,9 @@
           </Key>
           <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Code" Type="nvarchar" MaxLength="50" />
-          <Property Name="Amount" Type="money" />
+          <Property Name="Amount" Type="nvarchar" MaxLength="50" />
           <Property Name="PercentageA" Type="float" />
-          <Property Name="Value" Type="money" />
+          <Property Name="Value" Type="nvarchar" MaxLength="50" />
           <Property Name="PercentageB" Type="float" />
           <Property Name="flag" Type="bit" />
         </EntityType>
@@ -36,7 +36,8 @@
           </Key>
           <Property Name="DL_GUID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="DL_STRATEGY" Type="nvarchar" MaxLength="50" />
-          <Property Name="DL_DIRECTION" Type="int" />
+          <Property Name="DL_DIRECTION" Type="nvarchar" MaxLength="50" />
+          <Property Name="DL_OFFSETFLAG" Type="nvarchar" MaxLength="50" />
           <Property Name="DL_CODE" Type="nvarchar" MaxLength="50" />
           <Property Name="DL_NAME" Type="nvarchar" MaxLength="50" />
           <Property Name="DL_STATUS" Type="nvarchar" MaxLength="50" />
@@ -47,6 +48,7 @@
           <Property Name="DL_BARGAIN_TIME" Type="nvarchar" MaxLength="50" />
           <Property Name="DL_NO" Type="nvarchar" MaxLength="50" />
           <Property Name="DL_LOAD" Type="bit" />
+          <Property Name="DL_USER" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ER_TAOLI_TABLE">
           <Key>
@@ -201,18 +203,6 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="MoneyEntityModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="BWNameTable">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Guid" Nullable="false" />
-          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Amount" Type="Decimal" Precision="19" Scale="4" />
-          <Property Name="PercentageA" Type="Double" />
-          <Property Name="Value" Type="Decimal" Precision="19" Scale="4" />
-          <Property Name="PercentageB" Type="Double" />
-          <Property Name="flag" Type="Boolean" />
-        </EntityType>
         <EntityType Name="CC_TAOLI_TABLE">
           <Key>
             <PropertyRef Name="ID" />
@@ -225,24 +215,6 @@
           <Property Name="CC_BUY_PRICE" Type="Double" />
           <Property Name="CC_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="CC_OFFSETFLAG" Type="Int32" />
-        </EntityType>
-        <EntityType Name="DL_TAOLI_TABLE">
-          <Key>
-            <PropertyRef Name="DL_GUID" />
-          </Key>
-          <Property Name="DL_GUID" Type="Guid" Nullable="false" />
-          <Property Name="DL_STRATEGY" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DL_DIRECTION" Type="Int32" />
-          <Property Name="DL_CODE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DL_NAME" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DL_STATUS" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DL_TYPE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DL_STOCK_AMOUNT" Type="Int32" />
-          <Property Name="DL_BARGAIN_PRICE" Type="Double" />
-          <Property Name="DL_BARGAIN_MONEY" Type="Double" />
-          <Property Name="DL_BARGAIN_TIME" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DL_NO" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DL_LOAD" Type="Boolean" />
         </EntityType>
         <EntityType Name="ER_TAOLI_TABLE">
           <Key>
@@ -336,9 +308,7 @@
           <Property Name="userRight" Type="Int32" />
         </EntityType>
         <EntityContainer Name="MoneyEntityEntities3" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="BWNameTable" EntityType="Self.BWNameTable" />
           <EntitySet Name="CC_TAOLI_TABLE" EntityType="Self.CC_TAOLI_TABLE" />
-          <EntitySet Name="DL_TAOLI_TABLE" EntityType="Self.DL_TAOLI_TABLE" />
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="Self.ER_TAOLI_TABLE" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="Self.OL_TAOLI_LIST_TABLE" />
           <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="Self.SG_TAOLI_CLOSE_TABLE" />
@@ -348,6 +318,8 @@
           <EntitySet Name="RISK_TABLE" EntityType="MoneyEntityModel.RISK_TABLE" />
           <EntitySet Name="FutureAccountTable" EntityType="MoneyEntityModel.FutureAccountTable" />
           <EntitySet Name="StockAccountTable" EntityType="MoneyEntityModel.StockAccountTable" />
+          <EntitySet Name="BWNameTable" EntityType="MoneyEntityModel.BWNameTable" />
+          <EntitySet Name="DL_TAOLI_TABLE" EntityType="MoneyEntityModel.DL_TAOLI_TABLE" />
         </EntityContainer>
         <EntityType Name="RISK_TABLE">
           <Key>
@@ -393,25 +365,44 @@
           <Property Name="Alias" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="UpdateTime" Type="DateTime" Precision="3" />
         </EntityType>
+        <EntityType Name="BWNameTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Amount" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="PercentageA" Type="Double" />
+          <Property Name="Value" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="PercentageB" Type="Double" />
+          <Property Name="flag" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="DL_TAOLI_TABLE">
+          <Key>
+            <PropertyRef Name="DL_GUID" />
+          </Key>
+          <Property Name="DL_GUID" Type="Guid" Nullable="false" />
+          <Property Name="DL_STRATEGY" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_DIRECTION" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_OFFSETFLAG" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_CODE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_NAME" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_STATUS" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_TYPE" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_STOCK_AMOUNT" Type="Int32" />
+          <Property Name="DL_BARGAIN_PRICE" Type="Double" />
+          <Property Name="DL_BARGAIN_MONEY" Type="Double" />
+          <Property Name="DL_BARGAIN_TIME" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_NO" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_LOAD" Type="Boolean" />
+          <Property Name="DL_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="MoneyEntityModelStoreContainer" CdmEntityContainer="MoneyEntityEntities3">
-          <EntitySetMapping Name="BWNameTable">
-            <EntityTypeMapping TypeName="MoneyEntityModel.BWNameTable">
-              <MappingFragment StoreEntitySet="BWNameTable">
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="Code" ColumnName="Code" />
-                <ScalarProperty Name="Amount" ColumnName="Amount" />
-                <ScalarProperty Name="PercentageA" ColumnName="PercentageA" />
-                <ScalarProperty Name="Value" ColumnName="Value" />
-                <ScalarProperty Name="PercentageB" ColumnName="PercentageB" />
-                <ScalarProperty Name="flag" ColumnName="flag" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="CC_TAOLI_TABLE">
             <EntityTypeMapping TypeName="MoneyEntityModel.CC_TAOLI_TABLE">
               <MappingFragment StoreEntitySet="CC_TAOLI_TABLE">
@@ -423,25 +414,6 @@
                 <ScalarProperty Name="CC_BUY_PRICE" ColumnName="CC_BUY_PRICE" />
                 <ScalarProperty Name="CC_USER" ColumnName="CC_USER" />
                 <ScalarProperty Name="CC_OFFSETFLAG" ColumnName="CC_OFFSETFLAG" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="DL_TAOLI_TABLE">
-            <EntityTypeMapping TypeName="MoneyEntityModel.DL_TAOLI_TABLE">
-              <MappingFragment StoreEntitySet="DL_TAOLI_TABLE">
-                <ScalarProperty Name="DL_GUID" ColumnName="DL_GUID" />
-                <ScalarProperty Name="DL_STRATEGY" ColumnName="DL_STRATEGY" />
-                <ScalarProperty Name="DL_DIRECTION" ColumnName="DL_DIRECTION" />
-                <ScalarProperty Name="DL_CODE" ColumnName="DL_CODE" />
-                <ScalarProperty Name="DL_NAME" ColumnName="DL_NAME" />
-                <ScalarProperty Name="DL_STATUS" ColumnName="DL_STATUS" />
-                <ScalarProperty Name="DL_TYPE" ColumnName="DL_TYPE" />
-                <ScalarProperty Name="DL_STOCK_AMOUNT" ColumnName="DL_STOCK_AMOUNT" />
-                <ScalarProperty Name="DL_BARGAIN_PRICE" ColumnName="DL_BARGAIN_PRICE" />
-                <ScalarProperty Name="DL_BARGAIN_MONEY" ColumnName="DL_BARGAIN_MONEY" />
-                <ScalarProperty Name="DL_BARGAIN_TIME" ColumnName="DL_BARGAIN_TIME" />
-                <ScalarProperty Name="DL_NO" ColumnName="DL_NO" />
-                <ScalarProperty Name="DL_LOAD" ColumnName="DL_LOAD" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -586,6 +558,40 @@
                 <ScalarProperty Name="MarketValue" ColumnName="MarketValue" />
                 <ScalarProperty Name="Balance" ColumnName="Balance" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BWNameTable">
+            <EntityTypeMapping TypeName="MoneyEntityModel.BWNameTable">
+              <MappingFragment StoreEntitySet="BWNameTable">
+                <ScalarProperty Name="flag" ColumnName="flag" />
+                <ScalarProperty Name="PercentageB" ColumnName="PercentageB" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="PercentageA" ColumnName="PercentageA" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DL_TAOLI_TABLE">
+            <EntityTypeMapping TypeName="MoneyEntityModel.DL_TAOLI_TABLE">
+              <MappingFragment StoreEntitySet="DL_TAOLI_TABLE">
+                <ScalarProperty Name="DL_USER" ColumnName="DL_USER" />
+                <ScalarProperty Name="DL_LOAD" ColumnName="DL_LOAD" />
+                <ScalarProperty Name="DL_NO" ColumnName="DL_NO" />
+                <ScalarProperty Name="DL_BARGAIN_TIME" ColumnName="DL_BARGAIN_TIME" />
+                <ScalarProperty Name="DL_BARGAIN_MONEY" ColumnName="DL_BARGAIN_MONEY" />
+                <ScalarProperty Name="DL_BARGAIN_PRICE" ColumnName="DL_BARGAIN_PRICE" />
+                <ScalarProperty Name="DL_STOCK_AMOUNT" ColumnName="DL_STOCK_AMOUNT" />
+                <ScalarProperty Name="DL_TYPE" ColumnName="DL_TYPE" />
+                <ScalarProperty Name="DL_STATUS" ColumnName="DL_STATUS" />
+                <ScalarProperty Name="DL_NAME" ColumnName="DL_NAME" />
+                <ScalarProperty Name="DL_CODE" ColumnName="DL_CODE" />
+                <ScalarProperty Name="DL_OFFSETFLAG" ColumnName="DL_OFFSETFLAG" />
+                <ScalarProperty Name="DL_DIRECTION" ColumnName="DL_DIRECTION" />
+                <ScalarProperty Name="DL_STRATEGY" ColumnName="DL_STRATEGY" />
+                <ScalarProperty Name="DL_GUID" ColumnName="DL_GUID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

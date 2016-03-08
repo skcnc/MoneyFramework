@@ -168,11 +168,13 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// <summary>
         /// 期货系数
         /// </summary>
-        public static double Factor
+        public static double Factor(string s)
         {
-            get { return factor; }
+            if (s.Substring(0, 2) == "IC") return factor_200;
+            else return factor_300;
         }
-        private static double factor = 300;
+        private static double factor_300 = 300;
+        private static double factor_200 = 200;
 
         /// <summary>
         /// 保证金系数

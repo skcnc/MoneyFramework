@@ -161,6 +161,10 @@ bool CStockTrader::trader(const Traderorderstruct  mytraderoder, QueryEntrustord
 		{
 			strcpy(Errormsg, getErrorCodeMsg(pAddEntrustRtn->return_status));
 			bRunning = false;
+			sprintf(myEntrust.cOrderSysID, "%d", 0);
+			sprintf(myEntrust.cExchangeID, "%s", mytraderoder.cExchangeID);
+			myEntrust.cSecuritytype = mytraderoder.cSecuritytype;
+			sprintf(myEntrust.cCode, "%s", mytraderoder.cSecurity_code);
  			return false;
 		}
 	}
@@ -282,7 +286,6 @@ bool CStockTrader::Batchstocktrader(const Traderorderstruct * mytraderoder, cons
 
 		if (pResult->return_status <= 0)
 		{
-
 			strcpy(Errormsg ,pResult->err_msg);
 			bRtn = false;
 		}
