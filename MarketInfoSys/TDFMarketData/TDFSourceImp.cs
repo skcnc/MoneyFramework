@@ -118,6 +118,7 @@ namespace MarketInfoSys
 
                 foreach (TDFMarketData data in marketDataArr)
                 {
+                    
                     EnQueueType obj = new EnQueueType() { Type = "S", value = (object)data };
                     if (Queue_Data.Suspend == false)
                     {
