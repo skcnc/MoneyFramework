@@ -7,6 +7,7 @@ using Stork_Future_TaoLi.Hubs;
 using Newtonsoft.Json;
 using System.Threading;
 using MCStockLib;
+using Stork_Future_TaoLi.Database;
 
 namespace Stork_Future_TaoLi
 {
@@ -41,6 +42,24 @@ namespace Stork_Future_TaoLi
                 oldValue = item
             );
 
+        }
+
+        /// <summary>
+        /// 根据本地委托号搜索委托信息
+        /// </summary>
+        /// <param name="orderRef">本地委托号</param>
+        /// <returns>
+        /// null：委托不存在 
+        /// 其他：委托信息
+        /// </returns>
+        public RecordItem getOrderInfo(int orderRef)
+        {
+            if (!this.Keys.Contains(orderRef))
+            {
+                return null;
+            }
+
+            return this[orderRef];
         }
 
         /// <summary>
@@ -102,7 +121,7 @@ namespace Stork_Future_TaoLi
             _record.OrderSysID = OrderSysID;
             _record.Status = TradeDealStatus.ORDERING;
 
-            //若交易已撤单 或者 全部成交则标记该稳妥完成
+            //若交易已撤单 或者 全部成交则标记该委托完成
             if(OrderStatus == 53 || _record.VolumeTotalOriginal == _record.VolumeTraded)
             {
                 _record.OrderTime_Completed = DateTime.Now;
@@ -181,7 +200,7 @@ namespace Stork_Future_TaoLi
                     bargain_price = Convert.ToDouble(Price),
                     User = _record.User,
                     offsetflag = _record.CombOffsetFlag,
-                    direction = Convert.ToInt16(_record.Orientation)
+                    direction = (_record.Orientation == "0") ? 48 : 49
                 };
 
                 //更新持仓列表
@@ -573,5 +592,119 @@ namespace Stork_Future_TaoLi
             }
         }
 
+    }
+
+
+    /// <summary>
+    /// 指令相关操作
+    /// </summary>
+    public class InstructionsAddtionalOperation
+    {
+        public static InstructionsTable InitInstrctionItem()
+        {
+            InstructionsTable item = new InstructionsTable()
+            {
+                ID = Guid.NewGuid(),
+                OrderTime = DateTime.Now,
+                OrderUser = string.Empty,
+                Activity = string.Empty,
+                OrderOrientation = string.Empty,
+                DebugMode = "false",
+                BasicID = string.Empty,
+                OpenPoint = string.Empty,
+                HandNum = string.Empty,
+                Contract = string.Empty,
+                IndexType = string.Empty,
+                SNMP = string.Empty,
+                RunStrategy = string.Empty,
+                AllowStrategy = string.Empty,
+                Weight = string.Empty,
+                ShortPoint = string.Empty,
+                PositionList = string.Empty,
+                CostOfEquity = string.Empty,
+                StockDividends = string.Empty,
+                StockAllotment = string.Empty,
+                ProspectiveEarnings = string.Empty,
+                Charge = string.Empty,
+                CloseMatchOpenStrategy = string.Empty,
+                ExchangeID = string.Empty,
+                SecurityCode = string.Empty,
+                SecurityAmount = string.Empty,
+                SecurityType = string.Empty,
+                OrderPrice = string.Empty,
+                OrderDirection = string.Empty,
+                OffsetFlag = string.Empty,
+                BelongStrategy = string.Empty,
+                OrderRef = string.Empty
+            };
+
+            return item;
+
+        }
+
+
+        public static void UpdateDatebase(string type, object value)
+        {
+            switch (type)
+            {
+                case "A1":
+                    {
+                        OPENCREATE data = (OPENCREATE)value;
+
+                        break;
+                    }
+                case "A2":
+                    {
+                        OPENMODIFY data = (OPENMODIFY)value;
+                        break;
+                    }
+                case "A3":
+                    {
+                        OPENRUN data = (OPENRUN)value;
+                        break;
+                    }
+                case "A4":
+                    {
+                        OPENALLOW data = (OPENALLOW)value;
+                        break;
+                    }
+                case "A5":
+                    {
+                        OPENDELETE data = (OPENDELETE)value;
+                        break;
+                    }
+                case "B1":
+                    {
+                        CLOSECREATE data = (CLOSECREATE)value;
+                        break;
+                    }
+                case "B2":
+                    {
+                        CLOSEMODIFY data = (CLOSEMODIFY)value;
+                        break;
+                    }
+                case "B3":
+                    {
+                        CLOSERUN data = (CLOSERUN)value;
+                        break;
+                    }
+                case "B4":
+                    {
+                        CLOSEALLOW data = (CLOSEALLOW)value;
+                        break;
+
+                    }
+                case "B5":
+                    {
+                        CLOSEDELETE data = (CLOSEDELETE)value;
+                        break;
+                    }
+                case "C1":
+                    {
+                        MakeOrder data = (MakeOrder)value;
+                        break;
+                    }
+            }
+        }
     }
 }

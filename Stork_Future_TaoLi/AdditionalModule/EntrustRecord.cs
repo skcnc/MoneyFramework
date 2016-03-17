@@ -46,6 +46,25 @@ namespace Stork_Future_TaoLi
             return 0;
         }
 
+        /// <summary>
+        /// 获取指定实时委托
+        /// </summary>
+        /// <param name="orderRef">本地委托编号</param>
+        /// <returns>
+        ///     null: 未查询到该委托
+        ///     其他：委托具体信息
+        /// </returns>
+        public static ERecord GetEntrustRecord(int orderRef)
+        {
+            var record = (from item in EntrustRecordList where item.OrderRef == orderRef select item);
+
+            if (record.Count() > 0)
+            {
+                return record.ToList()[0];
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// 减持委托数量

@@ -78,6 +78,21 @@ namespace Stork_Future_TaoLi.Hubs
                      if (!OrderLists.Keys.Contains(name))
                      {
                          List<OrderViewItem> ss = new List<OrderViewItem>();
+
+                         ss.Add(new OrderViewItem()
+                         {
+                             CODE = "test",
+                             ComboOff = "0",
+                             DealTime = DateTime.Now.ToString(),
+                             Direction = "0",
+                             OrderRef = "100",
+                             Price = "3.14",
+                             MSG = "success",
+                             OrderSysID = "12345",
+                             VolumeTotalOrigin = "100",
+                             VolumeTotal = "10"
+                         });
+
                          OrderLists.Add(name, ss);
                      }
 
@@ -143,8 +158,19 @@ namespace Stork_Future_TaoLi.Hubs
         public void updateAuditInfo(List<AccountInfo> accounts)
         {
             List<RISK_TABLE> risks = DBAccessLayer.GetLatestRiskRecord();
+            List<RISK_TABLE> show_risks = new List<RISK_TABLE>();
             if (risks == null) risks = new List<RISK_TABLE>();
-            _context.Clients.All.updateauditInfo(JsonConvert.SerializeObject(accounts), JsonConvert.SerializeObject(risks));
+            else
+            {
+                foreach(RISK_TABLE risk in risks)
+                {
+                    if(Convert.ToDateTime(risk.time).Date == DateTime.Now.Date)
+                    {
+                        show_risks.Add(risk);
+                    }
+                }
+            }
+            _context.Clients.All.updateauditInfo(JsonConvert.SerializeObject(accounts), JsonConvert.SerializeObject(show_risks));
         }
     }
 

@@ -16,6 +16,7 @@
           <Property Name="Value" Type="nvarchar" MaxLength="50" />
           <Property Name="PercentageB" Type="float" />
           <Property Name="flag" Type="bit" />
+          <Property Name="securityName" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="CC_TAOLI_TABLE">
           <Key>
@@ -87,6 +88,43 @@
           <Property Name="ExpendableFund" Type="nvarchar" MaxLength="50" />
           <Property Name="Alias" Type="nvarchar" MaxLength="50" />
           <Property Name="UpdateTime" Type="datetime" />
+        </EntityType>
+        <EntityType Name="InstructionsTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="OrderTime" Type="datetime" />
+          <Property Name="OrderUser" Type="nvarchar" MaxLength="50" />
+          <Property Name="Activity" Type="nvarchar" MaxLength="50" />
+          <Property Name="OrderOrientation" Type="nvarchar" MaxLength="50" />
+          <Property Name="DebugMode" Type="nvarchar" MaxLength="50" />
+          <Property Name="BasicID" Type="nvarchar" MaxLength="50" />
+          <Property Name="OpenPoint" Type="nvarchar" MaxLength="50" />
+          <Property Name="HandNum" Type="nvarchar" MaxLength="50" />
+          <Property Name="Contract" Type="nvarchar" MaxLength="50" />
+          <Property Name="IndexType" Type="nvarchar" MaxLength="50" />
+          <Property Name="SNMP" Type="text" />
+          <Property Name="RunStrategy" Type="nvarchar" MaxLength="50" />
+          <Property Name="AllowStrategy" Type="nvarchar" MaxLength="50" />
+          <Property Name="Weight" Type="text" />
+          <Property Name="ShortPoint" Type="nvarchar" MaxLength="50" />
+          <Property Name="PositionList" Type="text" />
+          <Property Name="CostOfEquity" Type="nvarchar" MaxLength="50" />
+          <Property Name="StockDividends" Type="nvarchar" MaxLength="50" />
+          <Property Name="StockAllotment" Type="nvarchar" MaxLength="50" />
+          <Property Name="ProspectiveEarnings" Type="nvarchar" MaxLength="50" />
+          <Property Name="Charge" Type="nvarchar" MaxLength="50" />
+          <Property Name="CloseMatchOpenStrategy" Type="nvarchar" MaxLength="50" />
+          <Property Name="ExchangeID" Type="nvarchar" MaxLength="50" />
+          <Property Name="SecurityCode" Type="nvarchar" MaxLength="50" />
+          <Property Name="SecurityAmount" Type="nvarchar" MaxLength="50" />
+          <Property Name="OrderPrice" Type="nvarchar" MaxLength="50" />
+          <Property Name="OrderDirection" Type="nvarchar" MaxLength="50" />
+          <Property Name="OffsetFlag" Type="nvarchar" MaxLength="50" />
+          <Property Name="SecurityType" Type="nvarchar" MaxLength="50" />
+          <Property Name="BelongStrategy" Type="nvarchar" MaxLength="50" />
+          <Property Name="OrderRef" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="OL_TAOLI_LIST_TABLE">
           <Key>
@@ -191,6 +229,7 @@
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="Self.DL_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ER_TAOLI_TABLE" EntityType="Self.ER_TAOLI_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FutureAccountTable" EntityType="Self.FutureAccountTable" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="InstructionsTable" EntityType="Self.InstructionsTable" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OL_TAOLI_LIST_TABLE" EntityType="Self.OL_TAOLI_LIST_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RISK_TABLE" EntityType="Self.RISK_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_CLOSE_TABLE" EntityType="Self.SG_TAOLI_CLOSE_TABLE" Schema="dbo" store:Type="Tables" />
@@ -320,6 +359,7 @@
           <EntitySet Name="StockAccountTable" EntityType="MoneyEntityModel.StockAccountTable" />
           <EntitySet Name="BWNameTable" EntityType="MoneyEntityModel.BWNameTable" />
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="MoneyEntityModel.DL_TAOLI_TABLE" />
+          <EntitySet Name="InstructionsTable" EntityType="MoneyEntityModel.InstructionsTable" />
         </EntityContainer>
         <EntityType Name="RISK_TABLE">
           <Key>
@@ -376,6 +416,7 @@
           <Property Name="Value" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="PercentageB" Type="Double" />
           <Property Name="flag" Type="Boolean" />
+          <Property Name="securityName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="DL_TAOLI_TABLE">
           <Key>
@@ -396,6 +437,43 @@
           <Property Name="DL_NO" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="DL_LOAD" Type="Boolean" />
           <Property Name="DL_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="InstructionsTable">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="OrderTime" Type="DateTime" Precision="3" />
+          <Property Name="OrderUser" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Activity" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OrderOrientation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DebugMode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="BasicID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OpenPoint" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="HandNum" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Contract" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="IndexType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SNMP" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="RunStrategy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="AllowStrategy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Weight" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ShortPoint" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="PositionList" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="CostOfEquity" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="StockDividends" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="StockAllotment" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ProspectiveEarnings" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Charge" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CloseMatchOpenStrategy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ExchangeID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityAmount" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OrderPrice" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OrderDirection" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OffsetFlag" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="BelongStrategy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="OrderRef" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -564,6 +642,7 @@
           <EntitySetMapping Name="BWNameTable">
             <EntityTypeMapping TypeName="MoneyEntityModel.BWNameTable">
               <MappingFragment StoreEntitySet="BWNameTable">
+                <ScalarProperty Name="securityName" ColumnName="securityName" />
                 <ScalarProperty Name="flag" ColumnName="flag" />
                 <ScalarProperty Name="PercentageB" ColumnName="PercentageB" />
                 <ScalarProperty Name="Value" ColumnName="Value" />
@@ -592,6 +671,44 @@
                 <ScalarProperty Name="DL_DIRECTION" ColumnName="DL_DIRECTION" />
                 <ScalarProperty Name="DL_STRATEGY" ColumnName="DL_STRATEGY" />
                 <ScalarProperty Name="DL_GUID" ColumnName="DL_GUID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InstructionsTable">
+            <EntityTypeMapping TypeName="MoneyEntityModel.InstructionsTable">
+              <MappingFragment StoreEntitySet="InstructionsTable">
+                <ScalarProperty Name="OrderRef" ColumnName="OrderRef" />
+                <ScalarProperty Name="BelongStrategy" ColumnName="BelongStrategy" />
+                <ScalarProperty Name="SecurityType" ColumnName="SecurityType" />
+                <ScalarProperty Name="OffsetFlag" ColumnName="OffsetFlag" />
+                <ScalarProperty Name="OrderDirection" ColumnName="OrderDirection" />
+                <ScalarProperty Name="OrderPrice" ColumnName="OrderPrice" />
+                <ScalarProperty Name="SecurityAmount" ColumnName="SecurityAmount" />
+                <ScalarProperty Name="SecurityCode" ColumnName="SecurityCode" />
+                <ScalarProperty Name="ExchangeID" ColumnName="ExchangeID" />
+                <ScalarProperty Name="CloseMatchOpenStrategy" ColumnName="CloseMatchOpenStrategy" />
+                <ScalarProperty Name="Charge" ColumnName="Charge" />
+                <ScalarProperty Name="ProspectiveEarnings" ColumnName="ProspectiveEarnings" />
+                <ScalarProperty Name="StockAllotment" ColumnName="StockAllotment" />
+                <ScalarProperty Name="StockDividends" ColumnName="StockDividends" />
+                <ScalarProperty Name="CostOfEquity" ColumnName="CostOfEquity" />
+                <ScalarProperty Name="PositionList" ColumnName="PositionList" />
+                <ScalarProperty Name="ShortPoint" ColumnName="ShortPoint" />
+                <ScalarProperty Name="Weight" ColumnName="Weight" />
+                <ScalarProperty Name="AllowStrategy" ColumnName="AllowStrategy" />
+                <ScalarProperty Name="RunStrategy" ColumnName="RunStrategy" />
+                <ScalarProperty Name="SNMP" ColumnName="SNMP" />
+                <ScalarProperty Name="IndexType" ColumnName="IndexType" />
+                <ScalarProperty Name="Contract" ColumnName="Contract" />
+                <ScalarProperty Name="HandNum" ColumnName="HandNum" />
+                <ScalarProperty Name="OpenPoint" ColumnName="OpenPoint" />
+                <ScalarProperty Name="BasicID" ColumnName="BasicID" />
+                <ScalarProperty Name="DebugMode" ColumnName="DebugMode" />
+                <ScalarProperty Name="OrderOrientation" ColumnName="OrderOrientation" />
+                <ScalarProperty Name="Activity" ColumnName="Activity" />
+                <ScalarProperty Name="OrderUser" ColumnName="OrderUser" />
+                <ScalarProperty Name="OrderTime" ColumnName="OrderTime" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

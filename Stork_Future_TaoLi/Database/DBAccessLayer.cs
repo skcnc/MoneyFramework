@@ -559,12 +559,13 @@ namespace Stork_Future_TaoLi
             if (DBAccessLayer.DBEnable == false) { return; }
 
             RecordItem record = (RecordItem)ret;
+            string number = record.OrderSysID.Trim();
 
             if (record != null)
             {
                 lock (DLtableLock)
                 {
-                    var selected = (from row in DbEntity.DL_TAOLI_TABLE where (row.DL_STRATEGY == record.StrategyId && row.DL_CODE == record.Code && row.DL_TYPE == "f") select row);
+                    var selected = (from row in DbEntity.DL_TAOLI_TABLE where row.DL_NO == number select row);
 
                     if (selected.Count() > 0)
                     {
@@ -791,16 +792,15 @@ namespace Stork_Future_TaoLi
                             offsetflag = offsetflag.ToString(),
 
                         };
-
+                        Dbsavechage("UpdateCCRecords");
                         
                         //修改本地CC列表
-                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user select item).ToList();
                         accountMonitor.ChangeLocalCC(user.Trim(), records);
 
                         //修改股票可用资金和股票成本
                         accountMonitor.ChangeStockAccountDuToStockDeal(user.Trim(), price, amount);
 
-                        Dbsavechage("UpdateCCRecords");
                         return;
                     }
                     else
@@ -863,12 +863,13 @@ namespace Stork_Future_TaoLi
                                 price = Convert.ToDouble(record.CC_BUY_PRICE)
                             };
 
+                            Dbsavechage("UpdateCCRecords");
+
                             //更新本地持仓列表
-                            List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                            List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user select item).ToList();
                             accountMonitor.ChangeLocalCC(user.Trim(), records);
 
                             //PositionRecord.UpdateCCRecord(ccrecord);
-                            Dbsavechage("UpdateCCRecords");
 
                             //修改股票可用资金和股票成本
                             accountMonitor.ChangeStockAccountDuToStockDeal(user.Trim(), price, amount * (-1));
@@ -896,14 +897,15 @@ namespace Stork_Future_TaoLi
 
                         //PositionRecord.UpdateCCRecord(ccRecord);
 
+                        Dbsavechage("UpdateCCRecords");
+
                         //更新本地持仓列表
-                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user select item).ToList();
                         accountMonitor.ChangeLocalCC(user.Trim(), records);
 
                         //修改股票可用资金和股票成本
                         accountMonitor.ChangeStockAccountDuToStockDeal(user.Trim(), price, amount);
 
-                        Dbsavechage("UpdateCCRecords");
 
                     }
                 }
@@ -946,11 +948,13 @@ namespace Stork_Future_TaoLi
                             offsetflag = offsetflag.ToString()
                         };
 
+                        Dbsavechage("UpdateCCRecords");
+
+
                         //更新本地持仓列表
-                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user select item).ToList();
                         accountMonitor.ChangeLocalCC(user.Trim(), records);
 
-                        Dbsavechage("UpdateCCRecords");
                         return;
                     }
                     else
@@ -981,11 +985,12 @@ namespace Stork_Future_TaoLi
                             direction = record.CC_DIRECTION
                         };
 
+                        Dbsavechage("UpdateCCRecords");
+
                         //更新本地持仓列表
-                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                        List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user select item).ToList();
                         accountMonitor.ChangeLocalCC(user.Trim(), records);
 
-                        Dbsavechage("UpdateCCRecords");
                     }
                 }
                 else
@@ -1043,8 +1048,10 @@ namespace Stork_Future_TaoLi
                                 amount = Convert.ToInt16(record.CC_AMOUNT)
                             };
 
+                            Dbsavechage("UpdateCCRecords");
+
                             //更新本地持仓列表
-                            List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE select item).ToList();
+                            List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user select item).ToList();
                             accountMonitor.ChangeLocalCC(user.Trim(), records);
                             Dbsavechage("UpdateCCRecords");
                             return;
@@ -1139,8 +1146,6 @@ namespace Stork_Future_TaoLi
             }
             
         }
-
-
 
         /// <summary>
         /// 更新持仓列表

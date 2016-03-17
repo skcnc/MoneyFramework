@@ -276,9 +276,28 @@ namespace STYClass
 		m_stockorders[stockordernum].cOrderlevel = 1;  //优先级
 		m_stockorders[stockordernum].cOrderexecutedetail = 0; //保留 暂不使用
 		m_stockorders[stockordernum].nSecurity_amount = nHands;
+
+		//m_stockorders[stockordernum].dOrderprice = 2000; //已低于实时价5报单
+
 		stockordernum++;
 		num = stockordernum;
 
+
+
+		//strcpy(m_stockorders[stockordernum].cSecurity_code, "510050");
+		//m_stockorders[stockordernum].cSecuritytype = 'S';
+		//m_stockorders[stockordernum].nSecurity_amount = 100;// itor->ntradervolume; //测试
+		//m_stockorders[stockordernum].dOrderprice = (2*1.02);   //以2%的溢价限价买入
+		//
+		//strcpy(m_stockorders[stockordernum].cExchangeID, "SH");
+
+		//m_stockorders[stockordernum].cOffsetFlag = 0;  //股票不需要
+		//m_stockorders[stockordernum].cOrderexecutedetail = 0; //保留 暂不使用
+		//m_stockorders[stockordernum].cOrderlevel = 1;  //优先级
+		//m_stockorders[stockordernum].cOrderPriceType = 0; //股票只有限价单  不需要
+		//m_stockorders[stockordernum].cTraderdirection = '1'; //买入
+
+		//num = 2;
 		return true;
 
 	}

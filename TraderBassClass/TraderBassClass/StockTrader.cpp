@@ -153,6 +153,7 @@ bool CStockTrader::trader(const Traderorderstruct  mytraderoder, QueryEntrustord
 			bRunning = false;
 			sprintf(myEntrust.cOrderSysID, "%d", pAddEntrustRtn->entrust_sn);
 			sprintf(myEntrust.cExchangeID, "%s", mytraderoder.cExchangeID);
+			myEntrust.Direction = mytraderoder.cTraderdirection;
 			myEntrust.cSecuritytype = mytraderoder.cSecuritytype;
 			sprintf(myEntrust.cCode, "%s", mytraderoder.cSecurity_code);
 			return true;
@@ -163,6 +164,7 @@ bool CStockTrader::trader(const Traderorderstruct  mytraderoder, QueryEntrustord
 			bRunning = false;
 			sprintf(myEntrust.cOrderSysID, "%d", 0);
 			sprintf(myEntrust.cExchangeID, "%s", mytraderoder.cExchangeID);
+			myEntrust.Direction = mytraderoder.cTraderdirection;
 			myEntrust.cSecuritytype = mytraderoder.cSecuritytype;
 			sprintf(myEntrust.cCode, "%s", mytraderoder.cSecurity_code);
  			return false;
@@ -281,6 +283,7 @@ bool CStockTrader::Batchstocktrader(const Traderorderstruct * mytraderoder, cons
 			sprintf(myEntrust[num].cExchangeID, "%s", mytraderoder[num].cExchangeID);
 			myEntrust[num].cSecuritytype = mytraderoder[num].cSecuritytype;
 			sprintf(myEntrust[num].cCode, "%s", mytraderoder[num].cSecurity_code);
+			myEntrust[num].Direction = mytraderoder[num].cTraderdirection;
 			num++;
 		}
 
@@ -603,7 +606,7 @@ bool  CStockTrader::querytrader(const QueryEntrustorderstruct myEntrust, Bargain
 
 			mytraderreturn[num].bargain_money = (pRetunResult->money.lo_value + pRetunResult->money.hi_value * 4294967296) / 10000.00;
 			mytraderreturn[num].bargain_no = pRetunResult->bargain_no;
-			mytraderreturn[num].bargain_price = pRetunResult->price;// 成交价格
+			mytraderreturn[num].bargain_price = pRetunResult->price / 1000;// 成交价格
 			strcpy(mytraderreturn[num].bargain_time, pRetunResult->bargain_time);
 			//mytraderreturn[num].cOrderStatus
 			sprintf(mytraderreturn[num].cOrderSysID, "%d", pRetunResult->entrust_no);

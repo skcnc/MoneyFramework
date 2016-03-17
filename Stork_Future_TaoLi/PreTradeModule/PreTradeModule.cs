@@ -163,10 +163,54 @@ namespace Stork_Future_TaoLi
 
                 #region 策略生成交易队列
                 List<TradeOrderStruct> tos = PreTradeModule.instance.DeQueue();
+                
+
                 if (tos != null)
                 {
 
                     log.LogEvent("来自策略的交易数：" + tos.Count.ToString());
+
+                    if(tos.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    string user = tos[0].cUser;
+                    string strategyid = tos[0].belongStrategy;
+
+                    //风控检测
+                    string result = string.Empty;
+                    bool brisk = riskmonitor.RiskDetection(user, tos, out result);
+
+                    //风控结果记入数据库
+                    DBAccessLayer.AddRiskRecord(user, result, strategyid, "00", 0, 0, "0");
+
+                    List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(user);
+
+                    int count = 0;
+
+                    if (risks.Count > 0)
+                    {
+                        List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
+
+                        foreach (RISK_TABLE risk in risks)
+                        {
+                            count++;
+                            if (count > 10) break;
+                            riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
+                        }
+
+
+                        TradeMonitor.Instance.updateRiskList(user, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
+
+                    }
+
+
+
+                    if (!brisk)
+                    {
+                        continue;
+                    }
 
                     //获取到新的list
                     List<TradeOrderStruct> stocks_sh = (from item in tos where item.cExhcnageID == ExchangeID.SH select item).OrderBy(i => i.cOrderLevel).ToList();

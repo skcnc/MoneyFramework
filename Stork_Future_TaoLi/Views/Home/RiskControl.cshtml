@@ -25,7 +25,7 @@
             <input id="PerStockCostPercentage" type="text" placeholder="0">
         </div>
         <div class="col-md-3">
-            <h5>股票成本占总资产比例：</h5>
+            <h5>股票市值占总资产比例：</h5>
             <input id="stockRatio" type="text" placeholder="0">
         </div>
     </div>
@@ -40,9 +40,10 @@
         <thead>
             <tr>
                 <th>代码</th>
-                <th>流通股</th>
-                <th>控比</th>
+                <th>名称</th>
                 <th>总股本</th>
+                <th>控比</th>
+                <th>总股本流通股</th>
                 <th>控比</th>
             </tr>
         </thead>
@@ -211,7 +212,7 @@
                     }
 
                     for (var j = 0; j < account.positions.length; j++) {
-                        var position = account[i].positions[j];
+                        var position = account.positions[j];
 
                         var positionitem = '<tr name="rc_cc_info"><td>' + position.code + '</td><td>' + position.type + '</td><td>' + position.amount + '</td><td>' + position.price + '</td><td>' + position.name + '</td><td>' + position.direction + '</td></tr>'
                         $('#tm_tb_position').append(positionitem);

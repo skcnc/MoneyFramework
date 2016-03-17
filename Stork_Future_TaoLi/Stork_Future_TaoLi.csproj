@@ -286,6 +286,9 @@
     <Compile Include="Database\FutureAccountTable.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\InstructionsTable.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\OL_TAOLI_LIST_TABLE.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
@@ -313,8 +316,8 @@
     <Compile Include="Hubs\monitorHub.cs" />
     <Compile Include="Hubs\StrategyInfoHub.cs" />
     <Compile Include="Hubs\TradeMonitorHub.cs" />
-    <Compile Include="Queues\queue_future_excuteThread.cs" />
-    <Compile Include="Queues\queue_system_status.cs" />
+    <Compile Include="Scripts\Queues\queue_future_excuteThread.cs" />
+    <Compile Include="Scripts\Queues\queue_system_status.cs" />
     <Compile Include="TradeModule\FutureMonitor.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -325,12 +328,12 @@
     <Compile Include="MarketInfo\UpdateMarketPanel.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="PreTradeModule\PreTradeModule.cs" />
-    <Compile Include="Queues\marketMonitorQueue.cs" />
-    <Compile Include="Queues\queue_hangqing_info.cs" />
-    <Compile Include="Queues\queue_prd_trade.cs" />
+    <Compile Include="Scripts\Queues\marketMonitorQueue.cs" />
+    <Compile Include="Scripts\Queues\queue_hangqing_info.cs" />
+    <Compile Include="Scripts\Queues\queue_prd_trade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queues\queue_query_entrust.cs" />
-    <Compile Include="Queues\queue_stock_excuteThread.cs" />
+    <Compile Include="Scripts\Queues\queue_query_entrust.cs" />
+    <Compile Include="Scripts\Queues\queue_stock_excuteThread.cs" />
     <Compile Include="AdditionalModule\ListCreate.cs" />
     <Compile Include="AdditionalModule\TestClass.cs" />
     <Compile Include="AdditionalModule\WinLogs.cs" />

@@ -84,7 +84,7 @@ window.onload = function (e) {
             for (var i = 0; i < obj.length; i++) {
                 var acc = obj[i];
 
-                $('#white_list_body').append('<tr name="white_list_row"><td>' + acc.Code + '</td><td>' + acc.Amount + '</td><td>' + acc.PercentageA + '</td><td>' + acc.Value + '</td><td>' + acc.PercentageB + '</td></tr>');
+                $('#white_list_body').append('<tr name="white_list_row"><td>' + acc.Code + '</td><td>' + acc.securityName + '</td><td>' + acc.Amount + '</td><td>' + acc.PercentageA + '</td><td>' + acc.Value + '</td><td>' + acc.PercentageB + '</td></tr>');
             }
         });
 

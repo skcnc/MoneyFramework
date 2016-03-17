@@ -271,7 +271,7 @@ namespace Stork_Future_TaoLi
                 case 8:
                     return "风险度超过阈值，交易未允许";
                 case 9:
-                    return "敞口过高，交易未允许";
+                    return "敞口过高，交易未允许，当前敞口：" + content ;
                 case 10:
                     return "单日期货交易过多（超过十次）";
                 case 11:
@@ -290,7 +290,7 @@ namespace Stork_Future_TaoLi
                     }
                 case 13:
                     {
-                        return "股票总成本，超过总资产的80%，达到" + content;
+                        return "股票权益超过总资产的限制，达到" + content;
                     }
                 case 14:
                     {
@@ -497,15 +497,34 @@ namespace Stork_Future_TaoLi
                 if(FutureAccountDictionary.Keys.Contains(alias))
                 {
                     //保证金改变
-                    FutureAccountDictionary[alias.Trim()].CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit) + AccountPARA.Factor(code) * hand * price * AccountPARA.MarginValue).ToString();
-
+                    
+                    FutureAccountTable future = FutureAccountDictionary[alias.Trim()];
+                    future.CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit) + AccountPARA.Factor(code) * hand * price * AccountPARA.MarginValue).ToString();
                     //平仓盈亏改变
                     if(hand < 0)
                     {
-                        double earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
-                         earning += (price - old_price) * hand;
-                        FutureAccountDictionary[alias.Trim()].OffsetGain = earning.ToString();
+                        double earning = 0;
+                        if (direction == TradeOrientationAndFlag.FutureTradeDirectionBuy)
+                        {
+                            earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
+                            earning += (price - old_price) * hand * AccountPARA.Factor(code);
+                            future.OffsetGain = earning.ToString();
+                        }
+                        else if(direction == TradeOrientationAndFlag.FutureTradeDirectionSell)
+                        {
+                            earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
+                            earning += (old_price - price) * hand * AccountPARA.Factor(code);
+                            future.OffsetGain = earning.ToString();
+                            FutureAccountDictionary[alias.Trim()].OffsetGain = earning.ToString();
+                        }
+
+                        
                     }
+
+                    FutureAccountDictionary.Remove(future.Alias);
+                    FutureAccountDictionary.Add(future.Alias, future);
+
+                    DBAccessLayer.InsertFutureAccountTable(future.StatisInterests, future.OffsetGain, future.FrozenValue, future.OpsitionGain, future.DynamicInterests, future.CashDeposit, future.ExpendableFund, future.Alias);
                 }
                 else
                 {
@@ -514,10 +533,23 @@ namespace Stork_Future_TaoLi
                     future.CashDeposit = (Convert.ToDouble(FutureAccountDictionary[alias.Trim()].CashDeposit)  + AccountPARA.Factor(code) * hand * price * AccountPARA.MarginValue).ToString();
 
                     if(hand < 0){
-                        double earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
-                        earning += (price - old_price) * hand;
-                        FutureAccountDictionary[alias.Trim()].OffsetGain = earning.ToString();
+
+                        double earning = 0;
+                        if (direction == TradeOrientationAndFlag.FutureTradeDirectionBuy)
+                        {
+                            earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
+                            earning += (price - old_price) * hand * AccountPARA.Factor(code);
+                            future.OffsetGain = earning.ToString();
+                        }
+                        else if (direction == TradeOrientationAndFlag.FutureTradeDirectionSell)
+                        {
+                            earning = Convert.ToDouble(FutureAccountDictionary[alias.Trim()].OffsetGain);
+                            earning += (old_price - price) * hand * AccountPARA.Factor(code);
+                            future.OffsetGain = earning.ToString();
+                        }
                     }
+
+                    DBAccessLayer.InsertFutureAccountTable(future.StatisInterests, future.OffsetGain, future.FrozenValue, future.OpsitionGain, future.DynamicInterests, future.CashDeposit, future.ExpendableFund, future.Alias);
 
                     FutureAccountDictionary.Add(alias.Trim(),future);
                 }
@@ -542,10 +574,10 @@ namespace Stork_Future_TaoLi
              }
 
             //获取股票持仓
-            List<CC_TAOLI_TABLE> CC_Stock_records = (from item in CC_records where item.CC_TYPE == "0"  select item).ToList();
+            List<CC_TAOLI_TABLE> CC_Stock_records = (from item in CC_records where item.CC_TYPE == "49" && item.CC_USER == alias select item).ToList();
 
             //获取期货持仓
-            List<CC_TAOLI_TABLE> CC_Future_records = (from item in CC_records where item.CC_TYPE == "1"  select item).ToList();
+            List<CC_TAOLI_TABLE> CC_Future_records = (from item in CC_records where item.CC_TYPE == "1" && item.CC_USER == alias  select item).ToList();
 
             //获取风控预冻结资金
             List<RiskFrozenInfo> Risk_Frozen_records = new List<RiskFrozenInfo>();
@@ -597,7 +629,11 @@ namespace Stork_Future_TaoLi
 
             foreach(CC_TAOLI_TABLE item in CC_Stock_records)
             {
-                double price = MarketPrice.market[item.CC_CODE.Trim()];
+                double price = 0;
+                if(MarketPrice.market.Keys.Contains(item.CC_CODE.Trim()))
+                { price = MarketPrice.market[item.CC_CODE.Trim()] / 10000; }
+                else { price = Convert.ToDouble(item.CC_BUY_PRICE); }
+                  
                 if (price != 0)
                 {
                     //存在最新市值，采用最新市值计算
@@ -653,7 +689,7 @@ namespace Stork_Future_TaoLi
 
                 if (MarketPrice.market.Keys.Contains(item.CC_CODE.Trim()))
                 {
-                    fprice = MarketPrice.market[item.CC_CODE.Trim()];
+                    fprice = MarketPrice.market[item.CC_CODE.Trim()] / 10000;
                 }
                 else
                 {
@@ -666,7 +702,7 @@ namespace Stork_Future_TaoLi
                     {
                         //期货买入仓位
                         //没有实时行情信息，无需再运行持仓盈亏
-                        opsition_gain += (fprice - Convert.ToDouble(item.CC_BUY_PRICE)) * Convert.ToInt32(item.CC_AMOUNT);
+                        opsition_gain += (fprice - Convert.ToDouble(item.CC_BUY_PRICE)) * Convert.ToInt32(item.CC_AMOUNT) * AccountPARA.Factor(item.CC_CODE);
 
                         //存在实时行情，用期货行情计算期货对应股票市值
                         future_stock_marketvalue += (AccountPARA.Factor(item.CC_CODE) * Convert.ToInt32(item.CC_AMOUNT) * fprice);
@@ -685,7 +721,7 @@ namespace Stork_Future_TaoLi
                     {
                         //期货买入仓位
                         //没有实时行情信息，无需再运行持仓盈亏
-                        opsition_gain += (Convert.ToDouble(item.CC_BUY_PRICE) - fprice) * Convert.ToInt32(item.CC_AMOUNT);
+                        opsition_gain += (Convert.ToDouble(item.CC_BUY_PRICE) - fprice) * Convert.ToInt32(item.CC_AMOUNT) * AccountPARA.Factor(item.CC_CODE);
 
                         //存在实时行情，用期货行情计算期货对应股票市值
                         future_stock_marketvalue -= (AccountPARA.Factor(item.CC_CODE) * Convert.ToInt32(item.CC_AMOUNT) * fprice);
@@ -804,7 +840,7 @@ namespace Stork_Future_TaoLi
                 accinfo.riskFrozenInfo.Add(record);
             }
 
-            accinfo.value = future_stock_marketvalue.ToString();
+            accinfo.value = market_value.ToString();
 
             return accinfo;
            

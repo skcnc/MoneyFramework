@@ -117,7 +117,7 @@ struct  QueryEntrustorderstruct
 	char	cOrderSysID[21];  	   ///报单编号
 	char	cCode[21];
 	char	cStrategyId[21];
-	int		Direction;
+	char		Direction;
 	//标志信息
 	//Clientinfor myclientinfor;
 

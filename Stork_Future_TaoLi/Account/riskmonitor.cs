@@ -34,11 +34,6 @@ namespace Stork_Future_TaoLi
             //初始化加载风控参数
             List<BWNameTable> BWRecords = DBAccessLayer.GetWBNamwList();
 
-            riskPara.changkouRatio = 0.1;
-            riskPara.riskLevel = 0.4;
-            riskPara.PerStockCostPercentage = 0.05;
-            riskPara.stockRatio = 0.05;
-
             if (BWRecords == null || BWRecords.Count == 0)
             {
 
@@ -263,10 +258,24 @@ namespace Stork_Future_TaoLi
             //计算预期期货追加保证金
             double future_estimate_add_deposit = 0;
 
+            //计算预期期货对应股票市值变化值
+            double future_estimate_market_value = 0;
+
             foreach(TradeOrderStruct order in Future_to_open)
             {
                 future_estimate_add_deposit += (order.nSecurityAmount * order.dOrderPrice * AccountPARA.MarginValue * AccountPARA.Factor(order.cSecurityCode));
+                if (order.cTradeDirection == TradeOrientationAndFlag.FutureTradeDirectionBuy)
+                {
+                    future_estimate_market_value += (order.nSecurityAmount * order.dOrderPrice * AccountPARA.Factor(order.cSecurityCode));
+                }
+                else if(order.cTradeDirection == TradeOrientationAndFlag.FutureTradeDirectionSell)
+                {
+                    future_estimate_market_value -= (order.nSecurityAmount * order.dOrderPrice * AccountPARA.Factor(order.cSecurityCode));
+                }
             }
+
+            
+
 
             //第二步： 计算修改的资金账户参数是否满足风控指标要求
 
@@ -285,9 +294,9 @@ namespace Stork_Future_TaoLi
 
                 if(tos.cSecurityType.ToUpper() == "S" && tos.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy)
                 {
-                    //判断总股本数量限制
+                    //判断总股本数量和流通股数量限制
                     double buylimit = Convert.ToDouble(BW_record.PercentageA) * Convert.ToDouble(BW_record.Amount);
-
+                    double buylimit2 = Convert.ToDouble(BW_record.PercentageB) * Convert.ToDouble(BW_record.Value);
                     
                     int entrust_amount = 0;
 
@@ -311,12 +320,21 @@ namespace Stork_Future_TaoLi
 
                     if (position_record != null) { position_amount = Convert.ToInt32(position_record.amount); }
 
+                    //总股本限制
                    if(tos.nSecurityAmount + entrust_amount + position_amount > buylimit)
                    {
                        errCode = 5;
                        result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
                        return false;
                    }
+
+                    //流通股限制
+                    if(tos.nSecurityAmount + entrust_amount + position_amount > buylimit2)
+                    {
+                        errCode = 5;
+                        result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
+                        return false;
+                    }
                 }
             }
 
@@ -496,13 +514,13 @@ namespace Stork_Future_TaoLi
             #region 股票所占投资总额不超过80%
             //总市值，totalAccount
             //当前股票成本 ， current_account.cost + 委托中的买入股票成本
-            double estimate_stock_cost = Convert.ToDouble(current_account.cost);
+            double estimate_stock_value = Convert.ToDouble(current_account.value);
 
             foreach(AccountEntrust record in current_account.entrusts)
             {
                 if(record.direction == TradeOrientationAndFlag.StockTradeDirectionBuy)
                 {
-                    estimate_stock_cost += Convert.ToDouble(record.dealMoney) * Convert.ToDouble(record.dealAmount);
+                    estimate_stock_value += Convert.ToDouble(record.dealMoney) * Convert.ToDouble(record.dealAmount);
                 }
             }
 
@@ -510,16 +528,16 @@ namespace Stork_Future_TaoLi
             {
                 if(record.Type.ToUpper() == "S" && record.TradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy)
                 {
-                    estimate_stock_cost += Convert.ToDouble(record.FrozenCost);
+                    estimate_stock_value += Convert.ToDouble(record.FrozenCost);
                 }
             }
 
-            estimate_stock_cost += Convert.ToDouble(stock_account.MarketValue);
+            estimate_stock_value += stock_etimate_add_cost;
 
-            if (estimate_stock_cost / totalAccount> riskPara.StockCostRatio)
+            if (estimate_stock_value / totalAccount > riskPara.stockRatio)
             {
                 errCode = 13;
-                result = accountMonitor.GetErrorCode(errCode,(estimate_stock_cost / totalAccount * 100).ToString());
+                result = accountMonitor.GetErrorCode(errCode, (estimate_stock_value / totalAccount * 100).ToString());
                 return false;
             }
             #endregion
@@ -595,11 +613,34 @@ namespace Stork_Future_TaoLi
 
 
             //敞口
+            foreach (TradeOrderStruct tos in orderlist)
+            {
+                //股票卖出和期货平仓交易不计算敞口
+                if (tos.cSecurityType.ToUpper() == "S" && tos.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionSell)
+                    continue;
+                if (tos.cSecurityType.ToUpper() == "F" && tos.cOffsetFlag == TradeOrientationAndFlag.FutureTradeOffsetClose)
+                    continue;
 
-            //MD直接拒绝交易
-           // errCode = 9;
-           // result = accountMonitor.GetErrorCode(errCode, string.Empty);
-           // return false;
+                //股票买入和期货开仓需要通过敞口验证
+                double changkouRatio = 0;
+
+                if (!((Convert.ToDouble(current_account.value) + stock_etimate_add_cost) == 0))
+                {
+                    changkouRatio = (Convert.ToDouble(current_account.fstockvalue) + future_estimate_market_value + Convert.ToDouble(current_account.value) + stock_etimate_add_cost) / (Convert.ToDouble(current_account.value) + stock_etimate_add_cost);
+                    if (Math.Abs(changkouRatio) > riskPara.changkouRatio)
+                    {
+                        errCode = 9;
+                        result = accountMonitor.GetErrorCode(errCode, changkouRatio.ToString());
+                        return false;
+                    }
+                }
+                else
+                {
+                    errCode = 9;
+                    result = accountMonitor.GetErrorCode(errCode, "无穷大");
+                    return false;
+                }
+            }
 
             //第三部： 实际减少股票资金
 
@@ -684,17 +725,17 @@ namespace Stork_Future_TaoLi
         /// 股票占总资金比例
         /// 全部股票市值 除以 （证券总资产 加上期货权益）
         /// </summary>
-        public double stockRatio = 0.05;
+        public double stockRatio = 0.8;
 
         /// <summary>
         /// 单只股票所占资金比例
         /// </summary>
         public double PerStockCostPercentage = 0.05;
 
-        /// <summary>
-        /// 股票占总投资比例
-        /// </summary>
-        public double StockCostRatio = 0.8;
+        ///// <summary>
+        ///// 股票占总投资比例
+        ///// </summary>
+        //public double StockCostRatio = 0.8;
 
         /// <summary>
         /// 持仓信息

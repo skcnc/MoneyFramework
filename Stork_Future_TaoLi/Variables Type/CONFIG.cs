@@ -73,7 +73,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// 全局监控用户
         /// </summary>
         public static string GlobalMonitor { get { return globalmonitor; } }
-        private static string globalmonitor = "sc";
+        private static string globalmonitor = "cj";
     }
 
     public class CommConfig
@@ -180,7 +180,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// 保证金系数
         /// </summary>
         public static double MarginValue { get { return marginValue; } }
-        private static double marginValue = 0.12;
+        private static double marginValue = 0.3;
 
 
 

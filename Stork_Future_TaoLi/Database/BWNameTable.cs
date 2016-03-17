@@ -21,5 +21,6 @@ namespace Stork_Future_TaoLi.Database
         public string Value { get; set; }
         public Nullable<double> PercentageB { get; set; }
         public Nullable<bool> flag { get; set; }
+        public string securityName { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.IO;
 using Stork_Future_TaoLi.Modulars;
 using Stork_Future_TaoLi.Account;
+using Stork_Future_TaoLi.Database;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -164,6 +165,7 @@ namespace Stork_Future_TaoLi.Controllers
                 object obj = new object();
 
                 if (mark == "C1") { obj = (object)(JsonConvert.DeserializeObject<MakeOrder>(jsonString)); }
+
                 queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue(obj);
                 return "SUCCESS";
 
@@ -201,6 +203,34 @@ namespace Stork_Future_TaoLi.Controllers
             AccountInfo info = accountMonitor.GetAccountInfo(user, out result);
 
             return JsonConvert.SerializeObject(info);
+        }
+
+        public string drawbackTrade(String orderRef)
+        {
+            if(orderRef == null || orderRef == string.Empty)
+            {
+                return "非法委托编号！";
+            }
+
+            int reference = int.Parse(orderRef.Trim());
+
+            ERecord srecord = EntrustRecord.GetEntrustRecord(reference);
+
+            if(srecord != null)
+            {
+                //找到股票委托交易信息
+                return "success";
+            }
+
+            RecordItem frecord = TradeRecord.GetInstance().getOrderInfo(reference);
+
+            if(frecord != null)
+            {
+                //找到期货委托交易信息
+                return "success";
+            }
+
+            return "未找到委托对应交易！";
         }
 
         public string GetRiskInfo()

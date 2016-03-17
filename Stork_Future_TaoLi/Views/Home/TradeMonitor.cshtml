@@ -81,8 +81,8 @@
                 </div>
             </div>
             <div class="col-md-12 form-inline" style="margin-top:5px">
-                手数：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <input type="text" class="form-control" id="tm_input_volume" placeholder="手数" />
+                数量：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="text" class="form-control" id="tm_input_volume" placeholder="数量" />
             </div>
             <div class="col-md-12 form-inline" style="margin-top:5px">
                 指定价：&nbsp;&nbsp;&nbsp;&nbsp;
@@ -106,6 +106,7 @@
                         <th>报单价格</th>
                         <th>报单状态</th>
                         <th>报单时间</th>
+                        <th>撤销</th>
                     </tr>
                 </thead>
                 <tbody id="tm_tb_inComplete" style="overflow-y:scroll;height:300px;position:relative"></tbody>
@@ -113,12 +114,12 @@
         </div>
     </div>
     <hr />
-    <div class="col-md-12" style="margin-top:10px">
+    @*<div class="col-md-12" style="margin-top:10px">
         <div class="col-md-3"><h4>敞口比例：<span id="riskpara_changkou">30%</span></h4></div>
         <div class="col-md-2"><h4>风险度：<span id="riskpara_riskratio"> 30%</span></h4></div>
         <div class="col-md-3"><h4>单股持股比例：<span id="riskpara_singlestockoccupation"> 30%</span></h4></div>
         <div class="col-md-4"><h4>股票占总投资比例：<span id="riskpara_stockcostratio">20%</span></h4></div>
-    </div>
+    </div>*@
     <div class="col-md-12" style="margin-top:10px">
         <div class="col-md-12">
             <table class="table table-striped table-hover">
@@ -206,7 +207,7 @@
                 for (var i = 0; i < _orders.length; i++) {
 
                     var _order = _orders[i];
-                    $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _order.OrderRef + '</td><td>' + _order.OrderSysID + '</td><td>' + _order.CODE + '</td><td>' + _order.Direction + '</td><td>' + _order.ComboOff + '</td><td>' + _order.VolumeTotalOrigin + '</td><td>' + _order.VolumeTotal + '</td><td>' + _order.Price + '</td><td>' + _order.MSG + '</td><td>' + _order.DealTime + '</td></tr>');
+                    $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _order.OrderRef + '</td><td>' + _order.OrderSysID + '</td><td>' + _order.CODE + '</td><td>' + _order.Direction + '</td><td>' + _order.ComboOff + '</td><td>' + _order.VolumeTotalOrigin + '</td><td>' + _order.VolumeTotal + '</td><td>' + _order.Price + '</td><td>' + _order.MSG + '</td><td>' + _order.DealTime + '</td><td><button orderno="' + _order.OrderRef   + '" class="btn btn-primary drawback_btn" type="submit">撤</button></td></tr>');
                 }
             };
 

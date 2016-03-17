@@ -129,6 +129,7 @@ namespace Stork_Future_TaoLi
                     //注册hash键
 
                     string key = info.Code;
+                    
                     if(key.Contains("."))
                     {
                         key = key.Split('.')[0]; 

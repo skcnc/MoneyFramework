@@ -5,6 +5,8 @@
 #include "callbackAndDelegate.h"
 #include "ThostFtdcUserApiStruct.h"
 
+bool a = false;
+
 namespace CTP_CLI
 {
 
@@ -91,7 +93,16 @@ void CCTPSpi::OnRtnOrder( CThostFtdcOrderField *pOrder )
 			this->rtnOrderCallback(&req);
 		}
 		else
-			this->rtnOrderCallback(pOrder);
+		{
+			if (a == false)
+			{
+				a = true;
+				this->rtnOrderCallback(pOrder);
+			}
+
+		}
+
+		a = false;
 	}
 	catch(int e){}
 }
