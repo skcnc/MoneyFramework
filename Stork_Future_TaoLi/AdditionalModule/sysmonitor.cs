@@ -167,6 +167,21 @@ namespace Stork_Future_TaoLi
         /// 委托查询系统状态
         /// </summary>
         public bool StockEntrustManagementSystemStatus { get; set; }
+
+        /// <summary>
+        /// 退货控制系统状态
+        /// </summary>
+        public bool RefundControlSystemStatus { get; set; }
+
+        /// <summary>
+        /// 股票退货系统状态
+        /// </summary>
+        public bool RefundStockSystemStatus { get; set; }
+
+        /// <summary>
+        /// 期货退货系统状态
+        /// </summary>
+        public bool RefundFutureSystemStatus { get; set; }
         #endregion 
 
     }
@@ -251,6 +266,9 @@ namespace Stork_Future_TaoLi
         public DateTime StockTradeManagementSystemStatus { get; set; }
         public List<DateTime> StockTradeWorkerSystemStatus { get; set; }
         public DateTime StockEntrustManagementSystemStatus { get; set; }
+        public DateTime RefundControlSystemStatus { get; set; }
+        public DateTime RefundStockSystemStatus { get; set; }
+        public DateTime RefundFutureSystemStatus { get; set; }
         public double MarketDelay { get; set; }
         public int MarketFrequence { get; set; }
         public Dictionary<string, StrategyInfo> StrategyInfomation { get; set; }
@@ -402,6 +420,13 @@ namespace Stork_Future_TaoLi
 
                     if ((current - messageData.StockEntrustManagementSystemStatus).TotalSeconds > 5) { message.StockEntrustManagementSystemStatus = false; } else { message.StockEntrustManagementSystemStatus = true; }
 
+                    if ((current - messageData.RefundControlSystemStatus).TotalSeconds > 5) { message.RefundControlSystemStatus = false; } else { message.RefundControlSystemStatus = true; }
+
+                    if ((current - messageData.RefundFutureSystemStatus).TotalSeconds > 5) { message.RefundFutureSystemStatus = false; } else { message.RefundFutureSystemStatus = true; }
+
+                    if ((current - messageData.RefundStockSystemStatus).TotalSeconds > 5) { message.RefundStockSystemStatus = false; } else { message.RefundStockSystemStatus = true; }
+
+
                     MonitorSys.Instance.updateSysStatus(message);
                 }
                 
@@ -467,6 +492,15 @@ namespace Stork_Future_TaoLi
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     case "THREAD_ENTRUST_WORKER":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "THREAD_Refund_Control_MONITOR":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "THREAD_Future_Refund_Control_MONITOR":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "THREAD_Stock_Refund_Control_MONITOR":
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     default:
@@ -583,6 +617,21 @@ namespace Stork_Future_TaoLi
                 case "THREAD_ENTRUST_WORKER":
                     {
                         messageData.StockEntrustManagementSystemStatus = DateTime.Now;
+                    }
+                    break;
+                case "THREAD_Stock_Refund_Control_MONITOR":
+                    {
+                        messageData.RefundStockSystemStatus = DateTime.Now;
+                    }
+                    break;
+                case "THREAD_Future_Refund_Control_MONITOR":
+                    {
+                        messageData.RefundFutureSystemStatus = DateTime.Now;
+                    }
+                    break;
+                case "THREAD_Refund_Control_MONITOR":
+                    {
+                        messageData.RefundControlSystemStatus = DateTime.Now;
                     }
                     break;
                 default: break;

@@ -24,6 +24,7 @@ namespace MCStockLib
 		int cal(String^ msg);
 		array<managedEntrustreturnstruct^>^  QueryEntrust(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg);
 		array<managedBargainreturnstruct^>^ QueryTrader(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg);
+		bool CancelTrade(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg);
 
 
 		

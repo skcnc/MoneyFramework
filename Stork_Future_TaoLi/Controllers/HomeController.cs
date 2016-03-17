@@ -9,6 +9,8 @@ using System.IO;
 using Stork_Future_TaoLi.Modulars;
 using Stork_Future_TaoLi.Account;
 using Stork_Future_TaoLi.Database;
+using Stork_Future_TaoLi.TradeModule;
+using Stork_Future_TaoLi.Queues;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -205,7 +207,7 @@ namespace Stork_Future_TaoLi.Controllers
             return JsonConvert.SerializeObject(info);
         }
 
-        public string drawbackTrade(String orderRef)
+        public string RefundTrade(String orderRef)
         {
             if(orderRef == null || orderRef == string.Empty)
             {
@@ -219,6 +221,19 @@ namespace Stork_Future_TaoLi.Controllers
             if(srecord != null)
             {
                 //找到股票委托交易信息
+                RefundStruct refund = new RefundStruct()
+                {
+                    Direction = srecord.Direction.Trim(),
+                    ExchangeId = srecord.ExchangeId.Trim(),
+                    OffSetFlag = "0",
+                    SecurityCode = srecord.Code,
+                    SecurityType = "S",
+                    OrderRef = srecord.OrderRef.ToString(),
+                    OrderSysId = srecord.SysOrderRef
+                };
+
+                queue_refund_thread.GetQueue().Enqueue(refund);
+
                 return "success";
             }
 
@@ -227,6 +242,19 @@ namespace Stork_Future_TaoLi.Controllers
             if(frecord != null)
             {
                 //找到期货委托交易信息
+
+                RefundStruct refund = new RefundStruct()
+                {
+                    Direction = frecord.Orientation,
+                    ExchangeId = String.Empty,
+                    OffSetFlag = frecord.CombOffsetFlag.ToString(),
+                    SecurityCode = frecord.Code,
+                    SecurityType = "F",
+                    OrderRef = frecord.OrderRef.ToString(),
+                    OrderSysId = frecord.OrderSysID
+                };
+
+                queue_refund_thread.GetQueue().Enqueue(refund);
                 return "success";
             }
 

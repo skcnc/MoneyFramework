@@ -32,6 +32,19 @@ bool managedStockClass::Init(managedLogin^ mylogininfor,System::String^ Errormsg
 	return rt_value;
 }
 
+//³·Ïú½»Ò×
+bool managedStockClass::CancelTrade(QueryEntrustOrderStruct_M^ queryEntrust, String^ Errormsg){
+	QueryEntrustorderstruct* query = new QueryEntrustorderstruct();
+
+	IntPtr ptr = Marshal::AllocHGlobal(Marshal::SizeOf(queryEntrust));
+	Marshal::StructureToPtr(queryEntrust, ptr, false);
+	query = (QueryEntrustorderstruct*)(ptr.ToPointer());
+
+	char errmsg[255];
+
+	return m_cstockTrader->canceltrader(*query, errmsg);
+}
+
 void managedStockClass::HeartBeat()
 {
 	

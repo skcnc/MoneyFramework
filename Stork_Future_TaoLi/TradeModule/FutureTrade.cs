@@ -18,15 +18,6 @@ namespace Stork_Future_TaoLi
         private static CTP_CLI.CCTPClient _client;
         private static FutureTradeThreadStatus status = FutureTradeThreadStatus.DISCONNECTED;
 
-        private static  string BROKER = "8890";
-        private static string INVESTOR = "17730203";
-        private static string PASSWORD = "111111";
-        private static string ADDRESS = "tcp://119.15.140.81:41205";
-
-        private static string TEST_BROKER = "8890";
-        private static string TEST_INVESTOR = "17730203";
-        private static string TEST_PASSWORD = "111111";
-        private static string TEST_ADDRESS = "tcp://119.15.140.81:41205";
 
 
 
@@ -159,7 +150,7 @@ namespace Stork_Future_TaoLi
 
         public static void InitRespFunc()
         {
-            _client = new CTP_CLI.CCTPClient(INVESTOR, PASSWORD, BROKER, ADDRESS);
+            _client = new CTP_CLI.CCTPClient(CommConfig.INVESTOR, CommConfig.PASSWORD, CommConfig.BROKER, CommConfig.ADDRESS);
 
             //CTP后台成功建立连接的回调函数
             _client.FrontConnected += _client_FrontConnected;
@@ -196,15 +187,6 @@ namespace Stork_Future_TaoLi
 
             //当前线程编号
             int _threadNo = _tpp._threadNo;
-
-            if(_threadNo == 0)
-            {
-                //默认0号期货交易线程即测试线程
-                BROKER = TEST_BROKER;
-                INVESTOR = TEST_INVESTOR;
-                ADDRESS = TEST_ADDRESS;
-                PASSWORD = TEST_PASSWORD;
-            }
 
             sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 开始执行");
 
@@ -279,8 +261,8 @@ namespace Stork_Future_TaoLi
 
                             //填写委托参数
 
-                            args.BrokerID = BROKER;
-                            args.InvestorID = INVESTOR;
+                            args.BrokerID = CommConfig.BROKER;
+                            args.InvestorID = CommConfig.INVESTOR;
                             args.InstrumentID = order.cSecurityCode;
                             args.Direction = Convert.ToByte(order.cTradeDirection);
                             args.CombOffsetFlag_0 =  Convert.ToByte(order.cOffsetFlag);

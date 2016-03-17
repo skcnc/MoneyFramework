@@ -74,6 +74,9 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// </summary>
         public static string GlobalMonitor { get { return globalmonitor; } }
         private static string globalmonitor = "cj";
+
+
+
     }
 
     public class CommConfig
@@ -113,6 +116,31 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// </summary>
         private static string stock_investor_id = "201509";
         public static string Stock_InvestorID { get { return stock_investor_id; } }
+
+        /// <summary>
+        /// 期货端口
+        /// </summary>
+        public static string BROKER { get { return broker; } }
+        private static string broker = "8890";
+
+        /// <summary>
+        /// 期货账号
+        /// </summary>
+        public static string INVESTOR { get { return investor; } }
+        private static string investor = "17730203";
+
+        /// <summary>
+        /// 期货密码
+        /// </summary>
+        public static string PASSWORD { get { return password; } }
+        private static string password = "111111";
+
+        /// <summary>
+        /// 期货交易地址
+        /// </summary>
+        public static string ADDRESS { get { return address; } }
+        private static string address = "tcp://119.15.140.81:41205";
+
     }
 
     /// <summary>

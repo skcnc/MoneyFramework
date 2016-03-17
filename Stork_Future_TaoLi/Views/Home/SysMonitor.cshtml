@@ -106,6 +106,24 @@
                 else result = "异常";
                 $('.thread_status').append(str.replace('$name', "策略控制").replace('$result', result));
 
+                if (obj.RefundControlSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "退货总控制").replace('$result', result));
+
+                if (obj.RefundStockSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "股票退货").replace('$result', result));
+
+                if (obj.RefundFutureSystemStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "期货退货").replace('$result', result));
+
                 if (obj.Pre_TradeControlSystemStatus == true) {
                     result = "正常";
                 }
