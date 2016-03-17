@@ -345,6 +345,7 @@
     <Compile Include="StrategyModule\StrategyWorker.cs" />
     <Compile Include="StrategyModule\UserBehave.cs" />
     <Compile Include="TradeModule\FutureTrade.cs" />
+    <Compile Include="TradeModule\RefundTrade.cs" />
     <Compile Include="TradeModule\StockTradeThread.cs" />
     <Compile Include="Variables Type\CONFIG.cs" />
     <Compile Include="Variables Type\ListType.cs" />
