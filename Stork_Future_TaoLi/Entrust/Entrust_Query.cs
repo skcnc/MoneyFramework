@@ -35,7 +35,7 @@ namespace Stork_Future_TaoLi.Entrust
         }
         private Entrust_Query()
         {
-            log.EventSourceName = "交易预处理模块";
+            log.EventSourceName = "委托查询模块";
             log.EventLogType = System.Diagnostics.EventLogEntryType.Information;
             log.EventLogID = 65001;
         }
