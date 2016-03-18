@@ -46,6 +46,29 @@ namespace Stork_Future_TaoLi.Entrust
         {
             Thread mythread = new Thread(new ThreadStart(threadproc));
             mythread.Start();
+
+            //载入未完成委托记录
+            List<ER_TAOLI_TABLE> ERs = DBAccessLayer.GetInCompletedERRecord("S");
+
+            if(ERs != null && ERs.Count > 0)
+            {
+                foreach (ER_TAOLI_TABLE item in ERs)
+                {
+                    QueryEntrustOrderStruct_M entrust = new QueryEntrustOrderStruct_M()
+                    {
+                        Code = item.ER_CODE,
+                        Direction = Convert.ToInt16(item.ER_DIRECTION),
+                        ExchangeID = item.ER_ORDER_EXCHANGE_ID,
+                        OrderPrice = Convert.ToDouble(item.ER_FROZEN_MONEY) / Convert.ToInt16(item.ER_VOLUME_TOTAL_ORIGINAL),
+                        OrderRef = Convert.ToInt32(item.ER_ORDER_REF),
+                        OrderSysID = item.ER_ID,
+                        SecurityType = (sbyte)115,
+                        StrategyId = item.ER_STRATEGY
+                    };
+
+                    queue_query_entrust.GetQueue().Enqueue(entrust);
+                }
+            }
         }
         #endregion
 
@@ -104,13 +127,6 @@ namespace Stork_Future_TaoLi.Entrust
                          ret = temps.ToList()[0];
                      }
 
-                    
-                   
-
-                    if (ret == null) continue;
-
-                    String USERNAME = UserRequestMap.GetInstance()[item.OrderRef];
-
                     if (ret == null) continue;
 
 
@@ -126,6 +142,13 @@ namespace Stork_Future_TaoLi.Entrust
                         GetStatusWord(ret.cOrderStatus),
                         ret.cInsertTime);
 
+
+                    if(!UserRequestMap.GetInstance().Keys.Contains(item.OrderRef))
+                    {
+                        UserRequestMap.GetInstance().AddOrUpdate(item.OrderRef, item.User, (key, oldValue) => oldValue = item.User);
+                    }
+
+                    String USERNAME = UserRequestMap.GetInstance()[item.OrderRef];
                     TradeMonitor.Instance.updateOrderList(USERNAME, order);
 
 
@@ -148,6 +171,8 @@ namespace Stork_Future_TaoLi.Entrust
                             continue;
                         }
 
+                        
+
 
                         //委托已经完成，进入成交状态查询
                         managedBargainreturnstruct bargin = new managedBargainreturnstruct();
@@ -169,15 +194,36 @@ namespace Stork_Future_TaoLi.Entrust
                         bargin.strategyId = item.StrategyId;
                         bargin.direction = item.Direction;
                         bargin.User = USERNAME;
-                        bargin.OrderType = Convert.ToSByte("49"); 
+                        bargin.OrderType = Convert.ToSByte("49");
+
+                        if (ret.cOrderStatus.ToString() == ((int)(EntrustStatus.Dealed)).ToString())
+                        {
+                            bargin.OrderMark = Deal_Status.DEAL;
+                        }
+                        else if(ret.cOrderStatus.ToString() == ((int)EntrustStatus.Canceled).ToString())
+                        {
+                            bargin.OrderMark = Deal_Status.CANCELED;
+                        }
+                        else if (ret.nVolumeTotal == 0)
+                        {
+                            bargin.OrderMark = Deal_Status.PARTIALDEAL;
+                        }
                     
 
                         ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateDLRecord), (object)bargin);
 
                         EntrustRecord.DeleteEntrustRecord(item.OrderRef);
 
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.DeleteERRecord),(object)(item.OrderRef));
+
                         //更新持仓列表
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
+
+                        if (ret.nVolumeTraded != 0)
+                        {
+                            //需要修改数据
+                            //仅存在成交记录时才更改持仓
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
+                        }
 
                     }
                 }

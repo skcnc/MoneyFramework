@@ -50,6 +50,7 @@
           <Property Name="DL_NO" Type="nvarchar" MaxLength="50" />
           <Property Name="DL_LOAD" Type="bit" />
           <Property Name="DL_USER" Type="nvarchar" MaxLength="50" />
+          <Property Name="DL_MARK" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ER_TAOLI_TABLE">
           <Key>
@@ -57,6 +58,7 @@
           </Key>
           <Property Name="ER_GUID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="ER_ID" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ER_ORDER_REF" Type="nvarchar" MaxLength="50" />
           <Property Name="ER_STRATEGY" Type="nvarchar" MaxLength="50" />
           <Property Name="ER_CODE" Type="nvarchar" MaxLength="50" />
           <Property Name="ER_ORDER_EXCHANGE_ID" Type="nvarchar" MaxLength="50" />
@@ -73,6 +75,7 @@
           <Property Name="ER_CANCEL_TIME" Type="datetime" />
           <Property Name="ER_COMPLETED" Type="bit" />
           <Property Name="ER_DIRECTION" Type="int" />
+          <Property Name="ER_USER" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="FutureAccountTable">
           <Key>
@@ -277,6 +280,8 @@
           <Property Name="ER_CANCEL_TIME" Type="DateTime" Precision="3" />
           <Property Name="ER_COMPLETED" Type="Boolean" />
           <Property Name="ER_DIRECTION" Type="Int32" />
+          <Property Name="ER_ORDER_REF" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="OL_TAOLI_LIST_TABLE">
           <Key>
@@ -437,6 +442,7 @@
           <Property Name="DL_NO" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="DL_LOAD" Type="Boolean" />
           <Property Name="DL_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DL_MARK" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="InstructionsTable">
           <Key>
@@ -498,6 +504,8 @@
           <EntitySetMapping Name="ER_TAOLI_TABLE">
             <EntityTypeMapping TypeName="MoneyEntityModel.ER_TAOLI_TABLE">
               <MappingFragment StoreEntitySet="ER_TAOLI_TABLE">
+                <ScalarProperty Name="ER_USER" ColumnName="ER_USER" />
+                <ScalarProperty Name="ER_ORDER_REF" ColumnName="ER_ORDER_REF" />
                 <ScalarProperty Name="ER_GUID" ColumnName="ER_GUID" />
                 <ScalarProperty Name="ER_ID" ColumnName="ER_ID" />
                 <ScalarProperty Name="ER_STRATEGY" ColumnName="ER_STRATEGY" />
@@ -656,6 +664,7 @@
           <EntitySetMapping Name="DL_TAOLI_TABLE">
             <EntityTypeMapping TypeName="MoneyEntityModel.DL_TAOLI_TABLE">
               <MappingFragment StoreEntitySet="DL_TAOLI_TABLE">
+                <ScalarProperty Name="DL_MARK" ColumnName="DL_MARK" />
                 <ScalarProperty Name="DL_USER" ColumnName="DL_USER" />
                 <ScalarProperty Name="DL_LOAD" ColumnName="DL_LOAD" />
                 <ScalarProperty Name="DL_NO" ColumnName="DL_NO" />

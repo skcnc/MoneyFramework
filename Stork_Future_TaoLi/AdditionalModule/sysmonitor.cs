@@ -367,6 +367,11 @@ namespace Stork_Future_TaoLi
                     message.StrategyNum = messageData.StrategyNum;
                     message.StrategyInformation = new List<StrategyInfo>();
 
+                    if(messageData.StrategyInfomation == null)
+                    {
+                        messageData.StrategyInfomation = new Dictionary<string, StrategyInfo>();
+                    }
+
                     foreach(KeyValuePair<String,StrategyInfo> info in messageData.StrategyInfomation)
                     {
                         message.StrategyInformation.Add(info.Value);

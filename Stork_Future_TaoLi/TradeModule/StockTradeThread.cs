@@ -382,6 +382,8 @@ namespace Stork_Future_TaoLi.TradeModule
                             entrustorli[i].Direction = Convert.ToInt32(trades[i].cTradeDirection);
                             entrustorli[i].OrderRef = Convert.ToInt32(trades[i].OrderRef);
                             entrustorli[i].OrderPrice = trades[i].dOrderPrice;
+                            entrustorli[i].SecurityType = (sbyte)115;
+                            entrustorli[i].User = trades[i].cUser;
                             ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateERRecord), (object)(entrustorli[i]));
                             queue_query_entrust.GetQueue().Enqueue((object)entrustorli[i]);
                             ERecord record = new ERecord()

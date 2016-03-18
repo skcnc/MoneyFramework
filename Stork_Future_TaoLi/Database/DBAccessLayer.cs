@@ -25,91 +25,37 @@ namespace Stork_Future_TaoLi
         //数据库测试标记
         public static bool DBEnable = true;
 
-        /// <summary>
-        /// 获取黑白名单
-        /// </summary>
-        /// <returns>股票黑白名单</returns>
-        public static List<BWNameTable> GetWBNamwList()
+        public static void Dbsavechage(string type)
         {
-            if (DBAccessLayer.DBEnable == false) { return null; }
-
-            var tmp = (from item in DbEntity.BWNameTable select item);
-
-            if (tmp.Count() == 0) return null;
-            else return tmp.ToList();
-        }
-
-        /// <summary>
-        /// 设定黑白名单
-        /// </summary>
-        /// <param name="records">名单</param>
-        /// <returns>成功状态</returns>
-        public static bool SetWBNameList(List<BWNameTable> records)
-        {
-            if (DBAccessLayer.DBEnable == false) return false;
-
-            List<BWNameTable> oldRecords = (from item in DbEntity.BWNameTable select item).ToList();
-
-            for (int i = 0; i < oldRecords.Count; i++)
+            lock (DBChangeLock)
             {
-                DbEntity.BWNameTable.Remove(oldRecords[i]);
+                bool lockdb = false;
+                int count = 100;
+                while (lockdb == false)
+                {
+                    count--;
+                    try
+                    {
+                        DbEntity.SaveChanges();
+                        lockdb = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        GlobalErrorLog.LogInstance.LogEvent("type = " + type + "\r\n" + ex.InnerException.ToString());
+                        Thread.Sleep(10);
+
+                        if (count == 0)
+                        {
+                            GlobalErrorLog.LogInstance.LogEvent("数据库提交100次失败！");
+                            lockdb = true;
+                        }
+                    }
+                }
             }
-
-            foreach (BWNameTable record in records)
-            {
-                DbEntity.BWNameTable.Add(record);
-            }
-
-            Dbsavechage("BWNameTable");
-
-            return true;
-            
         }
 
-        /// <summary>
-        /// 获取用户可用资金量 
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns>股票|期货</returns>
-        public static string GetAccountAvailable(string user)
-        {
-            if (DBAccessLayer.DBEnable == false) return string.Empty;
-
-            var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
-            if (tmp == null || tmp.Count() == 0)
-            {
-                return string.Empty;
-            }
-
-            return tmp.ToList()[0].stockAvailable.ToString() + "|" + tmp.ToList()[0].futureAvailable.ToString();
-        }
-
-        /// <summary>
-        /// 设置用户资金量
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="stock"></param>
-        /// <param name="future"></param>
-        /// <returns></returns>
-        public static bool SetAccountAvailable(string user,string stock,string future)
-        {
-            if (DBAccessLayer.DBEnable == false) return false;
-
-            var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
-
-            if (tmp.Count() == 0) return false;
-
-            UserInfo info = tmp.ToList()[0];
-
-            info.stockAvailable = stock; 
-            info.futureAvailable = future;
-
-            Dbsavechage("SetAccountAvailable");
-            return true;
-
-        }
-
-        public static void AddRiskRecord(string alias , string err, string strid,string code,int amount,double price,string orientation )
+        #region 风控相关
+        public static void AddRiskRecord(string alias, string err, string strid, string code, int amount, double price, string orientation)
         {
 
             if (DBAccessLayer.DBEnable == false) { return; }
@@ -166,7 +112,203 @@ namespace Stork_Future_TaoLi
                 return risks.OrderByDescending(i => i.time).ToList();
             }
         }
+        /// <summary>
+        /// 获取黑白名单
+        /// </summary>
+        /// <returns>股票黑白名单</returns>
+        public static List<BWNameTable> GetWBNamwList()
+        {
+            if (DBAccessLayer.DBEnable == false) { return null; }
 
+            var tmp = (from item in DbEntity.BWNameTable select item);
+
+            if (tmp.Count() == 0) return null;
+            else return tmp.ToList();
+        }
+
+        /// <summary>
+        /// 设定黑白名单
+        /// </summary>
+        /// <param name="records">名单</param>
+        /// <returns>成功状态</returns>
+        public static bool SetWBNameList(List<BWNameTable> records)
+        {
+            if (DBAccessLayer.DBEnable == false) return false;
+
+            List<BWNameTable> oldRecords = (from item in DbEntity.BWNameTable select item).ToList();
+
+            for (int i = 0; i < oldRecords.Count; i++)
+            {
+                DbEntity.BWNameTable.Remove(oldRecords[i]);
+            }
+
+            foreach (BWNameTable record in records)
+            {
+                DbEntity.BWNameTable.Add(record);
+            }
+
+            Dbsavechage("BWNameTable");
+
+            return true;
+
+        }
+        #endregion
+
+        #region 账户相关
+
+
+        /// <summary>
+        /// 记录新股票资金变动
+        /// </summary>
+        /// <param name="balance">可用资金</param>
+        /// <param name="marketvalue">股票市值</param>
+        /// <param name="stockvalue">股票成本</param>
+        /// <param name="total">股票权益</param>
+        /// <param name="frozen">风控+委托冻结资金</param>
+        /// <param name="earning">盈亏</param>
+        /// <param name="alias">用户名</param>
+        public static void InsertStockAccountTable(string balance, string marketvalue, string stockvalue, string total, string earning, string alias, string frozen)
+        {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            StockAccountTable item = new StockAccountTable()
+            {
+                ID = Guid.NewGuid(),
+                Balance = balance,
+                MarketValue = marketvalue,
+                StockValue = stockvalue,
+                Total = total,
+                StockFrozenValue = frozen,
+                Earning = earning,
+                Alias = alias,
+                UpdateTime = DateTime.Now
+            };
+
+            DbEntity.StockAccountTable.Add(item);
+            Dbsavechage("InsertStockAccountTable");
+        }
+
+        /// <summary>
+        /// 获取最新的资金状态
+        /// </summary>
+        /// <param name="alias">用户名</param>
+        /// <returns>最新资金状态</returns>
+        public static StockAccountTable GetStockAccount(string alias)
+        {
+            if (DBAccessLayer.DBEnable == false) return null;
+
+            var records = (from item in DbEntity.StockAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
+
+            if (records.Count() > 0)
+            {
+                return records.ToList()[0];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 记录新资金变动
+        /// </summary>
+        /// <param name="staticInterests">静态权益</param>
+        /// <param name="OffsetGain">平仓盈亏</param>
+        /// <param name="OpsitionGain">持仓盈亏</param>
+        /// <param name="DynamicInterests">动态权益</param>
+        /// <param name="frozen">风控+委托冻结资金</param>
+        /// <param name="CashDeposit">保证金</param>
+        /// <param name="ExpendableFund">可用资金</param>
+        /// <param name="alias">用户名</param>
+        public static void InsertFutureAccountTable(string staticInterests, string OffsetGain, string frozen, string OpsitionGain, string DynamicInterests, string CashDeposit, string ExpendableFund, string alias)
+        {
+            if (DBAccessLayer.DBEnable == false) { return; }
+
+            FutureAccountTable item = new FutureAccountTable()
+            {
+                ID = Guid.NewGuid(),
+                StatisInterests = staticInterests,
+                OffsetGain = OffsetGain,
+                OpsitionGain = OpsitionGain,
+                DynamicInterests = DynamicInterests,
+                CashDeposit = CashDeposit,
+                FrozenValue = frozen,
+                ExpendableFund = ExpendableFund,
+                Alias = alias,
+                UpdateTime = DateTime.Now
+            };
+
+            DbEntity.FutureAccountTable.Add(item);
+            Dbsavechage("InsertFutureAccountTable");
+        }
+
+        /// <summary>
+        /// 获取期货账户
+        /// </summary>
+        /// <param name="alias">用户名</param>
+        /// <returns>期货资金</returns>
+        public static FutureAccountTable GetFutureAccount(string alias)
+        {
+            if (DBAccessLayer.DBEnable == false) return null;
+
+            var records = (from item in DbEntity.FutureAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
+
+            if (records.Count() > 0)
+            {
+                return records.ToList()[0];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
+
+        /// <summary>
+        /// 获取用户可用资金量 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>股票|期货</returns>
+        public static string GetAccountAvailable(string user)
+        {
+            if (DBAccessLayer.DBEnable == false) return string.Empty;
+
+            var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
+            if (tmp == null || tmp.Count() == 0)
+            {
+                return string.Empty;
+            }
+
+            return tmp.ToList()[0].stockAvailable.ToString() + "|" + tmp.ToList()[0].futureAvailable.ToString();
+        }
+
+        /// <summary>
+        /// 设置用户资金量
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="stock"></param>
+        /// <param name="future"></param>
+        /// <returns></returns>
+        public static bool SetAccountAvailable(string user, string stock, string future)
+        {
+            if (DBAccessLayer.DBEnable == false) return false;
+
+            var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
+
+            if (tmp.Count() == 0) return false;
+
+            UserInfo info = tmp.ToList()[0];
+
+            info.stockAvailable = stock;
+            info.futureAvailable = future;
+
+            Dbsavechage("SetAccountAvailable");
+            return true;
+
+        }
+        #endregion
+
+        #region 用户信息相关
         public static List<UserInfo> GetUser()
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
@@ -187,7 +329,7 @@ namespace Stork_Future_TaoLi
             else return tmp.ToList()[0];
         }
 
-        public static void UpdateUserAccount(string alias,double stockaccount,double futureaccount)
+        public static void UpdateUserAccount(string alias, double stockaccount, double futureaccount)
         {
             if (DBAccessLayer.DBEnable == false) { return; }
 
@@ -204,17 +346,267 @@ namespace Stork_Future_TaoLi
 
         }
 
+
+        /// <summary>
+        /// 创建新用户
+        /// </summary>
+        /// <param name="para">参数</param>
+        /// <returns></returns>
+        public static string InsertUser(registerType para)
+        {
+            if (DBAccessLayer.DBEnable == false) { return "数据库未启用"; }
+            if (para == null) return "参数有误";
+
+            Database.UserInfo user = new UserInfo()
+            {
+                ID = Guid.NewGuid(),
+                alias = para.username,
+                name = para.Realname,
+                password = DESoper.EncryptDES(para.Password),
+                userRight = Convert.ToInt16(para.right),
+                stockAvailable = para.StockAccount,
+                futureAvailable = para.FutureAccount
+            };
+
+            DbEntity.UserInfo.Add(user);
+
+            //为新用户分配股市资金流动信息
+            InsertStockAccountTable(para.StockAccount, "0", "0", para.StockAccount, "0", para.username, "0");
+
+            //为新用户分配期货资金流动信息
+            InsertFutureAccountTable(para.FutureAccount, "0", "0", "0", para.FutureAccount, "0", para.FutureAccount, para.username);
+
+            Dbsavechage("InsertUser");
+
+            return "success";
+        }
+
+        /// <summary>
+        /// 用户登录
+        /// </summary>
+        /// <param name="para">参数</param>
+        /// <returns></returns>
+        public static int? Login(loginType para)
+        {
+            if (DBAccessLayer.DBEnable == false) { return 0; }
+            if (para == null) return 0;
+
+            para.password = DESoper.EncryptDES(para.password);
+
+            var tmp = (from item in DbEntity.UserInfo where item.password == para.password && item.alias == para.name select item);
+
+            if (tmp.Count() > 0) { return tmp.ToList()[0].userRight; }
+            else return 0;
+        }
+
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        public static bool ChangePassword(ChangePasswordType para)
+        {
+            if (DBAccessLayer.DBEnable == false) { return false; }
+            if (para == null) return false;
+
+            para.op = DESoper.EncryptDES(para.op);
+            para.np = DESoper.EncryptDES(para.np);
+
+            var tmp = (from item in DbEntity.UserInfo where item.password == para.op && item.alias == para.name select item);
+
+            if (tmp.Count() == 0) return false;
+
+            var s = tmp.ToList()[0];
+            s.password = para.np;
+
+            Dbsavechage("ChangePassword");
+            return true;
+
+        }
+
+        #endregion
+
+        #region 策略相关
+
+        /// <summary>
+        /// 获取匹配策略ID
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public static string SearchStrategy(SEARCHSTRATEGY info, out int hd)
+        {
+            hd = 0;
+            if (DBAccessLayer.DBEnable == false) return string.Empty;
+
+
+            String SG_IDs = String.Empty;
+
+
+            double op = Convert.ToDouble(info.BASIS);
+            string contract = info.CONTRACT.Trim();
+            int index = Convert.ToInt32(info.INDEX);
+
+
+            var _records = (from item in DbEntity.SG_TAOLI_OPEN_TABLE
+                            where ((item.SG_STATUS == 3) &&
+                            (item.SG_OP_POINT == op) &&
+                            (item.SG_Contract == contract) &&
+                            (item.SG_INDEX == index) &&
+                            (item.SG_USER == info.basic.USER))
+                            select item);
+
+            if (_records != null && _records.Count() == 0)
+            {
+                return string.Empty;
+            }
+
+            SG_IDs = _records.ToList()[0].SG_ID;
+            hd = Convert.ToInt16(_records.ToList()[0].SG_HAND_NUM);
+
+            return SG_IDs;
+
+        }
+
+        public static void UpdateStrategyStatusRecord(string str_id, int status)
+        {
+            if (DBAccessLayer.DBEnable == false) return;
+            if (status == 1)
+            {
+                SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
+                {
+                    SG_GUID = Guid.NewGuid(),
+                    SG_ID = str_id,
+                    SG_STATUS = status,
+                    SG_UPDATE_TIME = DateTime.Now
+                };
+
+                DbEntity.SG_TAOLI_STATUS_TABLE.Add(record);
+            }
+            else
+            {
+                var _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
+
+                if (_rec.Count() == 0)
+                {
+                    SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
+                    {
+                        SG_GUID = Guid.NewGuid(),
+                        SG_ID = str_id,
+                        SG_STATUS = 0,
+                        SG_UPDATE_TIME = DateTime.Now
+                    };
+
+                    _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
+                }
+
+                if (_rec.Count() == 0) return;
+
+                var _unit = _rec.ToList()[0];
+
+                switch (status)
+                {
+                    case 1:
+                        _unit.SG_STATUS = 1;
+                        break;
+                    case 2:
+                        _unit.SG_STATUS = 2;
+                        break;
+                    case 3:
+                        _unit.SG_STATUS = 3;
+                        break;
+                    default:
+                        _unit.SG_STATUS = 0;
+                        break;
+                }
+            }
+            Dbsavechage("UpdateStrategyStatusRecord");
+        }
+
+        /// <summary>
+        /// 获得上次退出时未完成的开仓实例
+        /// 策略管理线程启动时执行
+        /// </summary>
+        public static List<OPENCREATE> GetInCompletedOPENStrategy()
+        {
+            if (DBAccessLayer.DBEnable == false) { return null; }
+
+            var selected = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_STATUS == 0 select item);
+
+            List<OPENCREATE> IncompletedStrategies = new List<OPENCREATE>();
+
+
+            foreach (var item in selected.ToList())
+            {
+                IncompletedStrategies.Add(new OPENCREATE()
+                {
+                    basic = new Basic()
+                    {
+                        USER = item.SG_USER,
+                        ACTIVITY = "OPENCREATE",
+                        ORIENTATION = "1",
+                        ID = item.SG_ID
+                    },
+                    OP = (float)item.SG_OP_POINT,
+                    HD = (int)item.SG_HAND_NUM,
+                    CT = item.SG_Contract,
+                    INDEX = item.SG_INDEX.ToString(),
+                    orderli = item.SG_LATEST_TRADE_LIST,
+                    weightli = item.SG_WEIGHT_LIST
+                });
+            }
+
+            return IncompletedStrategies;
+        }
+
+        /// <summary>
+        /// 获得上次退出时未完成的平仓实例
+        /// </summary>
+        /// <returns></returns>
+        public static List<CLOSECREATE> GetInCompletedCLOSEStrategy()
+        {
+            if (DBAccessLayer.DBEnable == false) { return null; }
+            var selected = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_STATUS == 0 select item);
+
+            List<CLOSECREATE> IncompletedStrategies = new List<CLOSECREATE>();
+
+            foreach (var item in selected.ToList())
+            {
+                IncompletedStrategies.Add(new CLOSECREATE()
+                {
+                    basic = new Basic()
+                    {
+                        USER = item.SG_USER,
+                        ACTIVITY = "CLOSECREATE",
+                        ORIENTATION = "0",
+                        ID = item.SG_ID
+                    },
+                    CT = item.SG_FUTURE_CONTRACT,
+                    SP = (float)item.SG_SHORT_POINT,
+                    HD = (int)item.SG_HAND,
+                    POSITION = item.SG_LATEST_POSITION_LIST,
+                    COSTOFEQUITY = (decimal)item.SG_COE,
+                    STOCKDIVIDENDS = (decimal)item.SG_SD,
+                    STOCKALLOTMENT = (decimal)item.SG_SA,
+                    PROSPECTIVEARNINGS = (decimal)item.SG_PE,
+                    OB = (float)item.SG_BAS
+                });
+            }
+
+            return IncompletedStrategies;
+        }
+
+
         public static void InsertSGOPEN(object v)
         {
 
-            
+
             if (DBAccessLayer.DBEnable == false) { return; }
             OPENCREATE open = (OPENCREATE)v;
             //若发现存在相同策略ID的实例未完成，将未完成实例标记为“删除”，替换以当前实例
             //这种情况在启动自检测时出现
 
             if (!DetectSGOPEN(open.basic.ID)) return;
-                
+
             //等待上一步操作完成
             Thread.Sleep(10);
 
@@ -370,7 +762,11 @@ namespace Stork_Future_TaoLi
             DbEntity.SG_TAOLI_STATUS_TABLE.Add(item);
             Dbsavechage("InsertSTATUS");
         }
+        #endregion
 
+        #region 交易相关
+
+        #region 下单
         public static void InsertORDERLIST(string strategyId, string orderli)
         {
             if (DBAccessLayer.DBEnable == false) { return; }
@@ -392,13 +788,15 @@ namespace Stork_Future_TaoLi
 
             var selected = (from item in DbEntity.OL_TAOLI_LIST_TABLE where item.SG_ID == strategyId select item);
 
-            if(selected.Count() > 0)
+            if (selected.Count() > 0)
             {
                 DbEntity.OL_TAOLI_LIST_TABLE.Remove(selected.ToList()[0]);
                 Dbsavechage("DeleteORDERLIST");
             }
         }
+        #endregion
 
+        #region 委托
         /// <summary>
         /// 创建委托记录
         /// </summary>
@@ -421,10 +819,11 @@ namespace Stork_Future_TaoLi
                 {
                     ER_GUID = Guid.NewGuid(),
                     ER_ID = entrust.OrderSysID,
+                    ER_ORDER_REF = entrust.OrderRef.ToString(),
                     ER_STRATEGY = entrust.StrategyId,
                     ER_ORDER_TYPE = entrust.SecurityType.ToString(),
                     ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
-
+                    ER_USER = entrust.User,
                     ER_CODE = entrust.Code,
                     ER_DIRECTION = entrust.Direction,
                     ER_CANCEL_TIME = new DateTime(1900, 1, 1),
@@ -448,6 +847,28 @@ namespace Stork_Future_TaoLi
         public static void CreateFutureERRecord(object item)
         {
 
+        }
+
+        public static void DeleteERRecord(object Ref)
+        {
+            if (DBEnable == false) return;
+
+            String OrderRef = ((int)Ref).ToString();
+
+            var record = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ORDER_REF == OrderRef select item);
+
+            if(record.Count() >0)
+            {
+                lock(ERtableLock)
+                {
+                    DbEntity.ER_TAOLI_TABLE.Remove(record.ToList()[0]);
+                    Dbsavechage("DeleteERRecord");
+                }
+
+                return;
+            }
+
+            return;
         }
 
         /// <summary>
@@ -494,6 +915,104 @@ namespace Stork_Future_TaoLi
         }
 
         /// <summary>
+        /// 功能： 获取所有未完成委托
+        /// 应用场景： 委托查询线程启动阶段载入委托记录
+        /// </summary>
+        /// <param name="Type">
+        /// 获取类型：
+        /// S: 股票
+        /// F: 期货
+        /// </param>
+        /// <returns></returns>
+        public static List<ER_TAOLI_TABLE> GetInCompletedERRecord(String Type)
+        {
+            if (DBEnable == false) return null;
+            string sbType = String.Empty;
+
+            if (Type.Trim().ToUpper() == "S")
+            {
+                sbType = "115";
+            }
+            else if(Type.Trim().ToUpper() == "F")
+            {
+                sbType = "102";
+            }
+
+            var ERs = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ORDER_TYPE == sbType select item);
+
+            if (ERs.Count() > 0)
+            {
+                return ERs.ToList();
+            }
+
+
+            return null;
+        }
+        #endregion
+
+        #region 成交
+        public static List<String> GetDealList(string strId, out decimal totalStockMoney, out decimal futureIndex)
+        {
+            totalStockMoney = 0;
+            futureIndex = 0;
+
+            if (DBAccessLayer.DBEnable)
+            {
+                var _record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_STRATEGY == strId select item);
+
+                if (_record == null || _record.Count() == 0)
+                {
+                    return null;
+                }
+
+
+                List<String> _li = new List<string>();
+
+                foreach (DL_TAOLI_TABLE i in _record.ToList())
+                {
+                    if (i.DL_TYPE == "f")
+                    {
+                        futureIndex = Convert.ToDecimal(i.DL_BARGAIN_PRICE);
+                    }
+                    else
+                    {
+                        totalStockMoney += Convert.ToDecimal(i.DL_BARGAIN_MONEY);
+                        _li.Add(i.DL_CODE + ";" + i.DL_TYPE + ";" + i.DL_STOCK_AMOUNT);
+                    }
+                }
+
+                return _li;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取用户交易
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public static List<DL_TAOLI_TABLE> GetUserDeals(string alias)
+        {
+            if (alias == null) return null;
+
+            alias = alias.Trim();
+
+            List<DL_TAOLI_TABLE> deals_record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_USER == alias select item).ToList();
+
+            if (deals_record != null && deals_record.Count > 0)
+            {
+                return deals_record;
+            }
+            else
+            {
+                return new List<DL_TAOLI_TABLE>();
+            }
+        }
+
+        /// <summary>
         /// 添加股票交易记录
         /// 成交记录只在委托完成后记录，如果委托未完成，就等它完成
         /// 因此这张表只会增加，不会删除或者修改
@@ -532,10 +1051,11 @@ namespace Stork_Future_TaoLi
                         DL_STOCK_AMOUNT = record.stock_amount,
                         DL_BARGAIN_PRICE = record.bargain_price / 1000,
                         DL_BARGAIN_MONEY = record.bargain_money,
-                        DL_BARGAIN_TIME =bargin_time,
+                        DL_BARGAIN_TIME = bargin_time,
                         DL_NO = record.OrderSysID.ToString(),
                         DL_LOAD = true,
-                        DL_USER = record.User
+                        DL_USER = record.User,
+                        DL_MARK = record.OrderMark
                     };
 
                     DbEntity.DL_TAOLI_TABLE.Add(item);
@@ -601,135 +1121,11 @@ namespace Stork_Future_TaoLi
                 }
             }
         }
+        #endregion
 
-        public static void UpdateStrategyStatusRecord(string str_id , int status)
-        {
-            if (DBAccessLayer.DBEnable == false) return;
-            if(status == 1)
-            {
-                SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
-                {
-                    SG_GUID = Guid.NewGuid(),
-                    SG_ID = str_id,
-                    SG_STATUS = status,
-                    SG_UPDATE_TIME = DateTime.Now
-                };
+        #endregion
 
-                DbEntity.SG_TAOLI_STATUS_TABLE.Add(record);
-            }
-            else
-            {
-                var _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
-
-                if (_rec.Count() == 0)
-                {
-                    SG_TAOLI_STATUS_TABLE record = new SG_TAOLI_STATUS_TABLE()
-                    {
-                        SG_GUID = Guid.NewGuid(),
-                        SG_ID = str_id,
-                        SG_STATUS = 0,
-                        SG_UPDATE_TIME = DateTime.Now
-                    };
-
-                    _rec = (from item in DbEntity.SG_TAOLI_STATUS_TABLE where item.SG_ID == str_id select item);
-                }
-
-                if (_rec.Count() == 0) return;
-
-                var _unit = _rec.ToList()[0];
-
-                switch (status)
-                {
-                    case 1:
-                        _unit.SG_STATUS = 1;
-                        break;
-                    case 2:
-                        _unit.SG_STATUS = 2;
-                        break;
-                    case 3:
-                        _unit.SG_STATUS = 3;
-                        break;
-                    default:
-                        _unit.SG_STATUS = 0;
-                        break;
-                }
-            }
-            Dbsavechage("UpdateStrategyStatusRecord");
-        }
-
-        /// <summary>
-        /// 获得上次退出时未完成的开仓实例
-        /// 策略管理线程启动时执行
-        /// </summary>
-        public static List<OPENCREATE> GetInCompletedOPENStrategy()
-        {
-            if (DBAccessLayer.DBEnable == false) { return null; }
-
-            var selected = (from item in DbEntity.SG_TAOLI_OPEN_TABLE where item.SG_STATUS == 0 select item);
-
-            List<OPENCREATE> IncompletedStrategies = new List<OPENCREATE>();
-
-
-            foreach (var item in selected.ToList())
-            {
-                IncompletedStrategies.Add(new OPENCREATE()
-                {
-                    basic = new Basic()
-                    {
-                        USER = item.SG_USER,
-                        ACTIVITY = "OPENCREATE",
-                        ORIENTATION = "1",
-                        ID = item.SG_ID
-                    },
-                    OP = (float)item.SG_OP_POINT,
-                    HD = (int)item.SG_HAND_NUM,
-                    CT = item.SG_Contract,
-                    INDEX = item.SG_INDEX.ToString(),
-                    orderli = item.SG_LATEST_TRADE_LIST,
-                    weightli = item.SG_WEIGHT_LIST
-                });
-            }
-
-            return IncompletedStrategies;
-        }
-
-        /// <summary>
-        /// 获得上次退出时未完成的平仓实例
-        /// </summary>
-        /// <returns></returns>
-        public static List<CLOSECREATE> GetInCompletedCLOSEStrategy()
-        {
-            if (DBAccessLayer.DBEnable == false) { return null; }
-            var selected = (from item in DbEntity.SG_TAOLI_CLOSE_TABLE where item.SG_STATUS == 0 select item);
-
-            List<CLOSECREATE> IncompletedStrategies = new List<CLOSECREATE>();
-
-            foreach (var item in selected.ToList())
-            {
-                IncompletedStrategies.Add(new CLOSECREATE()
-                {
-                    basic = new Basic()
-                    {
-                        USER = item.SG_USER,
-                        ACTIVITY = "CLOSECREATE",
-                        ORIENTATION = "0",
-                        ID = item.SG_ID
-                    },
-                    CT = item.SG_FUTURE_CONTRACT,
-                    SP = (float)item.SG_SHORT_POINT,
-                    HD = (int)item.SG_HAND,
-                    POSITION = item.SG_LATEST_POSITION_LIST,
-                    COSTOFEQUITY = (decimal)item.SG_COE,
-                    STOCKDIVIDENDS = (decimal)item.SG_SD,
-                    STOCKALLOTMENT = (decimal)item.SG_SA,
-                    PROSPECTIVEARNINGS = (decimal)item.SG_PE,
-                    OB = (float)item.SG_BAS
-                });
-            }
-
-            return IncompletedStrategies;
-        }
-
+        #region 持仓操作相关
         /// <summary>
         /// 单笔成交查询回报更新持仓文件
         /// </summary>
@@ -792,7 +1188,7 @@ namespace Stork_Future_TaoLi
 
                         };
                         Dbsavechage("UpdateCCRecords");
-                        
+
                         //修改本地CC列表
                         List<CC_TAOLI_TABLE> records = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user select item).ToList();
                         accountMonitor.ChangeLocalCC(user.Trim(), records);
@@ -998,7 +1394,7 @@ namespace Stork_Future_TaoLi
 
                     var selectedFuture = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_CODE == code && item.CC_DIRECTION != sDirection && item.CC_TYPE == type && item.CC_USER == user select item);
 
-                    if(selectedFuture.Count() == 0)
+                    if (selectedFuture.Count() == 0)
                     {
                         //不可能持仓列表是负值，肯定有问题
                         GlobalErrorLog.LogInstance.LogEvent("对空仓平仓--策略：" + bargin.strategyId + "， 当前交易代码：" + code + ", 买入：" + amount + "， 价格：" + price);
@@ -1133,7 +1529,7 @@ namespace Stork_Future_TaoLi
 
             if (DBAccessLayer.DBEnable == false) return;
 
-            if(userName != "*")
+            if (userName != "*")
             {
                 var tmp = (from item in DbEntity.CC_TAOLI_TABLE select item);
                 records = tmp.ToList();
@@ -1143,7 +1539,7 @@ namespace Stork_Future_TaoLi
                 var tmp = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == userName select item);
                 records = tmp.ToList();
             }
-            
+
         }
 
         /// <summary>
@@ -1171,322 +1567,9 @@ namespace Stork_Future_TaoLi
 
             var position = (from item in DbEntity.CC_TAOLI_TABLE where item.CC_USER == user && item.CC_CODE == code select item);
 
-            
+
 
         }
-
-        public static List<String> GetDealList(string strId, out decimal totalStockMoney, out decimal futureIndex)
-        {
-            totalStockMoney = 0;
-            futureIndex = 0;
-
-            if (DBAccessLayer.DBEnable)
-            {
-                var _record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_STRATEGY == strId select item);
-
-                if(_record == null || _record.Count() == 0)
-                {
-                    return null;
-                }
-
-
-                List<String> _li = new List<string>();
-
-                foreach(DL_TAOLI_TABLE i in _record.ToList())
-                {
-                    if (i.DL_TYPE == "f")
-                    {
-                        futureIndex = Convert.ToDecimal(i.DL_BARGAIN_PRICE);
-                    }
-                    else
-                    {
-                        totalStockMoney += Convert.ToDecimal(i.DL_BARGAIN_MONEY);
-                        _li.Add(i.DL_CODE + ";" + i.DL_TYPE + ";" + i.DL_STOCK_AMOUNT);
-                    }
-                }
-
-                return _li;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 获取用户交易
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        public static List<DL_TAOLI_TABLE> GetUserDeals(string alias)
-        {
-            if (alias == null) return null;
-
-            alias = alias.Trim();
-
-            List<DL_TAOLI_TABLE> deals_record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_USER == alias select item).ToList();
-
-            if(deals_record != null && deals_record.Count > 0)
-            {
-                return deals_record;
-            }
-            else
-            {
-                return new List<DL_TAOLI_TABLE>();
-            }
-        }
-
-        /// <summary>
-        /// 获取匹配策略ID
-        /// </summary>
-        /// <param name="info"></param>
-        /// <returns></returns>
-        public static string SearchStrategy(SEARCHSTRATEGY info,out int hd)
-        {
-            hd = 0;
-            if (DBAccessLayer.DBEnable == false) return string.Empty;
-
-
-            String SG_IDs = String.Empty;
-
-
-            double op = Convert.ToDouble(info.BASIS);
-            string contract = info.CONTRACT.Trim();
-            int index = Convert.ToInt32(info.INDEX);
-
-
-            var _records = (from item in DbEntity.SG_TAOLI_OPEN_TABLE
-                            where ((item.SG_STATUS == 3) &&
-                            (item.SG_OP_POINT == op) &&
-                            (item.SG_Contract == contract) &&
-                            (item.SG_INDEX == index) &&
-                            (item.SG_USER == info.basic.USER))
-                            select item);
-
-            if(_records != null && _records.Count() == 0)
-            {
-                return string.Empty;
-            }
-
-            SG_IDs = _records.ToList()[0].SG_ID;
-            hd = Convert.ToInt16(_records.ToList()[0].SG_HAND_NUM);
-
-            return SG_IDs;
-
-        }
-
-        /// <summary>
-        /// 创建新用户
-        /// </summary>
-        /// <param name="para">参数</param>
-        /// <returns></returns>
-        public static string  InsertUser(registerType para)
-        {
-            if (DBAccessLayer.DBEnable == false) { return "数据库未启用"; }
-            if (para == null) return "参数有误";
-
-            Database.UserInfo user = new UserInfo()
-            {
-                ID = Guid.NewGuid(),
-                alias = para.username,
-                name = para.Realname,
-                password = DESoper.EncryptDES(para.Password),
-                userRight = Convert.ToInt16(para.right),
-                stockAvailable = para.StockAccount,
-                futureAvailable = para.FutureAccount
-            };
-
-            DbEntity.UserInfo.Add(user);
-
-            //为新用户分配股市资金流动信息
-            InsertStockAccountTable(para.StockAccount, "0", "0", para.StockAccount, "0", para.username, "0");
-
-            //为新用户分配期货资金流动信息
-            InsertFutureAccountTable(para.FutureAccount, "0", "0", "0", para.FutureAccount, "0", para.FutureAccount, para.username);
-
-            Dbsavechage("InsertUser");
-
-            return "success";
-        }
-
-        /// <summary>
-        /// 用户登录
-        /// </summary>
-        /// <param name="para">参数</param>
-        /// <returns></returns>
-        public static int? Login(loginType para)
-        {
-            if (DBAccessLayer.DBEnable == false) { return 0; }
-            if (para == null) return 0;
-
-            para.password = DESoper.EncryptDES(para.password);
-
-            var tmp = (from item in DbEntity.UserInfo where item.password == para.password && item.alias == para.name select item);
-
-            if (tmp.Count() > 0) { return tmp.ToList()[0].userRight; }
-            else return 0;
-        }
-
-        /// <summary>
-        /// 修改密码
-        /// </summary>
-        /// <param name="para"></param>
-        /// <returns></returns>
-        public static bool ChangePassword(ChangePasswordType para)
-        {
-            if (DBAccessLayer.DBEnable == false) { return false; }
-            if (para == null) return false;
-
-            para.op = DESoper.EncryptDES(para.op);
-            para.np = DESoper.EncryptDES(para.np);
-
-            var tmp = (from item in DbEntity.UserInfo where item.password == para.op && item.alias == para.name select item);
-
-            if (tmp.Count() == 0) return false;
-
-            var s = tmp.ToList()[0];
-            s.password = para.np;
-
-            Dbsavechage("ChangePassword");
-            return true;
-
-        }
-
-
-        /// <summary>
-        /// 记录新股票资金变动
-        /// </summary>
-        /// <param name="balance">可用资金</param>
-        /// <param name="marketvalue">股票市值</param>
-        /// <param name="stockvalue">股票成本</param>
-        /// <param name="total">股票权益</param>
-        /// <param name="frozen">风控+委托冻结资金</param>
-        /// <param name="earning">盈亏</param>
-        /// <param name="alias">用户名</param>
-        public static void InsertStockAccountTable(string balance,string marketvalue,string stockvalue,string total,string earning,string alias,string frozen)
-        {
-            if (DBAccessLayer.DBEnable == false) { return; }
-
-            StockAccountTable item = new StockAccountTable()
-            {
-                ID = Guid.NewGuid(),
-                Balance = balance,
-                MarketValue = marketvalue,
-                StockValue = stockvalue,
-                Total = total,
-                StockFrozenValue = frozen,
-                Earning = earning,
-                Alias = alias,
-                UpdateTime = DateTime.Now
-            };
-
-            DbEntity.StockAccountTable.Add(item);
-            Dbsavechage("InsertStockAccountTable");
-        }
-
-        /// <summary>
-        /// 获取最新的资金状态
-        /// </summary>
-        /// <param name="alias">用户名</param>
-        /// <returns>最新资金状态</returns>
-        public static StockAccountTable GetStockAccount(string alias)
-        {
-            if (DBAccessLayer.DBEnable == false) return null;
-
-            var records = (from item in DbEntity.StockAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
-
-            if (records.Count() > 0)
-            {
-                return records.ToList()[0];
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 记录新资金变动
-        /// </summary>
-        /// <param name="staticInterests">静态权益</param>
-        /// <param name="OffsetGain">平仓盈亏</param>
-        /// <param name="OpsitionGain">持仓盈亏</param>
-        /// <param name="DynamicInterests">动态权益</param>
-        /// <param name="frozen">风控+委托冻结资金</param>
-        /// <param name="CashDeposit">保证金</param>
-        /// <param name="ExpendableFund">可用资金</param>
-        /// <param name="alias">用户名</param>
-        public static void InsertFutureAccountTable(string staticInterests,string OffsetGain,string frozen,string OpsitionGain,string DynamicInterests,string CashDeposit,string ExpendableFund,string alias)
-        {
-            if (DBAccessLayer.DBEnable == false) { return; }
-
-            FutureAccountTable item = new FutureAccountTable()
-            {
-                ID = Guid.NewGuid(),
-                StatisInterests = staticInterests,
-                OffsetGain = OffsetGain,
-                OpsitionGain = OpsitionGain,
-                DynamicInterests = DynamicInterests,
-                CashDeposit = CashDeposit,
-                FrozenValue = frozen,
-                ExpendableFund = ExpendableFund,
-                Alias = alias,
-                UpdateTime = DateTime.Now
-            };
-
-            DbEntity.FutureAccountTable.Add(item);
-            Dbsavechage("InsertFutureAccountTable");
-        }
-
-        /// <summary>
-        /// 获取期货账户
-        /// </summary>
-        /// <param name="alias">用户名</param>
-        /// <returns>期货资金</returns>
-        public static FutureAccountTable GetFutureAccount(string alias)
-        {
-            if (DBAccessLayer.DBEnable == false) return null;
-
-            var records = (from item in DbEntity.FutureAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
-
-            if (records.Count() > 0)
-            {
-                return records.ToList()[0];
-            }
-            else
-            {
-                return null;
-            }
-        }
-        
-
-        public static void Dbsavechage(string type)
-        {
-            lock(DBChangeLock)
-            {
-                bool lockdb = false;
-                int count = 100;
-                while (lockdb == false)
-                {
-                    count--;
-                    try
-                    {
-                        DbEntity.SaveChanges();
-                        lockdb = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        GlobalErrorLog.LogInstance.LogEvent("type = " + type + "\r\n" + ex.InnerException.ToString());
-                        Thread.Sleep(10);
-
-                        if(count == 0)
-                        {
-                            GlobalErrorLog.LogInstance.LogEvent("数据库提交100次失败！");
-                            lockdb = true;
-                        }
-                    }
-                }
-            }
-        }
+        #endregion
     }
 }

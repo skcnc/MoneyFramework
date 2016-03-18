@@ -245,12 +245,10 @@ namespace Stork_Future_TaoLi
             return Instance;
         }
 
-        
-
         public void Update(int OrderRef, RecordItem Record)
         {
             this.AddOrUpdate(OrderRef, Record, (key, oldValue) => oldValue = Record);
-
+            DBAccessLayer.DeleteERRecord((object)OrderRef);
             DBAccessLayer.CreateFutureDLRecord((object)Record);
         }
 

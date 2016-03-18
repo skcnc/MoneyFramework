@@ -97,6 +97,15 @@ namespace Stork_Future_TaoLi.Variables_Type
         public static string FUTURE { get { return "0"; } }
     }
 
+    /// <summary>
+    /// 交易状态
+    /// </summary>
+    public static class Deal_Status
+    {
+        public static string DEAL { get { return "全部成交"; } }
+        public static string PARTIALDEAL { get { return "部分成交"; } }
+        public static string CANCELED { get { return "已撤销"; } }
+    }
 
     public static class TradeOrientationAndFlag
     {

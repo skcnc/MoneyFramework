@@ -113,6 +113,9 @@ namespace MCStockLib
 		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
 		String^ StrategyId;
 
+		[MarshalAs(UnmanagedType::ByValTStr, SizeConst = 21)]
+		String^ User;
+
 		int Direction;
 
 		int OrderRef;
@@ -229,6 +232,7 @@ namespace MCStockLib
 		int direction;
 		int offsetflag;
 		String^ User;
+		String^ OrderMark;
 
 
 		Bargainreturnstruct CreateInstance(){

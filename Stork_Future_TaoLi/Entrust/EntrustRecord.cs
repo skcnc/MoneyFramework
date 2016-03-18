@@ -27,7 +27,7 @@ namespace Stork_Future_TaoLi
         {
             var tmp = (from item in EntrustRecordList where item.OrderRef == record.OrderRef select item);
 
-            if(tmp.Count() == 0)
+            if(tmp.Count() > 0)
             {
                 GlobalErrorLog.LogInstance.LogEvent("添加委托失败，原因是该委托已经存在，策略号： " + record.StrategyNo + "  代码： " + record.Code + "  本地编号： " + record.OrderRef);
                 return 1;

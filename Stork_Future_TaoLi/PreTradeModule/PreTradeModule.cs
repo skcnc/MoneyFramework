@@ -368,12 +368,12 @@ namespace Stork_Future_TaoLi
                         OrderRef = REQUEST_ID.ApplyNewID()
                     };
 
-                    if (mo.cSecurityType == "f" || mo.cSecurityType == "F")
+                    if (mo.cSecurityType.ToUpper() == "F")
                     {
                         _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "48" : "49");
                         _tradeUnit.cOffsetFlag = (_tradeUnit.cOffsetFlag == "0" ? "48" : "49");
                     }
-                    if(mo.cSecurityType == "s" || mo.cSecurityType == "S")
+                    if(mo.cSecurityType.ToUpper()  == "S")
                     {
                         _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "1" : "2");
                     }

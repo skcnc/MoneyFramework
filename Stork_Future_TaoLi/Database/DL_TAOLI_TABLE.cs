@@ -29,5 +29,6 @@ namespace Stork_Future_TaoLi.Database
         public string DL_NO { get; set; }
         public Nullable<bool> DL_LOAD { get; set; }
         public string DL_USER { get; set; }
+        public string DL_MARK { get; set; }
     }
 }

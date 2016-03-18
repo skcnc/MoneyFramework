@@ -457,7 +457,11 @@ namespace Stork_Future_TaoLi
                         int count_0 = (from item in WorkersStratus where item.Value == 0 select item).Count();
                         int count_12 = (from item in WorkersStratus where item.Value == 1 || item.Value == 2 select item).Count();
 
-                        log.LogEvent("运行策略： " + (count_0 + count_12).ToString() + "\n问题或结束策略： " + count_0.ToString());
+
+                        if (DateTime.Now.Second % 31 == 0 || DateTime.Now.Second % 32 == 0)
+                        {
+                            log.LogEvent("运行策略： " + (count_0 + count_12).ToString() + "\n问题或结束策略： " + count_0.ToString());
+                        }
 
                         Dictionary<String, StrategyInfo> strategyInfo = new Dictionary<string, StrategyInfo>();
                         foreach (var item in Workers)
