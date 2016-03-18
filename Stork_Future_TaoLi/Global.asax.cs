@@ -54,6 +54,8 @@ namespace Stork_Future_TaoLi
             UpdateMarketPanel MarketMonitor = new UpdateMarketPanel();
             MarketMonitor.Run();
 
+            RefundTrade.Main();
+
             Entrust_Query.Instance.Run();
 
             ThreadHeartBeatControl.Run();

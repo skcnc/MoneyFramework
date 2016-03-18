@@ -135,7 +135,7 @@ namespace Stork_Future_TaoLi.TradeModule
                     {
                         Code = refundItem.SecurityCode,
                         Direction = Convert.ToInt32(refundItem.Direction),
-                        ExchangeID = refundItem.ExchangeId,
+                        ExchangeID = (refundItem.ExchangeId == "SH" ? "1" : "2"),
                         OrderPrice = 0,                                             //撤单不用考虑价格
                         OrderRef = Convert.ToInt32(refundItem.OrderRef),
                         OrderSysID = refundItem.OrderSysId,
@@ -243,7 +243,7 @@ namespace Stork_Future_TaoLi.TradeModule
             Task FutureRefundThread = new Task(FutureThreadProc);
 
             StockRefundThread.Start();
-            FutureRefundThread.Start();
+            //FutureRefundThread.Start();
 
             while (true)
             {
@@ -280,9 +280,9 @@ namespace Stork_Future_TaoLi.TradeModule
                         }
                     }
                 }
-               
 
-                if (next_trade.OrderRef == String.Empty || next_trade.OrderSysId == String.Empty)
+
+                if (next_trade.OrderRef == null || next_trade.OrderRef == String.Empty || next_trade.OrderSysId == String.Empty)
                 {
                     continue;
                 }
@@ -300,10 +300,12 @@ namespace Stork_Future_TaoLi.TradeModule
                 if (next_trade.SecurityType.ToUpper() == "S")
                 {
                     //股票退货
+                    queue_stock_refund_thread.GetQueue().Enqueue(next_trade);
                 }
                 else if(next_trade.SecurityType.ToUpper() == "F")
                 {
                     //期货退货
+                    queue_future_refund_thread.GetQueue().Enqueue(next_trade);
                 }
             }
 

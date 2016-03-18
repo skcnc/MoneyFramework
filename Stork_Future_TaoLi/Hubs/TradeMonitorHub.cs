@@ -79,20 +79,6 @@ namespace Stork_Future_TaoLi.Hubs
                      {
                          List<OrderViewItem> ss = new List<OrderViewItem>();
 
-                         ss.Add(new OrderViewItem()
-                         {
-                             CODE = "test",
-                             ComboOff = "0",
-                             DealTime = DateTime.Now.ToString(),
-                             Direction = "0",
-                             OrderRef = "100",
-                             Price = "3.14",
-                             MSG = "success",
-                             OrderSysID = "12345",
-                             VolumeTotalOrigin = "100",
-                             VolumeTotal = "10"
-                         });
-
                          OrderLists.Add(name, ss);
                      }
 

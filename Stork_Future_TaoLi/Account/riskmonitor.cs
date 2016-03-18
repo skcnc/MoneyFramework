@@ -631,14 +631,14 @@ namespace Stork_Future_TaoLi
                     {
                         errCode = 9;
                         result = accountMonitor.GetErrorCode(errCode, changkouRatio.ToString());
-                        return false;
+                        //return false;
                     }
                 }
                 else
                 {
                     errCode = 9;
                     result = accountMonitor.GetErrorCode(errCode, "无穷大");
-                    return false;
+                    //return false;
                 }
             }
 

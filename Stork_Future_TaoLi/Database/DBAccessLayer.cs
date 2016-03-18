@@ -693,7 +693,6 @@ namespace Stork_Future_TaoLi
             return IncompletedStrategies;
         }
 
-
         /// <summary>
         /// 获得上次退出时未完成的平仓实例
         /// </summary>
