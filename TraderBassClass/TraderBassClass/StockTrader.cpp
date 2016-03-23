@@ -606,7 +606,7 @@ bool  CStockTrader::querytrader(const QueryEntrustorderstruct myEntrust, Bargain
 
 			mytraderreturn[num].bargain_money = (pRetunResult->money.lo_value + pRetunResult->money.hi_value * 4294967296) / 10000.00;
 			mytraderreturn[num].bargain_no = pRetunResult->bargain_no;
-			mytraderreturn[num].bargain_price = pRetunResult->price / 1000;// 成交价格
+			mytraderreturn[num].bargain_price = pRetunResult->price / 1000.000;// 成交价格
 			strcpy(mytraderreturn[num].bargain_time, pRetunResult->bargain_time);
 			//mytraderreturn[num].cOrderStatus
 			sprintf(mytraderreturn[num].cOrderSysID, "%d", pRetunResult->entrust_no);

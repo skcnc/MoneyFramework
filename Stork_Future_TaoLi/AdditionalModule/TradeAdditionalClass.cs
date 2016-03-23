@@ -98,7 +98,20 @@ namespace Stork_Future_TaoLi
                 oldValue = _record
             );
 
+            QueryEntrustOrderStruct_M record = new QueryEntrustOrderStruct_M()
+            {
+                Code = _record.Code,
+                User = _record.User,
+                OrderRef = _record.OrderRef,
+                Direction = Convert.ToInt32(_record.Orientation),
+                ExchangeID = "FetureExchange",
+                OrderPrice = Convert.ToDouble(_record.Price),
+                OrderSysID = _record.OrderSysID,
+                SecurityType = Convert.ToSByte(_record.Type),
+                StrategyId = _record.StrategyId
+            };
 
+            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateFutureERRecord), ((object)record));
         }
 
         /// <summary>
@@ -205,6 +218,9 @@ namespace Stork_Future_TaoLi
 
                 //更新持仓列表
                 ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateCCRecords), (object)bargin);
+
+                //删除委托信息
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.DeleteERRecord), (object)OrderRef);
             }
         }
 

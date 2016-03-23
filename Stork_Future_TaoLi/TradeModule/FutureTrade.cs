@@ -328,7 +328,7 @@ namespace Stork_Future_TaoLi
         /// </summary>
         /// <param name="pInputOrder"></param>
         /// <param name="pRspInfo"></param>
-        static void _client_ErrRtnOrderInsert(CThostFtdcInputOrderField_M pInputOrder, CThostFtdcRspInfoField_M pRspInfo)
+        public static void _client_ErrRtnOrderInsert(CThostFtdcInputOrderField_M pInputOrder, CThostFtdcRspInfoField_M pRspInfo)
         {
             TradeRecord.GetInstance().MarkFailure(Convert.ToInt16(pInputOrder.OrderRef), pRspInfo.ErrorMsg);
 
@@ -364,7 +364,7 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo"></param>
         /// <param name="nRequestID"></param>
         /// <param name="bIsLast"></param>
-        static void _client_RspOrderInsert(CTP_CLI.CThostFtdcInputOrderField_M pInputOrder, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        public static void _client_RspOrderInsert(CTP_CLI.CThostFtdcInputOrderField_M pInputOrder, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             TradeRecord.GetInstance().MarkFailure(Convert.ToInt16(pInputOrder.OrderRef), pRspInfo.ErrorMsg);
             if (pInputOrder.CombOffsetFlag_0 == (byte)(FutureTradeOffSet.Open))
@@ -382,7 +382,7 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo">返回信息</param>
         /// <param name="nRequestID"></param>
         /// <param name="bIsLast"></param>
-        static void _client_RspOrderAction(CTP_CLI.CThostFtdcInputOrderActionField_M pInputOrderAction, 
+        public static void _client_RspOrderAction(CTP_CLI.CThostFtdcInputOrderActionField_M pInputOrderAction, 
             CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             //throw new NotImplementedException();
@@ -393,7 +393,7 @@ namespace Stork_Future_TaoLi
         /// 此函数通知交易的变化
         /// </summary>
         /// <param name="pTrade"></param>
-        static void _client_RtnTrade(CTP_CLI.CThostFtdcTradeField_M pTrade)
+        public static void _client_RtnTrade(CTP_CLI.CThostFtdcTradeField_M pTrade)
         {
             TradeRecord.GetInstance().UpdateTrade(Convert.ToInt16(pTrade.OrderRef), pTrade.Volume, Convert.ToDecimal(pTrade.Price), pTrade.TradeID);
         }
@@ -403,7 +403,7 @@ namespace Stork_Future_TaoLi
         /// 此函数通知报单的变化
         /// </summary>
         /// <param name="pOrder"></param>
-        static void _client_RtnOrder(CTP_CLI.CThostFtdcOrderField_M pOrder)
+        public static void _client_RtnOrder(CTP_CLI.CThostFtdcOrderField_M pOrder)
         {
             switch (pOrder.OrderStatus)
             {
@@ -460,7 +460,7 @@ namespace Stork_Future_TaoLi
         /// <param name="pRspInfo">返回用户响应信息</param>
         /// <param name="nRequestID">返回用户登录请求的ID，该ID 由用户在登录时指定。</param>
         /// <param name="bIsLast">指示该次返回是否为针对nRequestID的最后一次返回。</param>
-        static void _client_RspUserLogin(CTP_CLI.CThostFtdcRspUserLoginField_M pRspUserLogin, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        public static void _client_RspUserLogin(CTP_CLI.CThostFtdcRspUserLoginField_M pRspUserLogin, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             if (pRspInfo.ErrorID == 0 && bIsLast == true)
             {
@@ -470,7 +470,7 @@ namespace Stork_Future_TaoLi
         }
 
 
-        static void _client_RspError(CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        public static void _client_RspError(CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
             throw new NotImplementedException();
         }

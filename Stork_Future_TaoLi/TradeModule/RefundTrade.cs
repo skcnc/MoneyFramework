@@ -60,6 +60,7 @@ namespace Stork_Future_TaoLi.TradeModule
     public class RefundTrade
     {
         private static LogWirter log = new LogWirter();  //退货线程记录
+        private static FutureTradeThreadStatus status = FutureTradeThreadStatus.DISCONNECTED;
 
         public static void Main()
         {
@@ -76,6 +77,8 @@ namespace Stork_Future_TaoLi.TradeModule
             log.EventSourceName = "证券退货线程模块";
             log.EventLogType = System.Diagnostics.EventLogEntryType.Information;
             log.EventLogID = 62315;
+
+
 
         }
 
@@ -170,9 +173,22 @@ namespace Stork_Future_TaoLi.TradeModule
 
             DateTime lastmessage = DateTime.Now;
 
-            FutureTradeThreadStatus status = FutureTradeThreadStatus.DISCONNECTED;
             CTP_CLI.CCTPClient _client = new CTP_CLI.CCTPClient(CommConfig.INVESTOR, CommConfig.PASSWORD, CommConfig.BROKER, CommConfig.ADDRESS);
 
+            _client.FrontConnected += _client_FrontConnected;
+            _client.FrontDisconnected += _client_FrontDisconnected;
+            _client.RspUserLogin += _client_RspUserLogin;
+
+            //报单变化回调函数
+            _client.RtnOrder += FutureTrade._client_RtnOrder;
+            //成交变化回调函数
+            _client.RtnTrade += FutureTrade._client_RtnTrade;
+            //报单修改操作回调函数（暂时不用）
+            _client.RspOrderAction += FutureTrade._client_RspOrderAction;
+            //报单失败回调函数
+            _client.RspOrderInsert += FutureTrade._client_RspOrderInsert;
+            //报单问题回调函数
+            _client.ErrRtnOrderInsert += FutureTrade._client_ErrRtnOrderInsert;
             _client.Connect();
 
             //状态 DISCONNECTED -> CONNECTED
@@ -228,6 +244,24 @@ namespace Stork_Future_TaoLi.TradeModule
             }
         }
 
+        static void _client_RspUserLogin(CTP_CLI.CThostFtdcRspUserLoginField_M pRspUserLogin, CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
+        {
+            //throw new NotImplementedException();
+            status = FutureTradeThreadStatus.LOGIN;
+        }
+
+        static void _client_FrontDisconnected(int nReason)
+        {
+            //throw new NotImplementedException();
+            status = FutureTradeThreadStatus.DISCONNECTED;
+        }
+
+        static void _client_FrontConnected()
+        {
+            //throw new NotImplementedException();
+            status = FutureTradeThreadStatus.CONNECTED;
+        }
+
         /// <summary>
         /// 退货总控线程函数
         /// </summary>
@@ -243,7 +277,7 @@ namespace Stork_Future_TaoLi.TradeModule
             Task FutureRefundThread = new Task(FutureThreadProc);
 
             StockRefundThread.Start();
-            //FutureRefundThread.Start();
+            FutureRefundThread.Start();
 
             while (true)
             {

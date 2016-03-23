@@ -207,7 +207,13 @@
                 for (var i = 0; i < _orders.length; i++) {
 
                     var _order = _orders[i];
-                    $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _order.OrderRef + '</td><td>' + _order.OrderSysID + '</td><td>' + _order.CODE + '</td><td>' + _order.Direction + '</td><td>' + _order.ComboOff + '</td><td>' + _order.VolumeTotalOrigin + '</td><td>' + _order.VolumeTotal + '</td><td>' + _order.Price + '</td><td>' + _order.MSG + '</td><td>' + _order.DealTime + '</td><td><button orderno="' + _order.OrderRef   + '" class="btn btn-primary drawback_btn" type="submit">撤</button></td></tr>');
+                    if (_order.MSG == '已成交' || _order.MSG == '已撤销' || _order.MSG == '委托取消') {
+                        $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _order.OrderRef + '</td><td>' + _order.OrderSysID + '</td><td>' + _order.CODE + '</td><td>' + _order.Direction + '</td><td>' + _order.ComboOff + '</td><td>' + _order.VolumeTotalOrigin + '</td><td>' + _order.VolumeTotal + '</td><td>' + _order.Price + '</td><td>' + _order.MSG + '</td><td>' + _order.DealTime + '</td><td><button orderno="' + _order.OrderRef + '" class="btn btn-primary drawback_btn" style="Visibility:Hidden" type="submit">撤</button></td></tr>');
+                    }
+                    else
+                    {
+                        $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _order.OrderRef + '</td><td>' + _order.OrderSysID + '</td><td>' + _order.CODE + '</td><td>' + _order.Direction + '</td><td>' + _order.ComboOff + '</td><td>' + _order.VolumeTotalOrigin + '</td><td>' + _order.VolumeTotal + '</td><td>' + _order.Price + '</td><td>' + _order.MSG + '</td><td>' + _order.DealTime + '</td><td><button orderno="' + _order.OrderRef + '" class="btn btn-primary drawback_btn" type="submit">撤</button></td></tr>');
+                    }
                 }
             };
 

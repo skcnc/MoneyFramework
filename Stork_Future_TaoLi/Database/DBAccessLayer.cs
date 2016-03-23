@@ -846,7 +846,41 @@ namespace Stork_Future_TaoLi
 
         public static void CreateFutureERRecord(object item)
         {
+            if (DBEnable == false) return;
 
+            if (item == null) return;
+
+            QueryEntrustOrderStruct_M entrust = (QueryEntrustOrderStruct_M)item;
+
+            lock (ERtableLock)
+            {
+                ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
+                {
+                    ER_GUID = Guid.NewGuid(),
+                    ER_ID = entrust.OrderSysID,
+                    ER_ORDER_REF = entrust.OrderRef.ToString(),
+                    ER_STRATEGY = entrust.StrategyId,
+                    ER_ORDER_TYPE = entrust.SecurityType.ToString(),
+                    ER_ORDER_EXCHANGE_ID = entrust.ExchangeID,
+                    ER_USER = entrust.User,
+                    ER_CODE = entrust.Code,
+                    ER_DIRECTION = entrust.Direction,
+                    ER_CANCEL_TIME = new DateTime(1900, 1, 1),
+                    ER_COMPLETED = false,
+                    ER_DATE = new DateTime(1900, 1, 1),
+                    ER_FROZEN_AMOUNT = 0,
+                    ER_FROZEN_MONEY = 0,
+                    ER_ORDER_STATUS = string.Empty,
+                    ER_ORDER_TIME = DateTime.Now,
+                    ER_VOLUME_REMAIN = 0,
+                    ER_VOLUME_TOTAL_ORIGINAL = 0,
+                    ER_VOLUME_TRADED = 0,
+                    ER_WITHDRAW_AMOUNT = 0
+                };
+
+                DbEntity.ER_TAOLI_TABLE.Add(record);
+                Dbsavechage("CreateERRecord");
+            }
         }
 
         public static void DeleteERRecord(object Ref)
