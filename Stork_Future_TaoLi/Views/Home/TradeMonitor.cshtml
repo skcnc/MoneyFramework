@@ -88,12 +88,15 @@
                 指定价：&nbsp;&nbsp;&nbsp;&nbsp;
                 <input type="text" class="form-control" id="tm_input_price" placeholder="交易价格" />
             </div>
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <button class="btn btn-success" type="submit" id="tm_btnMakeOrder">下单</button>
             </div>
+            <div class="col-md-6">
+                <button class="btn btn-success" type="submit" id="tm_btnBatchOrder">批量下单</button>
+            </div>
         </div>
-        <div class="col-md-8 table-responsive">
-            <table class="table table-striped table-hover " >
+        <div class="col-md-8 table-responsive " style="overflow-y:auto;overflow-x:auto;height:300px">
+            <table class="table table-striped table-hover ">
                 <thead>
                     <tr>
                         <th>系统号</th>
@@ -121,7 +124,12 @@
         <div class="col-md-4"><h4>股票占总投资比例：<span id="riskpara_stockcostratio">20%</span></h4></div>
     </div>*@
     <div class="col-md-12" style="margin-top:10px">
-        <div class="col-md-12">
+        <ul class="nav nav-tabs">
+            <li role="presentation" id="trademonitor_tab_li1" onclick="switchtab(1)" class="active"><a href="#">持仓列表</a></li>
+            <li role="presentation" id="trademonitor_tab_li2" onclick="switchtab(2)"><a href="#">成交记录</a></li>
+            <li role="presentation" id="trademonitor_tab_li3" onclick="switchtab(3)"><a href="#">风控记录</a></li>
+        </ul>
+        <div  id="chicang_table" style="display:block" class="col-md-12">
             <table class="table table-striped table-hover">
                 <!--持仓列表-->
                 <thead>
@@ -135,7 +143,7 @@
                 <tbody id="tm_tb_position"></tbody>
             </table>
         </div>
-        <div class="col-md-12" style="overflow-y:auto;overflow-x:auto;height:300px">
+        <div id="trade_table"  class="col-md-12" style="overflow-y:auto;overflow-x:auto;height:300px;display:none">
             <table class="table table-striped table-hover">
                 <!--成交记录-->
                 <thead>
@@ -155,10 +163,10 @@
             </table>
         </div>
     </div>
-    <div class="col-md-12" style="margin-top:10px">
+    <div id="risk_table" class="col-md-12" style="margin-top:10px;display:none">
         <div class="col-md-12" style="overflow-y:auto;overflow-x:auto;height:300px">
             <table class="table table-striped table-hover">
-                <thead >
+                <thead>
                     <tr>
                         <th>代码</th>
                         <th>手数</th>
@@ -170,7 +178,7 @@
                         <th>风控信息</th>
                     </tr>
                 </thead>
-                  <tbody id="tm_tb_risk"></tbody>
+                <tbody id="tm_tb_risk"></tbody>
             </table>
         </div>
     </div>
@@ -207,7 +215,7 @@
                 for (var i = 0; i < _orders.length; i++) {
 
                     var _order = _orders[i];
-                    if (_order.MSG == '已成交' || _order.MSG == '已撤销' || _order.MSG == '委托取消') {
+                    if (_order.MSG == '已成交' || _order.MSG == '已撤销' || _order.MSG == '已撤单' || _order.MSG == '委托取消') {
                         $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _order.OrderRef + '</td><td>' + _order.OrderSysID + '</td><td>' + _order.CODE + '</td><td>' + _order.Direction + '</td><td>' + _order.ComboOff + '</td><td>' + _order.VolumeTotalOrigin + '</td><td>' + _order.VolumeTotal + '</td><td>' + _order.Price + '</td><td>' + _order.MSG + '</td><td>' + _order.DealTime + '</td><td><button orderno="' + _order.OrderRef + '" class="btn btn-primary drawback_btn" style="Visibility:Hidden" type="submit">撤</button></td></tr>');
                     }
                     else

@@ -245,6 +245,7 @@
     <Compile Include="Account\riskmonitor.cs" />
     <Compile Include="Account\UserInfo.cs" />
     <Compile Include="AdditionalModule\DESoper.cs" />
+    <Compile Include="AdditionalModule\pythonOper.cs" />
     <Compile Include="Entrust\EntrustRecord.cs" />
     <Compile Include="AdditionalModule\sysmonitor.cs" />
     <Compile Include="AdditionalModule\TradeAdditionalClass.cs" />

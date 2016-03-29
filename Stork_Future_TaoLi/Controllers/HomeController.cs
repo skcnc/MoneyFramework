@@ -11,7 +11,7 @@ using Stork_Future_TaoLi.Account;
 using Stork_Future_TaoLi.Database;
 using Stork_Future_TaoLi.TradeModule;
 using Stork_Future_TaoLi.Queues;
-using Stork_Future_TaoLi.AdditionalModule;
+using Stork_Future_TaoLi;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -184,7 +184,7 @@ namespace Stork_Future_TaoLi.Controllers
         {
             try
             {
-                List<string> strs = pythonOper.GetBatchTradeList();
+                List<string> strs = pythonOper.GetInstance().GetBatchTradeList();
 
                 foreach(string s in strs)
                 {
@@ -196,7 +196,7 @@ namespace Stork_Future_TaoLi.Controllers
                         {
                             belongStrategy = "00",
                             User = vars[0].Trim(),
-                            exchangeId = vars[1].Trim(),
+                            exchangeId = vars[1].Trim().ToUpper(),
                             cSecurityCode = vars[2].Trim(),
                             nSecurityAmount = Convert.ToInt64(vars[3].Trim()),
                             dOrderPrice = Convert.ToDouble(vars[4].Trim()),

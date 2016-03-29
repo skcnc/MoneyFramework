@@ -34,5 +34,6 @@ namespace Stork_Future_TaoLi.Database
         public Nullable<int> ER_DIRECTION { get; set; }
         public string ER_ORDER_REF { get; set; }
         public string ER_USER { get; set; }
+        public string ER_OFFSETFLAG { get; set; }
     }
 }

@@ -9,6 +9,7 @@ using Stork_Future_TaoLi.Variables_Type;
 using System.Threading;
 using Stork_Future_TaoLi.TradeModule;
 using Stork_Future_TaoLi.Modulars;
+using Stork_Future_TaoLi.Database;
 
 
 namespace Stork_Future_TaoLi
@@ -32,9 +33,6 @@ namespace Stork_Future_TaoLi
             //启动主线程
             FutureTradeControl.Start();
 
-
-
-
             //日志初始化
             log.EventSourceName = "期货交易线程控制模块";
             log.EventLogType = System.Diagnostics.EventLogEntryType.Information;
@@ -43,6 +41,8 @@ namespace Stork_Future_TaoLi
             sublog.EventSourceName = "期货交易线程模块";
             sublog.EventLogType = System.Diagnostics.EventLogEntryType.Information;
             sublog.EventLogID = 62309;
+
+            
         }
 
         private void ThreadProc() {

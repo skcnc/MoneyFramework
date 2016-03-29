@@ -152,9 +152,6 @@ namespace Stork_Future_TaoLi
         {
             return lastHeartBeat;
         }
-
-
-
     }
 
 

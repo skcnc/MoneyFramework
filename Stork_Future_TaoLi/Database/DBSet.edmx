@@ -76,6 +76,7 @@
           <Property Name="ER_COMPLETED" Type="bit" />
           <Property Name="ER_DIRECTION" Type="int" />
           <Property Name="ER_USER" Type="nvarchar" MaxLength="50" />
+          <Property Name="ER_OFFSETFLAG" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="FutureAccountTable">
           <Key>
@@ -282,6 +283,7 @@
           <Property Name="ER_DIRECTION" Type="Int32" />
           <Property Name="ER_ORDER_REF" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="ER_USER" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ER_OFFSETFLAG" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="OL_TAOLI_LIST_TABLE">
           <Key>
@@ -504,6 +506,7 @@
           <EntitySetMapping Name="ER_TAOLI_TABLE">
             <EntityTypeMapping TypeName="MoneyEntityModel.ER_TAOLI_TABLE">
               <MappingFragment StoreEntitySet="ER_TAOLI_TABLE">
+                <ScalarProperty Name="ER_OFFSETFLAG" ColumnName="ER_OFFSETFLAG" />
                 <ScalarProperty Name="ER_USER" ColumnName="ER_USER" />
                 <ScalarProperty Name="ER_ORDER_REF" ColumnName="ER_ORDER_REF" />
                 <ScalarProperty Name="ER_GUID" ColumnName="ER_GUID" />

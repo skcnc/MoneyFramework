@@ -260,7 +260,7 @@ void CCTPSpi::OnRspQryOrder( CThostFtdcOrderField *pOrder, CThostFtdcRspInfoFiel
 	{
 		CThostFtdcOrderField req;
 		memset(&req,0,sizeof(req));
-		this->rspQryOrderCallback(&req,repareInfo(pRspInfo),nRequestID,bIsLast);
+		//this->rspQryOrderCallback(&req,repareInfo(pRspInfo),nRequestID,bIsLast);
 	}
 	else
 		this->rspQryOrderCallback(pOrder,repareInfo(pRspInfo),nRequestID,bIsLast);

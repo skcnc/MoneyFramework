@@ -62,6 +62,39 @@ namespace Stork_Future_TaoLi
             return this[orderRef];
         }
 
+        public void SubscribeIncompleteOrder(String type, String code, string orderSysId, String orientation, int VolumeTotalOriginal, decimal price, int OrderRef, int orderStatus, int ComboOffsetFlag,string user)
+        {
+            RecordItem _record = new RecordItem();
+            _record = this.GetOrAdd(OrderRef, _record);
+
+            _record.OrderTime_Start = DateTime.Now;
+            _record.Code = code;
+            _record.Orientation = orientation;
+            _record.VolumeTotalOriginal = VolumeTotalOriginal;
+            _record.VolumeTotal = 0;
+            _record.Price = price;
+            _record.AveragePrice = 0;
+            _record.VolumeTraded = 0;
+            _record.ErrMsg = String.Empty;
+            _record.OrderRef = OrderRef;
+            _record.OrderStatus = orderStatus;
+            _record.Trades = new List<TradeItem>();
+            _record.CombOffsetFlag = ComboOffsetFlag;
+            _record.Status = TradeDealStatus.PREORDER;
+            _record.CombOffsetFlag = ComboOffsetFlag;
+            _record.OrderSysID = orderSysId;
+            _record.User = user;
+
+
+            this.AddOrUpdate(OrderRef, _record, (key, oldValue) =>
+                oldValue = _record
+            );
+
+            OrderViewItem order = new OrderViewItem(_record.OrderRef.ToString(), _record.OrderSysID, _record.Code, _record.Orientation, _record.CombOffsetFlag.ToString(), _record.VolumeTotalOriginal.ToString(), _record.VolumeTotal.ToString(), _record.Price.ToString(), _record.ErrMsg, _record.OrderTime_Start.ToString());
+
+            TradeMonitor.Instance.updateOrderList(_record.User, order);
+        }
+
         /// <summary>
         /// 填写新的委托
         /// </summary>
@@ -92,26 +125,12 @@ namespace Stork_Future_TaoLi
             _record.Trades = new List<TradeItem>();
             _record.CombOffsetFlag = ComboOffsetFlag;
             _record.Status = TradeDealStatus.PREORDER;
+            _record.CombOffsetFlag = ComboOffsetFlag;
 
             
             this.AddOrUpdate(OrderRef, _record, (key, oldValue) =>
                 oldValue = _record
             );
-
-            QueryEntrustOrderStruct_M record = new QueryEntrustOrderStruct_M()
-            {
-                Code = _record.Code,
-                User = _record.User,
-                OrderRef = _record.OrderRef,
-                Direction = Convert.ToInt32(_record.Orientation),
-                ExchangeID = "FetureExchange",
-                OrderPrice = Convert.ToDouble(_record.Price),
-                OrderSysID = _record.OrderSysID,
-                SecurityType = Convert.ToSByte(_record.Type),
-                StrategyId = _record.StrategyId
-            };
-
-            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateFutureERRecord), ((object)record));
         }
 
         /// <summary>
@@ -123,16 +142,40 @@ namespace Stork_Future_TaoLi
         /// <param name="StatusMsg"></param>
         /// <param name="OrderStatus"></param>
         /// <param name="VolumeTotal"></param>
-        public void UpdateOrder(int volumeTraded, int OrderRef, String OrderSysID, String StatusMsg,int OrderStatus,int VolumeTotal)
+        /// <param name="ExchangeID">退货使用</param>
+        public void UpdateOrder(int volumeTraded, int OrderRef, String OrderSysID, String StatusMsg,int OrderStatus,int VolumeTotal, String ExchangeID)
         {
             RecordItem _record = new RecordItem();
             _record = this.GetOrAdd(OrderRef, _record);
+
+            string sysid = _record.OrderSysID;
+
             _record.VolumeTraded = volumeTraded;
             _record.VolumeTotal = VolumeTotal;
             _record.ErrMsg = StatusMsg;
             _record.OrderStatus = OrderStatus;
             _record.OrderSysID = OrderSysID;
+            _record.ExchangeID = ExchangeID;
             _record.Status = TradeDealStatus.ORDERING;
+            if (sysid.Trim() == "0" && _record.OrderSysID != String.Empty)
+            {
+                QueryEntrustOrderStruct_M record = new QueryEntrustOrderStruct_M()
+                {
+                    Code = _record.Code,
+                    User = _record.User,
+                    OrderRef = _record.OrderRef,
+                    Direction = Convert.ToInt32(_record.Orientation),
+                    ExchangeID = "FetureExchange",
+                    OrderPrice = Convert.ToDouble(_record.Price),
+                    OrderSysID = _record.OrderSysID.Trim(),
+                    SecurityType = Convert.ToSByte(_record.Type),
+                    StrategyId = _record.StrategyId,
+                    OffsetFlag = _record.CombOffsetFlag,
+                    Amount = _record.VolumeTotalOriginal
+                };
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.CreateFutureERRecord), ((object)record));
+            }
 
             //若交易已撤单 或者 全部成交则标记该委托完成
             if(OrderStatus == 53 || _record.VolumeTotalOriginal == _record.VolumeTraded)
@@ -141,9 +184,13 @@ namespace Stork_Future_TaoLi
                 _record.Status = TradeDealStatus.ORDERCOMPLETED;
             }
 
+
+
             this.AddOrUpdate(OrderRef, _record, (key, oldValue) =>
                 oldValue = _record
             );
+
+
 
             String USERNAME = UserRequestMap.GetInstance()[OrderRef];
             OrderViewItem order = new OrderViewItem(_record.OrderRef.ToString(),_record.OrderSysID,_record.Code,_record.Orientation,_record.CombOffsetFlag.ToString(),_record.VolumeTotalOriginal.ToString(),_record.VolumeTotal.ToString(),_record.Price.ToString(),_record.ErrMsg,_record.OrderTime_Start.ToString());
@@ -401,6 +448,11 @@ namespace Stork_Future_TaoLi
         /// 组合开平标志 0： 开仓 · 1： 平仓
         /// </summary>
         public int CombOffsetFlag { get; set; }
+
+        /// <summary>
+        /// 期货退货使用字段
+        /// </summary>
+        public string ExchangeID { get; set; }
 
         /// <summary>
         /// 交易状态

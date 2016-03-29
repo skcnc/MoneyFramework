@@ -75,8 +75,22 @@ namespace Stork_Future_TaoLi.Variables_Type
         public static string GlobalMonitor { get { return globalmonitor; } }
         private static string globalmonitor = "sc";
 
-
-
+        /// <summary>
+        /// 本地ORDERREF重复性判断
+        /// </summary>
+        private static List<int> GlobalOrderRefList = new List<int>();
+        public static bool CheckOrderRefAvailiable(int Ref)
+        {
+            if(GlobalOrderRefList.Contains(Ref))
+            {
+                return false;
+            }
+            else
+            {
+                GlobalOrderRefList.Add(Ref);
+                return true;
+            }
+        }
     }
 
     public class CommConfig

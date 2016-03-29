@@ -118,7 +118,11 @@ namespace MCStockLib
 
 		int Direction;
 
+		int Amount;
+
 		int OrderRef;
+
+		int OffsetFlag;
 
 		double OrderPrice;
 	};

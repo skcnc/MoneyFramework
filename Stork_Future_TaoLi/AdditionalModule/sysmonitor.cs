@@ -590,11 +590,18 @@ namespace Stork_Future_TaoLi
                     break;
                 case "THREAD_STRATEGY_WORKER":
                     {
-                        messageData.StrategyWorkerSystemStatus.Clear();
-                        Dictionary<string,int> workers = (Dictionary<string,int>)obj;
-                        foreach (KeyValuePair<string, int> value in workers)
+                        try
                         {
-                            messageData.StrategyWorkerSystemStatus.Add(value.Key+value.Value.ToString(), DateTime.Now);
+                            messageData.StrategyWorkerSystemStatus.Clear();
+                            Dictionary<string, int> workers = (Dictionary<string, int>)obj;
+                            foreach (KeyValuePair<string, int> value in workers)
+                            {
+                                messageData.StrategyWorkerSystemStatus.Add(value.Key + value.Value.ToString(), DateTime.Now);
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            GlobalErrorLog.LogInstance.LogEvent("sysmonitor-arrive_thread_status-THREAD_STRATEGY_WORKER:" + ex.ToString());
                         }
                     }
                     break;

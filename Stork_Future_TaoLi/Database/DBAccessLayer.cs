@@ -836,7 +836,8 @@ namespace Stork_Future_TaoLi
                     ER_VOLUME_REMAIN = 0,
                     ER_VOLUME_TOTAL_ORIGINAL = 0,
                     ER_VOLUME_TRADED = 0,
-                    ER_WITHDRAW_AMOUNT = 0
+                    ER_WITHDRAW_AMOUNT = 0,
+                    ER_OFFSETFLAG = String.Empty
                 };
 
                 DbEntity.ER_TAOLI_TABLE.Add(record);
@@ -856,6 +857,7 @@ namespace Stork_Future_TaoLi
             {
                 ER_TAOLI_TABLE record = new ER_TAOLI_TABLE()
                 {
+
                     ER_GUID = Guid.NewGuid(),
                     ER_ID = entrust.OrderSysID,
                     ER_ORDER_REF = entrust.OrderRef.ToString(),
@@ -868,14 +870,15 @@ namespace Stork_Future_TaoLi
                     ER_CANCEL_TIME = new DateTime(1900, 1, 1),
                     ER_COMPLETED = false,
                     ER_DATE = new DateTime(1900, 1, 1),
-                    ER_FROZEN_AMOUNT = 0,
-                    ER_FROZEN_MONEY = 0,
+                    ER_FROZEN_AMOUNT = entrust.Amount,
+                    ER_FROZEN_MONEY = entrust.Amount * entrust.OrderPrice,
                     ER_ORDER_STATUS = string.Empty,
                     ER_ORDER_TIME = DateTime.Now,
                     ER_VOLUME_REMAIN = 0,
-                    ER_VOLUME_TOTAL_ORIGINAL = 0,
+                    ER_VOLUME_TOTAL_ORIGINAL = entrust.Amount,
                     ER_VOLUME_TRADED = 0,
-                    ER_WITHDRAW_AMOUNT = 0
+                    ER_WITHDRAW_AMOUNT = 0,
+                    ER_OFFSETFLAG = entrust.OffsetFlag.ToString()
                 };
 
                 DbEntity.ER_TAOLI_TABLE.Add(record);
@@ -969,7 +972,7 @@ namespace Stork_Future_TaoLi
             }
             else if(Type.Trim().ToUpper() == "F")
             {
-                sbType = "102";
+                sbType = "1";
             }
 
             var ERs = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ORDER_TYPE == sbType select item);

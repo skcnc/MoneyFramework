@@ -229,12 +229,18 @@ namespace Stork_Future_TaoLi.TradeModule
                 {
                     RefundStruct refundItem = (RefundStruct)queue_future_refund_thread.GetQueue().Dequeue();
 
+                    RecordItem record = TradeRecord.GetInstance().getOrderInfo(Convert.ToInt32(refundItem.OrderRef));
+
+                    refundItem.ExchangeId = record.ExchangeID;
+
                     CTP_CLI.CThostFtdcInputOrderActionField_M item = new CTP_CLI.CThostFtdcInputOrderActionField_M()
                     {
                         BrokerID = CommConfig.BROKER,
                         ExchangeID = refundItem.ExchangeId,
-                        OrderRef = refundItem.OrderRef,
-                        OrderSysID = refundItem.OrderSysId
+                        OrderSysID = refundItem.OrderSysId.PadLeft(12),
+                        InvestorID = CommConfig.INVESTOR,
+                        ActionFlag = Convert.ToByte('0'),        //删除标志 THOST_FTDC_AF_Delete 
+                        InstrumentID = record.Code
                     };
 
                     _client.ReqOrderAction(item);
