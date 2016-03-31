@@ -87,7 +87,7 @@ namespace Stork_Future_TaoLi.Hubs
                 }
                
             }
-            catch (Exception ex) { GlobalErrorLog.LogInstance.LogEvent(ex.ToString()); }
+            catch (Exception ex) { DBAccessLayer.LogSysInfo("TradeMonitorHub-updateOrderList", ex.ToString()); GlobalErrorLog.LogInstance.LogEvent(ex.ToString()); }
         }
 
         public void updateTradeList(String name, String JsonString)
@@ -99,6 +99,7 @@ namespace Stork_Future_TaoLi.Hubs
             }
             catch (Exception ex)
             {
+                DBAccessLayer.LogSysInfo("TradeMonitorHub-updateTradeList", ex.ToString());
                 GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
             }
         }
@@ -112,7 +113,7 @@ namespace Stork_Future_TaoLi.Hubs
                 _context.Clients.Client(UserConnectionRelation[name]).updateRiskList(JsonStringRisk);
                 _context.Clients.Client(UserConnectionRelation[name]).updateRiskPara(JsonStringRiskPara);
             }
-            catch (Exception ex) { GlobalErrorLog.LogInstance.LogEvent(ex.ToString()); }
+            catch (Exception ex) { DBAccessLayer.LogSysInfo("TradeMonitorHub-updateRiskList", ex.ToString()); GlobalErrorLog.LogInstance.LogEvent(ex.ToString()); }
         }
 
         public void Join(String user,String Connectionid)

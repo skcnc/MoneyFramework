@@ -91,9 +91,6 @@
             <div class="col-md-6">
                 <button class="btn btn-success" type="submit" id="tm_btnMakeOrder">下单</button>
             </div>
-            <div class="col-md-6">
-                <button class="btn btn-success" type="submit" id="tm_btnBatchOrder">批量下单</button>
-            </div>
         </div>
         <div class="col-md-8 table-responsive " style="overflow-y:auto;overflow-x:auto;height:300px">
             <table class="table table-striped table-hover ">
@@ -212,10 +209,10 @@
 
                 var _orders = eval('(' + jsonString + ')');
 
-                for (var i = 0; i < _orders.length; i++) {
+                for (var i = _orders.length - 1; i >= 0; i--) {
 
                     var _order = _orders[i];
-                    if (_order.MSG == '已成交' || _order.MSG == '已撤销' || _order.MSG == '已撤单' || _order.MSG == '委托取消') {
+                    if (_order.MSG == '已成交' || _order.MSG == '已撤销' || _order.MSG == '已撤单' || _order.MSG == '全部成交报单已提交' || _order.MSG == '委托取消') {
                         $('#tm_tb_inComplete').append('<tr name="entrust_item_info"><td>' + _order.OrderRef + '</td><td>' + _order.OrderSysID + '</td><td>' + _order.CODE + '</td><td>' + _order.Direction + '</td><td>' + _order.ComboOff + '</td><td>' + _order.VolumeTotalOrigin + '</td><td>' + _order.VolumeTotal + '</td><td>' + _order.Price + '</td><td>' + _order.MSG + '</td><td>' + _order.DealTime + '</td><td><button orderno="' + _order.OrderRef + '" class="btn btn-primary drawback_btn" style="Visibility:Hidden" type="submit">撤</button></td></tr>');
                     }
                     else

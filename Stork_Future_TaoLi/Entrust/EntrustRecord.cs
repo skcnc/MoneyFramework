@@ -39,6 +39,7 @@ namespace Stork_Future_TaoLi
             }
             catch (Exception ex)
             {
+                DBAccessLayer.LogSysInfo("EntrustRecord-AddEntrustRecord", ex.ToString());
                 GlobalErrorLog.LogInstance.LogEvent("添加委托失败，原因：" + ex.ToString());
                 return 2;
             }

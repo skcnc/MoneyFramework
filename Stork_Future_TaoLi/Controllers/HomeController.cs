@@ -106,6 +106,7 @@ namespace Stork_Future_TaoLi.Controllers
             }
             catch(Exception ex)
             {
+                DBAccessLayer.LogSysInfo("HomeController", ex.ToString());
                 return ex.ToString();
             }
         }
@@ -176,6 +177,7 @@ namespace Stork_Future_TaoLi.Controllers
             catch (Exception ex)
             {
                 GlobalErrorLog.LogInstance.LogEvent("生成交易失败： " + InputJson);
+                DBAccessLayer.LogSysInfo("HomeController", ex.ToString());
                 return "FALSE";
             }
         }
@@ -221,6 +223,54 @@ namespace Stork_Future_TaoLi.Controllers
             }
             catch(Exception ex)
             {
+                DBAccessLayer.LogSysInfo("HomeController-ImportBatchTrades", ex.ToString());
+                return ex.ToString();
+            }
+        }
+
+        public string GetBatchTrade(string user)
+        {
+            try
+            {
+                List<string> strs = pythonOper.GetInstance().GetBatchTradeList();
+                List<MakeOrder> orders = new List<MakeOrder>();
+
+                foreach (string s in strs)
+                {
+                    try
+                    {
+                        string[] vars = s.Split('\t');
+
+                        MakeOrder order = new MakeOrder()
+                        {
+                            belongStrategy = "00",
+                            User = vars[0].Trim(),
+                            exchangeId = vars[1].Trim().ToUpper(),
+                            cSecurityCode = vars[2].Trim(),
+                            nSecurityAmount = Convert.ToInt64(vars[3].Trim()),
+                            dOrderPrice = Convert.ToDouble(vars[4].Trim()),
+                            cTradeDirection = vars[5].Trim(),
+                            offsetflag = vars[6].Trim(),
+                            cSecurityType = vars[7].Trim(),
+                            OrderRef = 0
+                        };
+
+
+                        orders.Add(order);
+
+                    }
+                    catch
+                    {
+                        GlobalErrorLog.LogInstance.LogEvent("批量交易生成部分失败：" + s);
+                        return "FALSE";
+                    }
+                }
+
+                return JsonConvert.SerializeObject(orders);
+            }
+            catch (Exception ex)
+            {
+                DBAccessLayer.LogSysInfo("HomeController-ImportBatchTrades", ex.ToString());
                 return ex.ToString();
             }
         }
@@ -346,6 +396,11 @@ namespace Stork_Future_TaoLi.Controllers
         }
 
         public ActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        public ActionResult BatchTrade()
         {
             return View();
         }

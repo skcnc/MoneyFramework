@@ -186,6 +186,7 @@ namespace Stork_Future_TaoLi
             }
             catch(Exception ex)
             {
+                DBAccessLayer.LogSysInfo("StrategyMonitorClass-RecruitNewWorker", ex.ToString());
                 GlobalErrorLog.LogInstance.LogEvent(ex.ToString() + ":StrategyMonitorClass.cs" + ":" + newWorker.StrategyInstanceID);
             }
         }
@@ -521,7 +522,7 @@ namespace Stork_Future_TaoLi
                 {
                     CheckSubscribeUpdate();
                 }
-                catch (Exception ex) { ex.ToString(); }
+                catch (Exception ex) { DBAccessLayer.LogSysInfo("StrategyMonitorClass-ThreadProc", ex.ToString()); ex.ToString(); }
 
                 Thread.Sleep(10);
             }

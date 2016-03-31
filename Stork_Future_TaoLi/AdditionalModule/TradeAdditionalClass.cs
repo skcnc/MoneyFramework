@@ -165,7 +165,7 @@ namespace Stork_Future_TaoLi
                     User = _record.User,
                     OrderRef = _record.OrderRef,
                     Direction = Convert.ToInt32(_record.Orientation),
-                    ExchangeID = "FetureExchange",
+                    ExchangeID = ExchangeID,
                     OrderPrice = Convert.ToDouble(_record.Price),
                     OrderSysID = _record.OrderSysID.Trim(),
                     SecurityType = Convert.ToSByte(_record.Type),

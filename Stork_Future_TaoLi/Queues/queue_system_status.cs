@@ -21,6 +21,12 @@ namespace Stork_Future_TaoLi.Queues
                 instance = new Queue();
             }
 
+            //防止queue数据量过大导致后续新数据无法入队
+            if(instance.Count > 40)
+            {
+                instance.Clear();
+            }
+
             return instance;
         }
 

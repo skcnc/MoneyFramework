@@ -246,6 +246,9 @@
     <Compile Include="Account\UserInfo.cs" />
     <Compile Include="AdditionalModule\DESoper.cs" />
     <Compile Include="AdditionalModule\pythonOper.cs" />
+    <Compile Include="Database\SYS_LOG.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entrust\EntrustRecord.cs" />
     <Compile Include="AdditionalModule\sysmonitor.cs" />
     <Compile Include="AdditionalModule\TradeAdditionalClass.cs" />
@@ -983,6 +986,7 @@
     <Content Include="Views\Home\MainPage.cshtml" />
     <Content Include="Views\Home\UserManger.cshtml" />
     <Content Include="Views\Home\AccountInfo.cshtml" />
+    <Content Include="Views\Home\BatchTrade.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

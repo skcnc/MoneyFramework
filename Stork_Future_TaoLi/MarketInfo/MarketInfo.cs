@@ -117,6 +117,7 @@ namespace Stork_Future_TaoLi
                 }
                 catch(Exception ex)
                 {
+                    DBAccessLayer.LogSysInfo("MarketInfo-ThreadProc", ex.ToString());
                     log.LogEvent("未能成功返回； "+ ex.ToString());
                     continue;
                 }

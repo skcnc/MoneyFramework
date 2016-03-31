@@ -215,6 +215,16 @@
           <Property Name="Alias" Type="nvarchar" MaxLength="50" />
           <Property Name="UpdateTime" Type="datetime" />
         </EntityType>
+        <EntityType Name="SYS_LOG">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="module" Type="nvarchar" MaxLength="50" />
+          <Property Name="exceptionWords" Type="text" />
+          <Property Name="logtime" Type="time" Precision="7" />
+          <Property Name="logdate" Type="date" />
+        </EntityType>
         <EntityType Name="UserInfo">
           <Key>
             <PropertyRef Name="ID" />
@@ -240,6 +250,7 @@
           <EntitySet Name="SG_TAOLI_OPEN_TABLE" EntityType="Self.SG_TAOLI_OPEN_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StockAccountTable" EntityType="Self.StockAccountTable" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SYS_LOG" EntityType="Self.SYS_LOG" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserInfo" EntityType="Self.UserInfo" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -367,6 +378,7 @@
           <EntitySet Name="BWNameTable" EntityType="MoneyEntityModel.BWNameTable" />
           <EntitySet Name="DL_TAOLI_TABLE" EntityType="MoneyEntityModel.DL_TAOLI_TABLE" />
           <EntitySet Name="InstructionsTable" EntityType="MoneyEntityModel.InstructionsTable" />
+          <EntitySet Name="SYS_LOG" EntityType="MoneyEntityModel.SYS_LOG" />
         </EntityContainer>
         <EntityType Name="RISK_TABLE">
           <Key>
@@ -482,6 +494,16 @@
           <Property Name="SecurityType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="BelongStrategy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="OrderRef" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="SYS_LOG">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="module" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="exceptionWords" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="logtime" Type="Time" Precision="7" />
+          <Property Name="logdate" Type="DateTime" Precision="0" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -720,6 +742,17 @@
                 <ScalarProperty Name="Activity" ColumnName="Activity" />
                 <ScalarProperty Name="OrderUser" ColumnName="OrderUser" />
                 <ScalarProperty Name="OrderTime" ColumnName="OrderTime" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SYS_LOG">
+            <EntityTypeMapping TypeName="MoneyEntityModel.SYS_LOG">
+              <MappingFragment StoreEntitySet="SYS_LOG">
+                <ScalarProperty Name="logdate" ColumnName="logdate" />
+                <ScalarProperty Name="logtime" ColumnName="logtime" />
+                <ScalarProperty Name="exceptionWords" ColumnName="exceptionWords" />
+                <ScalarProperty Name="module" ColumnName="module" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

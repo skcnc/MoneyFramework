@@ -59,6 +59,7 @@ namespace Stork_Future_TaoLi
                 }
                 //EventLog.WriteEntry(eventSourceName, message, EventLogEntryType.Error);
                 EventLog.WriteEntry(eventSourceName, message, eventLogType, eventLogId);
+                
             }
             catch { }
         }

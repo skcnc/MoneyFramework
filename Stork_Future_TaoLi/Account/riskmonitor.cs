@@ -144,6 +144,7 @@ namespace Stork_Future_TaoLi
             }
             catch (Exception ex)
             {
+                DBAccessLayer.LogSysInfo("riskmonitor", ex.ToString());
                 return ex.ToString();
             }
         }

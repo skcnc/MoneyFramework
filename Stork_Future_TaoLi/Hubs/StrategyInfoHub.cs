@@ -49,7 +49,7 @@ namespace Stork_Future_TaoLi.Hubs
                 }
                 catch (Exception ex)
                 {
-                    ex.ToString();
+                    DBAccessLayer.LogSysInfo("StrategyInfoHub-GetStrategyID", ex.ToString());
                     return;
                 }
             }

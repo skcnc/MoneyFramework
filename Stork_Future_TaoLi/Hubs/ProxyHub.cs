@@ -150,6 +150,7 @@ namespace Stork_Future_TaoLi
             }
             catch(Exception ex)
             {
+                DBAccessLayer.LogSysInfo("ProxyHub-UpdateStrategyInfo", ex.ToString());
                 GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
             }
         }

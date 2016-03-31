@@ -170,6 +170,7 @@ window.onload = function (e) {
             $("[name='mainpage_userinfo']").addClass('sr-only');
             $("[name='mainpage_strategy']").removeClass('sr-only');
             $("[name='mainpage_trade']").removeClass('sr-only');
+            $("[name='mainpage_batch_trade']").removeClass('sr-only');
             $("[name='mainpage_riskcontrol']").removeClass('sr-only');
             $("[name='mainpage_sysstatus']").removeClass('sr-only');
             $("[name='mainpage_account']").removeClass('sr-only');
@@ -180,6 +181,7 @@ window.onload = function (e) {
             $("[name='mainpage_userinfo']").removeClass('sr-only');
             $("[name='mainpage_strategy']").removeClass('sr-only');
             $("[name='mainpage_trade']").removeClass('sr-only');
+            $("[name='mainpage_batch_trade']").removeClass('sr-only');
             $("[name='mainpage_riskcontrol']").addClass('sr-only');
             $("[name='mainpage_sysstatus']").addClass('sr-only');
             $("[name='mainpage_account']").removeClass('sr-only');
@@ -189,6 +191,7 @@ window.onload = function (e) {
             $("[name='mainpage_userinfo']").removeClass('sr-only');
             $("[name='mainpage_strategy']").addClass('sr-only');
             $("[name='mainpage_trade']").addClass('sr-only');
+            $("[name='mainpage_batch_trade']").addClass('sr-only');
             $("[name='mainpage_riskcontrol']").removeClass('sr-only');
             $("[name='mainpage_sysstatus']").removeClass('sr-only');
             $("[name='mainpage_account']").addClass('sr-only');
@@ -211,11 +214,38 @@ window.onload = function (e) {
         $('#sysregister_futureconn_account').val("17730203");
         $('#sysregister_futureconn_password').val("111111");
     }
-    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/AccountInfo")
+    else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/accountinfo")
     {
         var user = localStorage["USERNAME"];
 
         loadAccountInfo(user);
+    }
+    else if(e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/batchtrade")
+    {
+        $.post("/home/GetBatchTrade", function (data, status) {
+            if (data == "FALSE") {
+                alert("搜索批量交易失败！");
+                return;
+            }
+            else {
+                var ul = $("[name='batch_trade_list']")
+
+
+
+                var orders = eval('(' + data + ')');
+                if (orders.length == 0) return;
+
+                for (var i = 0; i < orders.length; i++) {
+                    var order = orders[i];
+
+                    var li = "<li><div class='col-md-12'><div class='col-md-1'><span>" + order.User + "</span></div><div class='col-md-1'><span>" + order.exchangeId + "</span></div><div class='col-md-1'><span>" + order.cSecurityCode + "</span></div><div class='col-md-1'><input type='text' value=" + order.nSecurityAmount + " style='max-width:50px' /></div><div class='col-md-1'><input type='text' value=" + order.dOrderPrice + " style='max-width:50px' /></div><div class='col-md-1'><input type='text' value=" + order.cTradeDirection + " style='max-width:50px' /></div><div class='col-md-1'><input type='text' value=" + order.offsetflag + " style='max-width:50px' /></div><div class='col-md-1'><span>" + order.cSecurityType + "</span></div></div></li>";
+
+                    ul.append(li);
+                }
+
+                return;
+            }
+        })
     }
     else {
         //alert("您当前使用的浏览器版本过低，网站功能将被限制！");
@@ -1324,7 +1354,6 @@ $('#btnSubmit_close').click(function (e) {
     }
     alert('参数已写入，请刷新控制页面')
 })
-
 
 
 

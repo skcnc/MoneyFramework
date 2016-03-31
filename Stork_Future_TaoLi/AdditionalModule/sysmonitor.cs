@@ -602,6 +602,7 @@ namespace Stork_Future_TaoLi
                         catch(Exception ex)
                         {
                             GlobalErrorLog.LogInstance.LogEvent("sysmonitor-arrive_thread_status-THREAD_STRATEGY_WORKER:" + ex.ToString());
+                            DBAccessLayer.LogSysInfo("sysmonitor", ex.ToString());
                         }
                     }
                     break;

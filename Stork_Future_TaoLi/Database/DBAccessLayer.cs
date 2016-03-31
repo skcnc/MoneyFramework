@@ -92,7 +92,15 @@ namespace Stork_Future_TaoLi
             if (risks == null || risks.Count() == 0) { return new List<RISK_TABLE>(); }
             else
             {
-                return risks.OrderByDescending(i => i.time).ToList();
+                try
+                {
+                    return risks.OrderByDescending(i => i.time).ToList();
+                }
+                catch(Exception ex)
+                {
+                    DBAccessLayer.LogSysInfo("DBAccessLayer-GetRiskRecord", ex.ToString());
+                    return new List<RISK_TABLE>();
+                }
             }
         }
 
@@ -1606,6 +1614,30 @@ namespace Stork_Future_TaoLi
 
 
 
+        }
+        #endregion
+
+        #region 日志相关
+        /// <summary>
+        /// 录入系统报错日志
+        /// </summary>
+        /// <param name="module">模块</param>
+        /// <param name="exception">报错信息</param>
+        public static void LogSysInfo(string module,string exception)
+        {
+            if (DBEnable == false) return;
+
+            SYS_LOG log = new SYS_LOG()
+            {
+                ID = Guid.NewGuid(),
+                logdate = DateTime.Now,
+                logtime = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second),
+                module = module,
+                exceptionWords = exception
+            };
+
+            DbEntity.SYS_LOG.Add(log);
+            Dbsavechage("LogSysInfo");
         }
         #endregion
     }
