@@ -20,6 +20,7 @@ namespace Stork_Future_TaoLi
     public static class DBAccessLayer
     {
         static MoneyEntityEntities3 DbEntity = new MoneyEntityEntities3();
+        static MoneyEntityEntities3 DbEntityGet = new MoneyEntityEntities3();
         static object ERtableLock = new object();
         static object DLtableLock = new object();
         static object DBChangeLock = new object();
@@ -88,23 +89,28 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
 
-            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
-            {
-                var risks = (from item in DbEntity.RISK_TABLE where item.alias == alias select item);
 
-                if (risks == null || risks.Count() == 0) { return new List<RISK_TABLE>(); }
-                else
+
+            var risks = (from item in DbEntityGet.RISK_TABLE where item.alias == alias select item);
+
+            if (risks == null || risks.Count() == 0)
+            {
+                return new List<RISK_TABLE>();
+            }
+            else
+            {
+                try
                 {
-                    try
-                    {
-                        return risks.OrderByDescending(i => i.time).ToList();
-                    }
-                    catch (Exception ex)
-                    {
-                        DBAccessLayer.LogSysInfo("DBAccessLayer-GetRiskRecord", ex.ToString());
-                        return new List<RISK_TABLE>();
-                    }
+                    return risks.OrderByDescending(i => i.time).ToList();
+
+
                 }
+                catch (Exception ex)
+                {
+                    DBAccessLayer.LogSysInfo("DBAccessLayer-GetRiskRecord", ex.ToString());
+                    return new List<RISK_TABLE>();
+                }
+
             }
         }
 
@@ -119,7 +125,7 @@ namespace Stork_Future_TaoLi
 
             using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
             {
-                var risks = (from item in DbEntity.RISK_TABLE select item);
+                var risks = (from item in DbEntityGet.RISK_TABLE select item);
 
                 Thread.Sleep(1);
 
@@ -1095,15 +1101,18 @@ namespace Stork_Future_TaoLi
 
             alias = alias.Trim();
 
-            List<DL_TAOLI_TABLE> deals_record = (from item in DbEntity.DL_TAOLI_TABLE where item.DL_USER == alias select item).ToList();
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
+            {
+                List<DL_TAOLI_TABLE> deals_record = (from item in DbEntityGet.DL_TAOLI_TABLE where item.DL_USER == alias select item).ToList();
 
-            if (deals_record != null && deals_record.Count > 0)
-            {
-                return deals_record;
-            }
-            else
-            {
-                return new List<DL_TAOLI_TABLE>();
+                if (deals_record != null && deals_record.Count > 0)
+                {
+                    return deals_record;
+                }
+                else
+                {
+                    return new List<DL_TAOLI_TABLE>();
+                }
             }
         }
 
