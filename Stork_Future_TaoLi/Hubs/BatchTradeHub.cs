@@ -4,6 +4,10 @@ using System.Linq;
 using System.Web;
 using Microsoft.AspNet.SignalR;
 using System.Collections;
+using System.Threading;
+using Stork_Future_TaoLi.Queues;
+using marketinfosys;
+using Newtonsoft.Json;
 
 namespace Stork_Future_TaoLi.Hubs
 {
@@ -20,9 +24,7 @@ namespace Stork_Future_TaoLi.Hubs
             string name = Clients.CallerState.USERNAME;
             List<string> codes = Clients.CallerState.CODES.Trim().Split('|');
 
-            
-
-
+            BatchTradeMonitor.Instance.MergeSubscribeList(name.Trim(), codes);
         }
     
     }
@@ -34,7 +36,7 @@ namespace Stork_Future_TaoLi.Hubs
         private BatchTradeMonitor(IHubContext context) 
         {
             //向行情模块添加消息列表映射
-            MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(BatchStrategy, newWorker.GetRefQueue()));
+            MarketInfo.SetStrategyQueue(new KeyValuePair<String, Queue>(BatchStrategy, queue_batchtrade_market.GetQueue()));
             _context = context; 
         }
         private readonly static BatchTradeMonitor _instance = 
@@ -61,8 +63,6 @@ namespace Stork_Future_TaoLi.Hubs
         /// 代码注册账户信息
         /// </summary>
         private Dictionary<String, List<String>> CodeSubscribeList = new Dictionary<String, List<String>>();
-
-
 
 
         //获取连接ID，并保存在本地
@@ -139,9 +139,116 @@ namespace Stork_Future_TaoLi.Hubs
 
             List<String> Codes = CodeSubscribeList.Keys.ToList();
 
+            MapMarketStratgy.SetMapMS(BatchStrategy, Codes);
+        }
+
+        /// <summary>
+        /// 更新行情列表
+        /// </summary>
+        /// <param name="PriceList"></param>
+        public void SetViewPrice(Dictionary<String,String> PriceList)
+        {
+            foreach(KeyValuePair<String,String> pair in UserConnectionRelation)
+            {
+                Dictionary<String, String> userPriceList = new Dictionary<string, string>();
+
+                if(!UserSubscribeList.Keys.Contains(pair.Key)) continue;
+                List<String> codes = UserSubscribeList[pair.Key];
+                foreach(String code in codes)
+                {
+                    if(PriceList.Keys.Contains(code))
+                    {
+                        userPriceList.Add(code, PriceList[code]);
+                    }
+                }
+
+                //userPriceList 中包含用户 pair.key 的所有注册行情最新价格
+                _context.Clients.Client(UserConnectionRelation[pair.Key]).updatePriceList(JsonConvert.SerializeObject(userPriceList));
+            }
+        }
+    }
+
+
+    public class BatchTrade_MarketReciver
+    {
+
+        private static DateTime runningMark = new DateTime();
+
+        private static object syncRoot = new object();
+
+        /// <summary>
+        /// 证券价格缓存列表
+        /// </summary>
+        private static Dictionary<String, String> CodeAndPriceList = new Dictionary<string, string>();
+
+
+        public static void Run()
+        {
+            Thread newThread = new Thread(TradeProc);
+            newThread.Start();
+        }
+
+        public static Dictionary<String, String> GetMarketValue()
+        {
+            lock(syncRoot)
+            {
+                Dictionary<String, String> RtnValue = new Dictionary<string, string>();
+
+                foreach(KeyValuePair<String,String> pair in CodeAndPriceList)
+                {
+                    RtnValue.Add(pair.Key, pair.Value);
+                }
+
+                return RtnValue;
+            }
+        }
+
+
+        /// <summary>
+        /// 更新本地行情变动
+        /// </summary>
+        private static void TradeProc()
+        {
+
+            while (true) {
+
+                Thread.Sleep(1);
+
+
+                if (DateTime.Now.Second != runningMark.Second)
+                {
+                    runningMark = DateTime.Now;
+
+                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("BatchTrade_MarketReciver", (object)true);
+                    queue_system_status.GetQueue().Enqueue((object)message1);
+
+                    if (DateTime.Now.Second % 2 == 0)
+                    {
+                        Dictionary<String, String> value = GetMarketValue();
+                        BatchTradeMonitor.Instance.SetViewPrice(value);
+                    }
+                }
+
+
+                if(queue_batchtrade_market.GetQueueNumber() > 0)
+                {
+                    MarketData data = (MarketData)queue_batchtrade_market.GetQueue().Dequeue();
+
+                    lock(syncRoot)
+                    {
+                       if(!CodeAndPriceList.Keys.Contains(data.Code.Trim()))
+                       {
+                           CodeAndPriceList.Add(data.Code.Trim(), data.Match.ToString());
+                       }
+
+                       CodeAndPriceList[data.Code.Trim()] = data.Match.ToString();
+                    }
+
+                }
 
             
-            MapMarketStratgy.SetRegeditStrategy(BatchStrategy, Codes);
+            }
+           
         }
     }
 }

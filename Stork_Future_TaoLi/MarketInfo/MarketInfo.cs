@@ -70,6 +70,19 @@ namespace Stork_Future_TaoLi
             if (MapMarketStratgy.bSubscribeListChangeLabel)
             {
                 subscribeList = MapMarketStratgy.GetMapSS();
+
+                foreach(KeyValuePair<String,List<String>> pair in  MapMarketStratgy.GetMapMS())
+                {
+                    if(!subscribeList.Keys.Contains(pair.Key))
+                    {
+                        subscribeList.Add(pair.Key, new List<string>());
+                    }
+                    foreach (String module in pair.Value)
+                    {
+                        subscribeList[pair.Key].Add(module);
+                    }
+                }
+
                 MapMarketStratgy.bSubscribeListChangeLabel = false;
             }
         }
@@ -198,7 +211,14 @@ namespace Stork_Future_TaoLi
         //股票代码与注册该代码的行情映射表
         //public static List<KeyValuePair<String, List<String>>> MapSS = new List<KeyValuePair<string, List<string>>>();
 
+        /// <summary>
+        /// 策略<--->证券集 关系字典
+        /// </summary>
         public static Dictionary<String, List<String>> MapSS = new Dictionary<String, List<String>>();
+        /// <summary>
+        /// 行情需求模块<--->证券集关系字典
+        /// </summary>
+        public static Dictionary<String, List<String>> MapMS = new Dictionary<string, List<string>>();
         public static bool bSubscribeListChangeLabel = false;
 
         /// <summary>
@@ -275,7 +295,7 @@ namespace Stork_Future_TaoLi
         }
 
         /// <summary>
-        /// 更新订阅列表
+        /// 更新策略订阅列表
         /// </summary>
         /// <param name="para"></param>
         public static void SetMapSS(Dictionary<String,List<String>> para)
@@ -288,13 +308,51 @@ namespace Stork_Future_TaoLi
         }
 
         /// <summary>
-        /// 获取订阅列表
+        /// 更新模块订阅列表
+        /// </summary>
+        /// <param name="module"></param>
+        /// <param name="codelist"></param>
+        public static void SetMapMS(String module ,List<String> codelist)
+        {
+            lock(syncRoot)
+            {
+                if(MapMS.Keys.Contains(module))
+                {
+                    MapMS[module].Clear();
+                }
+                else
+                {
+                    MapMS.Add(module, new List<string>());
+                }
+
+                foreach(String code in codelist)
+                {
+                    MapMS[module].Add(code);
+                }
+
+                bSubscribeListChangeLabel = true;
+            }
+        }
+
+        /// <summary>
+        /// 获取策略订阅列表
         /// 该函数由行情模块调用
         /// </summary>
         /// <returns></returns>
         public static Dictionary<String,List<String>> GetMapSS()
         {
             return MapSS;
+        }
+
+
+        /// <summary>
+        /// 获取模块订阅列表
+        /// 该函数由行情模块调用
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<String , List<String>> GetMapMS()
+        {
+            return MapMS;
         }
     }
 }

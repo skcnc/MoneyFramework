@@ -317,9 +317,11 @@
     <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Hubs\AccountHub.cs" />
+    <Compile Include="Hubs\BatchTradeHub.cs" />
     <Compile Include="Hubs\monitorHub.cs" />
     <Compile Include="Hubs\StrategyInfoHub.cs" />
     <Compile Include="Hubs\TradeMonitorHub.cs" />
+    <Compile Include="Queues\queue_batchtrade_market.cs" />
     <Compile Include="Queues\queue_future_excuteThread.cs" />
     <Compile Include="Queues\queue_refund_thread.cs" />
     <Compile Include="Queues\queue_system_status.cs" />
