@@ -13,4 +13,5 @@
 /// <reference path="respond.min.js" />
 /// <reference path="sitescript.js" />
 /// <reference path="risk.js" />
+/// <reference path="layout.js" />
 

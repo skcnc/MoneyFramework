@@ -86,14 +86,14 @@ namespace Stork_Future_TaoLi
         /// <returns>
         /// NULL : 说明队列中无值
         /// 其他 ：返回队列中首值</returns>
-        private MakeOrder DeQueueMonitorOrder()
+        private List<MakeOrder> DeQueueMonitorOrder()
         {
-            MakeOrder tos;
+            List<MakeOrder> tos;
 
             lock(queue_prd_trade_from_tradeMonitor.GetQueue().SyncRoot)
             {
                 if (queue_prd_trade_from_tradeMonitor.GetQueue().Count == 0) return null;
-                tos = (MakeOrder)queue_prd_trade_from_tradeMonitor.GetQueue().Dequeue();
+                tos = (List<MakeOrder>)queue_prd_trade_from_tradeMonitor.GetQueue().Dequeue();
             }
 
             if (tos != null) return tos;
@@ -346,101 +346,141 @@ namespace Stork_Future_TaoLi
                 #endregion
 
                 #region 交易管理界面直接发起交易
-                MakeOrder mo = PreTradeModule.instance.DeQueueMonitorOrder();
-                if (mo != null)
+                List<MakeOrder> mos = PreTradeModule.instance.DeQueueMonitorOrder();
+
+
+                if (mos != null)
                 {
+                    if (mos.Count == 0) continue;
+
                     List<TradeOrderStruct> _TradeList = new List<TradeOrderStruct>();
-                    TradeOrderStruct _tradeUnit = new TradeOrderStruct()
+                    string User = String.Empty;
+                    foreach (MakeOrder mo in mos)
                     {
-                        cExhcnageID = mo.exchangeId,
-                        cSecurityCode = mo.cSecurityCode,
-                        nSecurityAmount = mo.nSecurityAmount,
-                        dOrderPrice = mo.dOrderPrice,
-                        cTradeDirection = mo.cTradeDirection,
-                        cOffsetFlag = mo.offsetflag,
-                        SecurityName = String.Empty,
-                        cOrderPriceType = "0",
-                        cUser = mo.User,
-                        cSecurityType = mo.cSecurityType,
-                        cOrderLevel = "1",
-                        cOrderexecutedetail = "0",
-                        belongStrategy = mo.belongStrategy,
-                        OrderRef = REQUEST_ID.ApplyNewID()
-                    };
+                        User = mo.User;
+                        TradeOrderStruct _tradeUnit = new TradeOrderStruct()
+                        {
+                            cExhcnageID = mo.exchangeId,
+                            cSecurityCode = mo.cSecurityCode,
+                            nSecurityAmount = mo.nSecurityAmount,
+                            dOrderPrice = mo.dOrderPrice,
+                            cTradeDirection = mo.cTradeDirection,
+                            cOffsetFlag = mo.offsetflag,
+                            SecurityName = String.Empty,
+                            cOrderPriceType = "0",
+                            cUser = mo.User,
+                            cSecurityType = mo.cSecurityType,
+                            cOrderLevel = "1",
+                            cOrderexecutedetail = "0",
+                            belongStrategy = mo.belongStrategy,
+                            OrderRef = REQUEST_ID.ApplyNewID()
+                        };
 
-                    if (mo.cSecurityType.ToUpper() == "F")
-                    {
-                        _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "48" : "49");
-                        _tradeUnit.cOffsetFlag = (_tradeUnit.cOffsetFlag == "0" ? "48" : "49");
+                        if (mo.cSecurityType.ToUpper() == "F")
+                        {
+                            _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "48" : "49");
+                            _tradeUnit.cOffsetFlag = (_tradeUnit.cOffsetFlag == "0" ? "48" : "49");
+                        }
+                        if (mo.cSecurityType.ToUpper() == "S")
+                        {
+                            _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "1" : "2");
+                        }
+
+                        UserRequestMap.GetInstance().AddOrUpdate(_tradeUnit.OrderRef, mo.User, (key, oldValue) => oldValue = mo.User);
+
+                        _TradeList.Add(_tradeUnit);
                     }
-                    if(mo.cSecurityType.ToUpper()  == "S")
-                    {
-                        _tradeUnit.cTradeDirection = ((_tradeUnit.cTradeDirection == "0") ? "1" : "2");
-                    }
-
-                    UserRequestMap.GetInstance().AddOrUpdate(_tradeUnit.OrderRef, mo.User,(key,oldValue) => oldValue = mo.User);
-
-                    _TradeList.Add(_tradeUnit);
-
 
                     //风控检测
                     string result = string.Empty;
-                    bool brisk = riskmonitor.RiskDetection(_tradeUnit.cUser, _TradeList, out result);
+                    bool brisk = riskmonitor.RiskDetection(User, _TradeList, out result);
 
                     //风控结果记入数据库
-                     DBAccessLayer.AddRiskRecord(_tradeUnit.cUser, result, "00", _tradeUnit.cSecurityCode, Convert.ToInt32(_tradeUnit.nSecurityAmount), _tradeUnit.dOrderPrice, _tradeUnit.cTradeDirection);
+                    if (_TradeList.Count == 1)
+                    {
+                        DBAccessLayer.AddRiskRecord(_TradeList[0].cUser, result, "00", _TradeList[0].cSecurityCode, Convert.ToInt32(_TradeList[0].nSecurityAmount), _TradeList[0].dOrderPrice, _TradeList[0].cTradeDirection);
+                    }
+                    else
+                    {
+                        foreach (TradeOrderStruct tradeUnit in _TradeList)
+                        {
+                            DBAccessLayer.AddRiskRecord(tradeUnit.cUser, result, "00", tradeUnit.cSecurityCode, Convert.ToInt32(tradeUnit.nSecurityAmount), tradeUnit.dOrderPrice, tradeUnit.cTradeDirection);
+                        }
+                    }
 
-                     List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(_tradeUnit.cUser);
+                    List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(User);
 
-                     int count = 0;
+                    int count = 0;
 
-                     if (risks.Count > 0)
-                     {
-                         List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
+                    if (risks.Count > 0)
+                    {
+                        List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
 
-                         foreach(RISK_TABLE risk in risks)
-                         {
-                             count++;
-                             if (count > 10) break;
-                             riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
-                         }
+                        foreach (RISK_TABLE risk in risks)
+                        {
+                            count++;
+                            if (count > 10) break;
+                            riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
+                        }
 
 
-                         TradeMonitor.Instance.updateRiskList(_tradeUnit.cUser, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
-     
-                     }
+                        TradeMonitor.Instance.updateRiskList(User, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
 
-                   
+                    }
 
-                    if(!brisk)
+
+
+                    if (!brisk)
                     {
                         continue;
                     }
 
                     log.LogEvent("来自交易管理页面的交易");
-                    if (mo.cSecurityType == "s" || mo.cSecurityType == "S")
-                    {
-                        if (mo.exchangeId == ExchangeID.SH)
-                        {
-                            lock (QUEUE_SH_TRADE.GetQueue().SyncRoot)
-                            {
-                                QUEUE_SH_TRADE.GetQueue().Enqueue((object)_TradeList);
-                            }
-                        }
-                        else if (mo.exchangeId == ExchangeID.SZ)
-                        {
-                            lock (QUEUE_SZ_TRADE.GetQueue().SyncRoot)
-                            {
-                                QUEUE_SZ_TRADE.GetQueue().Enqueue((object)_TradeList);
-                            }
-                        }
 
+                    List<TradeOrderStruct> shTradeList = new List<TradeOrderStruct>();
+                    List<TradeOrderStruct> szTradeList = new List<TradeOrderStruct>();
+                    List<TradeOrderStruct> futureTradeList = new List<TradeOrderStruct>();
+                    foreach (TradeOrderStruct tradeUnit in _TradeList)
+                    {
+                        if (tradeUnit.cSecurityType.ToUpper() == "S")
+                        {
+                            if (tradeUnit.cExhcnageID == ExchangeID.SH)
+                            {
+                                shTradeList.Add(tradeUnit);
+                                continue;
+                            }
+                            else if (tradeUnit.cExhcnageID == ExchangeID.SZ)
+                            {
+                                szTradeList.Add(tradeUnit);
+                                continue;
+                            }
+
+                        }
+                        else if (tradeUnit.cSecurityType.ToUpper() == "F")
+                        {
+                            futureTradeList.Add(tradeUnit);
+                        }
                     }
-                    else if (mo.cSecurityType == "f" || mo.cSecurityType == "F")
+
+                    if (shTradeList.Count > 0)
+                    {
+                        lock (QUEUE_SH_TRADE.GetQueue().SyncRoot)
+                        {
+                            QUEUE_SH_TRADE.GetQueue().Enqueue((object)shTradeList);
+                        }
+                    }
+                    if (szTradeList.Count > 0)
+                    {
+                        lock (QUEUE_SZ_TRADE.GetQueue().SyncRoot)
+                        {
+                            QUEUE_SZ_TRADE.GetQueue().Enqueue((object)szTradeList);
+                        }
+                    }
+                    if (futureTradeList.Count > 0)
                     {
                         lock (QUEUE_FUTURE_TRADE.GetQueue().SyncRoot)
                         {
-                            QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)_TradeList);
+                            QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)futureTradeList);
                         }
                     }
                 }

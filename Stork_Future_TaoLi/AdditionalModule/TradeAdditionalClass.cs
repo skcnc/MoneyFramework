@@ -148,8 +148,6 @@ namespace Stork_Future_TaoLi
             RecordItem _record = new RecordItem();
             _record = this.GetOrAdd(OrderRef, _record);
 
-            string sysid = _record.OrderSysID;
-
             _record.VolumeTraded = volumeTraded;
             _record.VolumeTotal = VolumeTotal;
             _record.ErrMsg = StatusMsg;
@@ -157,7 +155,7 @@ namespace Stork_Future_TaoLi
             _record.OrderSysID = OrderSysID;
             _record.ExchangeID = ExchangeID;
             _record.Status = TradeDealStatus.ORDERING;
-            if (sysid.Trim() == "0" && _record.OrderSysID != String.Empty)
+            if (_record.OrderSysID.Trim() == "0" && _record.OrderSysID != String.Empty)
             {
                 QueryEntrustOrderStruct_M record = new QueryEntrustOrderStruct_M()
                 {
@@ -191,8 +189,17 @@ namespace Stork_Future_TaoLi
             );
 
 
+            if (UserRequestMap.GetInstance().Count == 0) return;
 
-            String USERNAME = UserRequestMap.GetInstance()[OrderRef];
+            String USERNAME = string.Empty;
+            try
+            {
+                USERNAME = UserRequestMap.GetInstance()[OrderRef];
+            }
+            catch(Exception ex)
+            {
+                DBAccessLayer.LogSysInfo("TradeAdditionalClass->UpdateOrder", ex.ToString());
+            }
             OrderViewItem order = new OrderViewItem(_record.OrderRef.ToString(),_record.OrderSysID,_record.Code,_record.Orientation,_record.CombOffsetFlag.ToString(),_record.VolumeTotalOriginal.ToString(),_record.VolumeTotal.ToString(),_record.Price.ToString(),_record.ErrMsg,_record.OrderTime_Start.ToString());
 
             TradeMonitor.Instance.updateOrderList(USERNAME, order);

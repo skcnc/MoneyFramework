@@ -5,6 +5,7 @@ using System.Web;
 using TDFAPI;
 using System.Threading;
 using System.Text;
+using System.Windows.Forms;
 
 namespace MarketInfoSys
 {
@@ -92,6 +93,8 @@ namespace MarketInfoSys
                 else
                 {
                     Queue_Data.Connected = false;
+
+                    MessageBox.Show(nOpenRet.ToString());
                     //连接失败，告警顶级日志
                     //GlobalErrorLog.LogInstance.LogEvent(String.Format("open returned:{0}, program quit", nOpenRet));
                 }

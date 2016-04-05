@@ -62,7 +62,7 @@
             this.tbip.Name = "tbip";
             this.tbip.Size = new System.Drawing.Size(118, 21);
             this.tbip.TabIndex = 1;
-            this.tbip.Text = "202.96.155.225";
+            this.tbip.Text = "114.80.154.34";
             // 
             // tbport
             // 
@@ -70,7 +70,7 @@
             this.tbport.Name = "tbport";
             this.tbport.Size = new System.Drawing.Size(100, 21);
             this.tbport.TabIndex = 3;
-            this.tbport.Text = "6221";
+            this.tbport.Text = "6231";
             // 
             // label2
             // 
@@ -96,7 +96,7 @@
             this.tbuserName.Name = "tbuserName";
             this.tbuserName.Size = new System.Drawing.Size(118, 21);
             this.tbuserName.TabIndex = 3;
-            this.tbuserName.Text = "TD1379799005";
+            this.tbuserName.Text = "TD1089824001";
             // 
             // label6
             // 
@@ -114,7 +114,7 @@
             this.tbpassword.PasswordChar = '*';
             this.tbpassword.Size = new System.Drawing.Size(100, 21);
             this.tbpassword.TabIndex = 3;
-            this.tbpassword.Text = "73166101";
+            this.tbpassword.Text = "60891665";
             // 
             // rtbSubscribe
             // 

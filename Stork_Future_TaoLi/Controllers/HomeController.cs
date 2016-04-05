@@ -166,11 +166,15 @@ namespace Stork_Future_TaoLi.Controllers
             {
                 string mark = InputJson.Substring(0, 2);
                 string jsonString = InputJson.Substring(2);
-                object obj = new object();
+                MakeOrder order = new MakeOrder();
 
-                if (mark == "C1") { obj = (object)(JsonConvert.DeserializeObject<MakeOrder>(jsonString)); }
+                if (mark == "C1") { order = (JsonConvert.DeserializeObject<MakeOrder>(jsonString)); }
 
-                queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue(obj);
+                List<MakeOrder> orders = new List<MakeOrder>();
+                orders.Add(order);
+
+                queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue((object)orders);
+
                 return "SUCCESS";
 
             }
@@ -182,42 +186,14 @@ namespace Stork_Future_TaoLi.Controllers
             }
         }
 
-        public string ImportBatchTrades()
+        public string ImportBatchTrades(String JsonString)
         {
             try
             {
-                List<string> strs = pythonOper.GetInstance().GetBatchTradeList();
-
-                foreach(string s in strs)
-                {
-                    try
-                    {
-                        string[] vars = s.Split('\t');
-
-                        MakeOrder order = new MakeOrder()
-                        {
-                            belongStrategy = "00",
-                            User = vars[0].Trim(),
-                            exchangeId = vars[1].Trim().ToUpper(),
-                            cSecurityCode = vars[2].Trim(),
-                            nSecurityAmount = Convert.ToInt64(vars[3].Trim()),
-                            dOrderPrice = Convert.ToDouble(vars[4].Trim()),
-                            cTradeDirection = vars[5].Trim(),
-                            offsetflag = vars[6].Trim(),
-                            cSecurityType = vars[7].Trim(),
-                            OrderRef = 0
-                        };
-
-
-                        queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue((object)order);
-                       
-                    }
-                    catch
-                    {
-                        GlobalErrorLog.LogInstance.LogEvent("批量交易生成部分失败：" + s);
-                        return "FALSE";
-                    }
-                }
+                List<MakeOrder> orders = new List<MakeOrder>();
+                orders = JsonConvert.DeserializeObject<List<MakeOrder>>(JsonString);
+                queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue((object)orders);
+               
 
                 return "SUCCESS";
             }

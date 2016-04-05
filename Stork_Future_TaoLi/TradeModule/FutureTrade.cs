@@ -19,6 +19,16 @@ namespace Stork_Future_TaoLi
         private static CTP_CLI.CCTPClient _client;
         private static FutureTradeThreadStatus status = FutureTradeThreadStatus.DISCONNECTED;
 
+        /// <summary>
+        /// Rtn Order 锁变量
+        /// </summary>
+        private static object syncRtnOrderObject = new object();
+
+        /// <summary>
+        /// Rtn Trade 锁变量
+        /// </summary>
+        private static object syncRtnTradeObject = new object();
+
         #region 委托参数
         /// <summary>
         /// 经纪公司代码
@@ -344,8 +354,6 @@ namespace Stork_Future_TaoLi
 
         public FutureTrade()
         {
-            
-          
         }
 
         /// <summary>
@@ -420,7 +428,39 @@ namespace Stork_Future_TaoLi
         /// <param name="pTrade"></param>
         public static void _client_RtnTrade(CTP_CLI.CThostFtdcTradeField_M pTrade)
         {
-            TradeRecord.GetInstance().UpdateTrade(Convert.ToInt16(pTrade.OrderRef), pTrade.Volume, Convert.ToDecimal(pTrade.Price), pTrade.TradeID);
+            CThostFtdcTradeField_M Trade = new CThostFtdcTradeField_M()
+            {
+                BrokerID = pTrade.BrokerID,
+                BrokerOrderSeq = pTrade.BrokerOrderSeq,
+                BusinessUnit = pTrade.BusinessUnit,
+                ClearingPartID = pTrade.ClearingPartID,
+                ClientID = pTrade.ClientID,
+                Direction = pTrade.Direction,
+                ExchangeID = pTrade.ExchangeID,
+                ExchangeInstID = pTrade.ExchangeInstID,
+                HedgeFlag = pTrade.HedgeFlag,
+                InstrumentID = pTrade.InstrumentID,
+                InvestorID = pTrade.InvestorID,
+                OffsetFlag = pTrade.OffsetFlag,
+                OrderLocalID = pTrade.OrderLocalID,
+                OrderRef = pTrade.OrderRef,
+                OrderSysID = pTrade.OrderSysID,
+                ParticipantID = pTrade.ParticipantID,
+                Price = pTrade.Price,
+                PriceSource = pTrade.PriceSource,
+                SequenceNo = pTrade.SequenceNo,
+                SettlementID = pTrade.SettlementID,
+                TradeDate = pTrade.TradeDate,
+                TradeID = pTrade.TradeID,
+                TraderID = pTrade.TraderID,
+                TradeTime = pTrade.TradeTime,
+                TradeType = pTrade.TradeType,
+                TradingDay = pTrade.TradingDay,
+                TradingRole = pTrade.TradingRole,
+                UserID = pTrade.UserID,
+                Volume = pTrade.Volume
+            };
+            ThreadPool.QueueUserWorkItem(new WaitCallback(FutureTrade.RtnTradeProc), (object)Trade);
         }
 
         /// <summary>
@@ -430,56 +470,51 @@ namespace Stork_Future_TaoLi
         /// <param name="pOrder"></param>
         public static void _client_RtnOrder(CTP_CLI.CThostFtdcOrderField_M pOrder)
         {
-            switch (pOrder.OrderStatus)
+            CTP_CLI.CThostFtdcOrderField_M order = new CThostFtdcOrderField_M()
             {
-                case 48:
-                    {
-                        //全部成交
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded,Convert.ToInt16(pOrder.OrderRef),pOrder.OrderSysID,pOrder.StatusMsg,pOrder.OrderStatus,pOrder.VolumeTotal,pOrder.ExchangeID);
+                ActiveTime = pOrder.ActiveTime,
+                ExchangeID = pOrder.ExchangeID,
+                ExchangeInstID = pOrder.ExchangeInstID,
+                ForceCloseReason = pOrder.ForceCloseReason,
+                Direction = pOrder.Direction,
+                CombHedgeFlag_0 = pOrder.CombHedgeFlag_0,
+                VolumeTotal = pOrder.VolumeTotal,
+                VolumeTotalOriginal = pOrder.VolumeTotalOriginal,
+                VolumeTraded = pOrder.VolumeTraded,
+                StatusMsg = pOrder.StatusMsg,
+                CombOffsetFlag_0 = pOrder.CombOffsetFlag_0,
+                OrderSysID = pOrder.OrderSysID,
+                OrderLocalID = pOrder.OrderLocalID,
+                OrderStatus = pOrder.OrderStatus,
+                OrderRef = pOrder.OrderRef,
+                ActiveTraderID = pOrder.ActiveTraderID,
+                ActiveUserID = pOrder.ActiveUserID,
+                BrokerID = pOrder.BrokerID,
+                BrokerOrderSeq = pOrder.BrokerOrderSeq,
+                BusinessUnit = pOrder.BusinessUnit,
+                CancelTime = pOrder.CancelTime,
+                ClearingPartID = pOrder.ClearingPartID,
+                ClientID = pOrder.ClientID,
+                CombHedgeFlag_1 = pOrder.CombHedgeFlag_1,
+                CombHedgeFlag_2 = pOrder.CombHedgeFlag_2,
+                CombHedgeFlag_3 = pOrder.CombHedgeFlag_3,
+                CombHedgeFlag_4 = pOrder.CombHedgeFlag_4,
+                CombOffsetFlag_1 = pOrder.CombOffsetFlag_1,
+                CombOffsetFlag_2 = pOrder.CombOffsetFlag_2,
+                CombOffsetFlag_3 = pOrder.CombOffsetFlag_3,
+                CombOffsetFlag_4 = pOrder.CombOffsetFlag_4,
+                FrontID = pOrder.FrontID,
+                InstrumentID = pOrder.InstrumentID,
+                InsertTime = pOrder.InsertTime,
+                InsertDate = pOrder.InsertDate,
+                LimitPrice = pOrder.LimitPrice,
+                OrderType = pOrder.OrderType,
+                SessionID = pOrder.SessionID,
+                UserID = pOrder.UserID,
+                TraderID = pOrder.TraderID
+            };
 
-                        if (pOrder.CombOffsetFlag_0 == (byte)(FutureTradeOffSet.Open))
-                        {
-                            //只有开仓涉及冻结资金
-                            //交易失败，需要释放冻结掉的期货交易资金
-                            accountMonitor.UpdateRiskFrozonAccount(pOrder.UserID, pOrder.InstrumentID, pOrder.VolumeTotalOriginal * (-1), pOrder.VolumeTotalOriginal * pOrder.LimitPrice * (-1), "F", pOrder.Direction.ToString());
-                        }
-                    }
-                    break;
-                case 49:
-                    {
-                        //部分成交
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-                    }
-                    break;
-                case 51:
-                    {
-                        //未成交状态
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-                    }
-                    break;
-                case 53:
-                    {
-                        //已撤单状态
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-                    }
-                    break;
-                case 97:
-                    {
-                        //报单已经提交，创建委托记录
-                        if (CONFIG.CheckOrderRefAvailiable(Convert.ToInt16(pOrder.OrderRef)))
-                        {
-                            // 重复返回不需要记库
-                            TradeRecord.GetInstance().SubscribeOrder("1", pOrder.InstrumentID, Convert.ToChar(pOrder.Direction).ToString(), pOrder.VolumeTotalOriginal, Convert.ToDecimal(pOrder.LimitPrice), Convert.ToInt16(pOrder.OrderRef), pOrder.OrderStatus, pOrder.CombOffsetFlag_0);
-                        }
-                    }
-                    break;
-                default:
-                    {
-                        //如果是没有见过的状态，则默认更新委托信息
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-                    }
-                    break;
-            }
+            ThreadPool.QueueUserWorkItem(new WaitCallback(FutureTrade.RtnOrderProc), (object)order);
         }
 
         /// <summary>
@@ -489,56 +524,7 @@ namespace Stork_Future_TaoLi
         /// <param name="pOrder"></param>
         public static void _client_RspQryOrder(CThostFtdcOrderField_M pOrder, CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
-            switch (pOrder.OrderStatus)
-            {
-                case 48:
-                    {
-                        //全部成交
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-
-                        if (pOrder.CombOffsetFlag_0 == (byte)(FutureTradeOffSet.Open))
-                        {
-                            //只有开仓涉及冻结资金
-                            //交易失败，需要释放冻结掉的期货交易资金
-                            accountMonitor.UpdateRiskFrozonAccount(pOrder.UserID, pOrder.InstrumentID, pOrder.VolumeTotalOriginal * (-1), pOrder.VolumeTotalOriginal * pOrder.LimitPrice * (-1), "F", pOrder.Direction.ToString());
-                        }
-                    }
-                    break;
-                case 49:
-                    {
-                        //部分成交
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-                    }
-                    break;
-                case 51:
-                    {
-                        //未成交状态
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-                    }
-                    break;
-                case 53:
-                    {
-                        //已撤单状态
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-                    }
-                    break;
-                case 97:
-                    {
-                        //报单已经提交，创建委托记录
-                        if (CONFIG.CheckOrderRefAvailiable(Convert.ToInt16(pOrder.OrderRef)))
-                        {
-                            // 重复返回不需要记库
-                            TradeRecord.GetInstance().SubscribeOrder("1", pOrder.InstrumentID, Convert.ToChar(pOrder.Direction).ToString(), pOrder.VolumeTotalOriginal, Convert.ToDecimal(pOrder.LimitPrice), Convert.ToInt16(pOrder.OrderRef), pOrder.OrderStatus, pOrder.CombOffsetFlag_0);
-                        }
-                    }
-                    break;
-                default:
-                    {
-                        //如果是没有见过的状态，则默认更新委托信息
-                        TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
-                    }
-                    break;
-            }
+            ThreadPool.QueueUserWorkItem(new WaitCallback(FutureTrade.RtnOrderProc), (object)pOrder);
         }
 
         /// <summary>
@@ -560,8 +546,81 @@ namespace Stork_Future_TaoLi
 
         public static void _client_RspError(CTP_CLI.CThostFtdcRspInfoField_M pRspInfo, int nRequestID, bool bIsLast)
         {
+
             throw new NotImplementedException();
         }
+
+
+        public static void RtnOrderProc(object order)
+        {
+            CThostFtdcOrderField_M pOrder = (CThostFtdcOrderField_M)order;
+
+            lock (syncRtnOrderObject)
+            {
+                switch (pOrder.OrderStatus)
+                {
+                    case 48:
+                        {
+                            //全部成交
+                            TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
+
+                            if (pOrder.CombOffsetFlag_0 == (byte)(FutureTradeOffSet.Open))
+                            {
+                                //只有开仓涉及冻结资金
+                                //交易失败，需要释放冻结掉的期货交易资金
+                                accountMonitor.UpdateRiskFrozonAccount(pOrder.UserID, pOrder.InstrumentID, pOrder.VolumeTotalOriginal * (-1), pOrder.VolumeTotalOriginal * pOrder.LimitPrice * (-1), "F", pOrder.Direction.ToString());
+                            }
+                        }
+                        break;
+                    case 49:
+                        {
+                            //部分成交
+                            TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
+                        }
+                        break;
+                    case 51:
+                        {
+                            //未成交状态
+                            TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
+                        }
+                        break;
+                    case 53:
+                        {
+                            //已撤单状态
+                            TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
+                        }
+                        break;
+                    case 97:
+                        {
+                            //报单已经提交，创建委托记录
+                            if (CONFIG.CheckOrderRefAvailiable(Convert.ToInt16(pOrder.OrderRef)))
+                            {
+                                // 重复返回不需要记库
+                                TradeRecord.GetInstance().SubscribeOrder("1", pOrder.InstrumentID, Convert.ToChar(pOrder.Direction).ToString(), pOrder.VolumeTotalOriginal, Convert.ToDecimal(pOrder.LimitPrice), Convert.ToInt16(pOrder.OrderRef), pOrder.OrderStatus, pOrder.CombOffsetFlag_0);
+                            }
+                        }
+                        break;
+                    default:
+                        {
+                            //如果是没有见过的状态，则默认更新委托信息
+                            TradeRecord.GetInstance().UpdateOrder(pOrder.VolumeTraded, Convert.ToInt16(pOrder.OrderRef), pOrder.OrderSysID, pOrder.StatusMsg, pOrder.OrderStatus, pOrder.VolumeTotal, pOrder.ExchangeID);
+                        }
+                        break;
+                }
+            }
+        }
+
+        public static void RtnTradeProc(object trade)
+        {
+            CThostFtdcTradeField_M pTrade = (CThostFtdcTradeField_M)trade;
+
+            lock (syncRtnTradeObject)
+            {
+                TradeRecord.GetInstance().UpdateTrade(Convert.ToInt16(pTrade.OrderRef), pTrade.Volume, Convert.ToDecimal(pTrade.Price), pTrade.TradeID);
+            }
+        
+        }
+
     }
 
 

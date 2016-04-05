@@ -196,6 +196,16 @@ window.onload = function (e) {
             $("[name='mainpage_sysstatus']").removeClass('sr-only');
             $("[name='mainpage_account']").addClass('sr-only');
         }
+
+        var dNow = new Date();
+
+        if (dNow.getHours() < 9 || dNow.getHours() >15) {
+            //$("[name='mainpage_strategy']").addClass('sr-only');
+            //$("[name='mainpage_trade']").addClass('sr-only');
+            //$("[name='mainpage_batch_trade']").addClass('sr-only');
+            //alert("非交易时段交易相关界面暂停使用！")
+            return;
+        }
     }
     else if (e.currentTarget.location.pathname == "/" || e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/syslogin") 
     {
@@ -222,30 +232,11 @@ window.onload = function (e) {
     }
     else if(e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/batchtrade")
     {
-        $.post("/home/GetBatchTrade", function (data, status) {
-            if (data == "FALSE") {
-                alert("搜索批量交易失败！");
-                return;
-            }
-            else {
-                var ul = $("[name='batch_trade_list']")
-
-
-
-                var orders = eval('(' + data + ')');
-                if (orders.length == 0) return;
-
-                for (var i = 0; i < orders.length; i++) {
-                    var order = orders[i];
-
-                    var li = "<li><div class='col-md-12'><div class='col-md-1'><span>" + order.User + "</span></div><div class='col-md-1'><span>" + order.exchangeId + "</span></div><div class='col-md-1'><span>" + order.cSecurityCode + "</span></div><div class='col-md-1'><input type='text' value=" + order.nSecurityAmount + " style='max-width:50px' /></div><div class='col-md-1'><input type='text' value=" + order.dOrderPrice + " style='max-width:50px' /></div><div class='col-md-1'><input type='text' value=" + order.cTradeDirection + " style='max-width:50px' /></div><div class='col-md-1'><input type='text' value=" + order.offsetflag + " style='max-width:50px' /></div><div class='col-md-1'><span>" + order.cSecurityType + "</span></div></div></li>";
-
-                    ul.append(li);
-                }
-
-                return;
-            }
-        })
+        var text = document.getElementById('batchTrade_Modal_TextArea'); autoTextarea(text);
+        $('#batchTrade_Show_TextArea').css("visibility", "collapse");
+        $('#batchTrade_Hide_TextArea').css("visibility", "visible");
+        $('#batchTrade_Modal_TextArea').css("visibility", "visible");
+        $('#batchTrade_Modal_TextArea').text("");
     }
     else {
         //alert("您当前使用的浏览器版本过低，网站功能将被限制！");
@@ -1189,6 +1180,8 @@ $('#tm_btnMakeOrder').click(function (e) {
         exchangeId: exchangeid
 
     }
+
+
 
     var JSONSTRING = "C1" + JSON.stringify(trade);
 

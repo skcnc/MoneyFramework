@@ -8,6 +8,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using Stork_Future_TaoLi.Account;
 using Stork_Future_TaoLi.Variables_Type;
+using System.Data.SqlClient;
 
 
 namespace Stork_Future_TaoLi
@@ -41,7 +42,7 @@ namespace Stork_Future_TaoLi
                     }
                     catch (Exception ex)
                     {
-                        GlobalErrorLog.LogInstance.LogEvent("type = " + type + "\r\n" + ex.InnerException.ToString());
+                        GlobalErrorLog.LogInstance.LogEvent("type = " + type + "\r\n" + ex.ToString());
                         Thread.Sleep(10);
 
                         if (count == 0)
@@ -87,19 +88,22 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
 
-            var risks = (from item in DbEntity.RISK_TABLE where item.alias == alias select item);
-
-            if (risks == null || risks.Count() == 0) { return new List<RISK_TABLE>(); }
-            else
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
             {
-                try
+                var risks = (from item in DbEntity.RISK_TABLE where item.alias == alias select item);
+
+                if (risks == null || risks.Count() == 0) { return new List<RISK_TABLE>(); }
+                else
                 {
-                    return risks.OrderByDescending(i => i.time).ToList();
-                }
-                catch(Exception ex)
-                {
-                    DBAccessLayer.LogSysInfo("DBAccessLayer-GetRiskRecord", ex.ToString());
-                    return new List<RISK_TABLE>();
+                    try
+                    {
+                        return risks.OrderByDescending(i => i.time).ToList();
+                    }
+                    catch (Exception ex)
+                    {
+                        DBAccessLayer.LogSysInfo("DBAccessLayer-GetRiskRecord", ex.ToString());
+                        return new List<RISK_TABLE>();
+                    }
                 }
             }
         }
@@ -112,12 +116,26 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
 
-            var risks = (from item in DbEntity.RISK_TABLE select item);
 
-            if (risks == null || risks.Count() == 0) { return null; }
-            else
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
             {
-                return risks.OrderByDescending(i => i.time).ToList();
+                var risks = (from item in DbEntity.RISK_TABLE select item);
+
+                Thread.Sleep(1);
+
+                try
+                {
+                    if (risks == null || risks.Count() == 0) { return null; }
+                    else
+                    {
+                        return risks.OrderByDescending(i => i.time).ToList();
+                    }
+                }
+                catch
+                {
+
+                    return null;
+                }
             }
         }
         /// <summary>
@@ -128,10 +146,13 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
 
-            var tmp = (from item in DbEntity.BWNameTable select item);
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
+            {
+                var tmp = (from item in DbEntity.BWNameTable select item);
 
-            if (tmp.Count() == 0) return null;
-            else return tmp.ToList();
+                if (tmp.Count() == 0) return null;
+                else return tmp.ToList();
+            }
         }
 
         /// <summary>
@@ -143,22 +164,24 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) return false;
 
-            List<BWNameTable> oldRecords = (from item in DbEntity.BWNameTable select item).ToList();
-
-            for (int i = 0; i < oldRecords.Count; i++)
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
             {
-                DbEntity.BWNameTable.Remove(oldRecords[i]);
+                List<BWNameTable> oldRecords = (from item in DbEntity.BWNameTable select item).ToList();
+
+                for (int i = 0; i < oldRecords.Count; i++)
+                {
+                    DbEntity.BWNameTable.Remove(oldRecords[i]);
+                }
+
+                foreach (BWNameTable record in records)
+                {
+                    DbEntity.BWNameTable.Add(record);
+                }
+
+                Dbsavechage("BWNameTable");
+
+                return true;
             }
-
-            foreach (BWNameTable record in records)
-            {
-                DbEntity.BWNameTable.Add(record);
-            }
-
-            Dbsavechage("BWNameTable");
-
-            return true;
-
         }
         #endregion
 
@@ -179,21 +202,24 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) { return; }
 
-            StockAccountTable item = new StockAccountTable()
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
             {
-                ID = Guid.NewGuid(),
-                Balance = balance,
-                MarketValue = marketvalue,
-                StockValue = stockvalue,
-                Total = total,
-                StockFrozenValue = frozen,
-                Earning = earning,
-                Alias = alias,
-                UpdateTime = DateTime.Now
-            };
+                StockAccountTable item = new StockAccountTable()
+                {
+                    ID = Guid.NewGuid(),
+                    Balance = balance,
+                    MarketValue = marketvalue,
+                    StockValue = stockvalue,
+                    Total = total,
+                    StockFrozenValue = frozen,
+                    Earning = earning,
+                    Alias = alias,
+                    UpdateTime = DateTime.Now
+                };
 
-            DbEntity.StockAccountTable.Add(item);
-            Dbsavechage("InsertStockAccountTable");
+                DbEntity.StockAccountTable.Add(item);
+                Dbsavechage("InsertStockAccountTable");
+            }
         }
 
         /// <summary>
@@ -205,15 +231,18 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) return null;
 
-            var records = (from item in DbEntity.StockAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
+            {
+                var records = (from item in DbEntity.StockAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
 
-            if (records.Count() > 0)
-            {
-                return records.ToList()[0];
-            }
-            else
-            {
-                return null;
+                if (records.Count() > 0)
+                {
+                    return records.ToList()[0];
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -259,15 +288,18 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) return null;
 
-            var records = (from item in DbEntity.FutureAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
+            {
+                var records = (from item in DbEntity.FutureAccountTable where item.Alias == alias select item).OrderByDescending((item) => item.UpdateTime);
 
-            if (records.Count() > 0)
-            {
-                return records.ToList()[0];
-            }
-            else
-            {
-                return null;
+                if (records.Count() > 0)
+                {
+                    return records.ToList()[0];
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
         
@@ -281,13 +313,16 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) return string.Empty;
 
-            var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
-            if (tmp == null || tmp.Count() == 0)
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
             {
-                return string.Empty;
-            }
+                var tmp = from item in DbEntity.UserInfo where item.alias == user select item;
+                if (tmp == null || tmp.Count() == 0)
+                {
+                    return string.Empty;
+                }
 
-            return tmp.ToList()[0].stockAvailable.ToString() + "|" + tmp.ToList()[0].futureAvailable.ToString();
+                return tmp.ToList()[0].stockAvailable.ToString() + "|" + tmp.ToList()[0].futureAvailable.ToString();
+            }
         }
 
         /// <summary>
@@ -320,37 +355,46 @@ namespace Stork_Future_TaoLi
         public static List<UserInfo> GetUser()
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
+            {
 
-            var tmp = (from item in DbEntity.UserInfo select item);
+                var tmp = (from item in DbEntity.UserInfo select item);
 
-            if (tmp.Count() == 0) return null;
-            else return tmp.ToList();
+                if (tmp.Count() == 0) return null;
+                else return tmp.ToList();
+            }
         }
 
         public static UserInfo GetOneUser(string alias)
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
 
-            var tmp = (from item in DbEntity.UserInfo where item.alias == alias select item);
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
+            {
+                var tmp = (from item in DbEntity.UserInfo where item.alias == alias select item);
 
-            if (tmp == null || tmp.Count() == 0) return null;
-            else return tmp.ToList()[0];
+                if (tmp == null || tmp.Count() == 0) return null;
+                else return tmp.ToList()[0];
+            }
         }
 
         public static void UpdateUserAccount(string alias, double stockaccount, double futureaccount)
         {
             if (DBAccessLayer.DBEnable == false) { return; }
 
-            var user = (from item in DbEntity.UserInfo where item.alias == alias select item);
+            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
+            {
+                var user = (from item in DbEntity.UserInfo where item.alias == alias select item);
 
-            if (user == null || user.Count() == 0) return;
+                if (user == null || user.Count() == 0) return;
 
-            user.ToList()[0].stockAvailable = stockaccount.ToString();
-            user.ToList()[0].futureAvailable = futureaccount.ToString();
+                user.ToList()[0].stockAvailable = stockaccount.ToString();
+                user.ToList()[0].futureAvailable = futureaccount.ToString();
 
 
-            //ToDo : 测试account修改能否生效
-            Dbsavechage("UpdateUserAccount");
+                //ToDo : 测试account修改能否生效
+                Dbsavechage("UpdateUserAccount");
+            }
 
         }
 
@@ -902,17 +946,23 @@ namespace Stork_Future_TaoLi
 
             var record = (from item in DbEntity.ER_TAOLI_TABLE where item.ER_ORDER_REF == OrderRef select item);
 
-            if(record.Count() >0)
+            try
             {
-                lock(ERtableLock)
+                if (record.Count() > 0)
                 {
-                    DbEntity.ER_TAOLI_TABLE.Remove(record.ToList()[0]);
-                    Dbsavechage("DeleteERRecord");
+                    lock (ERtableLock)
+                    {
+                        DbEntity.ER_TAOLI_TABLE.Remove(record.ToList()[0]);
+                        Dbsavechage("DeleteERRecord");
+                    }
+
+                    return;
                 }
-
-                return;
             }
-
+            catch
+            {
+                return; 
+            }
             return;
         }
 

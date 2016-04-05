@@ -300,8 +300,10 @@ namespace Stork_Future_TaoLi.TradeModule
 
                         if (entrustUnit != null && entrustUnit.ToList().Count() > 0)
                         {
+                            i = -1;
                             foreach (QueryEntrustOrderStruct_M unit in entrustUnit.ToList())
                             {
+                                i++;
                                 if (unit == null)
                                     continue;
 
@@ -323,6 +325,7 @@ namespace Stork_Future_TaoLi.TradeModule
                                     //只有股票买入，才需要移除风控列表
                                     accountMonitor.UpdateRiskFrozonAccount(user, unit.Code, tradesUnit[i].SecurityAmount * (-1), tradesUnit[i].SecurityAmount * tradesUnit[i].OrderPrice * (-1), "S", "0");
                                 }
+
 
                             }
                         }
