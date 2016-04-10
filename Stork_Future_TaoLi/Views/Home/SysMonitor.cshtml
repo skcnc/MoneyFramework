@@ -166,6 +166,12 @@
                 else result = "异常";
                 $('.thread_status').append(str.replace('$name', "股票委托查询").replace('$result', result));
 
+                if (obj.BatchTradeMarketInfoPump == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+
+                $('.thread_status').append(str.replace('$name', "批量信息行情pump").replace('$result', result));
 
                 for (var i = 0; i < obj.StrategyNum; i++) {
 

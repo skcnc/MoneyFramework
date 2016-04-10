@@ -174,6 +174,7 @@ window.onload = function (e) {
             $("[name='mainpage_riskcontrol']").removeClass('sr-only');
             $("[name='mainpage_sysstatus']").removeClass('sr-only');
             $("[name='mainpage_account']").removeClass('sr-only');
+            $("[name='mainpage_authorized_trade']").removeClass('sr-only');
         }
         if (right == "2") {
 
@@ -185,6 +186,7 @@ window.onload = function (e) {
             $("[name='mainpage_riskcontrol']").addClass('sr-only');
             $("[name='mainpage_sysstatus']").addClass('sr-only');
             $("[name='mainpage_account']").removeClass('sr-only');
+            $("[name='mainpage_authorized_trade']").removeClass('sr-only');
         }
         if (right == "3") {
             $("[name='mainpage_usermanage']").addClass('sr-only');
@@ -192,6 +194,7 @@ window.onload = function (e) {
             $("[name='mainpage_strategy']").addClass('sr-only');
             $("[name='mainpage_trade']").addClass('sr-only');
             $("[name='mainpage_batch_trade']").addClass('sr-only');
+            $("[name='mainpage_authorized_trade']").addClass('sr-only');
             $("[name='mainpage_riskcontrol']").removeClass('sr-only');
             $("[name='mainpage_sysstatus']").removeClass('sr-only');
             $("[name='mainpage_account']").addClass('sr-only');

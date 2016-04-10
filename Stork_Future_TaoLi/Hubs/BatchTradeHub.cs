@@ -22,9 +22,9 @@ namespace Stork_Future_TaoLi.Hubs
         public void scribeTradeCode()
         {
             string name = Clients.CallerState.USERNAME;
-            List<string> codes = Clients.CallerState.CODES.Trim().Split('|');
+            String[] codes = Clients.CallerState.CODES.Trim().Split('|');
 
-            BatchTradeMonitor.Instance.MergeSubscribeList(name.Trim(), codes);
+            BatchTradeMonitor.Instance.MergeSubscribeList(name.Trim(), codes.ToList());
         }
     
     }
@@ -111,21 +111,23 @@ namespace Stork_Future_TaoLi.Hubs
 
             //更新股票-注册者映射
 
-            if (CodeSubscribeList.Keys.Contains(user))
-            {
+
                 foreach (string code in oldList)
                 {
-                    if(CodeSubscribeList[code].Contains(code))
+                    if (CodeSubscribeList.Keys.Contains(code))
                     {
-                        CodeSubscribeList[code].Remove(user);
-
-                        if(CodeSubscribeList[code].Count == 0)
+                        if (CodeSubscribeList[code].Contains(user))
                         {
-                            CodeSubscribeList.Remove(code);
+                            CodeSubscribeList[code].Remove(user);
+
+                            if (CodeSubscribeList[code].Count == 0)
+                            {
+                                CodeSubscribeList.Remove(code);
+                            }
                         }
                     }
                 }
-            }
+
 
             foreach(String code in codeList)
             {

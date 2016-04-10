@@ -312,7 +312,37 @@ namespace Stork_Future_TaoLi
         public Basic basic { get; set; }
     }
 
+    /// <summary>
+    /// 下单到交易预处理模块数据结构
+    /// </summary>
     public class MakeOrder
+    {
+        //用户名
+        public String User { get; set; }
+        //交易所代码
+        public string exchangeId { get; set; }
+        //证券代码
+        public string cSecurityCode { get; set; }
+        //委托数量
+        public long nSecurityAmount { get; set; }
+        //委托价格
+        public double dOrderPrice { get; set; }
+        //买卖类别（见数据字典说明)
+        public string cTradeDirection { get; set; }
+        //开平标志
+        public string offsetflag { get; set; }
+        //证券类型
+        public string cSecurityType { get; set; }
+        // 列表所属策略实例ID
+        public string belongStrategy { get; set; }
+        // 本地委托编号
+        public int OrderRef { get; set; }
+    }
+
+    /// <summary>
+    /// 授权交易结构，相比MakeOrder添加下单时间控制标志
+    /// </summary>
+    public class AuthorizedOrder
     {
         //用户名
         public String User { get; set; }

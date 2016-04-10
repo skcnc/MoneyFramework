@@ -11,6 +11,7 @@ using Stork_Future_TaoLi.TradeModule;
 using System.Threading;
 using Stork_Future_TaoLi.Entrust;
 using Stork_Future_TaoLi.Queues;
+using Stork_Future_TaoLi.Hubs;
 
 
 namespace Stork_Future_TaoLi
@@ -65,6 +66,7 @@ namespace Stork_Future_TaoLi
             riskmonitor.Init();
 
             accountMonitor.RUN();
+            BatchTrade_MarketReciver.Run();
 
             Thread.Sleep(3000);
            

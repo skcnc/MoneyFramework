@@ -154,6 +154,7 @@
                         <th>成交手数</th>
                         <th>成交总金额</th>
                         <th>用户</th>
+                        <th>成交时间</th>
                     </tr>
                 </thead>
                 <tbody id="tm_tb_tradeRecord"></tbody>
@@ -244,7 +245,7 @@
 
                     if(tradeitem != undefined)
                     {
-                        var item = '<tr name="deal_item_info"><td>' + tradeitem.DL_NO + "</td><td>" + tradeitem.DL_CODE + "</td><td>" + tradeitem.DL_NAME + "</td><td>" + tradeitem.DL_DIRECTION + "</td><td>" + tradeitem.DL_OFFSETFLAG + "</td><td>" + tradeitem.DL_BARGAIN_PRICE + "</td><td>" + tradeitem.DL_STOCK_AMOUNT + "</td><td>" + tradeitem.DL_BARGAIN_MONEY + "</td><td>" + tradeitem.DL_USER + "</td></tr>";
+                        var item = '<tr name="deal_item_info"><td>' + tradeitem.DL_NO + "</td><td>" + tradeitem.DL_CODE + "</td><td>" + tradeitem.DL_NAME + "</td><td>" + tradeitem.DL_DIRECTION + "</td><td>" + tradeitem.DL_OFFSETFLAG + "</td><td>" + tradeitem.DL_BARGAIN_PRICE + "</td><td>" + tradeitem.DL_STOCK_AMOUNT + "</td><td>" + tradeitem.DL_BARGAIN_MONEY + "</td><td>" + tradeitem.DL_USER + "</td><td>" + tradeitem.DL_BARGAIN_TIME + "</td></tr>";
                         $('#tm_tb_tradeRecord').append(item);
                     }
                 }

@@ -990,6 +990,7 @@
     <Content Include="Views\Home\UserManger.cshtml" />
     <Content Include="Views\Home\AccountInfo.cshtml" />
     <Content Include="Views\Home\BatchTrade.cshtml" />
+    <Content Include="Views\Home\AuthorizedTrade.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

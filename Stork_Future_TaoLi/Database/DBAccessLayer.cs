@@ -364,7 +364,7 @@ namespace Stork_Future_TaoLi
             using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
             {
 
-                var tmp = (from item in DbEntity.UserInfo select item);
+                var tmp = (from item in DbEntityGet.UserInfo select item);
 
                 if (tmp.Count() == 0) return null;
                 else return tmp.ToList();
@@ -375,13 +375,11 @@ namespace Stork_Future_TaoLi
         {
             if (DBAccessLayer.DBEnable == false) { return null; }
 
-            using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
-            {
-                var tmp = (from item in DbEntity.UserInfo where item.alias == alias select item);
+            var tmp = (from item in DbEntityGet.UserInfo where item.alias == alias select item);
 
-                if (tmp == null || tmp.Count() == 0) return null;
-                else return tmp.ToList()[0];
-            }
+            if (tmp == null || tmp.Count() == 0) return null;
+            else return tmp.ToList()[0];
+
         }
 
         public static void UpdateUserAccount(string alias, double stockaccount, double futureaccount)
@@ -1103,7 +1101,7 @@ namespace Stork_Future_TaoLi
 
             using (SqlConnection conn = new SqlConnection(DbEntity.Database.Connection.ConnectionString))
             {
-                List<DL_TAOLI_TABLE> deals_record = (from item in DbEntityGet.DL_TAOLI_TABLE where item.DL_USER == alias select item).ToList();
+                List<DL_TAOLI_TABLE> deals_record = (from item in DbEntityGet.DL_TAOLI_TABLE where item.DL_USER == alias select item).OrderByDescending(i => i.DL_BARGAIN_TIME).ToList();
 
                 if (deals_record != null && deals_record.Count > 0)
                 {
@@ -1142,6 +1140,17 @@ namespace Stork_Future_TaoLi
 
                     string bargin_time = DateTime.Now.ToString();
 
+                    double price = 0;
+
+                    if(record.OrderType.ToString().ToUpper() == "F")
+                    {
+                        price = record.bargain_price / 1000;
+                    }
+                    else
+                    {
+                        price = record.bargain_price;
+                    }
+
                     DL_TAOLI_TABLE item = new DL_TAOLI_TABLE()
                     {
                         DL_GUID = Guid.NewGuid(),
@@ -1153,7 +1162,7 @@ namespace Stork_Future_TaoLi
                         DL_STATUS = record.OrderStatus.ToString(),
                         DL_TYPE = type,
                         DL_STOCK_AMOUNT = record.stock_amount,
-                        DL_BARGAIN_PRICE = record.bargain_price / 1000,
+                        DL_BARGAIN_PRICE = price,
                         DL_BARGAIN_MONEY = record.bargain_money,
                         DL_BARGAIN_TIME = bargin_time,
                         DL_NO = record.OrderSysID.ToString(),

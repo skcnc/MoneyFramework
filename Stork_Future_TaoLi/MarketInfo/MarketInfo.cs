@@ -79,7 +79,10 @@ namespace Stork_Future_TaoLi
                     }
                     foreach (String module in pair.Value)
                     {
-                        subscribeList[pair.Key].Add(module);
+                        if (!subscribeList[pair.Key].Contains(module))
+                        {
+                            subscribeList[pair.Key].Add(module);
+                        }
                     }
                 }
 
@@ -316,18 +319,20 @@ namespace Stork_Future_TaoLi
         {
             lock(syncRoot)
             {
-                if(MapMS.Keys.Contains(module))
+                foreach(string code in codelist)
                 {
-                    MapMS[module].Clear();
-                }
-                else
-                {
-                    MapMS.Add(module, new List<string>());
-                }
-
-                foreach(String code in codelist)
-                {
-                    MapMS[module].Add(code);
+                    if(MapMS.Keys.Contains(code))
+                    {
+                        if(!MapMS[code].Contains(module))
+                        {
+                            MapMS[code].Add(module);
+                        }
+                    }
+                    else
+                    {
+                        MapMS.Add(code, new List<string>());
+                        MapMS[code].Add(module);
+                    }
                 }
 
                 bSubscribeListChangeLabel = true;

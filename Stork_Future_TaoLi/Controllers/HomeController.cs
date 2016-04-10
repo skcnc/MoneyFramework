@@ -12,6 +12,7 @@ using Stork_Future_TaoLi.Database;
 using Stork_Future_TaoLi.TradeModule;
 using Stork_Future_TaoLi.Queues;
 using Stork_Future_TaoLi;
+using System.Text;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -341,6 +342,71 @@ namespace Stork_Future_TaoLi.Controllers
             return JsonConvert.SerializeObject(infos);
         }
 
+        [HttpPost]
+        public String AuthorizedTrade_Import(HttpPostedFileBase file,String USER)
+        {
+            if(file != null && file.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(file.FileName);
+                using (var binaryReader = new BinaryReader(file.InputStream))
+                {
+                    byte[] array = binaryReader.ReadBytes(file.ContentLength);
+                    var str = Encoding.Default.GetString(array);
+
+                    if (!str.Contains('\n'))
+                    {
+                        return "FALSE";
+                    }
+                    List<AuthorizedOrder> AuthorizedOrders = new List<AuthorizedOrder>();
+                    string[] orders = str.Split('\n');
+
+                    for (int i = 0; i < orders.Length; i++)
+                    {
+                        string order = orders[i].Substring(0, orders[i].Length - 1);
+
+                        if (!order.Contains('\t')) { return "FALSE"; }
+
+                        string[] values = order.Split('\t');
+
+                        if (values.Count() < 8) return "FALSE";
+
+                        string exchange = values[0];
+                        string code = values[1];
+                        string num = values[2];
+                        string price = values[3];
+                        string direction = values[4];
+                        string offsetflag = values[5];
+                        string type = values[6];
+                        string limitedflag = values[7];
+
+                        AuthorizedOrder a_order = new AuthorizedOrder()
+                        {
+                            belongStrategy = "00",
+                            cSecurityCode = code.Trim(),
+                            cSecurityType = type.Trim(),
+                            cTradeDirection = direction.Trim(),
+                            dOrderPrice = Convert.ToDouble(price.Trim()),
+                            exchangeId = exchange.Trim(),
+                            nSecurityAmount = Convert.ToInt32(num.Trim()),
+                            offsetflag = offsetflag.Trim(),
+                            OrderRef = 0,
+                            User = USER
+                        };
+                    }
+
+
+
+
+
+                    return "TRUE";
+                }
+            }
+            else
+            {
+                return "FALSE";
+            }
+        }
+
         public ActionResult OPEN_EDIT()
         {
             ViewBag.ID = Request.QueryString["StrategyID"];
@@ -377,6 +443,11 @@ namespace Stork_Future_TaoLi.Controllers
         }
 
         public ActionResult BatchTrade()
+        {
+            return View();
+        }
+
+        public ActionResult AuthorizedTrade()
         {
             return View();
         }

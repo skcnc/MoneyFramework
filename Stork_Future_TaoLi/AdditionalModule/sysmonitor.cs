@@ -182,6 +182,11 @@ namespace Stork_Future_TaoLi
         /// 期货退货系统状态
         /// </summary>
         public bool RefundFutureSystemStatus { get; set; }
+
+        /// <summary>
+        /// 批量交易行情更新线程状态
+        /// </summary>
+        public bool BatchTradeMarketInfoPump { get; set; }
         #endregion 
 
     }
@@ -273,6 +278,7 @@ namespace Stork_Future_TaoLi
         public int MarketFrequence { get; set; }
         public Dictionary<string, StrategyInfo> StrategyInfomation { get; set; }
         public int StrategyNum { get; set; }
+        public DateTime BatchTradeMarketInfoSystem { get; set; }
     }
 
     class SystemMonitorClass
@@ -431,6 +437,8 @@ namespace Stork_Future_TaoLi
 
                     if ((current - messageData.RefundStockSystemStatus).TotalSeconds > 5) { message.RefundStockSystemStatus = false; } else { message.RefundStockSystemStatus = true; }
 
+                    if ((current - messageData.BatchTradeMarketInfoSystem).TotalSeconds > 5) { message.BatchTradeMarketInfoPump = false; } else { message.BatchTradeMarketInfoPump = true; }
+
 
                     MonitorSys.Instance.updateSysStatus(message);
                 }
@@ -506,6 +514,9 @@ namespace Stork_Future_TaoLi
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     case "THREAD_Stock_Refund_Control_MONITOR":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "BatchTrade_MarketReciver":
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     default:
@@ -630,6 +641,11 @@ namespace Stork_Future_TaoLi
                 case "THREAD_ENTRUST_WORKER":
                     {
                         messageData.StockEntrustManagementSystemStatus = DateTime.Now;
+                    }
+                    break;
+                case "BatchTrade_MarketReciver":
+                    {
+                        messageData.BatchTradeMarketInfoSystem = DateTime.Now;
                     }
                     break;
                 case "THREAD_Stock_Refund_Control_MONITOR":
