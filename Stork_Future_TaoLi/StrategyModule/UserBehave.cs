@@ -364,6 +364,12 @@ namespace Stork_Future_TaoLi
         public string belongStrategy { get; set; }
         // 本地委托编号
         public int OrderRef { get; set; }
+        //限价单
+        public String LimitedPrice { get; set; }
+        //止盈价
+        public float SurplusValue { get; set; }
+        //止损价
+        public float LossValue { get; set; }
     }
 
 

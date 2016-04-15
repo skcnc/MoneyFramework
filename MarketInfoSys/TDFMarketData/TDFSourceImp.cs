@@ -111,6 +111,16 @@ namespace MarketInfoSys
         //  2. 只在这个函数里做数据获取工作 -- 将数据复制到其它数据缓存区，由其它线程做业务逻辑处理
         public override void OnRecvDataMsg(TDFMSG msg)
         {
+            if(Queue_Data.GetQueueNumber() > 2000)
+            {
+                Queue_Data.GetQueue().Clear();
+            }
+
+            if(MarketInfoQueue.GetQueueLength() > 2000)
+            {
+                MarketInfoQueue.ClearQueue();
+            }
+
             if (msg.MsgID == TDFMSGID.MSG_DATA_MARKET)
             {
                 //行情消息

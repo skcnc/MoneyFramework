@@ -343,7 +343,7 @@ namespace Stork_Future_TaoLi.Controllers
         }
 
         [HttpPost]
-        public String AuthorizedTrade_Import(HttpPostedFileBase file,String USER)
+        public ActionResult authorizedtrade(HttpPostedFileBase file, String USER)
         {
             if(file != null && file.ContentLength > 0)
             {
@@ -355,55 +355,164 @@ namespace Stork_Future_TaoLi.Controllers
 
                     if (!str.Contains('\n'))
                     {
-                        return "FALSE";
+                        return View(); 
                     }
                     List<AuthorizedOrder> AuthorizedOrders = new List<AuthorizedOrder>();
                     string[] orders = str.Split('\n');
 
                     for (int i = 0; i < orders.Length; i++)
                     {
-                        string order = orders[i].Substring(0, orders[i].Length - 1);
 
-                        if (!order.Contains('\t')) { return "FALSE"; }
+                        string order = orders[i];
 
-                        string[] values = order.Split('\t');
+                        if (order.Trim() == string.Empty)
+                            break;
 
-                        if (values.Count() < 8) return "FALSE";
-
-                        string exchange = values[0];
-                        string code = values[1];
-                        string num = values[2];
-                        string price = values[3];
-                        string direction = values[4];
-                        string offsetflag = values[5];
-                        string type = values[6];
-                        string limitedflag = values[7];
-
-                        AuthorizedOrder a_order = new AuthorizedOrder()
+                        if (order.Contains('\r'))
                         {
-                            belongStrategy = "00",
-                            cSecurityCode = code.Trim(),
-                            cSecurityType = type.Trim(),
-                            cTradeDirection = direction.Trim(),
-                            dOrderPrice = Convert.ToDouble(price.Trim()),
-                            exchangeId = exchange.Trim(),
-                            nSecurityAmount = Convert.ToInt32(num.Trim()),
-                            offsetflag = offsetflag.Trim(),
-                            OrderRef = 0,
-                            User = USER
-                        };
+                            order = order.Substring(0, order.Length - 1);
+                        }
+
+                        if (!order.Contains('|')) { return View(); }
+
+                        string[] values = order.Split('|');
+
+                        if (values.Count() < 8) return View();
+
+                        string exchange = values[1];
+                        string code = values[2];
+                        string num = values[3];
+                        string price = values[4];
+                        string direction = values[5];
+                        string offsetflag = values[6];
+                        string type = values[7];
+                        string limitedflag = values[8];
+                        string lossPrice = values[9];
+                        string superPrice = values[10];
+
+                        try
+                        {
+                            AuthorizedOrder a_order = new AuthorizedOrder()
+                            {
+                                belongStrategy = "00",
+                                cSecurityCode = code.Trim(),
+                                cSecurityType = type.Trim(),
+                                cTradeDirection = direction.Trim(),
+                                dOrderPrice = Convert.ToDouble(price.Trim()),
+                                exchangeId = exchange.Trim(),
+                                nSecurityAmount = Convert.ToInt32(num.Trim()),
+                                offsetflag = offsetflag.Trim(),
+                                OrderRef = 0,
+                                User = USER,
+                                LimitedPrice = limitedflag,
+                                LossValue = Convert.ToSingle(lossPrice.Trim()),
+                                SurplusValue = Convert.ToSingle(superPrice.Trim())
+                            };
+
+                            AuthorizedOrders.Add(a_order);
+                        }
+                        catch(Exception ex)
+                        {
+                            DBAccessLayer.LogSysInfo("HomeController", ex.ToString());
+                        }
                     }
 
 
+                    queue_authorized_trade.EnQueue((object)AuthorizedOrders);
 
-
-
-                    return "TRUE";
+                    return RedirectToAction("AuthorizedTradeB");
                 }
             }
             else
             {
-                return "FALSE";
+                return View();
+            }
+        }
+
+        [HttpPost]
+        public ActionResult authorizedtradeB(HttpPostedFileBase file, String USER)
+        {
+            if (file != null && file.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(file.FileName);
+                using (var binaryReader = new BinaryReader(file.InputStream))
+                {
+                    byte[] array = binaryReader.ReadBytes(file.ContentLength);
+                    var str = Encoding.Default.GetString(array);
+
+                    if (!str.Contains('\n'))
+                    {
+                        return View();
+                    }
+                    List<AuthorizedOrder> AuthorizedOrders = new List<AuthorizedOrder>();
+                    string[] orders = str.Split('\n');
+
+                    for (int i = 0; i < orders.Length; i++)
+                    {
+
+                        string order = orders[i];
+
+                        if (order.Trim() == string.Empty)
+                            break;
+
+                        if (order.Contains('\r'))
+                        {
+                            order = order.Substring(0, order.Length - 1);
+                        }
+
+                        if (!order.Contains('|')) { return View(); }
+
+                        string[] values = order.Split('|');
+
+                        if (values.Count() < 8) return View();
+
+                        string exchange = values[1];
+                        string code = values[2];
+                        string num = values[3];
+                        string price = values[4];
+                        string direction = values[5];
+                        string offsetflag = values[6];
+                        string type = values[7];
+                        string limitedflag = values[8];
+                        string lossPrice = values[9];
+                        string superPrice = values[10];
+
+                        try
+                        {
+                            AuthorizedOrder a_order = new AuthorizedOrder()
+                            {
+                                belongStrategy = "00",
+                                cSecurityCode = code.Trim(),
+                                cSecurityType = type.Trim(),
+                                cTradeDirection = direction.Trim(),
+                                dOrderPrice = Convert.ToDouble(price.Trim()),
+                                exchangeId = exchange.Trim(),
+                                nSecurityAmount = Convert.ToInt32(num.Trim()),
+                                offsetflag = offsetflag.Trim(),
+                                OrderRef = 0,
+                                User = USER,
+                                LimitedPrice = limitedflag,
+                                LossValue = Convert.ToSingle(lossPrice.Trim()),
+                                SurplusValue = Convert.ToSingle(superPrice.Trim())
+                            };
+
+                            AuthorizedOrders.Add(a_order);
+                        }
+                        catch (Exception ex)
+                        {
+                            DBAccessLayer.LogSysInfo("HomeController", ex.ToString());
+                        }
+                    }
+
+
+                    queue_authorized_trade.EnQueue((object)AuthorizedOrders);
+
+                    return RedirectToAction("AuthorizedTrade");
+                }
+            }
+            else
+            {
+                return View();
             }
         }
 
@@ -448,6 +557,11 @@ namespace Stork_Future_TaoLi.Controllers
         }
 
         public ActionResult AuthorizedTrade()
+        {
+            return View();
+        }
+
+        public ActionResult AuthorizedTradeB()
         {
             return View();
         }

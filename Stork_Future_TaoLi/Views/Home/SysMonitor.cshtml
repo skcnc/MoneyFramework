@@ -173,6 +173,20 @@
 
                 $('.thread_status').append(str.replace('$name', "批量信息行情pump").replace('$result', result));
 
+                if (obj.AuthorizedStrategyAStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+
+                $('.thread_status').append(str.replace('$name', "授权交易执行").replace('$result', result));
+
+                if (obj.AuthorizedStrategyBStatus == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+
+                $('.thread_status').append(str.replace('$name', "授权交易通知").replace('$result', result));
+
                 for (var i = 0; i < obj.StrategyNum; i++) {
 
 

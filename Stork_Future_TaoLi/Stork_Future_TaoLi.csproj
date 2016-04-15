@@ -317,14 +317,17 @@
     <Compile Include="Entrust\Entrust_Query.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Hubs\AccountHub.cs" />
+    <Compile Include="Hubs\AuthorizedStrategyHub.cs" />
     <Compile Include="Hubs\BatchTradeHub.cs" />
     <Compile Include="Hubs\monitorHub.cs" />
     <Compile Include="Hubs\StrategyInfoHub.cs" />
     <Compile Include="Hubs\TradeMonitorHub.cs" />
+    <Compile Include="Queues\queue_authorized_trade.cs" />
     <Compile Include="Queues\queue_batchtrade_market.cs" />
     <Compile Include="Queues\queue_future_excuteThread.cs" />
     <Compile Include="Queues\queue_refund_thread.cs" />
     <Compile Include="Queues\queue_system_status.cs" />
+    <Compile Include="StrategyModule\AuthorizedStrategy.cs" />
     <Compile Include="TradeModule\FutureMonitor.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -991,6 +994,7 @@
     <Content Include="Views\Home\AccountInfo.cshtml" />
     <Content Include="Views\Home\BatchTrade.cshtml" />
     <Content Include="Views\Home\AuthorizedTrade.cshtml" />
+    <Content Include="Views\Home\AuthorizedTradeB.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

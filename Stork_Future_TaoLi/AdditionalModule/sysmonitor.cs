@@ -187,6 +187,16 @@ namespace Stork_Future_TaoLi
         /// 批量交易行情更新线程状态
         /// </summary>
         public bool BatchTradeMarketInfoPump { get; set; }
+
+        /// <summary>
+        /// 授权交易A线程（交易线程）状态
+        /// </summary>
+        public bool AuthorizedStrategyAStatus { get; set; }
+
+        /// <summary>
+        /// 授权交易B线程（推送线程）状态
+        /// </summary>
+        public bool AuthorizedStrategyBStatus { get; set; }
         #endregion 
 
     }
@@ -279,6 +289,8 @@ namespace Stork_Future_TaoLi
         public Dictionary<string, StrategyInfo> StrategyInfomation { get; set; }
         public int StrategyNum { get; set; }
         public DateTime BatchTradeMarketInfoSystem { get; set; }
+        public DateTime AuthorizedStrategyASystem { get; set; }
+        public DateTime AuthorizedStrategyBSystem { get; set; }
     }
 
     class SystemMonitorClass
@@ -439,6 +451,19 @@ namespace Stork_Future_TaoLi
 
                     if ((current - messageData.BatchTradeMarketInfoSystem).TotalSeconds > 5) { message.BatchTradeMarketInfoPump = false; } else { message.BatchTradeMarketInfoPump = true; }
 
+                    if((current - messageData.AuthorizedStrategyASystem).TotalSeconds > 5)
+                    { message.AuthorizedStrategyAStatus = false; }
+                    else { message.AuthorizedStrategyAStatus = true; }
+
+                    if ((current - messageData.AuthorizedStrategyBSystem).TotalSeconds > 5)
+                    {
+                        message.AuthorizedStrategyBStatus = false;
+                    }
+                    else
+                    {
+                        message.AuthorizedStrategyBStatus = true;
+                    }
+
 
                     MonitorSys.Instance.updateSysStatus(message);
                 }
@@ -517,6 +542,12 @@ namespace Stork_Future_TaoLi
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     case "BatchTrade_MarketReciver":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "AuthorizedStrategy_ThreadA":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "AuthorizedStrategy_ThreadB":
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     default:
@@ -661,6 +692,16 @@ namespace Stork_Future_TaoLi
                 case "THREAD_Refund_Control_MONITOR":
                     {
                         messageData.RefundControlSystemStatus = DateTime.Now;
+                    }
+                    break;
+                case "AuthorizedStrategy_ThreadA":
+                    {
+                        messageData.AuthorizedStrategyASystem = DateTime.Now;
+                    }
+                    break;
+                case "AuthorizedStrategy_ThreadB":
+                    {
+                        messageData.AuthorizedStrategyBSystem = DateTime.Now;
                     }
                     break;
                 default: break;
