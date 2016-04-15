@@ -389,6 +389,7 @@ namespace Stork_Future_TaoLi.Controllers
                         string limitedflag = values[8];
                         string lossPrice = values[9];
                         string superPrice = values[10];
+                        int status = 0; //未启动
 
                         try
                         {
@@ -406,7 +407,8 @@ namespace Stork_Future_TaoLi.Controllers
                                 User = USER,
                                 LimitedPrice = limitedflag,
                                 LossValue = Convert.ToSingle(lossPrice.Trim()),
-                                SurplusValue = Convert.ToSingle(superPrice.Trim())
+                                SurplusValue = Convert.ToSingle(superPrice.Trim()),
+                                Status = status
                             };
 
                             AuthorizedOrders.Add(a_order);
@@ -476,6 +478,7 @@ namespace Stork_Future_TaoLi.Controllers
                         string limitedflag = values[8];
                         string lossPrice = values[9];
                         string superPrice = values[10];
+                        int status = 0; //未启动
 
                         try
                         {
@@ -493,7 +496,8 @@ namespace Stork_Future_TaoLi.Controllers
                                 User = USER,
                                 LimitedPrice = limitedflag,
                                 LossValue = Convert.ToSingle(lossPrice.Trim()),
-                                SurplusValue = Convert.ToSingle(superPrice.Trim())
+                                SurplusValue = Convert.ToSingle(superPrice.Trim()),
+                                Status = status
                             };
 
                             AuthorizedOrders.Add(a_order);

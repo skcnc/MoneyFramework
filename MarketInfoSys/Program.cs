@@ -163,7 +163,7 @@ namespace MarketInfoSys
         private static uint _indexPrice = 4000;
 
         public static int SimMarketPerSecond = 10;
-        public static string SimMarketCode = "600000;s;16.39|601288;s;3.94|600015;s;10.56|600016;s;8.60";
+        public static string SimMarketCode = "600000;s;16.39|601288;s;3.94|600015;s;10.56|600016;s;8.60|600001;s;4.2";
        
 
         //模拟行情开关

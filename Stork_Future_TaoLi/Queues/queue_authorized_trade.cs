@@ -177,6 +177,12 @@ namespace Stork_Future_TaoLi
         }
     }
 
+    /// <summary>
+    /// 入队交易类型：
+    /// 1. 显示全部交易  A+
+    /// 2. 显示下单交易  O+
+    /// 3. 显示未下单交易I+
+    /// </summary>
     public class queue_authorized_tradeview
     {
         private static Queue instance;

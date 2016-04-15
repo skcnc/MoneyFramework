@@ -169,7 +169,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                     }
                     else
                     {
-                        return;
+                        continue ;
                     }
 
                 }
@@ -179,14 +179,14 @@ namespace Stork_Future_TaoLi.StrategyModule
                 foreach (String User in Users)
                 {
                     List<String> Codes = AuthorizedTradesList.GetCodeList(User);
-
                     Dictionary<String, String> PriceMap = new Dictionary<string, string>();
-
                     foreach (String Code in Codes)
                     {
                         float price = AuthorizedMarket.GetMarketInfo(Code) / 1000;
                         PriceMap.Add(Code, price.ToString());
                     }
+
+                    AuthorizedStrategyMonitor.Instance.UpdateCurrentPrice(User, PriceMap);
                 }
 
                 if (DateTime.Now.Second != dt.Second)
@@ -216,6 +216,14 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         private static Dictionary<String, List<AuthorizedOrder>> AuthorizedOrderMap = new Dictionary<string, List<AuthorizedOrder>>();
 
+
+        /// <summary>
+        /// 源策略交易信息
+        /// 策略创建时添加
+        /// 策略全部完成后删除
+        /// </summary>
+        private static Dictionary<String, List<AuthorizedOrder>> SourceAuthorizedOrderMap = new Dictionary<string, List<AuthorizedOrder>>();
+
         /// <summary>
         /// 授权策略/用户映射表
         /// TKey : 策略号码
@@ -227,7 +235,6 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// 模块监听行情列表
         /// </summary>
         private static Dictionary<String, int> ListeningCode = new Dictionary<string, int>();
-
 
         /// <summary>
         /// 注册新的策略
@@ -268,6 +275,9 @@ namespace Stork_Future_TaoLi.StrategyModule
             lock(AuthorizedOrderMap)
             {
                 AuthorizedOrderMap.Add(strategyNo, orders);
+
+                List<AuthorizedOrder> dup_orders = DuplexOrders(orders);
+                SourceAuthorizedOrderMap.Add(strategyNo, dup_orders);
             }
 
             
@@ -276,13 +286,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                 AuthorizedUserMap.Add(strategyNo, User);
             }
 
-            Dictionary<String, List<AuthorizedOrder>> UserOrders = AuthorizedTradesList.GetOrdersForSpecificUser(User);
-
-            if (UserOrders != null)
-            {
-                AuthorizedStrategyMonitor.Instance.UpdateOrderView(User, UserOrders.Keys.ToList(), UserOrders);
-            }
-
+            queue_authorized_tradeview.EnQueue((object)("A+" + User + "|" + strategyNo));
         }
 
         /// <summary>
@@ -309,6 +313,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                 lock (AuthorizedOrderMap)
                 {
                     AuthorizedOrderMap.Remove(strategyNo);
+                    SourceAuthorizedOrderMap.Remove(strategyNo);
                 }
             }
 
@@ -391,34 +396,46 @@ namespace Stork_Future_TaoLi.StrategyModule
             Dictionary<String, List<AuthorizedOrder>> MapClone = new Dictionary<string, List<AuthorizedOrder>>();
             foreach(KeyValuePair<String,List<AuthorizedOrder>> item in AuthorizedOrderMap)
             {
-                List<AuthorizedOrder> orders = new List<AuthorizedOrder>();
-
-                foreach(AuthorizedOrder order in item.Value)
-                {
-                    AuthorizedOrder o = new AuthorizedOrder()
-                    {
-                        belongStrategy = order.belongStrategy,
-                        cSecurityCode = order.cSecurityCode,
-                        cSecurityType = order.cSecurityType,
-                        User = order.User,
-                        OrderRef = order.OrderRef,
-                        offsetflag = order.offsetflag,
-                        nSecurityAmount = order.nSecurityAmount,
-                        exchangeId = order.exchangeId,
-                        dOrderPrice = order.dOrderPrice,
-                        cTradeDirection = order.cTradeDirection,
-                        LimitedPrice = order.LimitedPrice,
-                        LossValue = order.LossValue,
-                        SurplusValue = order.SurplusValue
-                    };
-
-                    orders.Add(o);
-                }
-
+                List<AuthorizedOrder> orders = DuplexOrders(item.Value);
                 MapClone.Add(item.Key, orders);
             }
 
             return MapClone;
+        }
+
+        /// <summary>
+        /// 复制策略交易列表
+        /// </summary>
+        /// <param name="orders"></param>
+        /// <returns></returns>
+        public static List<AuthorizedOrder> DuplexOrders(List<AuthorizedOrder> orders)
+        {
+            List<AuthorizedOrder> Dup_orders = new List<AuthorizedOrder>();
+
+            foreach(AuthorizedOrder order in orders)
+            {
+                AuthorizedOrder o = new AuthorizedOrder()
+                {
+                    belongStrategy = order.belongStrategy,
+                    cSecurityCode = order.cSecurityCode,
+                    cSecurityType = order.cSecurityType,
+                    User = order.User,
+                    OrderRef = order.OrderRef,
+                    offsetflag = order.offsetflag,
+                    nSecurityAmount = order.nSecurityAmount,
+                    exchangeId = order.exchangeId,
+                    dOrderPrice = order.dOrderPrice,
+                    cTradeDirection = order.cTradeDirection,
+                    LimitedPrice = order.LimitedPrice,
+                    LossValue = order.LossValue,
+                    SurplusValue = order.SurplusValue,
+                    Status = order.Status
+                };
+
+                Dup_orders.Add(o);
+            }
+
+            return Dup_orders;
         }
 
         /// <summary>
