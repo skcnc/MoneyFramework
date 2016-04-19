@@ -16,11 +16,20 @@ namespace Stork_Future_TaoLi.Hubs
             AuthorizedStrategyMonitor.Instance.Join(name, Context.ConnectionId);
         }
 
+        public void setTradeQueue()
+        {
+            string name = Clients.CallerState.USERNAME;
+            string type = Clients.CallerState.TYPE;
+            string strategy = Clients.CallerState.STRATEGY;
+            string code = Clients.CallerState.CODE;
+            queue_authorized_trade.EnQueue((object)(type + "|" + name + "|" + strategy + "|" + code));
+        }
+
         /// <summary>
         /// 页面初始化加载
         /// 返回策略列表和策略信息
         /// </summary>
-        public void Load()
+        public void load()
         {
             string name = Clients.CallerState.USERNAME;
             queue_authorized_query.EnQueue((object)name);
@@ -29,13 +38,13 @@ namespace Stork_Future_TaoLi.Hubs
         /// <summary>
         /// 获取策略内容
         /// </summary>
-        public void getStrategy()
+        public void setStatusQueue()
         {
-            string strategy = Clients.CallerState.USERNAME + DateTime.Now.Year + Clients.CallerState.STRATEGY;
+            string strategy = Clients.CallerState.STRATEGY;
             string name = Clients.CallerState.USERNAME;
             //展示类型 A+ 全部  O+ 已下单 I+ 未下单
             string type = Clients.CallerState.SHOWTYPE;
-            queue_authorized_tradeview.EnQueue(type + (object)(name + "|" + strategy));
+            queue_authorized_tradeview.EnQueue((object)(type + "|" + name + "|" + strategy));
         }
     }
 
@@ -125,6 +134,15 @@ namespace Stork_Future_TaoLi.Hubs
             {
                 String ConnectionID = UserConnectionRelation[user];
                 _context.Clients.Client(ConnectionID).updatePrice(JsonConvert.SerializeObject(prices));
+            }
+        }
+
+        public void UpdateCurrentStatus(String user, Dictionary<String,String> status)
+        {
+            if (UserConnectionRelation.Keys.Contains(user))
+            {
+                String ConnectionID = UserConnectionRelation[user];
+                _context.Clients.Client(ConnectionID).updateStatus(JsonConvert.SerializeObject(status));
             }
         }
     }

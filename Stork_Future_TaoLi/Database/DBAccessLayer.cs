@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Stork_Future_TaoLi.Account;
 using Stork_Future_TaoLi.Variables_Type;
 using System.Data.SqlClient;
+using Stork_Future_TaoLi.StrategyModule;
 
 
 namespace Stork_Future_TaoLi
@@ -21,9 +22,11 @@ namespace Stork_Future_TaoLi
     {
         static MoneyEntityEntities3 DbEntity = new MoneyEntityEntities3();
         static MoneyEntityEntities3 DbEntityGet = new MoneyEntityEntities3();
+        static MoneyEntityEntities3 DbEntityAuthorized = new MoneyEntityEntities3();
         static object ERtableLock = new object();
         static object DLtableLock = new object();
         static object DBChangeLock = new object();
+        static object AuthorizedUpdateLock = new object();
         //数据库测试标记
         public static bool DBEnable = true;
 
@@ -39,6 +42,35 @@ namespace Stork_Future_TaoLi
                     try
                     {
                         DbEntity.SaveChanges();
+                        lockdb = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        GlobalErrorLog.LogInstance.LogEvent("type = " + type + "\r\n" + ex.ToString());
+                        Thread.Sleep(10);
+
+                        if (count == 0)
+                        {
+                            GlobalErrorLog.LogInstance.LogEvent("数据库提交100次失败！");
+                            lockdb = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void DbAuthorizedsavechage(string type)
+        {
+            lock (DBChangeLock)
+            {
+                bool lockdb = false;
+                int count = 100;
+                while (lockdb == false)
+                {
+                    count--;
+                    try
+                    {
+                        DbEntityAuthorized.SaveChanges();
                         lockdb = true;
                     }
                     catch (Exception ex)
@@ -817,6 +849,239 @@ namespace Stork_Future_TaoLi
 
             DbEntity.SG_TAOLI_STATUS_TABLE.Add(item);
             Dbsavechage("InsertSTATUS");
+        }
+        #endregion
+
+        #region 授权策略
+        public static void InsertAuthorizedStrategy(String StrNo, String User,String file, List<AuthorizedOrder> trades)
+        {
+            if (DBAccessLayer.DBEnable == false) return;
+
+            AuthorizedStrategyTable row = new AuthorizedStrategyTable()
+            {
+                ID = Guid.NewGuid(),
+                cUser = User,
+                ImportFile = file,
+                ImportTime = DateTime.Now,
+                Strno = StrNo,
+                TradeNum = trades.Count,
+                FinishFlag = false
+            };
+
+            DbEntityAuthorized.AuthorizedStrategyTable.Add(row);
+            
+            foreach(AuthorizedOrder order in trades)
+            {
+                AuthorizedTradeTable trade = new AuthorizedTradeTable()
+                {
+                    ID = Guid.NewGuid(),
+                    Code = order.cSecurityCode,
+                    dealPrice = 0,
+                    dealTime = new DateTime(1900, 1, 1),
+                    limitedFlag = order.LimitedPrice,
+                    lossPrice = order.LossValue,
+                    Offsetflag = order.offsetflag,
+                    Orientation = order.cTradeDirection,
+                    requestPrice = order.dOrderPrice,
+                    startTime = new DateTime(1900, 1, 1),
+                    status = order.Status.ToString(),
+                    surplusPrice = order.SurplusValue,
+                    StrNo = order.belongStrategy,
+                    TradeNum = (int?)(order.nSecurityAmount),
+                    type = order.cSecurityType,
+                    describe = AuthorizedStatus.GetStatus(order.Status)
+                };
+
+                DbEntityAuthorized.AuthorizedTradeTable.Add(trade);
+                                       
+            }
+
+            DbAuthorizedsavechage("InsertAuthorizedStrategy");
+        }
+
+        public static void  DeleteAuthorizedStrategy(String StrNo)
+        {
+            if (DBAccessLayer.DBEnable == false) return;
+
+            var records = (from item in DbEntityAuthorized.AuthorizedStrategyTable where item.Strno == StrNo select item);
+
+            if(records.Count() > 0)
+            {
+                records.ToList()[0].FinishFlag = true;
+            }
+
+            DbAuthorizedsavechage("DeleteAuthorizedStrategy");
+        }
+
+        public static void UpdateAuthorizedTrade(Object obj) 
+        {
+
+            lock (AuthorizedUpdateLock)
+            {
+                Dictionary<String, String> paras = (Dictionary<String, String>)obj;
+
+                String StrNo = paras["strno"];
+                String Code = paras["code"];
+                double dealPrice = Convert.ToDouble(paras["dealprice"].Trim());
+                int status = Convert.ToInt16(paras["status"].Trim());
+
+                if (DBAccessLayer.DBEnable == false) return;
+
+                var records = (from item in DbEntityAuthorized.AuthorizedTradeTable where item.StrNo == StrNo && item.Code == Code select item);
+
+                if (records.Count() == 0) return;
+
+                AuthorizedTradeTable record = records.ToList()[0];
+
+                switch (status)
+                {
+                    case (int)AuthorizedTradeStatus.Pause:
+                        {
+                            record.status = status.ToString();
+                            record.describe = AuthorizedStatus.GetStatus(status);
+                            break;
+                        }
+                    case (int)AuthorizedTradeStatus.Running:
+                        {
+                            if (record.status == ((int)AuthorizedTradeStatus.Init).ToString())
+                            {
+                                //初始running时间
+                                record.status = status.ToString();
+                                record.describe = AuthorizedStatus.GetStatus(status);
+                                record.startTime = DateTime.Now;
+                            }
+                            break;
+                        }
+                    case (int)AuthorizedTradeStatus.Stop:
+                        {
+                            record.status = status.ToString();
+                            record.describe = AuthorizedStatus.GetStatus(status);
+                            break;
+                        }
+                    case (int)AuthorizedTradeStatus.Dealed:
+                        {
+                            record.status = status.ToString();
+                            record.describe = AuthorizedStatus.GetStatus(status);
+                            record.dealTime = DateTime.Now;
+                            record.dealPrice = dealPrice;
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+
+                }
+
+                DbAuthorizedsavechage("UpdateAuthorizedTrade");
+            }
+        }
+
+        public static Dictionary<String, List<AuthorizedOrder>> LoadPauseStrategy()
+        {
+            if (DBAccessLayer.DBEnable == false) return new Dictionary<string,List<AuthorizedOrder>>();
+
+            var str_records = (from item in DbEntityAuthorized.AuthorizedStrategyTable where item.FinishFlag == false select item);
+
+            if (str_records.Count() == 0) return new Dictionary<string, List<AuthorizedOrder>>();
+
+            Dictionary<String, List<AuthorizedOrder>> orders = new Dictionary<string, List<AuthorizedOrder>>();
+
+            foreach (AuthorizedStrategyTable str_record in str_records)
+            {
+                orders.Add(str_record.Strno, new List<AuthorizedOrder>());
+
+                var trade_records = (from item in DbEntityAuthorized.AuthorizedTradeTable where item.StrNo == str_record.Strno select item);
+
+                if (trade_records.Count() == 0) continue;
+
+                foreach (AuthorizedTradeTable trade_record in trade_records)
+                {
+                    AuthorizedOrder order = new AuthorizedOrder()
+                    {
+                        belongStrategy = str_record.Strno,
+                        Status = Convert.ToInt16(trade_record.status),
+                        cSecurityCode = trade_record.Code,
+                        cSecurityType = trade_record.type,
+                        nSecurityAmount = (long)trade_record.TradeNum,
+                        SurplusValue = Convert.ToSingle(trade_record.surplusPrice),
+                        dOrderPrice = (double)trade_record.requestPrice,
+                        cTradeDirection = trade_record.Orientation,
+                        offsetflag = trade_record.Offsetflag,
+                        LossValue = (float)trade_record.lossPrice,
+                        LimitedPrice = trade_record.limitedFlag,
+                        dDealPrice = (double)trade_record.dealPrice,
+                        exchangeId = trade_record.exchangeid,
+                        OrderRef = 0,
+                        User = str_record.cUser
+
+                    };
+
+                    orders[str_record.Strno].Add(order);
+                }
+            }
+
+            return orders;
+        }
+
+        public static void DailyDBExchange(object obj)
+        {
+            if(DBAccessLayer.DBEnable == false) return;
+            var str_records = (from item in DbEntityAuthorized.AuthorizedStrategyTable where item.FinishFlag == true select item);
+
+            if (str_records.Count() == 0) return;
+
+            foreach(AuthorizedStrategyTable str_record in str_records.ToList())
+            {
+                var trade_records = (from item in DbEntityAuthorized.AuthorizedTradeTable where item.StrNo == str_record.Strno select item);
+
+                if (trade_records.Count() == 0) continue;
+
+                AuthorizedStrategyTable_HIS str_his_record = new AuthorizedStrategyTable_HIS()
+                {
+                    cUser = str_record.cUser,
+                    FinishFlag = str_record.FinishFlag,
+                    ID = str_record.ID,
+                    ImportFile = str_record.ImportFile,
+                    ImportTime = str_record.ImportTime,
+                    Strno = str_record.Strno,
+                    TradeNum = str_record.TradeNum
+                };
+
+                foreach (AuthorizedTradeTable trade_record in trade_records)
+                {
+                    AuthorizedTradeTable_HIS trade_his_record = new AuthorizedTradeTable_HIS()
+                    {
+                        Code = trade_record.Code,
+                        dealPrice = trade_record.dealPrice,
+                        dealTime = trade_record.dealTime,
+                        describe = trade_record.describe,
+                        exchangeid = trade_record.exchangeid,
+                        ID = trade_record.ID,
+                        limitedFlag = trade_record.limitedFlag,
+                        lossPrice = trade_record.lossPrice,
+                        Offsetflag = trade_record.Offsetflag,
+                        Orientation = trade_record.Orientation,
+                        requestPrice = trade_record.requestPrice,
+                        startTime = trade_record.startTime,
+                        status = trade_record.status,
+                        StrNo = trade_record.StrNo,
+                        surplusPrice = trade_record.surplusPrice,
+                        TradeNum = trade_record.TradeNum,
+                        type = trade_record.type
+                    };
+
+                    DbEntityAuthorized.AuthorizedTradeTable_HIS.Add(trade_his_record);
+                    DbEntityAuthorized.AuthorizedTradeTable.Remove(trade_record);
+
+                }
+
+                 DbEntityAuthorized.AuthorizedStrategyTable_HIS.Add(str_his_record);
+                 DbEntityAuthorized.AuthorizedStrategyTable.Remove(str_record);
+
+            }
+
+            DbAuthorizedsavechage("DailyDBExchange");
         }
         #endregion
 

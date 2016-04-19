@@ -2,6 +2,7 @@
 using Stork_Future_TaoLi.Hubs;
 using Stork_Future_TaoLi.Modulars;
 using Stork_Future_TaoLi.Queues;
+using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,9 +16,8 @@ namespace Stork_Future_TaoLi.StrategyModule
     {
 
         private static AuthorizedStrategy instance = new AuthorizedStrategy();
-
-
         private static LogWirter log = new LogWirter();
+        private static DateTime DailyDBExchangeMark = new DateTime();
 
         public static void RUN()
         {
@@ -25,10 +25,17 @@ namespace Stork_Future_TaoLi.StrategyModule
             log.EventLogType = System.Diagnostics.EventLogEntryType.Information;
             log.EventLogID = 66001;
 
+            DailyDBExchangeMark = new DateTime(1900, 1, 1);
+            AuthorizedTradesList.LoadPauseStrategy();
+
+            Thread.Sleep(1000);
+
             Thread excuteThreadA = new Thread(new ThreadStart(ThreadProc_Check));
             Thread excuteThreadB = new Thread(new ThreadStart(ThreadProc_PushInfo));
             excuteThreadA.Start();
             excuteThreadB.Start();
+
+            
         }
 
         private static void ThreadProc_Check()
@@ -49,6 +56,12 @@ namespace Stork_Future_TaoLi.StrategyModule
                     dt = DateTime.Now;
                 }
 
+                if (DailyDBExchangeMark.Year != DateTime.Now.Year || DailyDBExchangeMark.DayOfWeek != DateTime.Now.DayOfWeek)
+                {
+                    AuthorizedTradesList.DailyDBExchange();
+                    DailyDBExchangeMark = DateTime.Now;
+                }
+
                 while(queue_authorized_market.GetQueueNumber() > 0)
                 {
                     MarketData info = (MarketData)queue_authorized_market.GetQueue().Dequeue();
@@ -56,14 +69,63 @@ namespace Stork_Future_TaoLi.StrategyModule
                 }
 
                
-                // 判断是否添加新策略
+                // 新指令判断
                 if(queue_authorized_trade.GetQueueNumber() > 0)
                 {
-                    List<AuthorizedOrder> orders = null;
-
                     try
                     {
-                        orders = (List<AuthorizedOrder>)queue_authorized_trade.GetQueue().Dequeue();
+                       var  orders = queue_authorized_trade.GetQueue().Dequeue();
+
+                       if (orders is List<AuthorizedOrder>)
+                       {
+                           AuthorizedTradesList.SubscribeNewAuhorizedStrategy((List<AuthorizedOrder>)orders);
+                       }
+                       else
+                       {
+                           string str = ((String)orders);
+                           string type = str.Split('|')[0].Trim();
+                           string name = str.Split('|')[1].Trim();
+                           string strategy = str.Split('|')[2].Trim();
+                           string code = str.Split('|')[3].Trim();
+
+                           switch(type)
+                           {
+                               case "BSO+":
+                                   //策略全部启动
+                                   AuthorizedTradesList.StartStrategyTrade(strategy);
+                                   break;
+                               case "BSS+":
+                                   //策略全部暂停
+                                   AuthorizedTradesList.SuspendStrategyTrade(strategy);
+                                   break;
+                               case "BSK+":
+                                   //策略全部停止
+                                   AuthorizedTradesList.StopStrategyTrade(strategy);
+                                   break;
+                               case "BSF+":
+                                   //策略全部强制交易
+                                   AuthorizedTradesList.ForceStrategyTrade(strategy);
+                                   break;
+                               case "BCO+":
+                                   //指定交易启动
+                                   AuthorizedTradesList.StartSingleTrade(strategy, code);
+                                   break;
+                               case "BCS+":
+                                   //指定交易暂停
+                                   AuthorizedTradesList.SuspendSingleTrade(strategy, code);
+                                   break;
+                               case "BCK+":
+                                   //指定交易停止
+                                   AuthorizedTradesList.StopSingleTrade(strategy, code);
+                                   break;
+                               case "BCF+":
+                                   //指定交易强制交易
+                                   AuthorizedTradesList.ForceSingleTrade(strategy, code);
+                                   break;
+                           }
+                           
+                       }
+
                     }
                     catch(Exception ex)
                     {
@@ -71,7 +133,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         continue;
                     }
 
-                    AuthorizedTradesList.SubscribeNewAuhorizedStrategy(orders);
+                    
                     
                 }
 
@@ -83,9 +145,24 @@ namespace Stork_Future_TaoLi.StrategyModule
                 {
                     foreach(AuthorizedOrder order in pair.Value)
                     {
+
+                        if (order.Status == 1 || order.Status == 0) continue;
+
+                        if(order.Status == 3)
+                        {
+                            AuthorizedTradesList.CompleteSpecificTrade(order.belongStrategy, order.cSecurityCode, 0);
+                            continue;
+                        }
+
                         bool tradeMark = false;
                         double currentPrice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode.Trim());
                         //开始执行交易规则判断
+
+                        if(order.Status == 4 && order.dOrderPrice != 0 && currentPrice != 0)
+                        {
+                            tradeMark = true;
+                            order.dDealPrice = currentPrice;
+                        }
 
                         if (order.LossValue != 0 && currentPrice <= order.LossValue)
                         {
@@ -114,7 +191,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                                 cSecurityCode = order.cSecurityCode,
                                 cSecurityType = order.cSecurityType,
                                 cTradeDirection = order.cTradeDirection,
-                                dOrderPrice = order.dOrderPrice,
+                                dOrderPrice = currentPrice,
                                 exchangeId = order.exchangeId,
                                 nSecurityAmount = order.nSecurityAmount,
                                 offsetflag = order.offsetflag,
@@ -122,9 +199,21 @@ namespace Stork_Future_TaoLi.StrategyModule
                                 User = order.User
                             };
 
-                            queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue((object)o);
+                            List<MakeOrder> orders = new List<MakeOrder>();
+                            orders.Add(o);
 
-                            AuthorizedTradesList.CompleteSpecificTrade(o.belongStrategy, o.cSecurityCode);
+                            queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue((object)orders);
+
+                            Dictionary<String, String> paras = new Dictionary<string, string>();
+
+                            paras.Add("strno", o.belongStrategy.Trim());
+                            paras.Add("code", o.cSecurityCode.Trim());
+                            paras.Add("dealprice", currentPrice.ToString());
+                            paras.Add("status", order.Status.ToString());
+
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+
+                            AuthorizedTradesList.CompleteSpecificTrade(o.belongStrategy, o.cSecurityCode, currentPrice); 
                         }
 
                     }
@@ -143,50 +232,83 @@ namespace Stork_Future_TaoLi.StrategyModule
             {
                 Thread.Sleep(1);
 
-                while(queue_authorized_query.GetQueueNumber() > 0)
+                while (queue_authorized_query.GetQueueNumber() > 0)
                 {
                     String name = (String)queue_authorized_query.GetQueue().Dequeue();
 
-                    List<String> strategies = AuthorizedTradesList.GetStrategiesForSpecificUser(name);
+                    List<String> strategies = AuthorizedTradesList.GetUserStrategies(name);
 
                     if (strategies.Count == 0) continue;
 
                     AuthorizedStrategyMonitor.Instance.UpdateStrategiesList(name, strategies);
                 }
 
-                while(queue_authorized_tradeview.GetQueueNumber() > 0)
+                while (queue_authorized_tradeview.GetQueueNumber() > 0)
                 {
                     string str = Convert.ToString(queue_authorized_tradeview.GetQueue().Dequeue());
 
-                    string name = str.Split('|')[0].Trim();
-                    string strategy = str.Split('|')[1].Trim();
+                    string type = str.Split('|')[0].Trim();
+                    string name = str.Split('|')[1].Trim();
+                    string strategy = str.Split('|')[2].Trim();
 
-                    Dictionary<String, List<AuthorizedOrder>> ordersDic = AuthorizedTradesList.GetOrdersForSpecificUser(name);
 
-                    if(ordersDic.Keys.Contains(strategy))
+                    List<AuthorizedOrder> orders = new List<AuthorizedOrder>();
+                    Dictionary<String, List<AuthorizedOrder>> dics = new Dictionary<string, List<AuthorizedOrder>>();
+                    String typeView = "0";
+                    switch (type)
                     {
-                        AuthorizedStrategyMonitor.Instance.UpdateStrategyOrders(name, strategy, ordersDic[strategy]);
-                    }
-                    else
-                    {
-                        continue ;
+                        case "A+":
+                            //显示全部交易
+                            dics = AuthorizedTradesList.GetAllOrders(name);
+                            typeView = "0";
+                            break;
+                        case "O+":
+                            //显示已下单交易
+                            dics = AuthorizedTradesList.GetCompletedOrders(name);
+                            typeView = "1";
+                            break;
+                        case "I+":
+                            //显示未下单交易
+                            dics = AuthorizedTradesList.GetRunningOrders(name);
+                            typeView = "2";
+                            break;
                     }
 
+                    if (dics != null && dics.Keys.Contains(strategy))
+                    {
+                        orders = dics[strategy];
+                    }
+                    AuthorizedStrategyMonitor.Instance.UpdateStrategyOrders(name, strategy, orders);
+
+                    AuthorizedTradesList.ChangeUserView(name, strategy, typeView);
                 }
 
                 List<String> Users = AuthorizedTradesList.GetUserList();
 
                 foreach (String User in Users)
                 {
-                    List<String> Codes = AuthorizedTradesList.GetCodeList(User);
+                    Dictionary<String, AuthorizedOrderStatus> Codes = AuthorizedTradesList.UpdateViewList(User);
+
+                    if (Codes == null) continue;
+
                     Dictionary<String, String> PriceMap = new Dictionary<string, string>();
-                    foreach (String Code in Codes)
+                    Dictionary<String, String> StatusMap = new Dictionary<string, string>();
+
+                    foreach (KeyValuePair<String, AuthorizedOrderStatus> Code in Codes)
                     {
-                        float price = AuthorizedMarket.GetMarketInfo(Code) / 1000;
-                        PriceMap.Add(Code, price.ToString());
+                        float price = 0;
+
+                        if (Code.Value.Status == "2")
+                            price = AuthorizedMarket.GetMarketInfo(Code.Key) / 1000;
+                        else if (Code.Value.Status == "4")
+                            price = Convert.ToSingle(Code.Value.DealPrice);
+
+                        PriceMap.Add(Code.Key, price.ToString());
+                        StatusMap.Add(Code.Key, Code.Value.StatusDesc);
                     }
 
                     AuthorizedStrategyMonitor.Instance.UpdateCurrentPrice(User, PriceMap);
+                    AuthorizedStrategyMonitor.Instance.UpdateCurrentStatus(User, StatusMap);
                 }
 
                 if (DateTime.Now.Second != dt.Second)
@@ -206,23 +328,24 @@ namespace Stork_Future_TaoLi.StrategyModule
     public class AuthorizedTradesList
     {
 
-
+        #region 变量
         private static String ModuleName = "AuthorizedStrategy";
 
         /// <summary>
-        /// 授权交易列表
+        /// 未完成交易列表，如果交易下单或者停止，则转存在CompletedAuthorizedOrderMap
+        /// suspend / running 
         /// TKEY : 授权策略号
         /// TValue : 策略对应交易列表
         /// </summary>
         private static Dictionary<String, List<AuthorizedOrder>> AuthorizedOrderMap = new Dictionary<string, List<AuthorizedOrder>>();
 
-
         /// <summary>
-        /// 源策略交易信息
-        /// 策略创建时添加
-        /// 策略全部完成后删除
+        /// 已经下单或完成的交易列表
+        /// completed / stop 
+        /// TKEY：策略编号
+        /// TValue : 策略对应已下单或已停止交易列表
         /// </summary>
-        private static Dictionary<String, List<AuthorizedOrder>> SourceAuthorizedOrderMap = new Dictionary<string, List<AuthorizedOrder>>();
+        private static Dictionary<String, List<AuthorizedOrder>> CompletedAuthorizedOrderMap = new Dictionary<string, List<AuthorizedOrder>>();
 
         /// <summary>
         /// 授权策略/用户映射表
@@ -236,6 +359,15 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         private static Dictionary<String, int> ListeningCode = new Dictionary<string, int>();
 
+        /// <summary>
+        /// 保存用户正在浏览的策略
+        /// Key : 用户名
+        /// Value : 正在浏览的策略|浏览方式 （0： 全部，1：运行/暂停，2： 已下单/停止）
+        /// </summary>
+        private static Dictionary<String, String> ViewStrategyBuffer = new Dictionary<string, string>();
+        #endregion
+
+        #region 修改函数
         /// <summary>
         /// 注册新的策略
         /// </summary>
@@ -251,7 +383,8 @@ namespace Stork_Future_TaoLi.StrategyModule
             String User = orders[0].User.Trim();
             String strategyNo = User + DateTime.Now.ToString("yyyyMMddhhmmss");
 
-            for(int i = 0;i<orders.Count ;i++){
+            for (int i = 0; i < orders.Count; i++)
+            {
                 AuthorizedOrder order = orders[i];
 
                 order.belongStrategy = strategyNo;
@@ -270,23 +403,23 @@ namespace Stork_Future_TaoLi.StrategyModule
                     }
                 }
             }
-            
 
-            lock(AuthorizedOrderMap)
+
+            lock (AuthorizedOrderMap)
             {
                 AuthorizedOrderMap.Add(strategyNo, orders);
-
-                List<AuthorizedOrder> dup_orders = DuplexOrders(orders);
-                SourceAuthorizedOrderMap.Add(strategyNo, dup_orders);
+                CompletedAuthorizedOrderMap.Add(strategyNo, new List<AuthorizedOrder>());
             }
 
-            
-            lock(AuthorizedUserMap)
+
+            lock (AuthorizedUserMap)
             {
                 AuthorizedUserMap.Add(strategyNo, User);
             }
 
-            queue_authorized_tradeview.EnQueue((object)("A+" + User + "|" + strategyNo));
+            DBAccessLayer.InsertAuthorizedStrategy(strategyNo, User, String.Empty, orders);
+
+            queue_authorized_tradeview.EnQueue((object)("A+" + "|" + User + "|" + strategyNo));
         }
 
         /// <summary>
@@ -297,7 +430,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         {
             strategyNo = strategyNo.Trim();
 
-            if(strategyNo.Trim() == String.Empty)
+            if (strategyNo.Trim() == String.Empty)
             {
                 GlobalErrorLog.LogInstance.LogEvent("AuthorizedTradesList -> DeleteAuthorizedStrategy -> 删除策略号为空！");
                 return;
@@ -313,11 +446,14 @@ namespace Stork_Future_TaoLi.StrategyModule
                 lock (AuthorizedOrderMap)
                 {
                     AuthorizedOrderMap.Remove(strategyNo);
-                    SourceAuthorizedOrderMap.Remove(strategyNo);
+                }
+                lock (CompletedAuthorizedOrderMap)
+                {
+                    CompletedAuthorizedOrderMap.Remove(strategyNo);
                 }
             }
 
-            if(AuthorizedUserMap.Keys.Contains(strategyNo))
+            if (AuthorizedUserMap.Keys.Contains(strategyNo))
             {
                 lock (AuthorizedUserMap)
                 {
@@ -325,7 +461,9 @@ namespace Stork_Future_TaoLi.StrategyModule
                 }
             }
 
-           
+            DBAccessLayer.DeleteAuthorizedStrategy(strategyNo);
+
+
         }
 
         /// <summary>
@@ -333,13 +471,13 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         /// <param name="strategyNo"></param>
         /// <param name="Code"></param>
-        public static void CompleteSpecificTrade(String strategyNo , String Code)
+        public static void CompleteSpecificTrade(String strategyNo, String Code, double DealPrice)
         {
             Code = Code.Trim();
             strategyNo = strategyNo.Trim();
             String user = String.Empty;
 
-            if(AuthorizedUserMap.Keys.Contains(strategyNo))
+            if (AuthorizedUserMap.Keys.Contains(strategyNo))
             {
                 user = AuthorizedUserMap[strategyNo];
             }
@@ -355,9 +493,20 @@ namespace Stork_Future_TaoLi.StrategyModule
                     GlobalErrorLog.LogInstance.LogEvent("AuthorizedTradeList -> SubscribeNewAuthorizedStrategy -> 未找到交易，策略：" + strategyNo + "代码：" + Code);
                 }
 
+                AuthorizedOrder o = order.ToList()[0];
+
                 lock (AuthorizedOrderMap)
                 {
-                    orders.Remove((AuthorizedOrder)order);
+                    orders.Remove(o);
+                }
+
+                if (CompletedAuthorizedOrderMap.Keys.Contains(strategyNo))
+                {
+                    lock (CompletedAuthorizedOrderMap)
+                    {
+                        o.dDealPrice = DealPrice;
+                        CompletedAuthorizedOrderMap[strategyNo].Add(o);
+                    }
                 }
 
                 lock (ListeningCode)
@@ -373,7 +522,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                     }
                 }
 
-                if(orders.Count == 0)
+                if (orders.Count == 0)
                 {
                     DeleteAuthorizedStrategy(strategyNo);
                     AuthorizedStrategyMonitor.Instance.DeleteStrategyView(user, strategyNo);
@@ -388,13 +537,285 @@ namespace Stork_Future_TaoLi.StrategyModule
         }
 
         /// <summary>
+        /// 启动策略交易
+        /// </summary>
+        /// <param name="strategy"></param>
+        /// <param name="Orders"></param>
+        public static void StartStrategyTrade(String strategy)
+        {
+            if(AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                for (int i = 0; i < AOs.Count; i++)
+                {
+                    if (AOs[i].Status != (int)AuthorizedTradeStatus.Stop || AOs[i].Status != (int)AuthorizedTradeStatus.Dealed)
+                    {
+                        AOs[i].Status = (int)AuthorizedTradeStatus.Running;
+
+                        Dictionary<String, String> paras = new Dictionary<string, string>();
+      
+                        paras.Add("strno", strategy.Trim());
+                        paras.Add("code", AOs[i].cSecurityCode.Trim());
+                        paras.Add("dealprice", "0");
+                        paras.Add("status", AOs[i].Status.ToString());
+
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 启动单支交易
+        /// </summary>
+        /// <param name="strategy"></param>
+        /// <param name="code"></param>
+        public static void StartSingleTrade(String strategy,String code)
+        {
+            if (AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                for (int i = 0; i < AOs.Count; i++)
+                {
+                    if (AOs[i].cSecurityCode == code)
+                    {
+                        if (AOs[i].Status != (int)AuthorizedTradeStatus.Stop || AOs[i].Status != (int)AuthorizedTradeStatus.Dealed)
+                        {
+                            AOs[i].Status = (int)AuthorizedTradeStatus.Running;
+
+                            Dictionary<String, String> paras = new Dictionary<string, string>();
+
+                            paras.Add("strno", strategy.Trim());
+                            paras.Add("code", AOs[i].cSecurityCode.Trim());
+                            paras.Add("dealprice", "0");
+                            paras.Add("status", AOs[i].Status.ToString());
+
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 暂停策略交易
+        /// </summary>
+        /// <param name="strategy"></param>
+        public static void SuspendStrategyTrade(String strategy)
+        {
+            if(AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                for (int i = 0; i < AOs.Count; i++)
+                {
+                    if (AOs[i].Status == (int)AuthorizedTradeStatus.Running)
+                    {
+                        AOs[i].Status = (int)AuthorizedTradeStatus.Pause;
+
+                        Dictionary<String, String> paras = new Dictionary<string, string>();
+
+                        paras.Add("strno", strategy.Trim());
+                        paras.Add("code", AOs[i].cSecurityCode.Trim());
+                        paras.Add("dealprice", "0");
+                        paras.Add("status", AOs[i].Status.ToString());
+
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 暂停单支交易
+        /// </summary>
+        /// <param name="strategy"></param>
+        /// <param name="code"></param>
+        public static void SuspendSingleTrade(String strategy, String code)
+        {
+            if (AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                for (int i = 0; i < AOs.Count; i++)
+                {
+                    if (AOs[i].cSecurityCode == code && AOs[i].Status == (int)AuthorizedTradeStatus.Running)
+                    {
+                        AOs[i].Status = (int)AuthorizedTradeStatus.Pause;
+
+                        Dictionary<String, String> paras = new Dictionary<string, string>();
+
+                        paras.Add("strno", strategy.Trim());
+                        paras.Add("code", AOs[i].cSecurityCode.Trim());
+                        paras.Add("dealprice", "0");
+                        paras.Add("status", AOs[i].Status.ToString());
+
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 停止策略交易
+        /// </summary>
+        /// <param name="strategy"></param>
+        public static void StopStrategyTrade(String strategy)
+        {
+            if (AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                for (int i = 0; i < AOs.Count; i++)
+                {
+                    if (AOs[i].Status == (int)AuthorizedTradeStatus.Pause || AOs[i].Status == (int)AuthorizedTradeStatus.Running || AOs[i].Status == (int)AuthorizedTradeStatus.Init)
+                    {
+                        AOs[i].Status = (int)AuthorizedTradeStatus.Stop;
+
+                        Dictionary<String, String> paras = new Dictionary<string, string>();
+
+                        paras.Add("strno", strategy.Trim());
+                        paras.Add("code", AOs[i].cSecurityCode.Trim());
+                        paras.Add("dealprice", "0");
+                        paras.Add("status", AOs[i].Status.ToString());
+
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 停止单支交易
+        /// </summary>
+        /// <param name="strategy"></param>
+        public static void StopSingleTrade(String strategy,String code)
+        {
+            if (AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                for (int i = 0; i < AOs.Count; i++)
+                {
+                    if (AOs[i].cSecurityCode == code)
+                    {
+                        if (AOs[i].Status == (int)AuthorizedTradeStatus.Pause || AOs[i].Status == (int)AuthorizedTradeStatus.Running || AOs[i].Status == (int)AuthorizedTradeStatus.Init)
+                        {
+                            AOs[i].Status = (int)AuthorizedTradeStatus.Stop;
+
+                            Dictionary<String, String> paras = new Dictionary<string, string>();
+
+                            paras.Add("strno", strategy.Trim());
+                            paras.Add("code", AOs[i].cSecurityCode.Trim());
+                            paras.Add("dealprice", "0");
+                            paras.Add("status", AOs[i].Status.ToString());
+
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 强制策略交易
+        /// </summary>
+        /// <param name="strategy"></param>
+        public static void ForceStrategyTrade(String strategy)
+        {
+            if (AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                for (int i = 0; i < AOs.Count; i++)
+                {
+                    if (AOs[i].Status == (int)AuthorizedTradeStatus.Pause || AOs[i].Status == (int)AuthorizedTradeStatus.Running)
+                    {
+                        AOs[i].Status = (int)AuthorizedTradeStatus.Dealed;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 强制单支交易
+        /// </summary>
+        /// <param name="strategy"></param>
+        public static void ForceSingleTrade(String strategy,String code)
+        {
+            if (AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+
+                for (int i = 0; i < AOs.Count; i++)
+                {
+                    if (AOs[i].cSecurityCode == code)
+                    {
+                        if (AOs[i].Status == (int)AuthorizedTradeStatus.Pause || AOs[i].Status == (int)AuthorizedTradeStatus.Running)
+                        {
+                            AOs[i].Status = (int)AuthorizedTradeStatus.Dealed;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 装载数据库中未完成策略
+        /// </summary>
+        public static void LoadPauseStrategy()
+        {
+            Dictionary<String, List<AuthorizedOrder>> orders = DBAccessLayer.LoadPauseStrategy();
+
+            if (orders.Count == 0) return;
+
+            foreach (KeyValuePair<String, List<AuthorizedOrder>> order in orders)
+            {
+                if(order.Value.Count == 0) continue;
+
+                string user = order.Value[0].User;
+
+                AuthorizedUserMap.Add(order.Key, user);
+
+                AuthorizedOrderMap.Add(order.Key, new List<AuthorizedOrder>());
+                CompletedAuthorizedOrderMap.Add(order.Key, new List<AuthorizedOrder>());
+
+                foreach(AuthorizedOrder o in order.Value)
+                {
+                    if((o.Status == (int)AuthorizedTradeStatus.Pause)||(o.Status == (int)AuthorizedTradeStatus.Init)||(o.Status == (int)AuthorizedTradeStatus.Running))
+                    {
+                        AuthorizedOrderMap[order.Key].Add(o);
+                    }
+                    else
+                    {
+                        CompletedAuthorizedOrderMap[order.Key].Add(o);
+                    }
+
+                    if(!ListeningCode.Keys.Contains(o.cSecurityCode.Trim()))
+                    {
+                        ListeningCode.Add(o.cSecurityCode.Trim(), 0);
+                    }
+
+                    ListeningCode[o.cSecurityCode.Trim()] += 1;
+                }
+            }
+
+            MapMarketStratgy.SetMapMS(ModuleName, ListeningCode.Keys.ToList());
+        }
+
+        /// <summary>
+        /// 数据库日切
+        /// </summary>
+        public static void DailyDBExchange()
+        {
+            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.DailyDBExchange));
+        }
+        #endregion
+
+        #region 查询函数
+        /// <summary>
         /// Clone 交易列表
         /// </summary>
         /// <returns></returns>
         public static Dictionary<String, List<AuthorizedOrder>> GetOrderList()
         {
             Dictionary<String, List<AuthorizedOrder>> MapClone = new Dictionary<string, List<AuthorizedOrder>>();
-            foreach(KeyValuePair<String,List<AuthorizedOrder>> item in AuthorizedOrderMap)
+            foreach (KeyValuePair<String, List<AuthorizedOrder>> item in AuthorizedOrderMap)
             {
                 List<AuthorizedOrder> orders = DuplexOrders(item.Value);
                 MapClone.Add(item.Key, orders);
@@ -412,7 +833,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         {
             List<AuthorizedOrder> Dup_orders = new List<AuthorizedOrder>();
 
-            foreach(AuthorizedOrder order in orders)
+            foreach (AuthorizedOrder order in orders)
             {
                 AuthorizedOrder o = new AuthorizedOrder()
                 {
@@ -445,7 +866,7 @@ namespace Stork_Future_TaoLi.StrategyModule
         public static List<String> GetListeningCodeList()
         {
             List<String> list = new List<string>();
-            foreach(String code in ListeningCode.Keys)
+            foreach (String code in ListeningCode.Keys)
             {
                 list.Add(code);
             }
@@ -454,42 +875,75 @@ namespace Stork_Future_TaoLi.StrategyModule
         }
 
         /// <summary>
-        /// 获取用户订阅交易列表
+        /// 获取用户当前查看策略所有未完成交易
         /// </summary>
         /// <param name="User"></param>
         /// <returns></returns>
-        public static List<String> GetCodeList(String User)
+        public static Dictionary<String, AuthorizedOrderStatus> UpdateViewList(String User)
         {
-            List<String> Strategies = new List<string>();
             User = User.Trim();
 
-            foreach(KeyValuePair<String,String> pair in AuthorizedUserMap)
-            {
-                if (pair.Value == User)
-                {
-                    Strategies.Add(pair.Key);
-                }
-            }
+
+            String str = GetUserViewStrategy(User);
+
+            if (str == string.Empty) return new Dictionary<string, AuthorizedOrderStatus>();
+
+            String strategy = str.Split('|')[0];
+            String type = str.Split('|')[1];
 
             List<String> Codes = new List<string>();
 
-            if(Strategies.Count > 0)
-            {                
-                foreach(String strategy in Strategies)
-                {
-                    List<AuthorizedOrder> orders = AuthorizedOrderMap[strategy];
+            if (strategy == String.Empty) return null;
 
-                    foreach(AuthorizedOrder order in orders)
+            Dictionary<String, AuthorizedOrderStatus> RunningStatus = new Dictionary<string, AuthorizedOrderStatus>();
+            Dictionary<String, AuthorizedOrderStatus> CompletedStatus = new Dictionary<string, AuthorizedOrderStatus>();
+            Dictionary<String, AuthorizedOrderStatus> AllStatus = new Dictionary<string, AuthorizedOrderStatus>();
+
+            if (AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                foreach(AuthorizedOrder order in AuthorizedOrderMap[strategy])
+                {
+                    string status = AuthorizedStatus.GetStatus(order.Status);
+                    AuthorizedOrderStatus stat = new AuthorizedOrderStatus()
                     {
-                        if(!Codes.Contains(order.cSecurityCode.Trim()))
-                        {
-                            Codes.Add(order.cSecurityCode.Trim());
-                        }
-                    }
+                        Code = order.cSecurityCode,
+                        DealPrice = "0",
+                        Status = order.Status.ToString(),
+                        StatusDesc = status,
+                        Strategy = strategy
+                    };
+
+                    RunningStatus.Add(order.cSecurityCode, stat);
+                    AllStatus.Add(order.cSecurityCode, stat);
                 }
             }
 
-            return Codes;
+            if (type == "2") return RunningStatus;
+           
+            if(CompletedAuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                foreach(AuthorizedOrder order in CompletedAuthorizedOrderMap[strategy])
+                {
+                    string status = AuthorizedStatus.GetStatus(order.Status);
+                    AuthorizedOrderStatus stat = new AuthorizedOrderStatus()
+                    {
+                        Code = order.cSecurityCode,
+                        DealPrice = order.dDealPrice.ToString(),
+                        Status = order.Status.ToString(),
+                        StatusDesc = status,
+                        Strategy = strategy
+                    };
+                    CompletedStatus.Add(order.cSecurityCode, stat);
+                    AllStatus.Add(order.cSecurityCode, stat);
+                }
+            }
+
+            if (type == "1") return CompletedStatus;
+
+            if (type == "0") return AllStatus;
+
+            return new Dictionary<String, AuthorizedOrderStatus>();
+
         }
 
         /// <summary>
@@ -502,7 +956,7 @@ namespace Stork_Future_TaoLi.StrategyModule
 
             foreach (KeyValuePair<String, String> pair in AuthorizedUserMap)
             {
-                if(!users.Contains(pair.Value.Trim()))
+                if (!users.Contains(pair.Value.Trim()))
                 {
                     users.Add(pair.Value.Trim());
                 }
@@ -516,15 +970,15 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         /// <param name="User"></param>
         /// <returns></returns>
-        public static List<String> GetStrategiesForSpecificUser(String User)
+        public static List<String> GetUserStrategies (String User)
         {
             List<String> Strategies = new List<string>();
             User = User.Trim();
 
 
-            foreach(KeyValuePair<String,String> pair in AuthorizedUserMap )
+            foreach (KeyValuePair<String, String> pair in AuthorizedUserMap)
             {
-                if(pair.Value == User)
+                if (pair.Value == User)
                 {
                     Strategies.Add(pair.Key);
                 }
@@ -534,11 +988,11 @@ namespace Stork_Future_TaoLi.StrategyModule
         }
 
         /// <summary>
-        /// 获取用户所有策略内容
+        /// 获取用户所有未完成交易
         /// </summary>
         /// <param name="User"></param>
         /// <returns></returns>
-        public static Dictionary<String, List<AuthorizedOrder>> GetOrdersForSpecificUser(String User)
+        public static Dictionary<String, List<AuthorizedOrder>> GetRunningOrders (String User)
         {
             User = User.Trim();
 
@@ -546,19 +1000,19 @@ namespace Stork_Future_TaoLi.StrategyModule
 
             Dictionary<String, List<AuthorizedOrder>> ListOrders = new Dictionary<string, List<AuthorizedOrder>>();
 
-            foreach(KeyValuePair<String,String> pair in AuthorizedUserMap)
+            foreach (KeyValuePair<String, String> pair in AuthorizedUserMap)
             {
-                if(pair.Value == User)
+                if (pair.Value == User)
                 {
                     Strategies.Add(pair.Key);
                 }
             }
 
-            if(Strategies.Count == 0) return null;
+            if (Strategies.Count == 0) return null;
 
-            foreach(KeyValuePair<String,List<AuthorizedOrder>> pair in AuthorizedOrderMap)
+            foreach (KeyValuePair<String, List<AuthorizedOrder>> pair in AuthorizedOrderMap)
             {
-                if(Strategies.Contains(pair.Key))
+                if (Strategies.Contains(pair.Key))
                 {
                     ListOrders.Add(pair.Key, pair.Value);
                 }
@@ -566,6 +1020,121 @@ namespace Stork_Future_TaoLi.StrategyModule
 
             return ListOrders;
         }
+
+        /// <summary>
+        /// 获取用户已经完成的交易
+        /// </summary>
+        /// <param name="User"></param>
+        /// <returns></returns>
+        public static Dictionary<String,List<AuthorizedOrder>> GetCompletedOrders(String User)
+        {
+            User = User.Trim();
+
+            List<String> Strategies = new List<string>();
+
+            Dictionary<String, List<AuthorizedOrder>> ListOrders = new Dictionary<string, List<AuthorizedOrder>>();
+
+            foreach (KeyValuePair<String, String> pair in AuthorizedUserMap)
+            {
+                if (pair.Value == User)
+                {
+                    Strategies.Add(pair.Key);
+                }
+            }
+
+            if (Strategies.Count == 0) return null;
+
+            foreach (KeyValuePair<String, List<AuthorizedOrder>> pair in CompletedAuthorizedOrderMap)
+            {
+                if (Strategies.Contains(pair.Key))
+                {
+                    ListOrders.Add(pair.Key, pair.Value);
+                }
+            }
+
+            return ListOrders;
+        }
+
+        /// <summary>
+        /// 获取用户所有交易
+        /// </summary>
+        /// <param name="User"></param>
+        /// <returns></returns>
+        public static Dictionary<String,List<AuthorizedOrder>> GetAllOrders(String User)
+        {
+            User = User.Trim();
+
+            List<String> Strategies = new List<string>();
+
+            Dictionary<String, List<AuthorizedOrder>> ListOrders = new Dictionary<string, List<AuthorizedOrder>>();
+
+            foreach (KeyValuePair<String, String> pair in AuthorizedUserMap)
+            {
+                if (pair.Value == User)
+                {
+                    Strategies.Add(pair.Key);
+                }
+            }
+
+            if (Strategies.Count == 0) return null;
+
+            foreach(String str in Strategies)
+            {
+                ListOrders.Add(str, new List<AuthorizedOrder>());
+                if(AuthorizedOrderMap.Keys.Contains(str))
+                {
+                    foreach(AuthorizedOrder order in AuthorizedOrderMap[str])
+                    {
+                        ListOrders[str].Add(order);
+                    }
+                }
+                if(CompletedAuthorizedOrderMap.Keys.Contains(str))
+                {
+                    foreach(AuthorizedOrder order in CompletedAuthorizedOrderMap[str])
+                    {
+                        ListOrders[str].Add(order);
+                    }
+                }
+            }
+
+            return ListOrders;
+        }
+
+        /// <summary>
+        /// 修改用户当前策略缓存
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="strategy"></param>
+        /// <returns></returns>
+        public static void ChangeUserView(String name,String strategy,String type)
+        {
+            if(ViewStrategyBuffer.Keys.Contains(name))
+            {
+                ViewStrategyBuffer[name] = strategy + "|" + type;
+            }
+            else
+            {
+                ViewStrategyBuffer.Add(name, strategy + "|" + type);
+            }
+        }
+
+        /// <summary>
+        /// 返回用户当前正在浏览的策略
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static String GetUserViewStrategy(String name)
+        {
+            if(ViewStrategyBuffer.Keys.Contains(name))
+            {
+                return ViewStrategyBuffer[name];
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+        #endregion
     }
 
     public class AuthorizedMarket
@@ -619,5 +1188,40 @@ namespace Stork_Future_TaoLi.StrategyModule
         } 
 
         
+    }
+
+    public class AuthorizedStatus
+    {
+        /// <summary>
+        /// 获取交易状态说明
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        public static string GetStatus(int status)
+        {
+            string stat = string.Empty;
+            switch(status)
+            {
+                case 0:
+                    stat = "暂停";
+                    break;
+                case 1:
+                    stat = "暂停";
+                    break;
+                case 2:
+                    stat = "运行中";
+                    break;
+                case 3:
+                    stat = "停止";
+                    break;
+                case 4:
+                    stat = "已下单";
+                    break;
+                default:
+                    stat = "未知" + status;
+                    break;
+            }
+            return stat;
+        }
     }
 }

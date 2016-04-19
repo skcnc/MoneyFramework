@@ -139,4 +139,14 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// </summary>
         public static string FutureTradeOffsetClose { get { return "49"; } }
     }
+
+  
+    public class AuthorizedOrderStatus
+    {
+        public string Code { get; set; }
+        public string Status { get; set; }
+        public string StatusDesc { get; set; }
+        public string DealPrice { get; set; }
+        public string Strategy { get; set; }
+    }
 }

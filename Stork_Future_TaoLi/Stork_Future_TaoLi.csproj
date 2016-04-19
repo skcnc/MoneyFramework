@@ -246,6 +246,18 @@
     <Compile Include="Account\UserInfo.cs" />
     <Compile Include="AdditionalModule\DESoper.cs" />
     <Compile Include="AdditionalModule\pythonOper.cs" />
+    <Compile Include="Database\AuthorizedStrategyTable.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\AuthorizedStrategyTable_HIS.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\AuthorizedTradeTable.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Database\AuthorizedTradeTable_HIS.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\SYS_LOG.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>

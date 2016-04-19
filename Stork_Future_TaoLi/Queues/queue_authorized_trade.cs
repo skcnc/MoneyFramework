@@ -120,6 +120,18 @@ namespace Stork_Future_TaoLi
         }
     }
 
+    /// <summary>
+    /// 入队下单线程
+    /// 1. List<Authorized>类型 创建新策略
+    /// 2. BSO+ 策略全部启动
+    /// 3. BSS+ 策略全部暂停
+    /// 4. BSK+ 策略全部停止
+    /// 5. BSF+ 策略全部强制交易
+    /// 6. BCO+ 指定交易启动
+    /// 7. BCS+ 指定交易暂停
+    /// 8. BCK+ 指定交易停止
+    /// 9. BCF+ 指定交易强制交易
+    /// </summary>
     public class queue_authorized_query
     {
         private static Queue instance;

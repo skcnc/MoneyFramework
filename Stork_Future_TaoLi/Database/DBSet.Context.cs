@@ -39,5 +39,9 @@ namespace Stork_Future_TaoLi.Database
         public DbSet<DL_TAOLI_TABLE> DL_TAOLI_TABLE { get; set; }
         public DbSet<InstructionsTable> InstructionsTable { get; set; }
         public DbSet<SYS_LOG> SYS_LOG { get; set; }
+        public DbSet<AuthorizedStrategyTable> AuthorizedStrategyTable { get; set; }
+        public DbSet<AuthorizedTradeTable> AuthorizedTradeTable { get; set; }
+        public DbSet<AuthorizedStrategyTable_HIS> AuthorizedStrategyTable_HIS { get; set; }
+        public DbSet<AuthorizedTradeTable_HIS> AuthorizedTradeTable_HIS { get; set; }
     }
 }

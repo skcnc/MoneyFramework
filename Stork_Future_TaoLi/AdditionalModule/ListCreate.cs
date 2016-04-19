@@ -92,4 +92,15 @@ namespace Stork_Future_TaoLi
         Dealed = 56
     }
 
+    /// <summary>
+    /// 授权交易状态
+    /// </summary>
+    public enum AuthorizedTradeStatus
+    {
+        Init = 0,
+        Pause = 1,
+        Running = 2,
+        Stop = 3,
+        Dealed = 4
+    }
 }

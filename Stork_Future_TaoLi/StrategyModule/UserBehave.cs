@@ -354,6 +354,8 @@ namespace Stork_Future_TaoLi
         public long nSecurityAmount { get; set; }
         //委托价格
         public double dOrderPrice { get; set; }
+        //下单价
+        public double dDealPrice { get; set; }
         //买卖类别（见数据字典说明)
         public string cTradeDirection { get; set; }
         //开平标志
@@ -370,7 +372,7 @@ namespace Stork_Future_TaoLi
         public float SurplusValue { get; set; }
         //止损价
         public float LossValue { get; set; }
-        //交易状态 （0：未开始，1：暂停，2：启动，3：停止，4：已下单）
+        //交易状态 （1：暂停，2：启动，3：停止，4：已下单）
         public int Status { get; set; }
     }
 
