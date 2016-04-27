@@ -13,6 +13,11 @@ using Stork_Future_TaoLi.TradeModule;
 using Stork_Future_TaoLi.Queues;
 using Stork_Future_TaoLi;
 using System.Text;
+using System.Net.Http;
+using Stork_Future_TaoLi.Variables_Type;
+using System.Net;
+using System.Net.Http.Headers;
+using Stork_Future_TaoLi.StrategyModule;
 
 namespace Stork_Future_TaoLi.Controllers
 {
@@ -389,6 +394,8 @@ namespace Stork_Future_TaoLi.Controllers
                         string limitedflag = values[8];
                         string lossPrice = values[9];
                         string superPrice = values[10];
+                        string cost = values[11];
+
                         int status = 0; //未启动
 
                         try
@@ -408,6 +415,7 @@ namespace Stork_Future_TaoLi.Controllers
                                 LimitedPrice = limitedflag,
                                 LossValue = Convert.ToSingle(lossPrice.Trim()),
                                 SurplusValue = Convert.ToSingle(superPrice.Trim()),
+                                cost = Convert.ToSingle(cost.Trim()),
                                 Status = status
                             };
 
@@ -478,6 +486,7 @@ namespace Stork_Future_TaoLi.Controllers
                         string limitedflag = values[8];
                         string lossPrice = values[9];
                         string superPrice = values[10];
+                        string cost = values[11];
                         int status = 0; //未启动
 
                         try
@@ -497,6 +506,7 @@ namespace Stork_Future_TaoLi.Controllers
                                 LimitedPrice = limitedflag,
                                 LossValue = Convert.ToSingle(lossPrice.Trim()),
                                 SurplusValue = Convert.ToSingle(superPrice.Trim()),
+                                cost = Convert.ToSingle(cost.Trim()),
                                 Status = status
                             };
 
@@ -518,6 +528,41 @@ namespace Stork_Future_TaoLi.Controllers
             {
                 return View();
             }
+        }
+
+        public void downloadAuthorizedFile(String USER)
+        {
+            try
+            {
+                String strategy = AuthorizedTradesList.GetUserViewStrategy(USER);
+
+                if (strategy.Trim() == String.Empty) return;
+                System.String filename = strategy.Split('|')[0];
+
+                //filename = "sc20160427025316";
+
+                // set the http content type to "APPLICATION/OCTET-STREAM
+                Response.ContentType = "APPLICATION/OCTET-STREAM";
+
+                // initialize the http content-disposition header to
+                // indicate a file attachment with the default filename
+                // "myFile.txt"
+                System.String disHeader = "Attachment; Filename=\"" + filename +
+                   "\"";
+                Response.AppendHeader("Content-Disposition", disHeader);
+
+                // transfer the file byte-by-byte to the response object
+                System.IO.FileInfo fileToDownload = new
+                   System.IO.FileInfo(CONFIG.AUTHORIZED_BASE_URL + filename);
+                Response.Flush();
+                Response.WriteFile(fileToDownload.FullName);
+            }
+            catch (System.Exception e)
+            // file IO errors
+            {
+                GlobalErrorLog.LogInstance.LogEvent(e.ToString());
+            }
+
         }
 
         public ActionResult OPEN_EDIT()

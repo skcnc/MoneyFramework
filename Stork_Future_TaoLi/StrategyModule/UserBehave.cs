@@ -372,6 +372,8 @@ namespace Stork_Future_TaoLi
         public float SurplusValue { get; set; }
         //止损价
         public float LossValue { get; set; }
+        //成本价
+        public float cost { get; set; }
         //交易状态 （1：暂停，2：启动，3：停止，4：已下单）
         public int Status { get; set; }
     }

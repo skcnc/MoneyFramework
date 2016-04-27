@@ -48,6 +48,12 @@ namespace Stork_Future_TaoLi.Variables_Type
         private static int future_trade_overtime = 15;
 
         /// <summary>
+        /// 授权交易列表文件存储路径
+        /// </summary>
+        public static String AUTHORIZED_BASE_URL { get { return authorized_base_url; } }
+        private static String authorized_base_url = "F:\\workbench\\suncheng\\downloads\\";
+
+        /// <summary>
         /// 初始化静态类参数
         /// </summary>
         /// <param name="STOCK_TRADE_THREAD_NUM">股票交易最大线程数</param>

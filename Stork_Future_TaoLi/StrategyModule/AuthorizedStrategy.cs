@@ -6,6 +6,7 @@ using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
@@ -155,29 +156,86 @@ namespace Stork_Future_TaoLi.StrategyModule
                         }
 
                         bool tradeMark = false;
-                        double currentPrice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode.Trim());
-                        //开始执行交易规则判断
+                        double currentPrice = 0;
+                        currentPrice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode.Trim());
 
+                        //开始执行交易规则判断
+                        //目前剩下running = 2 , conpleted = 4
+
+                        //强制下单的情况
                         if(order.Status == 4 && order.dOrderPrice != 0 && currentPrice != 0)
                         {
                             tradeMark = true;
                             order.dDealPrice = currentPrice;
                         }
 
-                        if (order.LossValue != 0 && currentPrice <= order.LossValue)
+                        try
                         {
-                            //低于止损价，立即发单
-                            order.dOrderPrice = order.dOrderPrice * 0.98;
-                            tradeMark = true;
-                        }
+                            if (order.Status == 2)
+                            {
+                                if (order.LossValue == 0 && order.SurplusValue == 0)
+                                {
+                                    if (order.LimitedPrice == "N")
+                                    {
+                                        //止损止盈为0，且限价为N
+                                        tradeMark = true;
+                                        if (order.cTradeDirection == "0")
+                                            order.dDealPrice = currentPrice * 1.02;
+                                        else
+                                            order.dDealPrice = currentPrice * 0.98;
+                                    }
+                                    else
+                                    {
+                                        //止损止盈为0，且限价为Y
+                                        tradeMark = true;
+                                        order.dDealPrice = currentPrice;
+                                    }
+                                }
+                                else
+                                {
+                                    //止损，止盈价不全为0
+                                    if (order.LossValue != 0)
+                                    {
+                                        if (currentPrice <= order.LossValue)
+                                        {
+                                            tradeMark = true;
+                                        }
+                                    }
 
-                        if (order.SurplusValue != 0 && currentPrice >= order.SurplusValue)
+                                    if (order.SurplusValue != 0)
+                                    {
+                                        if (currentPrice >= order.SurplusValue)
+                                        {
+                                            tradeMark = true;
+                                        }
+                                    }
+
+                                    if (tradeMark == true)
+                                    {
+                                        if (order.LimitedPrice == "N")
+                                        {
+                                            if (order.cTradeDirection == "0")
+                                                order.dDealPrice = currentPrice * 1.02;
+                                            else
+                                                order.dDealPrice = currentPrice * 0.98;
+                                        }
+                                        else
+                                        {
+                                            order.dDealPrice = currentPrice;
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        catch(Exception ex)
                         {
-                            //高于止盈价，立即发单
-                            order.dOrderPrice = order.dOrderPrice * 1.02;
-                            tradeMark = true;
+                            GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
                         }
-
+                        if (currentPrice == 0 && order.LimitedPrice == "Y")
+                        {
+                            tradeMark = false;
+                        }
                         
 
 
@@ -297,9 +355,10 @@ namespace Stork_Future_TaoLi.StrategyModule
                     foreach (KeyValuePair<String, AuthorizedOrderStatus> Code in Codes)
                     {
                         float price = 0;
-
-                        if (Code.Value.Status == "2")
-                            price = AuthorizedMarket.GetMarketInfo(Code.Key) / 1000;
+                        if (Code.Value.Status == "0" || Code.Value.Status == "1")
+                            price = Convert.ToSingle(AuthorizedMarket.GetMarketInfo(Code.Key) / 10000.0);
+                        else if (Code.Value.Status == "2")
+                            price = Convert.ToSingle(AuthorizedMarket.GetMarketInfo(Code.Key) / 10000.0);
                         else if (Code.Value.Status == "4")
                             price = Convert.ToSingle(Code.Value.DealPrice);
 
@@ -309,6 +368,19 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     AuthorizedStrategyMonitor.Instance.UpdateCurrentPrice(User, PriceMap);
                     AuthorizedStrategyMonitor.Instance.UpdateCurrentStatus(User, StatusMap);
+
+                    int runningNum = 0;
+                    int completedNum = 0;
+
+                    AuthorizedTradesList.CalculateOrderNum(User, out runningNum, out completedNum);
+                    AuthorizedStrategyMonitor.Instance.UpdateTradeNum(User, runningNum.ToString(), completedNum.ToString(), (runningNum + completedNum).ToString());
+
+                    float earning = 0;
+                    float marketvalue = 0;
+
+                    AuthorizedTradesList.GetStrategyAccount(User,out earning,out marketvalue);
+                    AuthorizedStrategyMonitor.Instance.UpdateAccountInfo(User, earning.ToString(), marketvalue.ToString());
+
                 }
 
                 if (DateTime.Now.Second != dt.Second)
@@ -418,7 +490,8 @@ namespace Stork_Future_TaoLi.StrategyModule
             }
 
             DBAccessLayer.InsertAuthorizedStrategy(strategyNo, User, String.Empty, orders);
-
+            FileOperations file = new FileOperations();
+            file.CreateFile(orders, strategyNo);
             queue_authorized_tradeview.EnQueue((object)("A+" + "|" + User + "|" + strategyNo));
         }
 
@@ -518,6 +591,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         {
                             ListeningCode.Remove(Code);
                             AuthorizedStrategyMonitor.Instance.CompleteTrade(user, strategyNo, Code);
+                            FileOperations file = new FileOperations();
                         }
                     }
                 }
@@ -875,6 +949,32 @@ namespace Stork_Future_TaoLi.StrategyModule
         }
 
         /// <summary>
+        /// 计算用户当前策略运行/结束 交易数量
+        /// </summary>
+        /// <param name="User"></param>
+        /// <param name="runningNum">运行数量</param>
+        /// <param name="completedNum">结束数量</param>
+        public static void CalculateOrderNum(String User, out int runningNum, out int completedNum)
+        {
+            User = User.Trim();
+
+            runningNum = 0;
+            completedNum = 0;
+
+            String str = GetUserViewStrategy(User);
+
+            if (str == string.Empty) return;
+
+            String strategy = str.Split('|')[0];
+            String type = str.Split('|')[1];
+
+            if (strategy == String.Empty) return;
+
+            if (AuthorizedOrderMap.Keys.Contains(strategy)) { runningNum = AuthorizedOrderMap[strategy].Count; }
+            if (CompletedAuthorizedOrderMap.Keys.Contains(strategy)) { completedNum = CompletedAuthorizedOrderMap[strategy].Count; }
+        }
+
+        /// <summary>
         /// 获取用户当前查看策略所有未完成交易
         /// </summary>
         /// <param name="User"></param>
@@ -1134,6 +1234,73 @@ namespace Stork_Future_TaoLi.StrategyModule
                 return string.Empty;
             }
         }
+
+        /// <summary>
+        /// 获取策略实时卖出，买入盈亏
+        /// </summary>
+        /// <param name="strategy"></param>
+        /// <param name="sellaccount"></param>
+        /// <param name="buyaccount"></param>
+        public static void GetStrategyAccount(String strategy, out float earning, out float marketvalue)
+        {
+            earning = marketvalue = 0;
+            try
+            {
+
+                List<AuthorizedOrder> runningOrder = new List<AuthorizedOrder>();
+                if(AuthorizedOrderMap.Keys.Contains(strategy))
+                    runningOrder = AuthorizedOrderMap[strategy];
+
+                List<AuthorizedOrder> completedOrder = new List<AuthorizedOrder>();
+                if(CompletedAuthorizedOrderMap.Keys.Contains(strategy))
+                    completedOrder = CompletedAuthorizedOrderMap[strategy];
+
+                foreach (AuthorizedOrder order in runningOrder)
+                {
+                    if (order.cTradeDirection == "0" && order.cSecurityType.ToUpper() == "S")
+                    {
+                        //买入
+                        uint currentprice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode);
+                        if(currentprice != 0)
+                        {
+                            marketvalue += Convert.ToSingle(currentprice) / 1000 * order.nSecurityAmount; 
+                        }
+                    }
+
+                    if(order.cTradeDirection == "1" && order.cSecurityType.ToUpper() == "S")
+                    {
+                        uint currentprice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode);
+                        if(currentprice != 0)
+                        {
+                            earning += (Convert.ToSingle(currentprice) / 1000 - order.cost) * order.nSecurityAmount; 
+                        }
+                    }
+                }
+
+                foreach(AuthorizedOrder order in completedOrder)
+                {
+                    if(order.cTradeDirection == "0" && order.cSecurityType.ToUpper() == "S")
+                    {
+                        if(order.dDealPrice != 0)
+                        {
+                            marketvalue += Convert.ToSingle(order.dDealPrice * order.nSecurityAmount);
+                        }
+                    }
+
+                    if(order.cTradeDirection == "1" && order.cSecurityType.ToUpper() == "S")
+                    {
+                        if(order.dDealPrice != 0)
+                        {
+                            earning += Convert.ToSingle(order.dDealPrice - order.cost) * order.nSecurityAmount;
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(e.ToString());
+            }
+        }
         #endregion
     }
 
@@ -1223,5 +1390,98 @@ namespace Stork_Future_TaoLi.StrategyModule
             }
             return stat;
         }
+    }
+
+    public class FileOperations
+    {
+        /// <summary>
+        /// 创建新输出文档
+        /// </summary>
+        /// <param name="orders">交易信息</param>
+        /// <param name="strategyNo">策略名称</param>
+        public void CreateFile(List<AuthorizedOrder> orders, String strategyNo )
+        {
+            String path = CONFIG.AUTHORIZED_BASE_URL + strategyNo;
+            String value = String.Empty;
+
+            //a. 用户| 交易所| 代码| 数量| 下单价格|买卖|开平|证券类型|是否限价|止损价|止盈价|成本价|是否交易
+            foreach(AuthorizedOrder order in orders)
+            {
+                value += (order.User + "|" + order.exchangeId + "|" + order.cSecurityCode + "|" + order.nSecurityAmount.ToString() + "|" + order.cTradeDirection + "|" + order.offsetflag + "|" + order.cSecurityType + "|" + order.LimitedPrice + "|" + order.LossValue.ToString() + "|" + order.SurplusValue.ToString() + "|" + order.cost.ToString() + "|" + "N" );
+                value += "\r\n";
+            }
+
+            if (value == string.Empty) return;
+
+            FileInfo file = new FileInfo(strategyNo);
+            try
+            {
+                if (!file.Exists)
+                {
+
+                    FileStream stream = File.Create(path);
+                    stream.Flush();
+                    stream.Close();
+                }
+
+                StreamWriter writer = new StreamWriter(path, false);
+                writer.Write(value);
+                writer.Flush();
+                writer.Close();
+            }
+            catch(Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent("创建文件失败，文件名：" + strategyNo + "\r\n" + ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 创建新输出文档
+        /// </summary>
+        /// <param name="orders">交易信息</param>
+        /// <param name="strategyNo">策略名称</param>
+        public void RefreshFile(List<AuthorizedOrder> running_orders,List<AuthorizedOrder> completed_orders, String strategyNo)
+        {
+            String path = System.Environment.CurrentDirectory + strategyNo;
+            String value = String.Empty;
+
+            //a. 用户| 交易所| 代码| 数量| 下单价格|买卖|开平|证券类型|是否限价|止损价|止盈价|成本价|是否交易
+            foreach (AuthorizedOrder order in running_orders)
+            {
+                value += (order.User + "|" + order.exchangeId + "|" + order.cSecurityCode + "|" + order.nSecurityAmount.ToString() + "|" + order.dDealPrice.ToString() + "|"  + order.cTradeDirection + "|" + order.offsetflag + "|" + order.cSecurityType + "|" + order.LimitedPrice + "|" + order.LossValue.ToString() + "|" + order.SurplusValue.ToString() + "|" + order.cost.ToString() + "|" + "N");
+                value += "\r\n";
+            }
+
+            foreach(AuthorizedOrder order in completed_orders)
+            {
+                value += (order.User + "|" + order.exchangeId + "|" + order.cSecurityCode + "|" + order.nSecurityAmount.ToString() + "|" + order.cTradeDirection + "|" + order.offsetflag + "|" + order.cSecurityType + "|" + order.LimitedPrice + "|" + order.LossValue.ToString() + "|" + order.SurplusValue.ToString() + "|" + order.cost.ToString() + "|" + "N");
+                value += "\r\n";
+            }
+
+            if (value == string.Empty) return;
+
+            FileInfo file = new FileInfo(strategyNo);
+
+            try
+            {
+                if (!file.Exists)
+                {
+
+                    FileStream stream = File.Create(path);
+                    stream.Flush();
+                    stream.Close();
+                }
+
+                StreamWriter writer = new StreamWriter(path, false);
+                writer.Write(value);
+                writer.Flush();
+                writer.Close();
+            }
+            catch (Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent("更新文件失败，文件名：" + strategyNo + "\r\n" + ex.ToString());
+            }
+        }
+
     }
 }

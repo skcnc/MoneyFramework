@@ -145,5 +145,23 @@ namespace Stork_Future_TaoLi.Hubs
                 _context.Clients.Client(ConnectionID).updateStatus(JsonConvert.SerializeObject(status));
             }
         }
+
+        public void UpdateTradeNum(String user, String running, String completed, String total)
+        {
+            if(UserConnectionRelation.Keys.Contains(user))
+            {
+                String ConnectionID = UserConnectionRelation[user];
+                _context.Clients.Client(ConnectionID).updateNum(running, completed, total);
+            }
+        }
+
+        public void UpdateAccountInfo(String user, String earning, String marketValue)
+        {
+            if (UserConnectionRelation.Keys.Contains(user))
+            {
+                String ConnectionID = UserConnectionRelation[user];
+                _context.Clients.Client(ConnectionID).updateAccount(earning, marketvalue);
+            }
+        }
     }
 }

@@ -35,6 +35,7 @@
           </Key>
           <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="StrNo" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Cost" Type="float" />
           <Property Name="Code" Type="nvarchar" MaxLength="50" />
           <Property Name="Orientation" Type="nvarchar" MaxLength="50" />
           <Property Name="Offsetflag" Type="nvarchar" MaxLength="50" />
@@ -58,6 +59,7 @@
           <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="StrNo" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Code" Type="nvarchar" MaxLength="50" />
+          <Property Name="Cost" Type="float" />
           <Property Name="Orientation" Type="nvarchar" MaxLength="50" />
           <Property Name="Offsetflag" Type="nvarchar" MaxLength="50" />
           <Property Name="TradeNum" Type="int" />
@@ -452,8 +454,8 @@
           <EntitySet Name="InstructionsTable" EntityType="MoneyEntityModel.InstructionsTable" />
           <EntitySet Name="SYS_LOG" EntityType="MoneyEntityModel.SYS_LOG" />
           <EntitySet Name="AuthorizedStrategyTable" EntityType="MoneyEntityModel.AuthorizedStrategyTable" />
-          <EntitySet Name="AuthorizedTradeTable" EntityType="MoneyEntityModel.AuthorizedTradeTable" />
           <EntitySet Name="AuthorizedStrategyTable_HIS" EntityType="MoneyEntityModel.AuthorizedStrategyTable_HIS" />
+          <EntitySet Name="AuthorizedTradeTable" EntityType="MoneyEntityModel.AuthorizedTradeTable" />
           <EntitySet Name="AuthorizedTradeTable_HIS" EntityType="MoneyEntityModel.AuthorizedTradeTable_HIS" />
         </EntityContainer>
         <EntityType Name="RISK_TABLE">
@@ -593,12 +595,25 @@
           <Property Name="TradeNum" Type="Int32" />
           <Property Name="FinishFlag" Type="Boolean" />
         </EntityType>
+        <EntityType Name="AuthorizedStrategyTable_HIS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="Strno" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="cUser" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ImportFile" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ImportTime" Type="DateTime" Precision="3" />
+          <Property Name="TradeNum" Type="Int32" />
+          <Property Name="FinishFlag" Type="Boolean" />
+        </EntityType>
         <EntityType Name="AuthorizedTradeTable">
           <Key>
             <PropertyRef Name="ID" />
           </Key>
           <Property Name="ID" Type="Guid" Nullable="false" />
           <Property Name="StrNo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Cost" Type="Double" />
           <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Orientation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Offsetflag" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
@@ -615,18 +630,6 @@
           <Property Name="lossPrice" Type="Double" />
           <Property Name="exchangeid" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityType Name="AuthorizedStrategyTable_HIS">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Guid" Nullable="false" />
-          <Property Name="Strno" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="cUser" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ImportFile" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="ImportTime" Type="DateTime" Precision="3" />
-          <Property Name="TradeNum" Type="Int32" />
-          <Property Name="FinishFlag" Type="Boolean" />
-        </EntityType>
         <EntityType Name="AuthorizedTradeTable_HIS">
           <Key>
             <PropertyRef Name="ID" />
@@ -634,6 +637,7 @@
           <Property Name="ID" Type="Guid" Nullable="false" />
           <Property Name="StrNo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Cost" Type="Double" />
           <Property Name="Orientation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Offsetflag" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="TradeNum" Type="Int32" />
@@ -914,6 +918,19 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="AuthorizedStrategyTable_HIS">
+            <EntityTypeMapping TypeName="MoneyEntityModel.AuthorizedStrategyTable_HIS">
+              <MappingFragment StoreEntitySet="AuthorizedStrategyTable_HIS">
+                <ScalarProperty Name="FinishFlag" ColumnName="FinishFlag" />
+                <ScalarProperty Name="TradeNum" ColumnName="TradeNum" />
+                <ScalarProperty Name="ImportTime" ColumnName="ImportTime" />
+                <ScalarProperty Name="ImportFile" ColumnName="ImportFile" />
+                <ScalarProperty Name="cUser" ColumnName="cUser" />
+                <ScalarProperty Name="Strno" ColumnName="Strno" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="AuthorizedTradeTable">
             <EntityTypeMapping TypeName="MoneyEntityModel.AuthorizedTradeTable">
               <MappingFragment StoreEntitySet="AuthorizedTradeTable">
@@ -932,20 +949,8 @@
                 <ScalarProperty Name="Offsetflag" ColumnName="Offsetflag" />
                 <ScalarProperty Name="Orientation" ColumnName="Orientation" />
                 <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Cost" ColumnName="Cost" />
                 <ScalarProperty Name="StrNo" ColumnName="StrNo" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="AuthorizedStrategyTable_HIS">
-            <EntityTypeMapping TypeName="MoneyEntityModel.AuthorizedStrategyTable_HIS">
-              <MappingFragment StoreEntitySet="AuthorizedStrategyTable_HIS">
-                <ScalarProperty Name="FinishFlag" ColumnName="FinishFlag" />
-                <ScalarProperty Name="TradeNum" ColumnName="TradeNum" />
-                <ScalarProperty Name="ImportTime" ColumnName="ImportTime" />
-                <ScalarProperty Name="ImportFile" ColumnName="ImportFile" />
-                <ScalarProperty Name="cUser" ColumnName="cUser" />
-                <ScalarProperty Name="Strno" ColumnName="Strno" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -967,6 +972,7 @@
                 <ScalarProperty Name="TradeNum" ColumnName="TradeNum" />
                 <ScalarProperty Name="Offsetflag" ColumnName="Offsetflag" />
                 <ScalarProperty Name="Orientation" ColumnName="Orientation" />
+                <ScalarProperty Name="Cost" ColumnName="Cost" />
                 <ScalarProperty Name="Code" ColumnName="Code" />
                 <ScalarProperty Name="StrNo" ColumnName="StrNo" />
                 <ScalarProperty Name="ID" ColumnName="ID" />

@@ -889,6 +889,7 @@ namespace Stork_Future_TaoLi
                     StrNo = order.belongStrategy,
                     TradeNum = (int?)(order.nSecurityAmount),
                     type = order.cSecurityType,
+                    Cost = order.cost,
                     describe = AuthorizedStatus.GetStatus(order.Status)
                 };
 
@@ -1013,7 +1014,8 @@ namespace Stork_Future_TaoLi
                         dDealPrice = (double)trade_record.dealPrice,
                         exchangeId = trade_record.exchangeid,
                         OrderRef = 0,
-                        User = str_record.cUser
+                        User = str_record.cUser,
+                        cost = Convert.ToSingle(trade_record.Cost)
 
                     };
 
@@ -1068,7 +1070,8 @@ namespace Stork_Future_TaoLi
                         StrNo = trade_record.StrNo,
                         surplusPrice = trade_record.surplusPrice,
                         TradeNum = trade_record.TradeNum,
-                        type = trade_record.type
+                        type = trade_record.type,
+                        Cost = trade_record.Cost
                     };
 
                     DbEntityAuthorized.AuthorizedTradeTable_HIS.Add(trade_his_record);
