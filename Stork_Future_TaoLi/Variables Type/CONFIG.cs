@@ -54,6 +54,12 @@ namespace Stork_Future_TaoLi.Variables_Type
         private static String authorized_base_url = "F:\\workbench\\suncheng\\downloads\\";
 
         /// <summary>
+        /// 授权交易列表文件存储路径
+        /// </summary>
+        public static String AUTHORIZED_ARCHIVE_URL { get { return authorized_archive_url; } }
+        private static String authorized_archive_url = "F:\\workbench\\suncheng\\archive\\";
+
+        /// <summary>
         /// 初始化静态类参数
         /// </summary>
         /// <param name="STOCK_TRADE_THREAD_NUM">股票交易最大线程数</param>

@@ -535,6 +535,8 @@ namespace Stork_Future_TaoLi.StrategyModule
             }
 
             DBAccessLayer.DeleteAuthorizedStrategy(strategyNo);
+            FileOperations fileoper = new FileOperations();
+            fileoper.DeleteFile(strategyNo);
 
 
         }
@@ -870,6 +872,28 @@ namespace Stork_Future_TaoLi.StrategyModule
             }
 
             MapMarketStratgy.SetMapMS(ModuleName, ListeningCode.Keys.ToList());
+        }
+
+        /// <summary>
+        /// 获取策略交易信息
+        /// </summary>
+        /// <param name="strategy"></param>
+        /// <param name="runningStrategy"></param>
+        /// <param name="completedStrategy"></param>
+        public static void GetStrategyTrades(String strategy, out List<AuthorizedOrder> runningStrategy, out List<AuthorizedOrder> completedStrategy)
+        {
+            runningStrategy = new List<AuthorizedOrder>();
+            completedStrategy = new List<AuthorizedOrder>();
+
+            if(AuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                runningStrategy = AuthorizedOrderMap[strategy];
+            }
+
+            if(CompletedAuthorizedOrderMap.Keys.Contains(strategy))
+            {
+                completedStrategy = CompletedAuthorizedOrderMap[strategy];
+            }
         }
 
         /// <summary>
@@ -1241,11 +1265,14 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// <param name="strategy"></param>
         /// <param name="sellaccount"></param>
         /// <param name="buyaccount"></param>
-        public static void GetStrategyAccount(String strategy, out float earning, out float marketvalue)
+        public static void GetStrategyAccount(String user, out float earning, out float marketvalue)
         {
             earning = marketvalue = 0;
             try
             {
+                String strategy = GetUserViewStrategy(user);
+
+                if (strategy != String.Empty) strategy = strategy.Split('|')[0];
 
                 List<AuthorizedOrder> runningOrder = new List<AuthorizedOrder>();
                 if(AuthorizedOrderMap.Keys.Contains(strategy))
@@ -1263,7 +1290,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         uint currentprice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode);
                         if(currentprice != 0)
                         {
-                            marketvalue += Convert.ToSingle(currentprice) / 1000 * order.nSecurityAmount; 
+                            marketvalue += Convert.ToSingle(currentprice) / 10000 * order.nSecurityAmount; 
                         }
                     }
 
@@ -1272,7 +1299,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         uint currentprice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode);
                         if(currentprice != 0)
                         {
-                            earning += (Convert.ToSingle(currentprice) / 1000 - order.cost) * order.nSecurityAmount; 
+                            earning += (Convert.ToSingle(currentprice) / 10000 - order.cost) * order.nSecurityAmount; 
                         }
                     }
                 }
@@ -1440,10 +1467,14 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         /// <param name="orders">交易信息</param>
         /// <param name="strategyNo">策略名称</param>
-        public void RefreshFile(List<AuthorizedOrder> running_orders,List<AuthorizedOrder> completed_orders, String strategyNo)
+        public void RefreshFile(String strategyNo)
         {
-            String path = System.Environment.CurrentDirectory + strategyNo;
+            String path = CONFIG.AUTHORIZED_BASE_URL + strategyNo;
             String value = String.Empty;
+            List<AuthorizedOrder> running_orders = new List<AuthorizedOrder>();
+            List<AuthorizedOrder> completed_orders = new List<AuthorizedOrder>();
+
+            AuthorizedTradesList.GetStrategyTrades(strategyNo, out running_orders, out completed_orders);
 
             //a. 用户| 交易所| 代码| 数量| 下单价格|买卖|开平|证券类型|是否限价|止损价|止盈价|成本价|是否交易
             foreach (AuthorizedOrder order in running_orders)
@@ -1454,7 +1485,7 @@ namespace Stork_Future_TaoLi.StrategyModule
 
             foreach(AuthorizedOrder order in completed_orders)
             {
-                value += (order.User + "|" + order.exchangeId + "|" + order.cSecurityCode + "|" + order.nSecurityAmount.ToString() + "|" + order.cTradeDirection + "|" + order.offsetflag + "|" + order.cSecurityType + "|" + order.LimitedPrice + "|" + order.LossValue.ToString() + "|" + order.SurplusValue.ToString() + "|" + order.cost.ToString() + "|" + "N");
+                value += (order.User + "|" + order.exchangeId + "|" + order.cSecurityCode + "|" + order.nSecurityAmount.ToString() + "|" + order.dDealPrice.ToString() +"|" + order.cTradeDirection + "|" + order.offsetflag + "|" + order.cSecurityType + "|" + order.LimitedPrice + "|" + order.LossValue.ToString() + "|" + order.SurplusValue.ToString() + "|" + order.cost.ToString() + "|" + "Y");
                 value += "\r\n";
             }
 
@@ -1480,6 +1511,26 @@ namespace Stork_Future_TaoLi.StrategyModule
             catch (Exception ex)
             {
                 GlobalErrorLog.LogInstance.LogEvent("更新文件失败，文件名：" + strategyNo + "\r\n" + ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 删除文件
+        /// </summary>
+        /// <param name="strategyNo"></param>
+        public void DeleteFile(String strategyNo)
+        {
+            String path = CONFIG.AUTHORIZED_BASE_URL + strategyNo;
+            String achivepath = CONFIG.AUTHORIZED_ARCHIVE_URL + strategyNo;
+
+            try
+            {
+                File.Copy(path, achivepath);
+                File.Delete(path);
+            }
+            catch (Exception e)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(e.ToString());
             }
         }
 

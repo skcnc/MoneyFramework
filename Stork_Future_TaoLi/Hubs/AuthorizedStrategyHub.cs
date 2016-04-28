@@ -160,7 +160,7 @@ namespace Stork_Future_TaoLi.Hubs
             if (UserConnectionRelation.Keys.Contains(user))
             {
                 String ConnectionID = UserConnectionRelation[user];
-                _context.Clients.Client(ConnectionID).updateAccount(earning, marketvalue);
+                _context.Clients.Client(ConnectionID).updateAccount(earning, marketValue);
             }
         }
     }

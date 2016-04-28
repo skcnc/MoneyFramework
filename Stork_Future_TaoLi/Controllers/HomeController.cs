@@ -539,6 +539,9 @@ namespace Stork_Future_TaoLi.Controllers
                 if (strategy.Trim() == String.Empty) return;
                 System.String filename = strategy.Split('|')[0];
 
+                FileOperations oper = new FileOperations();
+                oper.RefreshFile(filename);
+
                 //filename = "sc20160427025316";
 
                 // set the http content type to "APPLICATION/OCTET-STREAM

@@ -890,6 +890,7 @@ namespace Stork_Future_TaoLi
                     TradeNum = (int?)(order.nSecurityAmount),
                     type = order.cSecurityType,
                     Cost = order.cost,
+                    exchangeid = order.exchangeId,
                     describe = AuthorizedStatus.GetStatus(order.Status)
                 };
 
