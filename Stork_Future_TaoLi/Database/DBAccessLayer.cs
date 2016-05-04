@@ -387,6 +387,106 @@ namespace Stork_Future_TaoLi
             return true;
 
         }
+
+        /// <summary>
+        /// 获取参数值
+        /// </summary>
+        /// <param name="paraname"></param>
+        /// <returns></returns>
+        public static String GetParameter(String paraname)
+        {
+            if (DBAccessLayer.DBEnable == false) return string.Empty;
+
+            paraname = paraname.Trim();
+
+            var tmp = from item in DbEntity.SYSPARAS where item.Paraname == paraname select item.Paravalue;
+
+            try
+            {
+                if(tmp.Count() > 0)
+                {
+                    return tmp.ToList()[0];
+                }
+                else
+                {
+                    return String.Empty;
+                }
+            }
+            catch(Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
+                LogSysInfo("DBAccessLayer-GetParameter", ex.ToString());
+                return String.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 设置具体参数
+        /// </summary>
+        /// <param name="paraname"></param>
+        /// <param name="paravalue"></param>
+        public static void SetParameter(PARAS para)
+        {
+            if (DBAccessLayer.DBEnable == false) return;
+
+
+            var tmp = from item in DbEntity.SYSPARAS select item;
+
+            try
+            {
+                if (tmp.Count() > 0)
+                {
+                    for (int i = 0; i < tmp.ToList().Count; i++)
+                    {
+                        switch(tmp.ToList()[i].Paraname.Trim())
+                        {
+                            case "STOCKADDR":
+                                tmp.ToList()[i].Paravalue = para.STOCKADDR.Trim();
+                                break;
+                            case "STOCKPORT":
+                                tmp.ToList()[i].Paravalue = para.STOCKPORT.Trim();
+                                break;
+                            case "STOCKACCOUNT":
+                                tmp.ToList()[i].Paravalue = para.STOCKACCOUNT.Trim();
+                                break;
+                            case "STOCKDEPTNO":
+                                tmp.ToList()[i].Paravalue = para.STOCKDEPTNO.Trim();
+                                break;
+                            case "STOCKNO":
+                                tmp.ToList()[i].Paravalue = para.STOCKNO.Trim();
+                                break;
+                            case "STOCKPASSWORD":
+                                tmp.ToList()[i].Paravalue = para.STOCKPASSWORD.Trim();
+                                break;
+                            case "FUTUREADDR":
+                                tmp.ToList()[i].Paravalue = para.FUTUREADDR.Trim();
+                                break;
+                            case "FUTUREBROKER":
+                                tmp.ToList()[i].Paravalue = para.FUTUREBROKER.Trim();
+                                break;
+                            case "FUTUREACCOUNT":
+                                tmp.ToList()[i].Paravalue = para.FUTUREACCOUNT.Trim();
+                                break;
+                            case "FUTUREPASSWORD":
+                                tmp.ToList()[i].Paravalue = para.FUTUREPASSWORD.Trim();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                        
+                    Dbsavechage("SetParameter");
+                }
+                else return;
+            }
+            catch(Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
+                LogSysInfo("DBAccessLayer-SetParameter", ex.ToString());
+                return;
+            }
+        }
         #endregion
 
         #region 用户信息相关
@@ -1977,5 +2077,7 @@ namespace Stork_Future_TaoLi
             Dbsavechage("LogSysInfo");
         }
         #endregion
+
+       
     }
 }

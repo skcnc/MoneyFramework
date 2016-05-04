@@ -210,6 +210,23 @@ namespace Stork_Future_TaoLi.Controllers
             }
         }
 
+        public string SetParas(String JsonString)
+        {
+            try
+            {
+                PARAS para = new PARAS();
+                para = JsonConvert.DeserializeObject<PARAS>(JsonString);
+                DBAccessLayer.SetParameter(para);
+                return "success";
+                
+            }
+            catch(Exception ex)
+            {
+                DBAccessLayer.LogSysInfo("HomeController-SetParas", ex.ToString());
+                return ex.ToString();
+            }
+        }
+
         public string GetBatchTrade(string user)
         {
             try

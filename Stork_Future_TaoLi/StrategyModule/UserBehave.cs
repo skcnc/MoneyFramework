@@ -394,4 +394,21 @@ namespace Stork_Future_TaoLi
         public String INDEX { get; set; }
     }
 
+    /// <summary>
+    /// 系统级参数
+    /// </summary>
+    public class PARAS
+    {
+        public String STOCKADDR { get; set; }
+        public String STOCKPORT { get; set; }
+        public String STOCKACCOUNT { get; set; }
+        public String STOCKDEPTNO { get; set; }
+        public String STOCKNO { get; set; }
+        public String STOCKPASSWORD { get; set; }
+        public String FUTUREADDR { get; set; }
+        public String FUTUREBROKER { get; set; }
+        public String FUTUREACCOUNT { get; set; }
+        public String FUTUREPASSWORD { get; set; }
+    }
+
 }

@@ -157,7 +157,7 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                         bool tradeMark = false;
                         double currentPrice = 0;
-                        currentPrice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode.Trim());
+                        currentPrice = Convert.ToSingle(AuthorizedMarket.GetMarketInfo(order.cSecurityCode.Trim()) / 10000.0);
 
                         //开始执行交易规则判断
                         //目前剩下running = 2 , conpleted = 4
@@ -580,6 +580,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                     lock (CompletedAuthorizedOrderMap)
                     {
                         o.dDealPrice = DealPrice;
+                        o.Status = 4;
                         CompletedAuthorizedOrderMap[strategyNo].Add(o);
                     }
                 }
@@ -1025,20 +1026,23 @@ namespace Stork_Future_TaoLi.StrategyModule
 
             if (AuthorizedOrderMap.Keys.Contains(strategy))
             {
-                foreach(AuthorizedOrder order in AuthorizedOrderMap[strategy])
+                lock (AuthorizedOrderMap)
                 {
-                    string status = AuthorizedStatus.GetStatus(order.Status);
-                    AuthorizedOrderStatus stat = new AuthorizedOrderStatus()
+                    foreach (AuthorizedOrder order in AuthorizedOrderMap[strategy])
                     {
-                        Code = order.cSecurityCode,
-                        DealPrice = "0",
-                        Status = order.Status.ToString(),
-                        StatusDesc = status,
-                        Strategy = strategy
-                    };
+                        string status = AuthorizedStatus.GetStatus(order.Status);
+                        AuthorizedOrderStatus stat = new AuthorizedOrderStatus()
+                        {
+                            Code = order.cSecurityCode,
+                            DealPrice = "0",
+                            Status = order.Status.ToString(),
+                            StatusDesc = status,
+                            Strategy = strategy
+                        };
 
-                    RunningStatus.Add(order.cSecurityCode, stat);
-                    AllStatus.Add(order.cSecurityCode, stat);
+                        RunningStatus.Add(order.cSecurityCode, stat);
+                        AllStatus.Add(order.cSecurityCode, stat);
+                    }
                 }
             }
 
@@ -1046,19 +1050,22 @@ namespace Stork_Future_TaoLi.StrategyModule
            
             if(CompletedAuthorizedOrderMap.Keys.Contains(strategy))
             {
-                foreach(AuthorizedOrder order in CompletedAuthorizedOrderMap[strategy])
+                lock (CompletedAuthorizedOrderMap)
                 {
-                    string status = AuthorizedStatus.GetStatus(order.Status);
-                    AuthorizedOrderStatus stat = new AuthorizedOrderStatus()
+                    foreach (AuthorizedOrder order in CompletedAuthorizedOrderMap[strategy])
                     {
-                        Code = order.cSecurityCode,
-                        DealPrice = order.dDealPrice.ToString(),
-                        Status = order.Status.ToString(),
-                        StatusDesc = status,
-                        Strategy = strategy
-                    };
-                    CompletedStatus.Add(order.cSecurityCode, stat);
-                    AllStatus.Add(order.cSecurityCode, stat);
+                        string status = AuthorizedStatus.GetStatus(order.Status);
+                        AuthorizedOrderStatus stat = new AuthorizedOrderStatus()
+                        {
+                            Code = order.cSecurityCode,
+                            DealPrice = order.dDealPrice.ToString(),
+                            Status = order.Status.ToString(),
+                            StatusDesc = status,
+                            Strategy = strategy
+                        };
+                        CompletedStatus.Add(order.cSecurityCode, stat);
+                        AllStatus.Add(order.cSecurityCode, stat);
+                    }
                 }
             }
 

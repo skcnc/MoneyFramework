@@ -295,6 +295,13 @@
           <Property Name="logtime" Type="time" Precision="7" />
           <Property Name="logdate" Type="date" />
         </EntityType>
+        <EntityType Name="SYSPARAS">
+          <Key>
+            <PropertyRef Name="Paraname" />
+          </Key>
+          <Property Name="Paraname" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Paravalue" Type="nvarchar" MaxLength="50" />
+        </EntityType>
         <EntityType Name="UserInfo">
           <Key>
             <PropertyRef Name="ID" />
@@ -325,6 +332,7 @@
           <EntitySet Name="SG_TAOLI_STATUS_TABLE" EntityType="Self.SG_TAOLI_STATUS_TABLE" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StockAccountTable" EntityType="Self.StockAccountTable" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SYS_LOG" EntityType="Self.SYS_LOG" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SYSPARAS" EntityType="Self.SYSPARAS" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserInfo" EntityType="Self.UserInfo" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -457,6 +465,7 @@
           <EntitySet Name="AuthorizedStrategyTable_HIS" EntityType="MoneyEntityModel.AuthorizedStrategyTable_HIS" />
           <EntitySet Name="AuthorizedTradeTable" EntityType="MoneyEntityModel.AuthorizedTradeTable" />
           <EntitySet Name="AuthorizedTradeTable_HIS" EntityType="MoneyEntityModel.AuthorizedTradeTable_HIS" />
+          <EntitySet Name="SYSPARAS" EntityType="MoneyEntityModel.SYSPARAS" />
         </EntityContainer>
         <EntityType Name="RISK_TABLE">
           <Key>
@@ -652,6 +661,13 @@
           <Property Name="surplusPrice" Type="Double" />
           <Property Name="lossPrice" Type="Double" />
           <Property Name="exchangeid" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="SYSPARAS">
+          <Key>
+            <PropertyRef Name="Paraname" />
+          </Key>
+          <Property Name="Paraname" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Paravalue" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -976,6 +992,14 @@
                 <ScalarProperty Name="Code" ColumnName="Code" />
                 <ScalarProperty Name="StrNo" ColumnName="StrNo" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SYSPARAS">
+            <EntityTypeMapping TypeName="MoneyEntityModel.SYSPARAS">
+              <MappingFragment StoreEntitySet="SYSPARAS">
+                <ScalarProperty Name="Paravalue" ColumnName="Paravalue" />
+                <ScalarProperty Name="Paraname" ColumnName="Paraname" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -258,6 +258,9 @@
     <Compile Include="Database\AuthorizedTradeTable_HIS.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\SYSPARAS.cs">
+      <DependentUpon>DBSet.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\SYS_LOG.cs">
       <DependentUpon>DBSet.tt</DependentUpon>
     </Compile>

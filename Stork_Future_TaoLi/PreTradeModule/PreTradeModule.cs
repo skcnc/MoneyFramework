@@ -444,12 +444,12 @@ namespace Stork_Future_TaoLi
                     {
                         if (tradeUnit.cSecurityType.ToUpper() == "S")
                         {
-                            if (tradeUnit.cExhcnageID == ExchangeID.SH)
+                            if (tradeUnit.cExhcnageID.ToUpper() == ExchangeID.SH)
                             {
                                 shTradeList.Add(tradeUnit);
                                 continue;
                             }
-                            else if (tradeUnit.cExhcnageID == ExchangeID.SZ)
+                            else if (tradeUnit.cExhcnageID.ToUpper() == ExchangeID.SZ)
                             {
                                 szTradeList.Add(tradeUnit);
                                 continue;
