@@ -395,23 +395,23 @@ namespace Stork_Future_TaoLi.Controllers
                             order = order.Substring(0, order.Length - 1);
                         }
 
-                        if (!order.Contains('|')) { return View(); }
+                        if (!order.Contains(',')) { return View(); }
 
-                        string[] values = order.Split('|');
+                        string[] values = order.Split(',');
 
                         if (values.Count() < 8) return View();
 
-                        string exchange = values[1];
-                        string code = values[2];
-                        string num = values[3];
-                        string price = values[4];
-                        string direction = values[5];
-                        string offsetflag = values[6];
-                        string type = values[7];
-                        string limitedflag = values[8];
-                        string lossPrice = values[9];
-                        string superPrice = values[10];
-                        string cost = values[11];
+                        string exchange = values[1];    //用户
+                        string code = values[2];        //股票代码
+                        string num = values[3];         //请求数量
+                        string price = values[4];       //请求价格
+                        string direction = values[5];   //交易方向 0：买入 ， 1：卖出
+                        string offsetflag = values[6];  //开平标志 0：开，1：平
+                        string type = values[7];        //类型： S:股票  F：期货
+                        string limitedflag = values[8]; //限价标志： N ： 不限  Y：限制
+                        string lossPrice = values[9];   //止损价  
+                        string superPrice = values[10]; //止盈价
+                        string cost = values[11];       //成本
 
                         int status = 0; //未启动
 
@@ -487,9 +487,9 @@ namespace Stork_Future_TaoLi.Controllers
                             order = order.Substring(0, order.Length - 1);
                         }
 
-                        if (!order.Contains('|')) { return View(); }
+                        if (!order.Contains(',')) { return View(); }
 
-                        string[] values = order.Split('|');
+                        string[] values = order.Split(',');
 
                         if (values.Count() < 8) return View();
 
@@ -612,6 +612,25 @@ namespace Stork_Future_TaoLi.Controllers
 
         public ActionResult SysRegister()
         {
+            try
+            {
+                ViewBag.STOCKADDR = DBAccessLayer.GetParameter("STOCKADDR");
+                ViewBag.STOCKPORT = DBAccessLayer.GetParameter("STOCKPORT");
+                ViewBag.STOCKACCOUNT = DBAccessLayer.GetParameter("STOCKACCOUNT");
+                ViewBag.STOCKDEPTNO = DBAccessLayer.GetParameter("STOCKDEPTNO");
+                ViewBag.STOCKNO = DBAccessLayer.GetParameter("STOCKNO");
+                ViewBag.STOCKPASSWORD = DBAccessLayer.GetParameter("STOCKPASSWORD");
+                ViewBag.FUTUREADDR = DBAccessLayer.GetParameter("FUTUREADDR");
+                ViewBag.FUTUREBROKER = DBAccessLayer.GetParameter("FUTUREBROKER");
+                ViewBag.FUTUREACCOUNT = DBAccessLayer.GetParameter("FUTUREACCOUNT");
+                ViewBag.FUTUREPASSWORD = DBAccessLayer.GetParameter("FUTUREPASSWORD");
+            }
+            catch(Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
+                DBAccessLayer.LogSysInfo("HomeController-SysRegister", ex.ToString());
+            }
+
             return View();
         }
 

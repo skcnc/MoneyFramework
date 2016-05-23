@@ -157,76 +157,85 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                         bool tradeMark = false;
                         double currentPrice = 0;
-                        currentPrice = Convert.ToSingle(AuthorizedMarket.GetMarketInfo(order.cSecurityCode.Trim()) / 10000.0);
+                        double highLimitPrice = 0;
+                        double lowLimitPrice = 0;
+
+                        MarketData market = AuthorizedMarket.GetMarketInfo(order.cSecurityCode);
+                        if(market != null)
+                        {
+                            currentPrice = Convert.ToSingle(market.Match / 10000.0);
+                            highLimitPrice = Convert.ToSingle(market.HighLimited / 10000.0);
+                            lowLimitPrice = Convert.ToSingle(market.LowLimited / 10000.0);
+                        }
 
                         //开始执行交易规则判断
                         //目前剩下running = 2 , conpleted = 4
 
-                        //强制下单的情况
-                        if(order.Status == 4 && order.dOrderPrice != 0 && currentPrice != 0)
-                        {
-                            tradeMark = true;
-                            order.dDealPrice = currentPrice;
-                        }
-
+            
                         try
                         {
                             if (order.Status == 2)
                             {
-                                if (order.LossValue == 0 && order.SurplusValue == 0)
+                                if (order.LimitedPrice == "Y")
                                 {
-                                    if (order.LimitedPrice == "N")
-                                    {
-                                        //止损止盈为0，且限价为N
-                                        tradeMark = true;
-                                        if (order.cTradeDirection == "0")
-                                            order.dDealPrice = currentPrice * 1.02;
-                                        else
-                                            order.dDealPrice = currentPrice * 0.98;
-                                    }
-                                    else
-                                    {
-                                        //止损止盈为0，且限价为Y
-                                        tradeMark = true;
-                                        order.dDealPrice = currentPrice;
-                                    }
+                                    order.dDealPrice = order.dOrderPrice;
                                 }
                                 else
                                 {
-                                    //止损，止盈价不全为0
-                                    if (order.LossValue != 0)
+                                    if (currentPrice != 0)
                                     {
-                                        if (currentPrice <= order.LossValue)
+                                        if (order.cTradeDirection == "0")
                                         {
-                                            tradeMark = true;
-                                        }
-                                    }
-
-                                    if (order.SurplusValue != 0)
-                                    {
-                                        if (currentPrice >= order.SurplusValue)
-                                        {
-                                            tradeMark = true;
-                                        }
-                                    }
-
-                                    if (tradeMark == true)
-                                    {
-                                        if (order.LimitedPrice == "N")
-                                        {
-                                            if (order.cTradeDirection == "0")
-                                                order.dDealPrice = currentPrice * 1.02;
+                                            if (currentPrice * 1.02 > highLimitPrice)
+                                            {
+                                                order.dDealPrice = highLimitPrice;
+                                            }
                                             else
-                                                order.dDealPrice = currentPrice * 0.98;
+                                            {
+                                                order.dDealPrice = currentPrice * 1.02;
+                                            }
                                         }
                                         else
                                         {
-                                            order.dDealPrice = currentPrice;
+                                            if (currentPrice * 0.98 < lowLimitPrice)
+                                            {
+                                                order.dDealPrice = lowLimitPrice;
+                                            }
+                                            else
+                                            {
+                                                order.dDealPrice = currentPrice * 0.98;
+                                            }
                                         }
+
+                                    }
+                                    else
+                                    {
+                                        order.dDealPrice = 0;
                                     }
                                 }
                             }
 
+                            if(order.LossValue != 0 && currentPrice <= order.LossValue)
+                            {
+                                tradeMark = true;
+                            }
+                            else if(order.SurplusValue != 0 && currentPrice >= order.SurplusValue)
+                            {
+                                tradeMark = true;
+                            }
+                            else if(order.SurplusValue == 0 && order.LossValue == 0)
+                            {
+                                tradeMark = true;
+                            }
+                            else
+                            {
+                                tradeMark = false;
+                            }
+                            if (order.Status == 4 && order.dOrderPrice != 0 && currentPrice != 0)
+                            {
+                                tradeMark = true;
+                            } 
+                   
                         }
                         catch(Exception ex)
                         {
@@ -273,10 +282,8 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                             AuthorizedTradesList.CompleteSpecificTrade(o.belongStrategy, o.cSecurityCode, currentPrice); 
                         }
-
                     }
                 }
-
             }
         }
 
@@ -355,13 +362,16 @@ namespace Stork_Future_TaoLi.StrategyModule
                     foreach (KeyValuePair<String, AuthorizedOrderStatus> Code in Codes)
                     {
                         float price = 0;
-                        if (Code.Value.Status == "0" || Code.Value.Status == "1")
-                            price = Convert.ToSingle(AuthorizedMarket.GetMarketInfo(Code.Key) / 10000.0);
-                        else if (Code.Value.Status == "2")
-                            price = Convert.ToSingle(AuthorizedMarket.GetMarketInfo(Code.Key) / 10000.0);
-                        else if (Code.Value.Status == "4")
-                            price = Convert.ToSingle(Code.Value.DealPrice);
-
+                        try
+                        {
+                            if (Code.Value.Status == "0" || Code.Value.Status == "1")
+                                price = Convert.ToSingle((AuthorizedMarket.GetMarketInfo(Code.Key) == null) ? 0 : AuthorizedMarket.GetMarketInfo(Code.Key).Match / 10000.0);
+                            else if (Code.Value.Status == "2")
+                                price = Convert.ToSingle((AuthorizedMarket.GetMarketInfo(Code.Key) == null) ? 0 : AuthorizedMarket.GetMarketInfo(Code.Key).Match / 10000.0);
+                            else if (Code.Value.Status == "4")
+                                price = Convert.ToSingle(Code.Value.DealPrice);
+                        }
+                        catch { }
                         PriceMap.Add(Code.Key, price.ToString());
                         StatusMap.Add(Code.Key, Code.Value.StatusDesc);
                     }
@@ -1040,8 +1050,15 @@ namespace Stork_Future_TaoLi.StrategyModule
                             Strategy = strategy
                         };
 
-                        RunningStatus.Add(order.cSecurityCode, stat);
-                        AllStatus.Add(order.cSecurityCode, stat);
+                        try
+                        {
+                            RunningStatus.Add(order.cSecurityCode, stat);
+                            AllStatus.Add(order.cSecurityCode, stat);
+                        }
+                        catch(Exception ex)
+                        {
+                            GlobalErrorLog.LogInstance.LogEvent("AuthorizedStrategy-UpdateViewList-" + ex.ToString());
+                        }
                     }
                 }
             }
@@ -1291,10 +1308,10 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                 foreach (AuthorizedOrder order in runningOrder)
                 {
+                    uint currentprice = (AuthorizedMarket.GetMarketInfo(order.cSecurityCode) == null) ? 0 : AuthorizedMarket.GetMarketInfo(order.cSecurityCode).Match;
                     if (order.cTradeDirection == "0" && order.cSecurityType.ToUpper() == "S")
                     {
                         //买入
-                        uint currentprice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode);
                         if(currentprice != 0)
                         {
                             marketvalue += Convert.ToSingle(currentprice) / 10000 * order.nSecurityAmount; 
@@ -1303,7 +1320,6 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                     if(order.cTradeDirection == "1" && order.cSecurityType.ToUpper() == "S")
                     {
-                        uint currentprice = AuthorizedMarket.GetMarketInfo(order.cSecurityCode);
                         if(currentprice != 0)
                         {
                             earning += (Convert.ToSingle(currentprice) / 10000 - order.cost) * order.nSecurityAmount; 
@@ -1352,6 +1368,9 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// <param name="info"></param>
         public static void UpdateMarketList(MarketData info )
         {
+            if (info == null)
+                return;
+
             lock (MarketList)
             {
                 if (MarketList.Keys.Contains(info.Code.Trim()))
@@ -1368,22 +1387,22 @@ namespace Stork_Future_TaoLi.StrategyModule
         /// </summary>
         /// <param name="Code"></param>
         /// <returns></returns>
-        public static uint GetMarketInfo(String Code)
+        public static MarketData GetMarketInfo(String Code)
         {
             Code = Code.Trim();
             if(!MarketList.Keys.Contains(Code))
             {
-                return 0;
+                return null;
             }
             else
             {
                 try
                 {
-                    return MarketList[Code].Match;
+                    return MarketList[Code];
                 }
                 catch
                 {
-                    return 0;
+                    return null;
                 }
             }
         } 

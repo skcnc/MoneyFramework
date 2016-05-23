@@ -113,7 +113,7 @@ bool CStockTrader::trader(const Traderorderstruct  mytraderoder, QueryEntrustord
 	if (mytraderoder.cSecuritytype == 's')
 		pReqMsg->price =  ((int)(mytraderoder.dOrderprice * 100)) * 10;  //股票只有两位精度
 	else
-		pReqMsg->price = (int)(mytraderoder.dOrderprice * 1000);
+		pReqMsg->price = ((int)(mytraderoder.dOrderprice * 100)) * 10; //(int)(mytraderoder.dOrderprice * 1000);
 
 	pReqMsg->head.crc = CalCRC(&pReqMsg->head.block_type, pReqMsg->head.block_size - 4);
 	len = pReqMsg->head.block_size;

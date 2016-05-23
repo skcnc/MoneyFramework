@@ -215,17 +215,17 @@ window.onload = function (e) {
         return;
     }
     else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/sysregister") {
-        $('#sysregister_stockconn_addr').val("10.65.8.14");
-        $('#sysregister_stockconn_port').val("18887");
-        $('#sysregister_stockconn_account').val("1653043461");
-        $('#sysregister_stockconn_deptno').val("001");
-        $('#sysregister_stockconn_no').val("201509");
-        $('#sysregister_stockconn_password').val("607178");
+        //$('#sysregister_stockconn_addr').val("10.65.8.14");
+        //$('#sysregister_stockconn_port').val("18887");
+        //$('#sysregister_stockconn_account').val("1653043461");
+        //$('#sysregister_stockconn_deptno').val("001");
+        //$('#sysregister_stockconn_no').val("201509");
+        //$('#sysregister_stockconn_password').val("607178");
 
-        $('#sysregister_futureconn_addr').val("tcp://119.15.140.81:41205");
-        $('#sysregister_futureconn_broker').val("8890");
-        $('#sysregister_futureconn_account').val("17730203");
-        $('#sysregister_futureconn_password').val("111111");
+        //$('#sysregister_futureconn_addr').val("tcp://119.15.140.81:41205");
+        //$('#sysregister_futureconn_broker').val("8890");
+        //$('#sysregister_futureconn_account').val("17730203");
+        //$('#sysregister_futureconn_password').val("111111");
     }
     else if (e.currentTarget.location.pathname.toLocaleLowerCase() == "/home/accountinfo")
     {

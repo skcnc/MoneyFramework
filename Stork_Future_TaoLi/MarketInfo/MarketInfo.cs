@@ -71,19 +71,31 @@ namespace Stork_Future_TaoLi
             {
                 subscribeList = MapMarketStratgy.GetMapSS();
 
-                foreach(KeyValuePair<String,List<String>> pair in  MapMarketStratgy.GetMapMS())
+                Dictionary<String, List<String>> dic = MapMarketStratgy.GetMapMS();
+                bool mark = true;
+                while(mark)
+                try
                 {
-                    if(!subscribeList.Keys.Contains(pair.Key))
+                    foreach (KeyValuePair<String, List<String>> pair in dic)
                     {
-                        subscribeList.Add(pair.Key, new List<string>());
-                    }
-                    foreach (String module in pair.Value)
-                    {
-                        if (!subscribeList[pair.Key].Contains(module))
+                        if (!subscribeList.Keys.Contains(pair.Key))
                         {
-                            subscribeList[pair.Key].Add(module);
+                            subscribeList.Add(pair.Key, new List<string>());
+                        }
+                        foreach (String module in pair.Value)
+                        {
+                            if (!subscribeList[pair.Key].Contains(module))
+                            {
+                                subscribeList[pair.Key].Add(module);
+                            }
                         }
                     }
+
+                    mark = false;
+                }
+                catch(Exception ex)
+                {
+                    GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
                 }
 
                 MapMarketStratgy.bSubscribeListChangeLabel = false;
@@ -108,8 +120,6 @@ namespace Stork_Future_TaoLi
                 //从行情应用获取新行情
                 Thread.Sleep(1); //线程的喘息时间
 
-
-
                 if (DateTime.Now.Second != lastmessage.Second)
                 {
                     KeyValuePair<string, object> message3 = new KeyValuePair<string, object>("THREAD_MARKET", (object)false);
@@ -126,10 +136,23 @@ namespace Stork_Future_TaoLi
 
                     break;
                 }
-                MarketData info = new MarketData();
+                List<MarketData> infos = new List<MarketData>();
                 try
                 {
-                    info = client.DeQueueInfo();
+                    int count = 0;
+                    MarketData info = new MarketData();
+                    while (count < 500)
+                    {
+                        info = client.DeQueueInfo();
+                        if(info == null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            infos.Add(info);
+                        }
+                    }
                 }
                 catch(Exception ex)
                 {
@@ -138,59 +161,66 @@ namespace Stork_Future_TaoLi
                     continue;
                 }
 
-                if (info == null)
+                if (infos == null)
                     continue;
                 else
                 {
                     //发现行情有变动，更新本地股市
                     //注册hash键
-
-                    string key = info.Code;
-                    
-                    if(key.Contains("."))
+                    foreach (MarketData info in infos)
                     {
-                        key = key.Split('.')[0]; 
-                    }
-                    if(MarketPrice.market.ContainsKey(info.Code))
-                    {
-                        MarketPrice.market[info.Code] = info.Match;
-                    }
-                    else
-                    {
-                        MarketPrice.market.Add(info.Code, info.Match);
-                    }
-
-                    MarketDelayCalculation.cal(info.Time);
-
-                    if (StockTable.ContainsKey(info.Code))
-                    {
-                        StockTable.Remove(info.Code);
-                    }
-                    StockTable.Add(info.Code, info);
-
-                    //marketMonitorQueue.EnQueueNew(info.Code, (((decimal)info.Match)/1000).ToString());
-                    marketMonitorQueue.EnQueueNew(info.Code, info.Time, info.Match, info.Status, info.HighLimited, info.LowLimited, info.PreClose, info.IOPV);
-
-                    if(!subscribeList.Keys.Contains(info.Code))
-                    {
-                        subscribeList.Add(info.Code, new List<String>());
-                    }
-
-                    if (subscribeList.Keys.Contains(info.Code))
-                    {
-                        //如果没有实例订阅过该股票，就不用管了
-                        List<String> _relatedStrategy = subscribeList[info.Code];
-
-                        foreach (String strategy in _relatedStrategy)
+                        if(info != null)
                         {
-                            if (refStrategyQueue.Keys.Contains(strategy))
+                            continue;
+                        }
+
+                        string key = info.Code;
+
+                        if (key.Contains("."))
+                        {
+                            key = key.Split('.')[0];
+                        }
+                        if (MarketPrice.market.ContainsKey(info.Code))
+                        {
+                            MarketPrice.market[info.Code] = info.Match;
+                        }
+                        else
+                        {
+                            MarketPrice.market.Add(info.Code, info.Match);
+                        }
+
+                        MarketDelayCalculation.cal(info.Time);
+
+                        if (StockTable.ContainsKey(info.Code))
+                        {
+                            StockTable.Remove(info.Code);
+                        }
+                        StockTable.Add(info.Code, info);
+
+                        //marketMonitorQueue.EnQueueNew(info.Code, (((decimal)info.Match)/1000).ToString());
+                        marketMonitorQueue.EnQueueNew(info.Code, info.Time, info.Match, info.Status, info.HighLimited, info.LowLimited, info.PreClose, info.IOPV);
+
+                        if (!subscribeList.Keys.Contains(info.Code))
+                        {
+                            subscribeList.Add(info.Code, new List<String>());
+                        }
+
+                        if (subscribeList.Keys.Contains(info.Code))
+                        {
+                            //如果没有实例订阅过该股票，就不用管了
+                            List<String> _relatedStrategy = subscribeList[info.Code];
+
+                            foreach (String strategy in _relatedStrategy)
                             {
-                                refStrategyQueue[strategy].Enqueue((object)info);
-                            }
-                            else
-                            {
-                                //如果发现策略实例包含工作列表，却不包含消息队列，则应该报错。
-                                continue;
+                                if (refStrategyQueue.Keys.Contains(strategy))
+                                {
+                                    refStrategyQueue[strategy].Enqueue((object)info);
+                                }
+                                else
+                                {
+                                    //如果发现策略实例包含工作列表，却不包含消息队列，则应该报错。
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -348,7 +378,6 @@ namespace Stork_Future_TaoLi
         {
             return MapSS;
         }
-
 
         /// <summary>
         /// 获取模块订阅列表
