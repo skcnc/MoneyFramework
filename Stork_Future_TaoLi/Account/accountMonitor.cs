@@ -100,6 +100,8 @@ namespace Stork_Future_TaoLi
                     //计划每5s刷新资金账户情况
                     List<UserInfo> users = DBAccessLayer.GetUser();
 
+                    if (users == null) return;
+
                     foreach (UserInfo info in users)
                     {
                         List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(info.alias);

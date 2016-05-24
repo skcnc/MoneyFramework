@@ -105,6 +105,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                                    break;
                                case "BSF+":
                                    //策略全部强制交易
+                                   GlobalTestLog.LogInstance.LogEvent(strategy + "全部下单开始！");
                                    AuthorizedTradesList.ForceStrategyTrade(strategy);
                                    break;
                                case "BCO+":
@@ -283,6 +284,11 @@ namespace Stork_Future_TaoLi.StrategyModule
                             AuthorizedTradesList.CompleteSpecificTrade(o.belongStrategy, o.cSecurityCode, currentPrice); 
                         }
                     }
+                }
+
+                if (OrderMap.Count > 10)
+                {
+                    GlobalTestLog.LogInstance.LogEvent("批量交易已下达交易预处理模块！");
                 }
             }
         }
@@ -499,7 +505,13 @@ namespace Stork_Future_TaoLi.StrategyModule
                 AuthorizedUserMap.Add(strategyNo, User);
             }
 
-            DBAccessLayer.InsertAuthorizedStrategy(strategyNo, User, String.Empty, orders);
+            Dictionary<String, Object> paras = new Dictionary<String, Object>();
+
+            paras.Add("strategyNo", strategyNo);
+            paras.Add("User", User);
+            paras.Add("orders", orders);
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.InsertAuthorizedStrategy), (object)(paras));
             FileOperations file = new FileOperations();
             file.CreateFile(orders, strategyNo);
             queue_authorized_tradeview.EnQueue((object)("A+" + "|" + User + "|" + strategyNo));
@@ -1229,19 +1241,27 @@ namespace Stork_Future_TaoLi.StrategyModule
             foreach(String str in Strategies)
             {
                 ListOrders.Add(str, new List<AuthorizedOrder>());
-                if(AuthorizedOrderMap.Keys.Contains(str))
+                try
                 {
-                    foreach(AuthorizedOrder order in AuthorizedOrderMap[str])
+                    if (AuthorizedOrderMap.Keys.Contains(str))
                     {
-                        ListOrders[str].Add(order);
+
+                        foreach (AuthorizedOrder order in AuthorizedOrderMap[str])
+                        {
+                            ListOrders[str].Add(order);
+                        }
+                    }
+                    if (CompletedAuthorizedOrderMap.Keys.Contains(str))
+                    {
+                        foreach (AuthorizedOrder order in CompletedAuthorizedOrderMap[str])
+                        {
+                            ListOrders[str].Add(order);
+                        }
                     }
                 }
-                if(CompletedAuthorizedOrderMap.Keys.Contains(str))
+                catch(Exception ex)
                 {
-                    foreach(AuthorizedOrder order in CompletedAuthorizedOrderMap[str])
-                    {
-                        ListOrders[str].Add(order);
-                    }
+                    GlobalErrorLog.LogInstance.LogEvent("AuthorizedStrategy-GetAllOrders: " + ex.ToString());
                 }
             }
 

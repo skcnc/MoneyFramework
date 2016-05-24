@@ -353,6 +353,11 @@ namespace Stork_Future_TaoLi
                 {
                     if (mos.Count == 0) continue;
 
+                    if (mos.Count > 10)
+                    {
+                        GlobalTestLog.LogInstance.LogEvent("批量交易已到交易预处理模块，数量：" + mos.Count);
+                    }
+
                     List<TradeOrderStruct> _TradeList = new List<TradeOrderStruct>();
                     string User = String.Empty;
                     foreach (MakeOrder mo in mos)
