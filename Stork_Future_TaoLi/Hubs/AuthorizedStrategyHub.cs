@@ -128,7 +128,7 @@ namespace Stork_Future_TaoLi.Hubs
             }
         }
 
-        public void UpdateCurrentPrice(String user,Dictionary<String,String> prices)
+        public void UpdateCurrentPrice(String user, Dictionary<String, String> prices)
         {
             if (UserConnectionRelation.Keys.Contains(user))
             {
@@ -137,7 +137,7 @@ namespace Stork_Future_TaoLi.Hubs
             }
         }
 
-        public void UpdateCurrentStatus(String user, Dictionary<String,String> status)
+        public void UpdateCurrentStatus(String user, Dictionary<String, String> status)
         {
             if (UserConnectionRelation.Keys.Contains(user))
             {

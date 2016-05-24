@@ -86,6 +86,9 @@ namespace Stork_Future_TaoLi
                 if (errLog == null)
                     errLog = new LogWirter();
 
+                errLog.EventSourceName = "全局报警";
+                errLog.EventLogType = System.Diagnostics.EventLogEntryType.Error;
+                errLog.EventLogID = 60001;
                 return errLog;
             }
         }
@@ -99,7 +102,7 @@ namespace Stork_Future_TaoLi
         GlobalTestLog()
         {
             testLog.EventSourceName = "全局测试";
-            testLog.EventLogType = System.Diagnostics.EventLogEntryType.Error;
+            testLog.EventLogType = System.Diagnostics.EventLogEntryType.SuccessAudit;
             testLog.EventLogID = 60002;
         }
 
@@ -113,6 +116,9 @@ namespace Stork_Future_TaoLi
                 if (testLog == null)
                     testLog = new LogWirter();
 
+                testLog.EventSourceName = "全局测试";
+                testLog.EventLogType = System.Diagnostics.EventLogEntryType.SuccessAudit;
+                testLog.EventLogID = 60002;
                 return testLog;
             }
         }

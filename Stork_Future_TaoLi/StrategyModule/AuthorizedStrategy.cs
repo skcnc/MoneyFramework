@@ -93,36 +93,45 @@ namespace Stork_Future_TaoLi.StrategyModule
                            {
                                case "BSO+":
                                    //策略全部启动
+                                   GlobalTestLog.LogInstance.LogEvent(strategy + "全部启动开始！,时间：" + DateTime.Now.Millisecond.ToString());
                                    AuthorizedTradesList.StartStrategyTrade(strategy);
+                                   Thread.Sleep(100);
                                    break;
                                case "BSS+":
                                    //策略全部暂停
                                    AuthorizedTradesList.SuspendStrategyTrade(strategy);
+                                   Thread.Sleep(100);
                                    break;
                                case "BSK+":
                                    //策略全部停止
                                    AuthorizedTradesList.StopStrategyTrade(strategy);
+                                   Thread.Sleep(100);
                                    break;
                                case "BSF+":
                                    //策略全部强制交易
-                                   GlobalTestLog.LogInstance.LogEvent(strategy + "全部下单开始！");
+                                   GlobalTestLog.LogInstance.LogEvent(strategy + "全部下单开始！,时间：" + DateTime.Now.Millisecond.ToString());
                                    AuthorizedTradesList.ForceStrategyTrade(strategy);
+                                   Thread.Sleep(100);
                                    break;
                                case "BCO+":
                                    //指定交易启动
                                    AuthorizedTradesList.StartSingleTrade(strategy, code);
+                                   Thread.Sleep(100);
                                    break;
                                case "BCS+":
                                    //指定交易暂停
                                    AuthorizedTradesList.SuspendSingleTrade(strategy, code);
+                                   Thread.Sleep(100);
                                    break;
                                case "BCK+":
                                    //指定交易停止
                                    AuthorizedTradesList.StopSingleTrade(strategy, code);
+                                   Thread.Sleep(100);
                                    break;
                                case "BCF+":
                                    //指定交易强制交易
                                    AuthorizedTradesList.ForceSingleTrade(strategy, code);
+                                   Thread.Sleep(100);
                                    break;
                            }
                            
@@ -145,9 +154,10 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                 foreach(KeyValuePair<String,List<AuthorizedOrder>> pair in OrderMap)
                 {
+                    int count = 0;
                     foreach(AuthorizedOrder order in pair.Value)
                     {
-
+                        count++;
                         if (order.Status == 1 || order.Status == 0) continue;
 
                         if(order.Status == 3)
@@ -251,7 +261,7 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                         //结束执行交易规则判断
 
-                        if(tradeMark)
+                        if (tradeMark)
                         {
                             MakeOrder o = new MakeOrder()
                             {
@@ -281,14 +291,17 @@ namespace Stork_Future_TaoLi.StrategyModule
 
                             ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
 
-                            AuthorizedTradesList.CompleteSpecificTrade(o.belongStrategy, o.cSecurityCode, currentPrice); 
-                        }
-                    }
-                }
+                            AuthorizedTradesList.CompleteSpecificTrade(o.belongStrategy, o.cSecurityCode, currentPrice);
 
-                if (OrderMap.Count > 10)
-                {
-                    GlobalTestLog.LogInstance.LogEvent("批量交易已下达交易预处理模块！");
+                            if(count == pair.Value.Count)
+                            {
+                                GlobalTestLog.LogInstance.LogEvent("策略：" + pair.Key + "全部下单至预处理模块！,时间：" + DateTime.Now.Millisecond.ToString());
+                            }
+                            
+                        }
+                        else
+                            continue;
+                    }
                 }
             }
         }
@@ -762,6 +775,7 @@ namespace Stork_Future_TaoLi.StrategyModule
             if (AuthorizedOrderMap.Keys.Contains(strategy))
             {
                 List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                List<Dictionary<String, String>> paraDic = new List<Dictionary<string, string>>();
                 for (int i = 0; i < AOs.Count; i++)
                 {
                     if (AOs[i].Status == (int)AuthorizedTradeStatus.Pause || AOs[i].Status == (int)AuthorizedTradeStatus.Running || AOs[i].Status == (int)AuthorizedTradeStatus.Init)
@@ -775,9 +789,12 @@ namespace Stork_Future_TaoLi.StrategyModule
                         paras.Add("dealprice", "0");
                         paras.Add("status", AOs[i].Status.ToString());
 
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                        paraDic.Add(paras);
+                        
                     }
                 }
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.BatchUpdateAuthorizedTrade), (object)(paraDic));
             }
         }
 
@@ -1093,7 +1110,14 @@ namespace Stork_Future_TaoLi.StrategyModule
                             Strategy = strategy
                         };
                         CompletedStatus.Add(order.cSecurityCode, stat);
-                        AllStatus.Add(order.cSecurityCode, stat);
+                        if (!AllStatus.Keys.Contains(order.cSecurityCode))
+                        {
+                            AllStatus.Add(order.cSecurityCode, stat);
+                        }
+                        else
+                        {
+                            AllStatus[order.cSecurityCode] = stat;
+                        }
                     }
                 }
             }
@@ -1114,14 +1138,20 @@ namespace Stork_Future_TaoLi.StrategyModule
         {
             List<String> users = new List<string>();
 
-            foreach (KeyValuePair<String, String> pair in AuthorizedUserMap)
+            try
             {
-                if (!users.Contains(pair.Value.Trim()))
+                foreach (KeyValuePair<String, String> pair in AuthorizedUserMap)
                 {
-                    users.Add(pair.Value.Trim());
+                    if (!users.Contains(pair.Value.Trim()))
+                    {
+                        users.Add(pair.Value.Trim());
+                    }
                 }
             }
-
+            catch(Exception ex)
+            {
+                GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
+            }
             return users;
         }
 

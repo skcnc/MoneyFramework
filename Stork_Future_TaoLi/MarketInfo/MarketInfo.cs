@@ -152,6 +152,7 @@ namespace Stork_Future_TaoLi
                         {
                             infos.Add(info);
                         }
+                        count++;
                     }
                 }
                 catch(Exception ex)
@@ -169,7 +170,7 @@ namespace Stork_Future_TaoLi
                     //注册hash键
                     foreach (MarketData info in infos)
                     {
-                        if(info != null)
+                        if(info == null)
                         {
                             continue;
                         }
@@ -214,7 +215,14 @@ namespace Stork_Future_TaoLi
                             {
                                 if (refStrategyQueue.Keys.Contains(strategy))
                                 {
-                                    refStrategyQueue[strategy].Enqueue((object)info);
+                                    try
+                                    {
+                                        refStrategyQueue[strategy].Enqueue((object)info);
+                                    }
+                                    catch
+                                    {
+                                        break;
+                                    }
                                 }
                                 else
                                 {

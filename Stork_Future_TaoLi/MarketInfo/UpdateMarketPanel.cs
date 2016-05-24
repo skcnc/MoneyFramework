@@ -24,6 +24,7 @@ namespace Stork_Future_TaoLi
                 while (marketMonitorQueue.GetQueueLength() > 0)
                 {
                     MarketValue value = marketMonitorQueue.DeQueueNew();
+                    if (value == null) continue;
                     MarketMonitor.Instance.Send(value);
                 }
             }

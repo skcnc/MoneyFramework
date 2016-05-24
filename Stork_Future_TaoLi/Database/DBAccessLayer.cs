@@ -1142,6 +1142,76 @@ namespace Stork_Future_TaoLi
             }
         }
 
+        public static void BatchUpdateAuthorizedTrade(Object obj)
+        {
+
+            lock (AuthorizedUpdateLock)
+            {
+                List<Dictionary<String, String>> paraDics = (List<Dictionary<String, String>>)obj;
+                using (MoneyEntityEntities3 entity = new MoneyEntityEntities3())
+                {
+                    foreach (Dictionary<String, String> paras in paraDics)
+                    {
+                        String StrNo = paras["strno"];
+                        String Code = paras["code"];
+                        double dealPrice = Convert.ToDouble(paras["dealprice"].Trim());
+                        int status = Convert.ToInt16(paras["status"].Trim());
+
+                        if (DBAccessLayer.DBEnable == false) return;
+
+                        var records = (from item in entity.AuthorizedTradeTable where item.StrNo == StrNo && item.Code == Code select item);
+
+                        if (records.Count() == 0) return;
+
+                        AuthorizedTradeTable record = records.ToList()[0];
+
+                        switch (status)
+                        {
+                            case (int)AuthorizedTradeStatus.Pause:
+                                {
+                                    record.status = status.ToString();
+                                    record.describe = AuthorizedStatus.GetStatus(status);
+                                    break;
+                                }
+                            case (int)AuthorizedTradeStatus.Running:
+                                {
+                                    if (record.status == ((int)AuthorizedTradeStatus.Init).ToString())
+                                    {
+                                        //初始running时间
+                                        record.status = status.ToString();
+                                        record.describe = AuthorizedStatus.GetStatus(status);
+                                        record.startTime = DateTime.Now;
+                                    }
+                                    break;
+                                }
+                            case (int)AuthorizedTradeStatus.Stop:
+                                {
+                                    record.status = status.ToString();
+                                    record.describe = AuthorizedStatus.GetStatus(status);
+                                    break;
+                                }
+                            case (int)AuthorizedTradeStatus.Dealed:
+                                {
+                                    record.status = status.ToString();
+                                    record.describe = AuthorizedStatus.GetStatus(status);
+                                    record.dealTime = DateTime.Now;
+                                    record.dealPrice = dealPrice;
+                                    break;
+                                }
+                            default:
+                                {
+                                    break;
+                                }
+
+                        } 
+                    }
+
+                    DBChangeSave save = new DBChangeSave();
+                    save.Dbsavechage("UpdateAuthorizedTrade", entity);
+                }
+            }
+        }
+
         public static Dictionary<String, List<AuthorizedOrder>> LoadPauseStrategy()
         {
             if (DBAccessLayer.DBEnable == false) return new Dictionary<string,List<AuthorizedOrder>>();

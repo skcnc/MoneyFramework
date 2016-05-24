@@ -355,7 +355,7 @@ namespace Stork_Future_TaoLi
 
                     if (mos.Count > 10)
                     {
-                        GlobalTestLog.LogInstance.LogEvent("批量交易已到交易预处理模块，数量：" + mos.Count);
+                        GlobalTestLog.LogInstance.LogEvent("批量交易已到交易预处理模块，数量：" + mos.Count + "时间:" + DateTime.Now.Millisecond.ToString());
                     }
 
                     List<TradeOrderStruct> _TradeList = new List<TradeOrderStruct>();
@@ -399,6 +399,11 @@ namespace Stork_Future_TaoLi
                     //风控检测
                     string result = string.Empty;
                     bool brisk = riskmonitor.RiskDetection(User, _TradeList, out result);
+
+                    if (_TradeList.Count > 10)
+                    {
+                        GlobalTestLog.LogInstance.LogEvent("交易经过风控，时间:" + DateTime.Now.Millisecond.ToString() + "数量：" + _TradeList.Count.ToString());
+                    }
 
                     //风控结果记入数据库
                     if (_TradeList.Count == 1)
