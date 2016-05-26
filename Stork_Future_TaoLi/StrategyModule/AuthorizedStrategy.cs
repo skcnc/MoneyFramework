@@ -95,6 +95,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                                    //策略全部启动
                                    GlobalTestLog.LogInstance.LogEvent(strategy + "全部启动开始！,时间：" + DateTime.Now.Millisecond.ToString());
                                    AuthorizedTradesList.StartStrategyTrade(strategy);
+                                   GlobalTestLog.LogInstance.LogEvent(strategy + "MARK2！,时间：" + DateTime.Now.Millisecond.ToString());
                                    Thread.Sleep(100);
                                    break;
                                case "BSS+":
@@ -151,16 +152,19 @@ namespace Stork_Future_TaoLi.StrategyModule
                 // 判断交易执行规则
 
                 Dictionary<String, List<AuthorizedOrder>> OrderMap = AuthorizedTradesList.GetOrderList();
-
-                foreach(KeyValuePair<String,List<AuthorizedOrder>> pair in OrderMap)
+                foreach (KeyValuePair<String, List<AuthorizedOrder>> pair in OrderMap)
                 {
                     int count = 0;
-                    foreach(AuthorizedOrder order in pair.Value)
+
+                    //记录成交数量，改变数据库
+                    List<Dictionary<String, String>> tradeUnits = new List<Dictionary<String, String>>();
+                    List<MakeOrder> trades = new List<MakeOrder>();
+                    foreach (AuthorizedOrder order in pair.Value)
                     {
                         count++;
                         if (order.Status == 1 || order.Status == 0) continue;
 
-                        if(order.Status == 3)
+                        if (order.Status == 3)
                         {
                             AuthorizedTradesList.CompleteSpecificTrade(order.belongStrategy, order.cSecurityCode, 0);
                             continue;
@@ -172,7 +176,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         double lowLimitPrice = 0;
 
                         MarketData market = AuthorizedMarket.GetMarketInfo(order.cSecurityCode);
-                        if(market != null)
+                        if (market != null)
                         {
                             currentPrice = Convert.ToSingle(market.Match / 10000.0);
                             highLimitPrice = Convert.ToSingle(market.HighLimited / 10000.0);
@@ -182,7 +186,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                         //开始执行交易规则判断
                         //目前剩下running = 2 , conpleted = 4
 
-            
+
                         try
                         {
                             if (order.Status == 2)
@@ -226,15 +230,15 @@ namespace Stork_Future_TaoLi.StrategyModule
                                 }
                             }
 
-                            if(order.LossValue != 0 && currentPrice <= order.LossValue)
+                            if (order.LossValue != 0 && currentPrice <= order.LossValue)
                             {
                                 tradeMark = true;
                             }
-                            else if(order.SurplusValue != 0 && currentPrice >= order.SurplusValue)
+                            else if (order.SurplusValue != 0 && currentPrice >= order.SurplusValue)
                             {
                                 tradeMark = true;
                             }
-                            else if(order.SurplusValue == 0 && order.LossValue == 0)
+                            else if (order.SurplusValue == 0 && order.LossValue == 0)
                             {
                                 tradeMark = true;
                             }
@@ -245,10 +249,10 @@ namespace Stork_Future_TaoLi.StrategyModule
                             if (order.Status == 4 && order.dOrderPrice != 0 && currentPrice != 0)
                             {
                                 tradeMark = true;
-                            } 
-                   
+                            }
+
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             GlobalErrorLog.LogInstance.LogEvent(ex.ToString());
                         }
@@ -256,10 +260,6 @@ namespace Stork_Future_TaoLi.StrategyModule
                         {
                             tradeMark = false;
                         }
-                        
-
-
-                        //结束执行交易规则判断
 
                         if (tradeMark)
                         {
@@ -277,30 +277,38 @@ namespace Stork_Future_TaoLi.StrategyModule
                                 User = order.User
                             };
 
-                            List<MakeOrder> orders = new List<MakeOrder>();
-                            orders.Add(o);
-
-                            queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue((object)orders);
-
-                            Dictionary<String, String> paras = new Dictionary<string, string>();
-
-                            paras.Add("strno", o.belongStrategy.Trim());
-                            paras.Add("code", o.cSecurityCode.Trim());
-                            paras.Add("dealprice", currentPrice.ToString());
-                            paras.Add("status", order.Status.ToString());
-
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
-
-                            AuthorizedTradesList.CompleteSpecificTrade(o.belongStrategy, o.cSecurityCode, currentPrice);
-
-                            if(count == pair.Value.Count)
-                            {
-                                GlobalTestLog.LogInstance.LogEvent("策略：" + pair.Key + "全部下单至预处理模块！,时间：" + DateTime.Now.Millisecond.ToString());
-                            }
-                            
+                            trades.Add(o);
                         }
-                        else
-                            continue;
+                    }
+
+                    if (trades.Count > 0)
+                    {
+                        queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue((object)trades);
+                    }
+
+                    if (trades.Count == pair.Value.Count)
+                    {
+                        GlobalTestLog.LogInstance.LogEvent("策略：" + pair.Key + "全部下单至预处理模块！,时间：" + DateTime.Now.Millisecond.ToString());
+                    }
+
+                    foreach (MakeOrder o in trades)
+                    {
+                        Dictionary<String, String> paras = new Dictionary<string, string>();
+
+                        paras.Add("strno", o.belongStrategy.Trim());
+                        paras.Add("code", o.cSecurityCode.Trim());
+                        paras.Add("dealprice", o.dOrderPrice.ToString());
+                        paras.Add("status", "4");                           //状态标记为已下单
+
+                        //结束执行交易规则判断
+                        AuthorizedTradesList.CompleteSpecificTrade(o.belongStrategy, o.cSecurityCode, o.dOrderPrice);
+
+                        tradeUnits.Add(paras);
+                    }
+
+                    if (tradeUnits.Count > 0)
+                    {
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.BatchUpdateAuthorizedTrade), (object)(tradeUnits));
                     }
                 }
             }
@@ -658,6 +666,7 @@ namespace Stork_Future_TaoLi.StrategyModule
             if(AuthorizedOrderMap.Keys.Contains(strategy))
             {
                 List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                List<Dictionary<String, String>> tradeUnits = new List<Dictionary<string, string>>();
                 for (int i = 0; i < AOs.Count; i++)
                 {
                     if (AOs[i].Status != (int)AuthorizedTradeStatus.Stop || AOs[i].Status != (int)AuthorizedTradeStatus.Dealed)
@@ -671,8 +680,13 @@ namespace Stork_Future_TaoLi.StrategyModule
                         paras.Add("dealprice", "0");
                         paras.Add("status", AOs[i].Status.ToString());
 
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                        tradeUnits.Add(paras);
                     }
+                }
+
+                if (tradeUnits.Count > 0)
+                {
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.BatchUpdateAuthorizedTrade), (object)(tradeUnits));
                 }
             }
         }
@@ -718,6 +732,7 @@ namespace Stork_Future_TaoLi.StrategyModule
             if(AuthorizedOrderMap.Keys.Contains(strategy))
             {
                 List<AuthorizedOrder> AOs = AuthorizedOrderMap[strategy];
+                List<Dictionary<String, String>> TradeUnits = new List<Dictionary<string, string>>();
                 for (int i = 0; i < AOs.Count; i++)
                 {
                     if (AOs[i].Status == (int)AuthorizedTradeStatus.Running)
@@ -731,9 +746,13 @@ namespace Stork_Future_TaoLi.StrategyModule
                         paras.Add("dealprice", "0");
                         paras.Add("status", AOs[i].Status.ToString());
 
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.UpdateAuthorizedTrade), (object)(paras));
+                        TradeUnits.Add(paras);
+
+                        
                     }
                 }
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.BatchUpdateAuthorizedTrade), (object)(TradeUnits));
             }
         }
 
@@ -1163,6 +1182,9 @@ namespace Stork_Future_TaoLi.StrategyModule
         public static List<String> GetUserStrategies (String User)
         {
             List<String> Strategies = new List<string>();
+
+            if (User == null) return Strategies;
+
             User = User.Trim();
 
 
@@ -1259,7 +1281,7 @@ namespace Stork_Future_TaoLi.StrategyModule
             Dictionary<String, List<AuthorizedOrder>> ListOrders = new Dictionary<string, List<AuthorizedOrder>>();
 
             foreach (KeyValuePair<String, String> pair in AuthorizedUserMap)
-            {
+            { 
                 if (pair.Value == User)
                 {
                     Strategies.Add(pair.Key);

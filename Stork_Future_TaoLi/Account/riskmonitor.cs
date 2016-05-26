@@ -6,6 +6,7 @@ using Stork_Future_TaoLi.Variables_Type;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 
 namespace Stork_Future_TaoLi
@@ -175,6 +176,13 @@ namespace Stork_Future_TaoLi
             //风控错误码
             int errCode = 0;
 
+            //默认策略号
+            String StrategyId = "000"; 
+            if(orderlist != null && orderlist.Count > 0)
+            {
+                StrategyId = orderlist[0].belongStrategy;
+            }
+
 
             //获取真实实时账户信息
             UserInfo user = DBAccessLayer.GetOneUser(alias);
@@ -182,6 +190,17 @@ namespace Stork_Future_TaoLi
             if (user == null) 
             {
                 result = "未查到用户：" + alias;
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = 0,
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info));
                 return false; 
             }
 
@@ -192,6 +211,17 @@ namespace Stork_Future_TaoLi
 
             if (stock_account == null) {
                 result = "stockAccountDictionary中不存在用户：" + alias;
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = 0,
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info));
                 return false;
             }
 
@@ -199,8 +229,19 @@ namespace Stork_Future_TaoLi
 
             if (future_account == null)
             {
-
                 result = "futureAccountDictionary中不存在用户： " + alias;
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = 0,
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info));
+                return false;
             }
 
             //计划买入股票交易列表
@@ -291,7 +332,24 @@ namespace Stork_Future_TaoLi
             {
                 BWNameTable BW_record=  BWRecords.Find(delegate(BWNameTable item) { return item.Code.Trim() == tos.cSecurityCode.Trim(); });
 
-                if (BW_record == null) { errCode = 4; result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode); return false; }
+                if (BW_record == null)
+                {
+                    errCode = 4; 
+                    result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode); 
+                    RiskInfo info = new RiskInfo()
+                    {
+                        alias = alias,
+                        price = tos.dOrderPrice,
+                        amount = Convert.ToInt32(tos.nSecurityAmount),
+                        err = result,
+                        orientation = tos.cTradeDirection,
+                        code = tos.cSecurityCode.Trim(),
+                        strid = tos.belongStrategy
+                    };
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
+                    
+                    return false;
+                }
 
                 if(tos.cSecurityType.ToUpper() == "S" && tos.cTradeDirection == TradeOrientationAndFlag.StockTradeDirectionBuy)
                 {
@@ -326,6 +384,17 @@ namespace Stork_Future_TaoLi
                    {
                        errCode = 5;
                        result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
+                       RiskInfo info = new RiskInfo()
+                       {
+                           alias = alias,
+                           price = tos.dOrderPrice,
+                           amount = Convert.ToInt32(tos.nSecurityAmount),
+                           err = result,
+                           orientation = tos.cTradeDirection,
+                           code = tos.cSecurityCode.Trim(),
+                           strid = tos.belongStrategy
+                       };
+                       ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                        return false;
                    }
 
@@ -334,6 +403,17 @@ namespace Stork_Future_TaoLi
                     {
                         errCode = 5;
                         result = accountMonitor.GetErrorCode(errCode, tos.cSecurityCode);
+                        RiskInfo info = new RiskInfo()
+                        {
+                            alias = alias,
+                            price = tos.dOrderPrice,
+                            amount = Convert.ToInt32(tos.nSecurityAmount),
+                            err = result,
+                            orientation = tos.cTradeDirection,
+                            code = tos.cSecurityCode.Trim(),
+                            strid = tos.belongStrategy
+                        };
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                         return false;
                     }
                 }
@@ -369,6 +449,17 @@ namespace Stork_Future_TaoLi
                                 //买入平仓数量小于卖出仓位，交易被拒绝。
                                 errCode = 12;
                                 result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + position_amount + "|" + order.cTradeDirection);
+                                RiskInfo info = new RiskInfo()
+                                {
+                                    alias = alias,
+                                    price = order.dOrderPrice,
+                                    amount = Convert.ToInt32(order.nSecurityAmount),
+                                    err = result,
+                                    orientation = order.cTradeDirection,
+                                    code = order.cSecurityCode.Trim(),
+                                    strid = order.belongStrategy
+                                };
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                                 return false;
                             }
 
@@ -391,6 +482,17 @@ namespace Stork_Future_TaoLi
                                 //卖出平仓数量小于买入仓位，交易被拒绝。
                                 errCode = 12;
                                 result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + position_amount + "|" + order.cTradeDirection);
+                                RiskInfo info = new RiskInfo()
+                                {
+                                    alias = alias,
+                                    price = order.dOrderPrice,
+                                    amount = Convert.ToInt32(order.nSecurityAmount),
+                                    err = result,
+                                    orientation = order.cTradeDirection,
+                                    code = order.cSecurityCode.Trim(),
+                                    strid = order.belongStrategy
+                                };
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                                 return false;
                             }
                         }
@@ -428,6 +530,17 @@ namespace Stork_Future_TaoLi
                         {
                             errCode = 11;
                             result = accountMonitor.GetErrorCode(errCode, order.cSecurityCode + "|" + (entrust_amount + position_amount).ToString());
+                            RiskInfo info = new RiskInfo()
+                            {
+                                alias = alias,
+                                price = order.dOrderPrice,
+                                amount = Convert.ToInt32(order.nSecurityAmount),
+                                err = result,
+                                orientation = order.cTradeDirection,
+                                code = order.cSecurityCode.Trim(),
+                                strid = order.belongStrategy
+                            };
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                             return false;
                         }
                     }
@@ -449,6 +562,17 @@ namespace Stork_Future_TaoLi
             {
                 errCode = 1;
                 result = accountMonitor.GetErrorCode(errCode, string.Empty);
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = Convert.ToInt32(0),
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                 return false;
             }
 
@@ -459,6 +583,17 @@ namespace Stork_Future_TaoLi
             {
                 errCode = 2;
                 result = accountMonitor.GetErrorCode(errCode, string.Empty);
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = Convert.ToInt32(0),
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                 return false;
             }
 
@@ -504,6 +639,17 @@ namespace Stork_Future_TaoLi
                         {
                             errCode  = 6;
                             result = accountMonitor.GetErrorCode(errCode,tos.cSecurityCode);
+                            RiskInfo info = new RiskInfo()
+                            {
+                                alias = alias,
+                                price = 0,
+                                amount = Convert.ToInt32(0),
+                                err = result,
+                                orientation = "0",
+                                code = "000",
+                                strid = StrategyId
+                            };
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                             return false;
                         }
                     }
@@ -539,6 +685,17 @@ namespace Stork_Future_TaoLi
             {
                 errCode = 13;
                 result = accountMonitor.GetErrorCode(errCode, (estimate_stock_value / totalAccount * 100).ToString());
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = Convert.ToInt32(0),
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                 return false;
             }
             #endregion
@@ -581,6 +738,17 @@ namespace Stork_Future_TaoLi
             {
                 errCode = 10;
                 result = accountMonitor.GetErrorCode(errCode,string.Empty);
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = Convert.ToInt32(0),
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                 return false;
             }
 
@@ -595,6 +763,17 @@ namespace Stork_Future_TaoLi
             {
                 errCode = 8;
                 result = accountMonitor.GetErrorCode(errCode,string.Empty);
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = Convert.ToInt32(0),
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                 return false;
             }
 
@@ -607,6 +786,17 @@ namespace Stork_Future_TaoLi
             {
                 errCode = 14;
                 result = accountMonitor.GetErrorCode(errCode, string.Empty);
+                RiskInfo info = new RiskInfo()
+                {
+                    alias = alias,
+                    price = 0,
+                    amount = Convert.ToInt32(0),
+                    err = result,
+                    orientation = "0",
+                    code = "000",
+                    strid = StrategyId
+                };
+                ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                 return false;
             }
 
@@ -632,6 +822,17 @@ namespace Stork_Future_TaoLi
                     {
                         errCode = 9;
                         result = accountMonitor.GetErrorCode(errCode, changkouRatio.ToString());
+                        RiskInfo info = new RiskInfo()
+                        {
+                            alias = alias,
+                            price = 0,
+                            amount = Convert.ToInt32(0),
+                            err = result,
+                            orientation = "0",
+                            code = "000",
+                            strid = StrategyId
+                        };
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                         //return false;
                     }
                 }
@@ -639,6 +840,17 @@ namespace Stork_Future_TaoLi
                 {
                     errCode = 9;
                     result = accountMonitor.GetErrorCode(errCode, "无穷大");
+                    RiskInfo info = new RiskInfo()
+                    {
+                        alias = alias,
+                        price = 0,
+                        amount = Convert.ToInt32(0),
+                        err = result,
+                        orientation = "0",
+                        code = "000",
+                        strid = StrategyId
+                    };
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(info)); 
                     //return false;
                 }
             }
@@ -668,6 +880,18 @@ namespace Stork_Future_TaoLi
             errCode = 0;
 
             result = accountMonitor.GetErrorCode(errCode, string.Empty);
+
+            RiskInfo infoSuccess = new RiskInfo()
+            {
+                alias = alias,
+                price = 0,
+                amount = Convert.ToInt32(0),
+                err = result,
+                orientation = "0",
+                code = "000",
+                strid = StrategyId
+            };
+            ThreadPool.QueueUserWorkItem(new WaitCallback(DBAccessLayer.AddRiskRecord), (object)(infoSuccess)); 
 
             return true;
         }

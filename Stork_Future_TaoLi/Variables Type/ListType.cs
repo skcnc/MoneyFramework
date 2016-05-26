@@ -149,4 +149,16 @@ namespace Stork_Future_TaoLi.Variables_Type
         public string DealPrice { get; set; }
         public string Strategy { get; set; }
     }
+
+    
+    public class RiskInfo
+    {
+        public string alias { get; set; }
+        public string err { get; set; }
+        public string strid { get; set; }
+        public string code { get; set; }
+        public string orientation { get; set; }
+        public int amount { get; set; }
+        public double price { get; set; }
+    }
 }

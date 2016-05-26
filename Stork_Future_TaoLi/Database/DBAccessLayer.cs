@@ -30,8 +30,18 @@ namespace Stork_Future_TaoLi
        
 
         #region 风控相关
-        public static void AddRiskRecord(string alias, string err, string strid, string code, int amount, double price, string orientation)
+        //public static void AddRiskRecord(string alias, string err, string strid, string code, int amount, double price, string orientation)
+        public static void AddRiskRecord(object para)
         {
+            RiskInfo risk = (RiskInfo)para;
+            string alias = risk.alias;
+            string err = risk.err;
+            string strid = risk.strid;
+            string code = risk.code;
+            int amount = risk.amount;
+            double price = risk.price;
+            string orientation = risk.orientation;
+
 
             if (DBAccessLayer.DBEnable == false) { return; }
 

@@ -182,28 +182,28 @@ namespace Stork_Future_TaoLi
                     string result = string.Empty;
                     bool brisk = riskmonitor.RiskDetection(user, tos, out result);
 
-                    //风控结果记入数据库
-                    DBAccessLayer.AddRiskRecord(user, result, strategyid, "00", 0, 0, "0");
+                    
+                    //DBAccessLayer.AddRiskRecord(user, result, strategyid, "00", 0, 0, "0");
 
-                    List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(user);
+                    //List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(user);
 
-                    int count = 0;
+                    //int count = 0;
 
-                    if (risks.Count > 0)
-                    {
-                        List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
+                    //if (risks.Count > 0)
+                    //{
+                    //    List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
 
-                        foreach (RISK_TABLE risk in risks)
-                        {
-                            count++;
-                            if (count > 10) break;
-                            riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
-                        }
+                    //    foreach (RISK_TABLE risk in risks)
+                    //    {
+                    //        count++;
+                    //        if (count > 10) break;
+                    //        riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
+                    //    }
 
 
-                        TradeMonitor.Instance.updateRiskList(user, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
+                    //    TradeMonitor.Instance.updateRiskList(user, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
 
-                    }
+                    //}
 
 
 
@@ -398,47 +398,12 @@ namespace Stork_Future_TaoLi
 
                     //风控检测
                     string result = string.Empty;
-                    bool brisk = riskmonitor.RiskDetection(User, _TradeList, out result);
-
+                    //bool brisk = riskmonitor.RiskDetection(User, _TradeList, out result);
+                    bool brisk = true;
                     if (_TradeList.Count > 10)
                     {
                         GlobalTestLog.LogInstance.LogEvent("交易经过风控，时间:" + DateTime.Now.Millisecond.ToString() + "数量：" + _TradeList.Count.ToString());
                     }
-
-                    //风控结果记入数据库
-                    if (_TradeList.Count == 1)
-                    {
-                        DBAccessLayer.AddRiskRecord(_TradeList[0].cUser, result, "00", _TradeList[0].cSecurityCode, Convert.ToInt32(_TradeList[0].nSecurityAmount), _TradeList[0].dOrderPrice, _TradeList[0].cTradeDirection);
-                    }
-                    else
-                    {
-                        foreach (TradeOrderStruct tradeUnit in _TradeList)
-                        {
-                            DBAccessLayer.AddRiskRecord(tradeUnit.cUser, result, "00", tradeUnit.cSecurityCode, Convert.ToInt32(tradeUnit.nSecurityAmount), tradeUnit.dOrderPrice, tradeUnit.cTradeDirection);
-                        }
-                    }
-
-                    List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(User);
-
-                    int count = 0;
-
-                    if (risks.Count > 0)
-                    {
-                        List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
-
-                        foreach (RISK_TABLE risk in risks)
-                        {
-                            count++;
-                            if (count > 10) break;
-                            riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
-                        }
-
-
-                        TradeMonitor.Instance.updateRiskList(User, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
-
-                    }
-
-
 
                     if (!brisk)
                     {
@@ -493,6 +458,26 @@ namespace Stork_Future_TaoLi
                             QUEUE_FUTURE_TRADE.GetQueue().Enqueue((object)futureTradeList);
                         }
                     }
+
+                    List<RISK_TABLE> risks = DBAccessLayer.GetRiskRecord(User);
+
+                    int count = 0;
+
+                    if (risks.Count > 0)
+                    {
+                        List<TMRiskInfo> riskinfos = new List<TMRiskInfo>();
+
+                        foreach (RISK_TABLE risk in risks)
+                        {
+                            count++;
+                            if (count > 10) break;
+                            riskinfos.Add(new TMRiskInfo() { code = risk.code, hand = risk.amount.ToString(), price = risk.price.ToString(), orientation = risk.orientation, time = risk.time.ToString(), strategy = "00", user = risk.alias, errinfo = risk.err });
+                        }
+
+
+                        TradeMonitor.Instance.updateRiskList(User, JsonConvert.SerializeObject(riskinfos), JsonConvert.SerializeObject(riskmonitor.riskPara));
+
+                    }
                 }
                 
                 #endregion
@@ -502,8 +487,7 @@ namespace Stork_Future_TaoLi
                     KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_PRE_TRADE", (object)true);
                     queue_system_status.GetQueue().Enqueue((object)message1);
                     PreTradeModule.isRunning = DateTime.Now;
-                } 
-
+                }
             }
         }
         

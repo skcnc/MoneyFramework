@@ -128,29 +128,64 @@ namespace Stork_Future_TaoLi.TradeModule
 
                 //此时内存中包含了即将被进行的交易
 
-                //判断空闲的线程
-                //利用随机选择，保证线程的平均使用
-                Random ran = new Random();
-                bool _bSearch = true;
-                int _tNo = 0;
-                while (_bSearch)
+                //按照15个一组分割交易
+                List<TradeOrderStruct> tradeGroup = new List<TradeOrderStruct>();
+                foreach(TradeOrderStruct trade in next_trade)
                 {
-                    _tNo = ran.Next(0, stockNum);
-                    if (queue_stock_excuteThread.GetThreadIsAvailiable(_tNo))
+                    if (tradeGroup.Count < 15)
                     {
-                        _bSearch = false;
+                        tradeGroup.Add(trade);
+
+                        if (tradeGroup.Count == 15)
+                        {
+                            //判断空闲的线程
+                            //利用随机选择，保证线程的平均使用
+                            Random ran = new Random();
+                            bool _bSearch = true;
+                            int _tNo = 0;
+                            while (_bSearch)
+                            {
+                                _tNo = ran.Next(0, stockNum);
+                                if (queue_stock_excuteThread.GetThreadIsAvailiable(_tNo))
+                                {
+                                    _bSearch = false;
+                                }
+                            }
+                            log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + tradeGroup.Count);
+                            //选择第 _tNo 个线程执行交易
+                            queue_stock_excuteThread.GetQueue(_tNo).Enqueue((object)tradeGroup);
+                            queue_stock_excuteThread.SetThreadBusy(_tNo);
+
+                            Thread.Sleep(10);
+
+                            tradeGroup.Clear();
+                        }
                     }
                 }
-                log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + next_trade.Count);
-                //选择第 _tNo 个线程执行交易
-                queue_stock_excuteThread.GetQueue(_tNo).Enqueue((object)next_trade);
-                queue_stock_excuteThread.SetThreadBusy(_tNo);
+                if (tradeGroup.Count > 0)
+                {
+                    //判断空闲的线程
+                    //利用随机选择，保证线程的平均使用
+                    Random ran = new Random();
+                    bool _bSearch = true;
+                    int _tNo = 0;
+                    while (_bSearch)
+                    {
+                        _tNo = ran.Next(0, stockNum);
+                        if (queue_stock_excuteThread.GetThreadIsAvailiable(_tNo))
+                        {
+                            _bSearch = false;
+                        }
+                    }
+                    log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + tradeGroup.Count);
+                    //选择第 _tNo 个线程执行交易
+                    queue_stock_excuteThread.GetQueue(_tNo).Enqueue((object)tradeGroup);
+                    queue_stock_excuteThread.SetThreadBusy(_tNo);
 
+                    Thread.Sleep(10);
 
-                //************************************
-                //将交易发送到相应执行线程后需要做的事情
-                //************************************
-              
+                    tradeGroup.Clear();
+                }
             }
 
             Thread.CurrentThread.Abort();

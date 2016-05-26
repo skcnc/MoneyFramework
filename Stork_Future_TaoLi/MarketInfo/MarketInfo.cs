@@ -141,7 +141,7 @@ namespace Stork_Future_TaoLi
                 {
                     int count = 0;
                     MarketData info = new MarketData();
-                    while (count < 500)
+                    while (count < 700)
                     {
                         info = client.DeQueueInfo();
                         if(info == null)
