@@ -75,22 +75,10 @@ namespace Stork_Future_TaoLi.TradeModule
             //  4. 记录每个交易线程目前处理的交易内容，并写入数据库
             while (true)
             {
-                Thread.Sleep(10);
-                if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
-                {
-                    log.LogEvent("本模块供血不足，线程即将死亡");
-                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_MONITOR", (object)false);
-                    queue_system_status.GetQueue().Enqueue((object)message1);
-                    break;
-                }
-
-                if (lastmessage.Second != DateTime.Now.Second)
-                {
-                    KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_MONITOR", (object)true);
-                    queue_system_status.GetQueue().Enqueue((object)message1);
-                    lastmessage = DateTime.Now;
-                }
-
+                
+                Thread.Sleep(1);
+                String logword = String.Empty;
+                
                 //获取下一笔交易
                 List<TradeOrderStruct> next_trade = new List<TradeOrderStruct>();
                 if (QUEUE_SH_TRADE.GetQueueNumber() > 0)
@@ -123,68 +111,75 @@ namespace Stork_Future_TaoLi.TradeModule
 
                 if (next_trade.Count == 0)
                 {
+                    if ((DateTime.Now - GlobalHeartBeat.GetGlobalTime()).TotalMinutes > 10)
+                    {
+                        log.LogEvent("本模块供血不足，线程即将死亡");
+                        KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_MONITOR", (object)false);
+                        queue_system_status.GetQueue().Enqueue((object)message1);
+                        break;
+                    }
+
+                    if (lastmessage.Second != DateTime.Now.Second)
+                    {
+                        KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_MONITOR", (object)true);
+                        try
+                        {
+                            queue_system_status.GetQueue().Enqueue((object)message1);
+                            lastmessage = DateTime.Now;
+                        }
+                        catch
+                        {
+                            //do nothing
+                        }
+                    }
+
                     continue;
                 }
-
-                //此时内存中包含了即将被进行的交易
-
-                //按照15个一组分割交易
-                List<TradeOrderStruct> tradeGroup = new List<TradeOrderStruct>();
-                foreach(TradeOrderStruct trade in next_trade)
+                else
                 {
-                    if (tradeGroup.Count < 15)
-                    {
-                        tradeGroup.Add(trade);
 
-                        if (tradeGroup.Count == 15)
+
+                    //此时内存中包含了即将被进行的交易
+
+                    //按照15个一组分割交易
+                    List<TradeOrderStruct> tradeGroup = new List<TradeOrderStruct>();
+                    foreach (TradeOrderStruct trade in next_trade)
+                    {
+                        if (tradeGroup.Count < 15)
                         {
-                            //判断空闲的线程
-                            //利用随机选择，保证线程的平均使用
-                            Random ran = new Random();
-                            bool _bSearch = true;
-                            int _tNo = 0;
-                            while (_bSearch)
+                            tradeGroup.Add(trade);
+
+                            if (tradeGroup.Count == 15)
                             {
-                                _tNo = ran.Next(0, stockNum);
-                                if (queue_stock_excuteThread.GetThreadIsAvailiable(_tNo))
+                                //判断空闲的线程
+                                //利用随机选择，保证线程的平均使用
+                                ChoosePackage package = new ChoosePackage()
                                 {
-                                    _bSearch = false;
-                                }
+                                    threadCount = stockNum,
+                                    tradeGroup = tradeGroup
+                                };
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(ChooseThread), (object)package);
+                                logword += " 发送交易： " + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString() + "\r\n";
+                                
+                                tradeGroup.Clear();
                             }
-                            log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + tradeGroup.Count);
-                            //选择第 _tNo 个线程执行交易
-                            queue_stock_excuteThread.GetQueue(_tNo).Enqueue((object)tradeGroup);
-                            queue_stock_excuteThread.SetThreadBusy(_tNo);
-
-                            Thread.Sleep(10);
-
-                            tradeGroup.Clear();
                         }
                     }
-                }
-                if (tradeGroup.Count > 0)
-                {
-                    //判断空闲的线程
-                    //利用随机选择，保证线程的平均使用
-                    Random ran = new Random();
-                    bool _bSearch = true;
-                    int _tNo = 0;
-                    while (_bSearch)
+                    if (tradeGroup.Count > 0)
                     {
-                        _tNo = ran.Next(0, stockNum);
-                        if (queue_stock_excuteThread.GetThreadIsAvailiable(_tNo))
+                        //判断空闲的线程
+                        //利用随机选择，保证线程的平均使用
+                        ChoosePackage package = new ChoosePackage()
                         {
-                            _bSearch = false;
-                        }
+                            threadCount = stockNum,
+                            tradeGroup = tradeGroup
+                        };
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(ChooseThread), (object)package);
+                        logword += " 发送交易： " + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString() + "\r\n";
+                        tradeGroup.Clear();
                     }
-                    log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + tradeGroup.Count);
-                    //选择第 _tNo 个线程执行交易
-                    queue_stock_excuteThread.GetQueue(_tNo).Enqueue((object)tradeGroup);
-                    queue_stock_excuteThread.SetThreadBusy(_tNo);
 
-                    Thread.Sleep(10);
-
-                    tradeGroup.Clear();
+                    GlobalTestLog.LogInstance.LogEvent(logword);
                 }
             }
 
@@ -248,8 +243,15 @@ namespace Stork_Future_TaoLi.TradeModule
                 if(lastmessagetime.Second != DateTime.Now.Second)
                 {
                     KeyValuePair<string, object> message1 = new KeyValuePair<string, object>("THREAD_STOCK_TRADE_WORKER", (object)_threadNo);
-                    queue_system_status.GetQueue().Enqueue((object)message1);
-                    lastmessagetime = DateTime.Now;
+                    try
+                    {
+                        queue_system_status.GetQueue().Enqueue((object)message1);
+                        lastmessagetime = DateTime.Now;
+                    }
+                    catch
+                    {
+                        //do nothing
+                    }
                 }
 
 
@@ -265,8 +267,43 @@ namespace Stork_Future_TaoLi.TradeModule
 
                 if (queue_stock_excuteThread.GetQueue(_threadNo).Count > 0)
                 {
-                    List<TradeOrderStruct> trades = (List<TradeOrderStruct>)queue_stock_excuteThread.StockExcuteQueues[_threadNo].Dequeue();
+                    List<TradeOrderStruct> Queuetrades = (List<TradeOrderStruct>)queue_stock_excuteThread.StockExcuteQueues[_threadNo].Dequeue();
 
+                    List<TradeOrderStruct> trades = new List<TradeOrderStruct>();
+
+                    int eni = 0;
+                    while (true)
+                    {
+                        try
+                        {
+                            TradeOrderStruct trade = Queuetrades[eni];
+                            trades.Add(new TradeOrderStruct()
+                            {
+                                belongStrategy = trade.belongStrategy,
+                                cExhcnageID = trade.cExhcnageID,
+                                cOffsetFlag = trade.cOffsetFlag,
+                                cOrderexecutedetail = trade.cOrderexecutedetail,
+                                cOrderLevel = trade.cOrderLevel,
+                                cOrderPriceType = trade.cOrderPriceType,
+                                cSecurityCode = trade.cSecurityCode,
+                                cSecurityType = trade.cSecurityType,
+                                cTradeDirection = trade.cTradeDirection,
+                                cUser = trade.cUser,
+                                dOrderPrice = trade.dOrderPrice,
+                                nSecurityAmount = trade.nSecurityAmount,
+                                OrderRef = trade.OrderRef,
+                                SecurityName = trade.SecurityName
+                            });
+                            eni++;
+                        }
+                        catch
+                        {
+                            break;
+                        }
+                    }
+
+
+                    Guid tradeuuid = Guid.NewGuid();
 
                     if (trades == null || trades.Count == 0)
                     {
@@ -282,17 +319,10 @@ namespace Stork_Future_TaoLi.TradeModule
                         DebugMark = false;
                     }
 
-
-
                     if (trades.Count > 0)
                     {
                         sublog.LogEvent("线程 ：" + _threadNo.ToString() + " 执行交易数量 ： " + trades.Count);
                     }
-
-                    
-
-                 
-
 
                     if (!_classTradeStock.getConnectStatus())
                     {
@@ -323,6 +353,8 @@ namespace Stork_Future_TaoLi.TradeModule
 
                         string user = trades[0].cUser;
 
+                        GlobalTestLog.LogInstance.LogEvent("线程 ：" + _threadNo.ToString() +  " 发送交易： " + tradeuuid.ToString() + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
+                        
                         if (DebugMark == true)
                         {
                             
@@ -332,6 +364,8 @@ namespace Stork_Future_TaoLi.TradeModule
                         {
                             entrustUnit = _classTradeStock.BatchTrade(tradesUnit, trades.Count, s);
                         }
+
+                        GlobalTestLog.LogInstance.LogEvent("线程 ：" + _threadNo.ToString() +  " 收到交易回报： " + tradeuuid.ToString() + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
 
                         if (entrustUnit != null && entrustUnit.ToList().Count() > 0)
                         {
@@ -377,6 +411,8 @@ namespace Stork_Future_TaoLi.TradeModule
 
                         string user = trades[0].cUser;
 
+                        //GlobalTestLog.LogInstance.LogEvent("发送交易： " + tradeuuid.ToString() + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
+
                         if (DebugMark == true)
                         {
                             test.SingleTradeTest(tradesUnit, out entrustUnit, out s);
@@ -385,6 +421,8 @@ namespace Stork_Future_TaoLi.TradeModule
                         {
                             _classTradeStock.SingleTrade(tradesUnit, entrustUnit, s);
                         }
+
+                        //GlobalTestLog.LogInstance.LogEvent("收到交易回报： " + tradeuuid.ToString() + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
 
                         if (entrustUnit.OrderSysID != null && entrustUnit.OrderSysID != String.Empty && entrustUnit.OrderSysID != "0")
                         {
@@ -524,11 +562,48 @@ namespace Stork_Future_TaoLi.TradeModule
 
         }
 
+        private static void ChooseThread(object package)
+        {
+
+            List<TradeOrderStruct> tradeGroup = ((ChoosePackage)package).tradeGroup;
+            if (tradeGroup == null) return;
+            int stockNum = ((ChoosePackage)package).threadCount;
+            Random ran = new Random();
+            //int stockNum = CONFIG.STOCK_TRADE_THREAD_NUM;
+            int _tNo = ran.Next(0, stockNum);
+           
+            //bool _bSearch = true;
+            //while (_bSearch)
+            //{
+            //    if (queue_stock_excuteThread.GetThreadIsAvailiable(_tNo))
+            //    {
+            //        _bSearch = false;
+            //    }
+            //    _tNo++;
+            //    if (_tNo == stockNum)
+            //    {
+            //        _tNo = 0;
+            //    }
+            //}
+
+            //GlobalTestLog.LogInstance.LogEvent("线程：" + _tNo.ToString() + " 发送交易： " + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
+            log.LogEvent("安排线程 ： " + _tNo + " 执行交易 数量： " + ((List < TradeOrderStruct >) tradeGroup).Count);
+            queue_stock_excuteThread.GetQueue(_tNo).Enqueue(tradeGroup);
+            ThreadPool.QueueUserWorkItem(new WaitCallback(queue_stock_excuteThread.SetThreadBusy), (object)(_tNo));
+
+        }
+
     }
 
     public class TradeParaPackage
     {
         //当前线程的编号
         public int _threadNo { get; set; }
+    }
+
+    public class ChoosePackage
+    {
+        public List<TradeOrderStruct> tradeGroup { get; set; }
+        public int threadCount { get; set; }
     }
 } 

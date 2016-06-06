@@ -105,11 +105,11 @@ namespace Stork_Future_TaoLi.Queues
         /// 设定指定线程的工作状态为“忙碌”
         /// </summary>
         /// <param name="_threadNo"></param>
-        public static void SetThreadBusy(int _threadNo)
+        public static void SetThreadBusy(object _threadNo)
         {
             lock (StockThreadIsAvailiable)
             {
-                StockThreadIsAvailiable[_threadNo] = false;
+                StockThreadIsAvailiable[(int)_threadNo] = false;
             }
         }
 

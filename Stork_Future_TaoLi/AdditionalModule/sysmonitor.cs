@@ -476,7 +476,13 @@ namespace Stork_Future_TaoLi
                 }
 
 
-                object obj = queue_system_status.GetQueue().Dequeue();
+                object obj = null;
+                try
+                {
+                    obj =
+                       queue_system_status.GetQueue().Dequeue();
+                }
+                catch { }
 
                 if (obj == null) continue;
 

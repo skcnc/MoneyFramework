@@ -353,9 +353,13 @@ namespace Stork_Future_TaoLi
                 {
                     if (mos.Count == 0) continue;
 
-                    if (mos.Count > 10)
+                    if (mos.Count > 1)
                     {
-                        GlobalTestLog.LogInstance.LogEvent("批量交易已到交易预处理模块，数量：" + mos.Count + "时间:" + DateTime.Now.Millisecond.ToString());
+                        GlobalTestLog.LogInstance.LogEvent("批量交易已到交易预处理模块，数量：" + mos.Count + "时间:" + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
+                    }
+                    else if(mos.Count == 1)
+                    {
+                        GlobalTestLog.LogInstance.LogEvent("单笔交易已到交易预处理模块，数量：" + mos.Count + "时间:" + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
                     }
 
                     List<TradeOrderStruct> _TradeList = new List<TradeOrderStruct>();
@@ -402,7 +406,7 @@ namespace Stork_Future_TaoLi
                     bool brisk = true;
                     if (_TradeList.Count > 10)
                     {
-                        GlobalTestLog.LogInstance.LogEvent("交易经过风控，时间:" + DateTime.Now.Millisecond.ToString() + "数量：" + _TradeList.Count.ToString());
+                        GlobalTestLog.LogInstance.LogEvent("交易经过风控，时间:" + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString() + "数量：" + _TradeList.Count.ToString());
                     }
 
                     if (!brisk)

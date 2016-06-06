@@ -7,6 +7,10 @@ Name	: 全局测试
 LogId	: 60002
 About	: 全局范围内的测试信息
 
+Name	: 全局测试2
+LogId	: 60003
+About	: 全局范围内的测试信息
+
 Name	: 行情延时日志
 LogId	: 60010
 About	: 记录分钟级行情接收入口延时信息

@@ -17,7 +17,7 @@ namespace Stork_Future_TaoLi.Variables_Type
         /// 股票交易最大线程数
         /// </summary>
         public static int STOCK_TRADE_THREAD_NUM { get { return stock_trade_thread_num; } }
-        private static int stock_trade_thread_num = 2;
+        private static int stock_trade_thread_num = 100;
 
         /// <summary>货交易最大线程数
         /// 期

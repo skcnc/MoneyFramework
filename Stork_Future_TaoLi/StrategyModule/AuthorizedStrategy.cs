@@ -45,9 +45,21 @@ namespace Stork_Future_TaoLi.StrategyModule
 
             DateTime dt = DateTime.Now;
 
+            int countLoop = 0;
+            DateTime lastdt = DateTime.Now;
+
             while (true)
             {
                 Thread.Sleep(1);
+                countLoop++;
+
+                if (countLoop >= 1000)
+                {
+                    double avartime = (DateTime.Now - lastdt).TotalMilliseconds / 1000;
+                    GlobalTestLog2.LogInstance.LogEvent("循环周期：" + avartime.ToString() + "毫秒");
+                    countLoop = 0;
+                    lastdt = DateTime.Now;
+                }
 
                 if (DateTime.Now.Second != dt.Second)
                 {
@@ -93,9 +105,8 @@ namespace Stork_Future_TaoLi.StrategyModule
                            {
                                case "BSO+":
                                    //策略全部启动
-                                   GlobalTestLog.LogInstance.LogEvent(strategy + "全部启动开始！,时间：" + DateTime.Now.Millisecond.ToString());
+                                   GlobalTestLog.LogInstance.LogEvent(strategy + "全部启动开始！,时间：" + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
                                    AuthorizedTradesList.StartStrategyTrade(strategy);
-                                   GlobalTestLog.LogInstance.LogEvent(strategy + "MARK2！,时间：" + DateTime.Now.Millisecond.ToString());
                                    Thread.Sleep(100);
                                    break;
                                case "BSS+":
@@ -110,7 +121,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                                    break;
                                case "BSF+":
                                    //策略全部强制交易
-                                   GlobalTestLog.LogInstance.LogEvent(strategy + "全部下单开始！,时间：" + DateTime.Now.Millisecond.ToString());
+                                   GlobalTestLog.LogInstance.LogEvent(strategy + "全部下单开始！,时间：" + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
                                    AuthorizedTradesList.ForceStrategyTrade(strategy);
                                    Thread.Sleep(100);
                                    break;
@@ -284,13 +295,16 @@ namespace Stork_Future_TaoLi.StrategyModule
                     if (trades.Count > 0)
                     {
                         queue_prd_trade_from_tradeMonitor.GetQueue().Enqueue((object)trades);
+
+                        if (trades.Count == pair.Value.Count)
+                        {
+                            GlobalTestLog.LogInstance.LogEvent("策略：" + pair.Key + "全部发往预处理模块！,时间：" + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
+                        }
+
+
                     }
 
-                    if (trades.Count == pair.Value.Count)
-                    {
-                        GlobalTestLog.LogInstance.LogEvent("策略：" + pair.Key + "全部下单至预处理模块！,时间：" + DateTime.Now.Millisecond.ToString());
-                    }
-
+                  
                     foreach (MakeOrder o in trades)
                     {
                         Dictionary<String, String> paras = new Dictionary<string, string>();
@@ -319,9 +333,10 @@ namespace Stork_Future_TaoLi.StrategyModule
             log.LogEvent("授权交易线程B启动！");
 
             DateTime dt = DateTime.Now;
-
             while (true)
             {
+                
+
                 Thread.Sleep(1);
 
                 while (queue_authorized_query.GetQueueNumber() > 0)

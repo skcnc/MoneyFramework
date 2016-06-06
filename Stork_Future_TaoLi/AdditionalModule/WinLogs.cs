@@ -125,6 +125,36 @@ namespace Stork_Future_TaoLi
 
     }
 
+    class GlobalTestLog2
+    {
+        //private static LogWirter errLog = new LogWirter();
+
+        GlobalTestLog2()
+        {
+            testLog.EventSourceName = "全局测试";
+            testLog.EventLogType = System.Diagnostics.EventLogEntryType.SuccessAudit;
+            testLog.EventLogID = 60003;
+        }
+
+        private static LogWirter testLog = new LogWirter();
+
+        public static LogWirter LogInstance
+        {
+            get
+            {
+
+                if (testLog == null)
+                    testLog = new LogWirter();
+
+                testLog.EventSourceName = "全局测试";
+                testLog.EventLogType = System.Diagnostics.EventLogEntryType.SuccessAudit;
+                testLog.EventLogID = 60003;
+                return testLog;
+            }
+        }
+
+    }
+
 
     class MarketDelayLog
     {
