@@ -114,11 +114,13 @@ namespace MarketInfoSys
             if(Queue_Data.GetQueueNumber() > 2000)
             {
                 Queue_Data.GetQueue().Clear();
+                GlobalMarketLog.LogInstance.LogEvent("Queue_Data超量自动删除，时间：" + DateTime.Now.ToString());
             }
 
             if(MarketInfoQueue.GetQueueLength() > 2000)
             {
                 MarketInfoQueue.ClearQueue();
+                GlobalMarketLog.LogInstance.LogEvent("MarketInfoQueue超量自动删除，时间：" + DateTime.Now.ToString());
             }
 
             if (msg.MsgID == TDFMSGID.MSG_DATA_MARKET)

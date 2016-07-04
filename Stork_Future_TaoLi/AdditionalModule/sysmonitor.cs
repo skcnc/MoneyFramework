@@ -124,6 +124,16 @@ namespace Stork_Future_TaoLi
         public bool MarketSystemStatus { get; set; }
 
         /// <summary>
+        /// 行情系统状态2
+        /// </summary>
+        public bool MarketSystemStatus2 { get; set; }
+
+        /// <summary>
+        /// 行情系统状态2
+        /// </summary>
+        public bool MarketSystemStatus3 { get; set; }
+
+        /// <summary>
         /// 心跳发生系统状态
         /// </summary>
         public bool HeartBeatSystemStatus { get; set; }
@@ -272,6 +282,8 @@ namespace Stork_Future_TaoLi
     class ThreadLatestMessage
     {
         public DateTime MarketSystemStatus { get; set; }
+        public DateTime MarketSystemStatus2 { get; set; }
+        public DateTime MarketSystemStatus3 { get; set; }
         public DateTime HeartBeatSystemStatus { get; set; }
         public DateTime StrategyManagementSystemStatus { get; set; }
         public Dictionary<string, DateTime> StrategyWorkerSystemStatus { get; set; }
@@ -411,6 +423,8 @@ namespace Stork_Future_TaoLi
                     }
 
                     if ((current - messageData.MarketSystemStatus).TotalSeconds > 5) { message.MarketSystemStatus = false; } else { message.MarketSystemStatus = true; }
+                    if ((current - messageData.MarketSystemStatus2).TotalSeconds > 5) { message.MarketSystemStatus2 = false; } else { message.MarketSystemStatus2 = true; }
+                    if ((current - messageData.MarketSystemStatus3).TotalSeconds > 5) { message.MarketSystemStatus3 = false; } else { message.MarketSystemStatus3 = true; }
                     if ((current - messageData.HeartBeatSystemStatus).TotalSeconds > 5) { message.HeartBeatSystemStatus = false; } else { message.HeartBeatSystemStatus = true; }
                     if ((current - messageData.StrategyManagementSystemStatus).TotalSeconds > 5) { message.StrategyManagementSystemStatus = false; } else { message.StrategyManagementSystemStatus = true; }
                     
@@ -509,6 +523,12 @@ namespace Stork_Future_TaoLi
                         arrive_strategy_info(news.Value);
                         break;
                     case "THREAD_MARKET":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "THREAD_MARKET_2":
+                        arrive_thread_status(news.Key, news.Value);
+                        break;
+                    case "THREAD_MARKET_3":
                         arrive_thread_status(news.Key, news.Value);
                         break;
                     case "THREAD_HEARTBEAT":
@@ -629,6 +649,12 @@ namespace Stork_Future_TaoLi
             {
                 case "THREAD_MARKET":
                     messageData.MarketSystemStatus = DateTime.Now;
+                    break;
+                case "THREAD_MARKET_2":
+                    messageData.MarketSystemStatus2 = DateTime.Now;
+                    break;
+                case "THREAD_MARKET_3":
+                    messageData.MarketSystemStatus2 = DateTime.Now;
                     break;
                 case "THREAD_HEARTBEAT":
                     messageData.HeartBeatSystemStatus = DateTime.Now;

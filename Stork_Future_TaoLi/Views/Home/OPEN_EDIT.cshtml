@@ -6,34 +6,27 @@
 
 
 <div class="container-fluid">
-    <div id="content">
-        <div class="col-md-12" style="margin-bottom:30px">
-            <div class="col-md-8">
-                <input id="ct_value" type="text" placeholder="期货合约" />
-                <input id="op_value" type="text" placeholder="开仓点位" />
-                <input id="hd_value" type="text" placeholder="交易手数" />
-                <select id="index_input" style="font-size:20px">
-                    <option value="000300">沪深300</option>
-                    <option value="999987">上证50</option>
-                    <option value="990905">中证500</option>
-                </select>
-            </div>
-            <button id="btnViewList" class="btn btn-success">预览交易列表</button>
-            <button id="btnSubmit_open" class="btn btn-info">确认交易列表</button>
-            <span class="sr-only" id="strategyID">@ViewBag.ID</span>
-            <span class="sr-only" id="userName">@ViewBag.USER</span>
+    <div class="col-md-12" style="margin-bottom:30px">
+        <div class="col-md-8">
+            <input id="ct_value" type="text" placeholder="期货合约" />
+            <input id="op_value" type="text" placeholder="开仓点位" />
+            <input id="hd_value" type="text" placeholder="交易手数" />
+            <select id="index_input" style="font-size:20px">
+                <option value="000300">沪深300</option>
+                <option value="999987">上证50</option>
+                <option value="990905">中证500</option>
+            </select>
         </div>
-        <div class="row" style="margin-top:40px">
-            <div class="col-lg-6">
-                <div class="col-lg-12">
-                    <textarea id="weightList" placeholder="请将权重文件粘贴至此后编辑" style="max-width:1000px;width:inherit;height:500px"></textarea>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="col-lg-12">
-                    <textarea id="tradeOrder" placeholder="权重文件和手数确认后，可通过计算在此预览并修改交易列表" style="max-width:1000px;width:inherit;height:500px"></textarea>
-                </div>
-            </div>
-        </div>
+        <button id="btnViewList" class="btn btn-success">预览交易列表</button>
+        <button id="btnSubmit_open" class="btn btn-info">确认交易列表</button>
+        <span class="sr-only" id="strategyID">@ViewBag.ID</span>
+        <span class="sr-only" id="userName">@ViewBag.USER</span>
+        @using (Html.BeginForm("authorizedtradeB", "home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+
+            <input id="autorizedtrade_import_file" type="file" name="file" class="sr-only" onload="$('#autorizedtrade_import_file')[0].value = ''" onchange="if ($('#autorizedtrade_import_file')[0].value != '') { submit()}" />
+            <input class="sr-only import_user" type="text" name="USER" />
+            <button id="authorizedTrade_btn_import" class="btn btn-primary btn-block" type="button"><span style="font-size:small">导入交易</span></button>
+        }
     </div>
 </div>

@@ -96,7 +96,7 @@
             this.tbuserName.Name = "tbuserName";
             this.tbuserName.Size = new System.Drawing.Size(118, 21);
             this.tbuserName.TabIndex = 3;
-            this.tbuserName.Text = "TD1379799005";
+            this.tbuserName.Text = "TD1089824001";
             // 
             // label6
             // 
@@ -114,7 +114,7 @@
             this.tbpassword.PasswordChar = '*';
             this.tbpassword.Size = new System.Drawing.Size(100, 21);
             this.tbpassword.TabIndex = 3;
-            this.tbpassword.Text = "73166101";
+            this.tbpassword.Text = "60891665";
             // 
             // rtbSubscribe
             // 

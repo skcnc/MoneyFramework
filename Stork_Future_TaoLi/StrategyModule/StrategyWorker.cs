@@ -626,7 +626,7 @@ namespace Stork_Future_TaoLi.StrategyModule
                     }
 
 
-                    _reached = true; //测试使用，注意删除
+                  //  _reached = true; //测试使用，注意删除
 
                     // 生成交易列表
                     if (_reached)

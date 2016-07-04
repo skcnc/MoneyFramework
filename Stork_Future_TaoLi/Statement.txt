@@ -15,6 +15,10 @@ Name	: 行情延时日志
 LogId	: 60010
 About	: 记录分钟级行情接收入口延时信息
 
+Name	: 行情自动删除日志
+LogId	: 60011
+About	: 记录超量日志删除
+
 Name	: 测试List发送模块
 LogId	: 62300
 About	: 模拟生成交易日志

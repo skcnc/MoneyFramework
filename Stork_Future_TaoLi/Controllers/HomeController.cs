@@ -547,6 +547,62 @@ namespace Stork_Future_TaoLi.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult openeditA(HttpPostedFileBase file, String USER)
+        {
+            if(file != null && file.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(file.FileName);
+                using (var binaryReader = new BinaryReader(file.InputStream))
+                {
+                    byte[] array = binaryReader.ReadBytes(file.ContentLength);
+                    var str = Encoding.Default.GetString(array);
+
+                    if (!str.Contains('\n'))
+                    {
+                        return View(); 
+                    }
+
+                    if (USER_TEMP_VARIABLES.Instance.WeightFileInfo.ContainsKey(USER.Trim()))
+                    {
+                        USER_TEMP_VARIABLES.Instance.WeightFileInfo.Remove(USER.Trim());
+                    }
+
+                    USER_TEMP_VARIABLES.Instance.WeightFileInfo.Add(USER.Trim(), str);
+                }
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult openeditB(HttpPostedFileBase file, String USER)
+        {
+            if (file != null && file.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(file.FileName);
+                using (var binaryReader = new BinaryReader(file.InputStream))
+                {
+                    byte[] array = binaryReader.ReadBytes(file.ContentLength);
+                    var str = Encoding.Default.GetString(array);
+
+                    if (!str.Contains('\n'))
+                    {
+                        return View();
+                    }
+
+                    if (USER_TEMP_VARIABLES.Instance.WeightFileInfo.ContainsKey(USER.Trim()))
+                    {
+                        USER_TEMP_VARIABLES.Instance.WeightFileInfo.Remove(USER.Trim());
+                    }
+
+                    USER_TEMP_VARIABLES.Instance.WeightFileInfo.Add(USER.Trim(), str);
+                }
+            }
+
+            return View();
+        }
+
         public void downloadAuthorizedFile(String USER)
         {
             try
@@ -653,5 +709,15 @@ namespace Stork_Future_TaoLi.Controllers
         {
             return View();
         }
+    }
+
+    public class USER_TEMP_VARIABLES
+    {
+        public static USER_TEMP_VARIABLES Instance = new USER_TEMP_VARIABLES();
+
+        /// <summary>
+        /// 权重文件信息
+        /// </summary>
+        public Dictionary<String, String> WeightFileInfo = new Dictionary<string, string>();
     }
 }

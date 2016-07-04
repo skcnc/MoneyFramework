@@ -94,6 +94,18 @@
                 else result = "异常";
                 $('.thread_status').append(str.replace('$name', "行情线程").replace('$result', result));
 
+                if (obj.MarketSystemStatus2 == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "行情线程2").replace('$result', result));
+
+                if (obj.MarketSystemStatus3 == true) {
+                    result = "正常";
+                }
+                else result = "异常";
+                $('.thread_status').append(str.replace('$name', "行情线程3").replace('$result', result));
+
                 if (obj.HeartBeatSystemStatus == true) {
                     result = "正常";
                 }

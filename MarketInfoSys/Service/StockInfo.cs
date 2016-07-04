@@ -29,6 +29,9 @@ namespace MarketInfoSys
                 {
                     EnQueueType OBJ = (EnQueueType)Queue_Data.GetQueue().Dequeue();
 
+                    if (OBJ == null)
+                        return null;
+
                     if (OBJ.Type == "S") { return new MarketData((TDFMarketData)(OBJ.value)); }
                     else if (OBJ.Type == "I") { return new MarketData((TDFIndexData)(OBJ.value)); }
                     else if (OBJ.Type == "F") { return new MarketData((TDFFutureData)(OBJ.value)); }

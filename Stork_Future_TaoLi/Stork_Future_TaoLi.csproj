@@ -1010,6 +1010,8 @@
     <Content Include="Views\Home\BatchTrade.cshtml" />
     <Content Include="Views\Home\AuthorizedTrade.cshtml" />
     <Content Include="Views\Home\AuthorizedTradeB.cshtml" />
+    <Content Include="Views\Home\openeditA.cshtml" />
+    <Content Include="Views\Home\openeditB.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

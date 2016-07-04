@@ -162,7 +162,7 @@ namespace MarketInfoSys
         private static string _indexCode = string.Empty;
         private static uint _indexPrice = 4000;
 
-        public static int SimMarketPerSecond = 10;
+        public static int SimMarketPerSecond = 400;
         public static string SimMarketCode = "600000;s;16.39|601288;s;3.94|600015;s;10.56|600016;s;8.60|600001;s;4.2";
        
 
@@ -217,7 +217,7 @@ namespace MarketInfoSys
             
 
             TDFMarketData data = new TDFMarketData()
-            {
+            { 
                 AskPrice = new uint[5] { price - 100, price - 200, price, price + 100, price + 200 },
                 AskVol = new uint[5] { 100, 100, 100, 100, 100 },
                 BidPrice = new uint[5] { price - 100, price - 200, price, price + 100, price + 200 },

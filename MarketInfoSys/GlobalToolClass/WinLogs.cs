@@ -86,6 +86,36 @@ namespace MarketInfoSys
 
     }
 
+    class GlobalMarketLog
+    {
+        //private static LogWirter errLog = new LogWirter();
+
+        GlobalMarketLog()
+        {
+            errLog.EventSourceName = "行情自动删除日志";
+            errLog.EventLogType = System.Diagnostics.EventLogEntryType.Error;
+            errLog.EventLogID = 60011;
+        }
+
+        private static LogWirter errLog = new LogWirter();
+
+        public static LogWirter LogInstance
+        {
+            get
+            {
+                if (errLog == null)
+                    errLog = new LogWirter();
+
+                errLog.EventSourceName = "行情自动删除日志";
+                errLog.EventLogType = System.Diagnostics.EventLogEntryType.Error;
+                errLog.EventLogID = 60011;
+
+                return errLog;
+            }
+        }
+
+    }
+
     class RunningTime
     {
         private static DateTime _lastTime = new DateTime();

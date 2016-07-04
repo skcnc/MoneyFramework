@@ -9,6 +9,7 @@ using Stork_Future_TaoLi.Queues;
 using Stork_Future_TaoLi.Modulars;
 using MCStockLib;
 using Stork_Future_TaoLi;
+using Newtonsoft.Json;
 
 namespace Stork_Future_TaoLi.TradeModule
 {
@@ -153,14 +154,9 @@ namespace Stork_Future_TaoLi.TradeModule
                             {
                                 //判断空闲的线程
                                 //利用随机选择，保证线程的平均使用
-                                ChoosePackage package = new ChoosePackage()
-                                {
-                                    threadCount = stockNum,
-                                    tradeGroup = tradeGroup
-                                };
-                                ThreadPool.QueueUserWorkItem(new WaitCallback(ChooseThread), (object)package);
-                                logword += " 发送交易： " + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString() + "\r\n";
-                                
+                                String para = JsonConvert.SerializeObject(tradeGroup);
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(ChooseThread), (object)para);
+                                logword += " 发送交易： " + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString() + "\r\n";        
                                 tradeGroup.Clear();
                             }
                         }
@@ -169,12 +165,8 @@ namespace Stork_Future_TaoLi.TradeModule
                     {
                         //判断空闲的线程
                         //利用随机选择，保证线程的平均使用
-                        ChoosePackage package = new ChoosePackage()
-                        {
-                            threadCount = stockNum,
-                            tradeGroup = tradeGroup
-                        };
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(ChooseThread), (object)package);
+                        String para = JsonConvert.SerializeObject(tradeGroup);
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(ChooseThread), (object)para);
                         logword += " 发送交易： " + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString() + "\r\n";
                         tradeGroup.Clear();
                     }
@@ -353,7 +345,7 @@ namespace Stork_Future_TaoLi.TradeModule
 
                         string user = trades[0].cUser;
 
-                        GlobalTestLog.LogInstance.LogEvent("线程 ：" + _threadNo.ToString() +  " 发送交易： " + tradeuuid.ToString() + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
+                        //GlobalTestLog.LogInstance.LogEvent("线程 ：" + _threadNo.ToString() +  " 发送交易： " + tradeuuid.ToString() + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
                         
                         if (DebugMark == true)
                         {
@@ -365,7 +357,7 @@ namespace Stork_Future_TaoLi.TradeModule
                             entrustUnit = _classTradeStock.BatchTrade(tradesUnit, trades.Count, s);
                         }
 
-                        GlobalTestLog.LogInstance.LogEvent("线程 ：" + _threadNo.ToString() +  " 收到交易回报： " + tradeuuid.ToString() + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
+                        //GlobalTestLog.LogInstance.LogEvent("线程 ：" + _threadNo.ToString() +  " 收到交易回报： " + tradeuuid.ToString() + " 时间： " + DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") + " : " + DateTime.Now.Millisecond.ToString());
 
                         if (entrustUnit != null && entrustUnit.ToList().Count() > 0)
                         {
@@ -565,9 +557,9 @@ namespace Stork_Future_TaoLi.TradeModule
         private static void ChooseThread(object package)
         {
 
-            List<TradeOrderStruct> tradeGroup = ((ChoosePackage)package).tradeGroup;
+            List<TradeOrderStruct> tradeGroup = JsonConvert.DeserializeObject<List<TradeOrderStruct>>(package.ToString());
             if (tradeGroup == null) return;
-            int stockNum = ((ChoosePackage)package).threadCount;
+            int stockNum = 100;
             Random ran = new Random();
             //int stockNum = CONFIG.STOCK_TRADE_THREAD_NUM;
             int _tNo = ran.Next(0, stockNum);
@@ -599,11 +591,5 @@ namespace Stork_Future_TaoLi.TradeModule
     {
         //当前线程的编号
         public int _threadNo { get; set; }
-    }
-
-    public class ChoosePackage
-    {
-        public List<TradeOrderStruct> tradeGroup { get; set; }
-        public int threadCount { get; set; }
     }
 } 
